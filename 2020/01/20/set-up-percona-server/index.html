@@ -1,0 +1,1368 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>Percona MySQL 搭建 - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-01-20 19:45" pubdate>
+        2020年1月20日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      7.6k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      108
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">Percona MySQL 搭建</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <h2 id="一、版本信息"><a href="#一、版本信息" class="headerlink" title="一、版本信息"></a>一、版本信息</h2><p>目前采用 MySQL fork 版本 Percona Server 5.7.28，监控方面选择 Percona Monitoring and Management 2.1.0，对应监控 Client 版本为 2.1.0</p>
+<h2 id="二、Percona-Server-安装"><a href="#二、Percona-Server-安装" class="headerlink" title="二、Percona Server 安装"></a>二、Percona Server 安装</h2><p>为保证兼容以及稳定性，MySQL 宿主机系统选择 CentOS 7，Percona Server 安装方式为 rpm 包，安装后由 Systemd 守护</p>
+<h3 id="2-1、下载安装包"><a href="#2-1、下载安装包" class="headerlink" title="2.1、下载安装包"></a>2.1、下载安装包</h3><p>安装包下载地址为 <a href="https://www.percona.com/downloads/Percona-Server-5.7/LATEST/" target="_blank" rel="noopener">https://www.percona.com/downloads/Percona-Server-5.7/LATEST/</a>，下载时选择 <code>Download All Packages Together</code>，下载后是所有组件全量的压缩 tar 包。</p>
+<h3 id="2-2、安装前准备"><a href="#2-2、安装前准备" class="headerlink" title="2.2、安装前准备"></a>2.2、安装前准备</h3><p>针对 CentOS 7 系统，安装前升级所有系统组件库，执行 <code>yum update</code> 既可；大部份 <strong>CentOS 7 安装后可能会附带 <code>mariadb-libs</code> 包，这个包会默认创建一些配置文件，导致后面的 Percona Server 无法覆盖它(例如 <code>/etc/my.cnf</code>)，所以安装 Percona Server 之前需要卸载它 <code>yum remove mariadb-libs</code></strong></p>
+<p>针对于数据存储硬盘，目前统一为 SSD 硬盘，挂载点为 <code>/data</code>，挂载方式可以采用 <code>fstab</code>、<code>systemd-mount</code>，分区格式目前采用 <code>xfs</code> 格式。</p>
+<p><strong>SSD 优化有待补充…</strong></p>
+<h3 id="2-3、安装-Percona-Server"><a href="#2-3、安装-Percona-Server" class="headerlink" title="2.3、安装 Percona Server"></a>2.3、安装 Percona Server</h3><p>Percona Server tar 包解压后会有 9 个 rpm 包，实际安装时只需要安装其中 4 个既可</p>
+<div class="hljs"><pre><code class="hljs sh">yum install Percona-Server-client-57-5.7.28-31.1.el7.x86_64.rpm Percona-Server-server-57-5.7.28-31.1.el7.x86_64.rpm Percona-Server-shared-57-5.7.28-31.1.el7.x86_64.rpm Percona-Server-shared-compat-57-5.7.28-31.1.el7.x86_64.rpm</code></pre></div>
+
+<h3 id="2-4、安装后调整"><a href="#2-4、安装后调整" class="headerlink" title="2.4、安装后调整"></a>2.4、安装后调整</h3><h4 id="2-4-1、硬盘调整"><a href="#2-4-1、硬盘调整" class="headerlink" title="2.4.1、硬盘调整"></a>2.4.1、硬盘调整</h4><p>目前 MySQL 数据会统一存放到 <code>/data</code> 目录下，所以需要将单独的数据盘挂载到 <code>/data</code> 目录；<strong>如果是 SSD 硬盘还需要调整系统 I/O 调度器等其他优化。</strong></p>
+<h4 id="2-4-2、目录预创建"><a href="#2-4-2、目录预创建" class="headerlink" title="2.4.2、目录预创建"></a>2.4.2、目录预创建</h4><p>Percona Server 安装完成后，由于配置调整原因，还会用到一些其他的数据目录，这些目录可以预先创建并授权</p>
+<div class="hljs"><pre><code class="hljs sh">mkdir -p /var/<span class="hljs-built_in">log</span>/mysql /data/mysql_tmp
+chown -R mysql:mysql /var/<span class="hljs-built_in">log</span>/mysql /data/mysql_tmp</code></pre></div>
+
+<p><code>/var/log/mysql</code> 目录用来存放 MySQL 相关的日志(不包括 binlog)，<code>/data/mysql_tmp</code> 用来存放 MySQL 运行时产生的缓存文件。</p>
+<h4 id="2-4-3、文件描述符调整"><a href="#2-4-3、文件描述符调整" class="headerlink" title="2.4.3、文件描述符调整"></a>2.4.3、文件描述符调整</h4><p>由于 rpm 安装的 Percona Server 会采用 Systemd 守护，所以如果想修改文件描述符配置应当调整 Systemd 配置文件</p>
+<div class="hljs"><pre><code class="hljs sh">vim /usr/lib/systemd/system/mysqld.service
+
+<span class="hljs-comment"># Sets open_files_limit</span>
+<span class="hljs-comment"># 注意 infinity = 65536</span>
+LimitCORE = infinity
+LimitNOFILE = infinity
+LimitNPROC = infinity</code></pre></div>
+
+<p>然后执行 <code>systemctl daemon-reload</code> 重载既可。</p>
+<h4 id="2-4-4、配置文件调整"><a href="#2-4-4、配置文件调整" class="headerlink" title="2.4.4、配置文件调整"></a>2.4.4、配置文件调整</h4><p>Percona Server 安装完成后也会生成 <code>/etc/my.cnf</code> 配置文件，不过不建议直接修改该文件；修改配置文件需要进入到 <code>/etc/percona-server.conf.d/</code> 目录调整相应配置；以下为配置样例(<strong>生产环境 mysqld 配置需要优化调整</strong>)</p>
+<p><strong>mysql.cnf</strong></p>
+<div class="hljs"><pre><code class="hljs ini"><span class="hljs-section">[mysql]</span>
+auto-rehash
+<span class="hljs-attr">default_character_set</span>=utf8mb4</code></pre></div>
+
+<p><strong>mysqld.cnf</strong></p>
+<div class="hljs"><pre><code class="hljs ini"><span class="hljs-comment"># Percona Server template configuration</span>
+
+<span class="hljs-section">[mysqld]</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Remove leading # and set to the amount of RAM for the most important data</span>
+<span class="hljs-comment"># cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.</span>
+<span class="hljs-comment"># innodb_buffer_pool_size = 128M</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Remove leading # to turn on a very important data integrity option: logging</span>
+<span class="hljs-comment"># changes to the binary log between backups.</span>
+<span class="hljs-comment"># log_bin</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Remove leading # to set options mainly useful for reporting servers.</span>
+<span class="hljs-comment"># The server defaults are faster for transactions and fast SELECTs.</span>
+<span class="hljs-comment"># Adjust sizes as needed, experiment to find the optimal values.</span>
+<span class="hljs-comment"># join_buffer_size = 128M</span>
+<span class="hljs-comment"># sort_buffer_size = 2M</span>
+<span class="hljs-comment"># read_rnd_buffer_size = 2M</span>
+<span class="hljs-attr">port</span>=<span class="hljs-number">3306</span>
+<span class="hljs-attr">datadir</span>=/data/mysql
+<span class="hljs-attr">socket</span>=/data/mysql/mysql.sock
+<span class="hljs-attr">pid_file</span>=/data/mysql/mysqld.pid
+
+<span class="hljs-comment"># 服务端编码</span>
+<span class="hljs-attr">character_set_server</span>=utf8mb4
+<span class="hljs-comment"># 服务端排序</span>
+<span class="hljs-attr">collation_server</span>=utf8mb4_general_ci
+<span class="hljs-comment"># 强制使用 utf8mb4 编码集，忽略客户端设置</span>
+<span class="hljs-attr">skip_character_set_client_handshake</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 日志输出到文件</span>
+<span class="hljs-attr">log_output</span>=FILE
+<span class="hljs-comment"># 开启常规日志输出</span>
+<span class="hljs-attr">general_log</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 常规日志输出文件位置</span>
+<span class="hljs-attr">general_log_file</span>=/var/log/mysql/mysqld.log
+<span class="hljs-comment"># 错误日志位置</span>
+<span class="hljs-attr">log_error</span>=/var/log/mysql/mysqld-error.log
+<span class="hljs-comment"># 记录慢查询</span>
+<span class="hljs-attr">slow_query_log</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 慢查询时间(大于 1s 被视为慢查询)</span>
+<span class="hljs-attr">long_query_time</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 慢查询日志文件位置</span>
+<span class="hljs-attr">slow_query_log_file</span>=/var/log/mysql/mysqld-slow.log
+<span class="hljs-comment"># 临时文件位置</span>
+<span class="hljs-attr">tmpdir</span>=/data/mysql_tmp
+<span class="hljs-comment"># 线程池缓存(refs https://my.oschina.net/realfighter/blog/363853)</span>
+<span class="hljs-attr">thread_cache_size</span>=<span class="hljs-number">30</span>
+<span class="hljs-comment"># The number of open tables for all threads.(refs https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_table_open_cache)</span>
+<span class="hljs-attr">table_open_cache</span>=<span class="hljs-number">16384</span>
+<span class="hljs-comment"># 文件描述符(此处修改不生效，请修改 systemd service 配置) </span>
+<span class="hljs-comment"># refs https://www.percona.com/blog/2017/10/12/open_files_limit-mystery/</span>
+<span class="hljs-comment"># refs https://www.cnblogs.com/wxxjianchi/p/10370419.html</span>
+<span class="hljs-comment">#open_files_limit=65535</span>
+<span class="hljs-comment"># 表定义缓存(5.7 以后自动调整)</span>
+<span class="hljs-comment"># refs https://dev.mysql.com/doc/refman/5.6/en/server-system-variables.html#sysvar_table_definition_cache</span>
+<span class="hljs-comment"># refs http://mysql.taobao.org/monthly/2015/08/10/</span>
+<span class="hljs-comment">#table_definition_cache=16384</span>
+<span class="hljs-attr">sort_buffer_size</span>=<span class="hljs-number">1</span>M
+<span class="hljs-attr">join_buffer_size</span>=<span class="hljs-number">1</span>M
+<span class="hljs-comment"># MyiSAM 引擎专用(内部临时磁盘表可能会用)</span>
+<span class="hljs-attr">read_buffer_size</span>=<span class="hljs-number">1</span>M
+<span class="hljs-attr">read_rnd_buffer_size</span>=<span class="hljs-number">1</span>M
+<span class="hljs-comment"># MyiSAM 引擎专用(内部临时磁盘表可能会用)</span>
+<span class="hljs-attr">key_buffer_size</span>=<span class="hljs-number">32</span>M
+<span class="hljs-comment"># MyiSAM 引擎专用(内部临时磁盘表可能会用)</span>
+<span class="hljs-attr">bulk_insert_buffer_size</span>=<span class="hljs-number">16</span>M
+<span class="hljs-comment"># myisam_sort_buffer_size 与 sort_buffer_size 区别请参考(https://stackoverflow.com/questions/7871027/myisam-sort-buffer-size-vs-sort-buffer-size)</span>
+<span class="hljs-attr">myisam_sort_buffer_size</span>=<span class="hljs-number">64</span>M
+<span class="hljs-comment"># 内部内存临时表大小</span>
+<span class="hljs-attr">tmp_table_size</span>=<span class="hljs-number">32</span>M
+<span class="hljs-comment"># 用户创建的 MEMORY 表最大大小(tmp_table_size 受此值影响)</span>
+<span class="hljs-attr">max_heap_table_size</span>=<span class="hljs-number">32</span>M
+<span class="hljs-comment"># 开启查询缓存</span>
+<span class="hljs-attr">query_cache_type</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 查询缓存大小</span>
+<span class="hljs-attr">query_cache_size</span>=<span class="hljs-number">32</span>M
+<span class="hljs-comment"># sql mode</span>
+<span class="hljs-attr">sql_mode</span>=<span class="hljs-string">'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'</span>
+
+<span class="hljs-comment">########### Network ###########</span>
+<span class="hljs-comment"># 最大连接数(该参数受到最大文件描述符影响，如果不生效请检查最大文件描述符设置)</span>
+<span class="hljs-comment"># refs https://stackoverflow.com/questions/39976756/the-max-connections-in-mysql-5-7</span>
+<span class="hljs-attr">max_connections</span>=<span class="hljs-number">1500</span>
+<span class="hljs-comment"># mysql 堆栈内暂存的链接数量</span>
+<span class="hljs-comment"># 当短时间内链接数量超过 max_connections 时，部分链接会存储在堆栈内，存储数量受此参数控制</span>
+<span class="hljs-attr">back_log</span>=<span class="hljs-number">256</span>
+<span class="hljs-comment"># 最大链接错误，针对于 client 主机，超过此数量的链接错误将会导致 mysql server 针对此主机执行锁定(禁止链接 ERROR 1129 )</span>
+<span class="hljs-comment"># 此错误计数仅在 mysql 链接握手失败才会计算，一般出现问题时都是网络故障</span>
+<span class="hljs-comment"># refs https://www.cnblogs.com/kerrycode/p/8405862.html</span>
+<span class="hljs-attr">max_connect_errors</span>=<span class="hljs-number">100000</span>
+<span class="hljs-comment"># mysql server 允许的最大数据包大小</span>
+<span class="hljs-attr">max_allowed_packet</span>=<span class="hljs-number">64</span>M
+<span class="hljs-comment"># 交互式客户端链接超时(30分钟自动断开)</span>
+<span class="hljs-attr">interactive_timeout</span>=<span class="hljs-number">1800</span>
+<span class="hljs-comment"># 非交互式链接超时时间(10分钟)</span>
+<span class="hljs-comment"># 如果客户端有连接池，则需要协商此参数(refs https://database.51cto.com/art/201909/603519.htm)</span>
+<span class="hljs-attr">wait_timeout</span>=<span class="hljs-number">600</span>
+<span class="hljs-comment"># 跳过外部文件系统锁定</span>
+<span class="hljs-comment"># If you run multiple servers that use the same database directory (not recommended), </span>
+<span class="hljs-comment"># each server must have external locking enabled.</span>
+<span class="hljs-comment"># refs https://dev.mysql.com/doc/refman/5.7/en/external-locking.html</span>
+<span class="hljs-attr">skip_external_locking</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 跳过链接的域名解析(开启此选项后 mysql 用户授权的 host 方式失效)</span>
+<span class="hljs-attr">skip_name_resolve</span>=<span class="hljs-number">0</span>
+<span class="hljs-comment"># 禁用主机名缓存，每次都会走 DNS</span>
+<span class="hljs-attr">host_cache_size</span>=<span class="hljs-number">0</span>
+
+<span class="hljs-comment">########### REPL ###########</span>
+<span class="hljs-comment"># 开启 binlog</span>
+<span class="hljs-attr">log_bin</span>=mysql-bin
+<span class="hljs-comment"># 作为从库时，同步信息依然写入 binlog，方便此从库再作为其他从库的主库</span>
+<span class="hljs-attr">log_slave_updates</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># server id，默认为 ipv4 地址去除第一段</span>
+<span class="hljs-comment"># eg: 172.16.10.11 =&gt; 161011</span>
+<span class="hljs-attr">server_id</span>=<span class="hljs-number">161011</span>
+<span class="hljs-comment"># 每次次事务 binlog 刷新到磁盘</span>
+<span class="hljs-comment"># refs http://liyangliang.me/posts/2014/03/innodb_flush_log_at_trx_commit-and-sync_binlog/</span>
+<span class="hljs-attr">sync_binlog</span>=<span class="hljs-number">100</span>
+<span class="hljs-comment"># binlog 格式(refs https://zhuanlan.zhihu.com/p/33504555)</span>
+<span class="hljs-attr">binlog_format</span>=row
+<span class="hljs-comment"># binlog 自动清理时间</span>
+<span class="hljs-attr">expire_logs_days</span>=<span class="hljs-number">10</span>
+<span class="hljs-comment"># 开启 relay-log，一般作为 slave 时开启</span>
+<span class="hljs-attr">relay_log</span>=mysql-replay
+<span class="hljs-comment"># 主从复制时跳过 test 库</span>
+<span class="hljs-attr">replicate_ignore_db</span>=test
+<span class="hljs-comment"># 每个 session binlog 缓存</span>
+<span class="hljs-attr">binlog_cache_size</span>=<span class="hljs-number">4</span>M
+<span class="hljs-comment"># binlog 滚动大小</span>
+<span class="hljs-attr">max_binlog_size</span>=<span class="hljs-number">1024</span>M
+<span class="hljs-comment"># GTID 相关(refs https://keithlan.github.io/2016/06/23/gtid/)</span>
+<span class="hljs-comment">#gtid_mode=1</span>
+<span class="hljs-comment">#enforce_gtid_consistency=1</span>
+
+<span class="hljs-comment">########### InnoDB ###########</span>
+<span class="hljs-comment"># 永久表默认存储引擎</span>
+<span class="hljs-attr">default_storage_engine</span>=InnoDB
+<span class="hljs-comment"># 系统表空间数据文件大小(初始化为 1G，并且自动增长)</span>
+<span class="hljs-attr">innodb_data_file_path</span>=ibdata1:<span class="hljs-number">1</span>G:autoextend
+<span class="hljs-comment"># InnoDB 缓存池大小</span>
+<span class="hljs-comment"># innodb_buffer_pool_size 必须等于 innodb_buffer_pool_chunk_size*innodb_buffer_pool_instances，或者是其整数倍</span>
+<span class="hljs-comment"># refs https://dev.mysql.com/doc/refman/5.7/en/innodb-buffer-pool-resize.html</span>
+<span class="hljs-comment"># refs https://zhuanlan.zhihu.com/p/60089484</span>
+<span class="hljs-attr">innodb_buffer_pool_size</span>=<span class="hljs-number">7680</span>M
+<span class="hljs-attr">innodb_buffer_pool_instances</span>=<span class="hljs-number">10</span>
+<span class="hljs-attr">innodb_buffer_pool_chunk_size</span>=<span class="hljs-number">128</span>M
+<span class="hljs-comment"># InnoDB 强制恢复(refs https://www.askmaclean.com/archives/mysql-innodb-innodb_force_recovery.html)</span>
+<span class="hljs-attr">innodb_force_recovery</span>=<span class="hljs-number">0</span>
+<span class="hljs-comment"># InnoDB buffer 预热(refs http://www.dbhelp.net/2017/01/12/mysql-innodb-buffer-pool-warmup.html)</span>
+<span class="hljs-attr">innodb_buffer_pool_dump_at_shutdown</span>=<span class="hljs-number">1</span>
+<span class="hljs-attr">innodb_buffer_pool_load_at_startup</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># InnoDB 日志组中的日志文件数</span>
+<span class="hljs-attr">innodb_log_files_in_group</span>=<span class="hljs-number">2</span>
+<span class="hljs-comment"># InnoDB redo 日志大小</span>
+<span class="hljs-comment"># refs https://www.percona.com/blog/2017/10/18/chose-mysql-innodb_log_file_size/</span>
+<span class="hljs-attr">innodb_log_file_size</span>=<span class="hljs-number">256</span>MB
+<span class="hljs-comment"># 缓存还未提交的事务的缓冲区大小</span>
+<span class="hljs-attr">innodb_log_buffer_size</span>=<span class="hljs-number">16</span>M
+<span class="hljs-comment"># InnoDB 在事务提交后的日志写入频率</span>
+<span class="hljs-comment"># refs http://liyangliang.me/posts/2014/03/innodb_flush_log_at_trx_commit-and-sync_binlog/</span>
+<span class="hljs-attr">innodb_flush_log_at_trx_commit</span>=<span class="hljs-number">2</span>
+<span class="hljs-comment"># InnoDB DML 操作行级锁等待时间</span>
+<span class="hljs-comment"># 超时返回 ERROR 1205 (HY000): Lock wait timeout exceeded; try restarting transaction</span>
+<span class="hljs-comment"># refs https://ningyu1.github.io/site/post/75-mysql-lock-wait-timeout-exceeded/</span>
+<span class="hljs-attr">innodb_lock_wait_timeout</span>=<span class="hljs-number">30</span>
+<span class="hljs-comment"># InnoDB 行级锁超时是否回滚整个事务，默认为 OFF 仅回滚上一条语句</span>
+<span class="hljs-comment"># 此时应用程序可以接受到错误后选择是否继续提交事务(并没有违反 ACID 原子性)</span>
+<span class="hljs-comment"># refs https://www.cnblogs.com/hustcat/archive/2012/11/18/2775487.html</span>
+<span class="hljs-comment">#innodb_rollback_on_timeout=ON</span>
+<span class="hljs-comment"># InnoDB 数据写入磁盘的方式，具体见博客文章</span>
+<span class="hljs-comment"># refs https://www.cnblogs.com/gomysql/p/3595806.html</span>
+<span class="hljs-attr">innodb_flush_method</span>=O_DIRECT
+<span class="hljs-comment"># InnoDB 缓冲池脏页刷新百分比</span>
+<span class="hljs-comment"># refs https://dbarobin.com/2015/08/29/mysql-optimization-under-ssd</span>
+<span class="hljs-attr">innodb_max_dirty_pages_pct</span>=<span class="hljs-number">50</span>
+<span class="hljs-comment"># InnoDB 每秒执行的写IO量</span>
+<span class="hljs-comment"># refs https://www.centos.bz/2016/11/mysql-performance-tuning-15-config-item/#10.INNODB_IO_CAPACITY,%20INNODB_IO_CAPACITY_MAX</span>
+<span class="hljs-attr">innodb_io_capacity</span>=<span class="hljs-number">500</span>
+<span class="hljs-attr">innodb_io_capacity_max</span>=<span class="hljs-number">1000</span>
+<span class="hljs-comment"># 请求并发 InnoDB 线程数</span>
+<span class="hljs-comment"># refs https://www.cnblogs.com/xinysu/p/6439715.html#_lab2_1_0</span>
+<span class="hljs-attr">innodb_thread_concurrency</span>=<span class="hljs-number">60</span>
+<span class="hljs-comment"># 再使用多个 InnoDB 表空间时，允许打开的最大 ".ibd" 文件个数，不设置默认 300，</span>
+<span class="hljs-comment"># 并且取与 table_open_cache 相比较大的一个，此选项独立于 open_files_limit</span>
+<span class="hljs-comment"># refs https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_open_files</span>
+<span class="hljs-attr">innodb_open_files</span>=<span class="hljs-number">65535</span>
+<span class="hljs-comment"># 每个 InnoDB 表都存储在独立的表空间(.ibd)中</span>
+<span class="hljs-attr">innodb_file_per_table</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 事务级别(可重复读，会出幻读)</span>
+<span class="hljs-attr">transaction_isolation</span>=REPEATABLE-READ
+<span class="hljs-comment"># 是否在搜索和索引扫描中使用间隙锁(gap locking)，不建议使用未来将删除</span>
+<span class="hljs-attr">innodb_locks_unsafe_for_binlog</span>=<span class="hljs-number">0</span>
+<span class="hljs-comment"># InnoDB 后台清理线程数，更大的值有助于 DML 执行性能，&gt;= 5.7.8 默认为 4</span>
+<span class="hljs-attr">innodb_purge_threads</span>=<span class="hljs-number">4</span></code></pre></div>
+
+<p><strong>mysqld_safe.cnf</strong></p>
+<div class="hljs"><pre><code class="hljs ini"><span class="hljs-comment">#</span>
+<span class="hljs-comment"># The Percona Server 5.7 configuration file.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># One can use all long options that the program supports.</span>
+<span class="hljs-comment"># Run program with --help to get a list of available options and with</span>
+<span class="hljs-comment"># --print-defaults to see which it would actually understand and use.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># For explanations see</span>
+<span class="hljs-comment"># http://dev.mysql.com/doc/mysql/en/server-system-variables.html</span>
+
+<span class="hljs-section">[mysqld_safe]</span>
+<span class="hljs-attr">pid-file</span> = /var/run/mysqld/mysqld.pid
+<span class="hljs-attr">socket</span>   = /var/run/mysqld/mysqld.sock
+<span class="hljs-attr">nice</span>     = <span class="hljs-number">0</span></code></pre></div>
+
+<p><strong>mysqldump.cnf</strong></p>
+<div class="hljs"><pre><code class="hljs ini"><span class="hljs-section">[mysqldump]</span>
+quick
+<span class="hljs-attr">default-character-set</span>=utf8mb4
+<span class="hljs-attr">max_allowed_packet</span>=<span class="hljs-number">256</span>M</code></pre></div>
+
+<h3 id="2-5、启动"><a href="#2-5、启动" class="headerlink" title="2.5、启动"></a>2.5、启动</h3><p>配置文件调整完成后启动既可</p>
+<div class="hljs"><pre><code class="hljs sh">systemctl start mysqld</code></pre></div>
+
+<p>启动完成后默认 root 密码会自动生成，通过 <code>grep &#39;temporary password&#39; /var/log/mysql/*</code> 查看默认密码；获得默认密码后可以通过 <code>mysqladmin -S /data/mysql/mysql.sock -u root -p password</code> 修改 root 密码。</p>
+<h2 id="三、Percona-Monitoring-and-Management"><a href="#三、Percona-Monitoring-and-Management" class="headerlink" title="三、Percona Monitoring and Management"></a>三、Percona Monitoring and Management</h2><p>数据库创建成功后需要增加 pmm 监控，后续将会通过监控信息来调优数据库，所以数据库监控必不可少。</p>
+<h3 id="3-1、安装前准备"><a href="#3-1、安装前准备" class="headerlink" title="3.1、安装前准备"></a>3.1、安装前准备</h3><p>pmm 监控需要使用特定用户来监控数据信息，所以需要预先为 pmm 创建用户</p>
+<div class="hljs"><pre><code class="hljs sql"><span class="hljs-keyword">USE</span> mysql;
+<span class="hljs-keyword">GRANT</span> <span class="hljs-keyword">ALL</span> <span class="hljs-keyword">PRIVILEGES</span> <span class="hljs-keyword">ON</span> *.* <span class="hljs-keyword">TO</span> <span class="hljs-string">'pmm'</span>@<span class="hljs-string">'%'</span> <span class="hljs-keyword">IDENTIFIED</span> <span class="hljs-keyword">BY</span> <span class="hljs-string">'pmm12345'</span> <span class="hljs-keyword">WITH</span> <span class="hljs-keyword">GRANT</span> <span class="hljs-keyword">OPTION</span>;
+<span class="hljs-keyword">FLUSH</span> <span class="hljs-keyword">PRIVILEGES</span>;</code></pre></div>
+
+<h3 id="3-2、安装-PMM-Server"><a href="#3-2、安装-PMM-Server" class="headerlink" title="3.2、安装 PMM Server"></a>3.2、安装 PMM Server</h3><p>pmm server 端推荐直接使用 docker 启动，以下为样例 docker compose</p>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">version:</span> <span class="hljs-string">'3.7'</span>
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">pmm:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">percona/pmm-server:2.1.0</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">pmm</span>
+    <span class="hljs-attr">restart:</span> <span class="hljs-string">always</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">data:/srv</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">"80:80"</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">"443:443"</span>
+<span class="hljs-attr">volumes:</span>
+  <span class="hljs-attr">data:</span></code></pre></div>
+
+<p><strong>如果想要自定义证书，请将证书复制到 volume 内的 nginx 目录下，自定义证书需要以下证书文件</strong></p>
+<div class="hljs"><pre><code class="hljs sh">pmmserver.node ➜ tree
+.
+├── ca-certs.pem
+├── certificate.conf  <span class="hljs-comment"># 此文件是 pmm 默认生成自签证书的配置文件，不需要关注</span>
+├── certificate.crt
+├── certificate.key
+└── dhparam.pem</code></pre></div>
+
+<p><strong>pmm server 启动后访问 <code>http(s)://IP_ADDRESS</code> 既可进入 granafa 面板，默认账户名和密码都是 <code>admin</code></strong></p>
+<h3 id="3-3、安装-PMM-Client"><a href="#3-3、安装-PMM-Client" class="headerlink" title="3.3、安装 PMM Client"></a>3.3、安装 PMM Client</h3><p>PMM Client 同样采用 rpm 安装，下载地址 <a href="https://www.percona.com/downloads/pmm2/" target="_blank" rel="noopener">https://www.percona.com/downloads/pmm2/</a>，当前采用最新的 2.1.0 版本；rpm 下载完成后直接 <code>yum install</code> 既可。</p>
+<p>rpm 安装完成后使用 <code>pmm-admin</code> 命令配置服务端地址，并添加当前 mysql 实例监控</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 配置服务端地址</span>
+pmm-admin config --server-url https://admin:admin@pmm.mysql.node 172.16.0.11 generic mysql
+<span class="hljs-comment"># 配置当前 mysql 实例</span>
+pmm-admin add mysql --username=pmm --password=pmm12345 mysql 172.16.0.11:3306</code></pre></div>
+
+<p>完成后稍等片刻既可在 pmm server 端的 granafa 中看到相关数据。</p>
+<h2 id="四、数据导入"><a href="#四、数据导入" class="headerlink" title="四、数据导入"></a>四、数据导入</h2><p>从原始数据库 dump 相关库，并导入到新数据库既可</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># dump</span>
+mysqldump -h 172.16.1.10 -u root -p --master-data=2 --routines --triggers --single_transaction --databases DATABASE_NAME &gt; dump.sql
+<span class="hljs-comment"># load</span>
+mysql -S /data/mysql/mysql.sock -u root -p &lt; dump.sql</code></pre></div>
+
+<p>数据导入后重建业务用户既可</p>
+<div class="hljs"><pre><code class="hljs sql"><span class="hljs-keyword">USE</span> mysql;
+<span class="hljs-keyword">GRANT</span> <span class="hljs-keyword">ALL</span> <span class="hljs-keyword">PRIVILEGES</span> <span class="hljs-keyword">ON</span> *.* <span class="hljs-keyword">TO</span> <span class="hljs-string">'test_user'</span>@<span class="hljs-string">'%'</span> <span class="hljs-keyword">IDENTIFIED</span> <span class="hljs-keyword">BY</span> <span class="hljs-string">'test_user'</span> <span class="hljs-keyword">WITH</span> <span class="hljs-keyword">GRANT</span> <span class="hljs-keyword">OPTION</span>;
+<span class="hljs-keyword">FLUSH</span> <span class="hljs-keyword">PRIVILEGES</span>;</code></pre></div>
+
+<h2 id="五、数据备份"><a href="#五、数据备份" class="headerlink" title="五、数据备份"></a>五、数据备份</h2><h3 id="5-1、安装-xtrabackup"><a href="#5-1、安装-xtrabackup" class="headerlink" title="5.1、安装 xtrabackup"></a>5.1、安装 xtrabackup</h3><p>目前数据备份采用 Perconra xtrabackup 工具，xtrabackup 可以实现高速、压缩带增量的备份；xtrabackup 安装同样采用 rpm 方式，下载地址为 <a href="https://www.percona.com/downloads/Percona-XtraBackup-2.4/LATEST/" target="_blank" rel="noopener">https://www.percona.com/downloads/Percona-XtraBackup-2.4/LATEST/</a>，下载完成后执行 <code>yum install</code> 既可</p>
+<h3 id="5-2、备份工具"><a href="#5-2、备份工具" class="headerlink" title="5.2、备份工具"></a>5.2、备份工具</h3><p>目前备份工具开源在 <a href="https://github.com/gozap/mybak" target="_blank" rel="noopener">GitHub</a> 上，每次全量备份会写入 <code>.full-backup</code> 文件，增量备份会写入 <code>.inc-backup</code> 文件</p>
+<h3 id="5-3、配置-systemd"><a href="#5-3、配置-systemd" class="headerlink" title="5.3、配置 systemd"></a>5.3、配置 systemd</h3><p>为了使备份自动运行，目前将定时任务配置到 systemd 中，由 systemd 调度并执行；以下为相关 systemd 配置文件</p>
+<p><strong>mysql-backup-full.service</strong></p>
+<div class="hljs"><pre><code class="hljs sh">[Unit]
+Description=mysql full backup
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=/usr/<span class="hljs-built_in">local</span>/bin/mybak --backup-dir /data/mysql_backup --prefix mysql full
+
+[Install]
+WantedBy=multi-user.target</code></pre></div>
+
+<p><strong>mysql-backup-inc.service</strong></p>
+<div class="hljs"><pre><code class="hljs sh">[Unit]
+Description=mysql incremental backup
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=/usr/<span class="hljs-built_in">local</span>/bin/mybak --backup-dir /data/mysql_backup --prefix mysql inc
+
+[Install]
+WantedBy=multi-user.target</code></pre></div>
+
+<p><strong>mysql-backup-compress.service</strong></p>
+<div class="hljs"><pre><code class="hljs sh">[Unit]
+Description=mysql backup compress
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=/usr/<span class="hljs-built_in">local</span>/bin/mybak --backup-dir /data/mysql_backup --prefix mysql compress --clean
+
+[Install]
+WantedBy=multi-user.target</code></pre></div>
+
+<p><strong>mysql-backup-full.timer</strong></p>
+<div class="hljs"><pre><code class="hljs sh">[Unit]
+Description=mysql weekly full backup
+<span class="hljs-comment"># 备份之前依赖相关目录的挂载</span>
+After=data.mount
+After=data-mysql_backup.mount
+
+[Timer]
+<span class="hljs-comment"># 目前每周日一个全量备份</span>
+OnCalendar=Sun *-*-* 3:00
+Persistent=<span class="hljs-literal">true</span>
+
+[Install]
+WantedBy=timers.target</code></pre></div>
+
+<p><strong>mysql-backup-inc.timer</strong></p>
+<div class="hljs"><pre><code class="hljs sh">[Unit]
+Description=mysql weekly full backup
+After=data.mount
+After=data-mysql_backup.mount
+
+[Timer]
+<span class="hljs-comment"># 每天三个增量备份</span>
+OnCalendar=*-*-* 9:00
+OnCalendar=*-*-* 13:00
+OnCalendar=*-*-* 18:00
+Persistent=<span class="hljs-literal">true</span>
+
+[Install]
+WantedBy=timers.target</code></pre></div>
+
+<p><strong>mysql-backup-compress.timer</strong></p>
+<div class="hljs"><pre><code class="hljs sh">[Unit]
+Description=mysql weekly backup compress
+<span class="hljs-comment"># 备份之前依赖相关目录的挂载</span>
+After=data.mount
+After=data-mysql_backup.mount
+
+[Timer]
+<span class="hljs-comment"># 目前每周日一个全量备份，自动压缩后同时完成清理</span>
+OnCalendar=Sun *-*-* 5:00
+Persistent=<span class="hljs-literal">true</span>
+
+[Install]
+WantedBy=timers.target</code></pre></div>
+
+<p>创建好相关文件后启动相关定时器既可</p>
+<div class="hljs"><pre><code class="hljs sh">cp *.timer *.service /lib/systemd/system
+systemctl daemon-reload
+systemctl start mysql-backup-full.timer mysql-backup-inc.timer mysql-backup-compress.timer
+systemctl <span class="hljs-built_in">enable</span> mysql-backup-full.timer mysql-backup-inc.timer mysql-backup-compress.timer</code></pre></div>
+
+<h2 id="六、数据恢复"><a href="#六、数据恢复" class="headerlink" title="六、数据恢复"></a>六、数据恢复</h2><h3 id="6-1、全量备份恢复"><a href="#6-1、全量备份恢复" class="headerlink" title="6.1、全量备份恢复"></a>6.1、全量备份恢复</h3><p>针对于全量备份，只需要按照官方文档的还原顺序进行还原既可</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 由于备份时进行了压缩，所以先解压备份文件</span>
+xtrabackup --decompress --parallel 4 --target-dir /data/mysql_backup/mysql-20191205230502
+<span class="hljs-comment"># 执行预处理</span>
+xtrabackup --prepare --target-dir /data/mysql_backup/mysql-20191205230502
+<span class="hljs-comment"># 执行恢复(恢复时自动根据 my.cnf 将数据覆盖到 data 数据目录)</span>
+xtrabackup --copy-back --target-dir /data/mysql_backup/mysql-20191205230502
+<span class="hljs-comment"># 修复数据目录权限</span>
+chown -R mysql:mysql /data/mysql
+<span class="hljs-comment"># 启动 mysql</span>
+systemctl start mysqld</code></pre></div>
+
+<h3 id="6-2、增量备份恢复"><a href="#6-2、增量备份恢复" class="headerlink" title="6.2、增量备份恢复"></a>6.2、增量备份恢复</h3><p>对于增量备份恢复，其与全量备份恢复的根本区别在于: <strong>对于非最后一个增量文件的预处理必须使用 <code>--apply-log-only</code> 选项防止运行回滚阶段的处理</strong></p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 对所有备份文件进行解压处理</span>
+<span class="hljs-keyword">for</span> dir <span class="hljs-keyword">in</span> `ls`; <span class="hljs-keyword">do</span> xtrabackup --decompress --parallel 4 --target-dir <span class="hljs-variable">$dir</span>; <span class="hljs-keyword">done</span>
+<span class="hljs-comment"># 对全量备份文件执行预处理(注意增加 --apply-log-only 选项)</span>
+xtrabackup --prepare --apply-log-only --target-dir /data/mysql_backup/mysql-20191205230502
+<span class="hljs-comment"># 对非最后一个增量备份执行预处理</span>
+xtrabackup --prepare --apply-log-only --target-dir /data/mysql_backup/mysql-20191205230502 --incremental-dir /data/mysql_backup/mysql-inc-20191206230802
+<span class="hljs-comment"># 对最后一个增量备份执行预处理(不需要 --apply-log-only)</span>
+xtrabackup --prepare --target-dir /data/mysql_backup/mysql-20191205230502 --incremental-dir /data/mysql_backup/mysql-inc-20191207031005
+<span class="hljs-comment"># 执行恢复(恢复时自动根据 my.cnf 将数据覆盖到 data 数据目录)</span>
+xtrabackup --copy-back --target-dir /data/mysql_backup/mysql-20191205230502
+<span class="hljs-comment"># 修复数据目录权限</span>
+chown -R mysql:mysql /data/mysql
+<span class="hljs-comment"># 启动 mysql</span>
+systemctl start mysqld</code></pre></div>
+
+<h3 id="6-3、创建-slave"><a href="#6-3、创建-slave" class="headerlink" title="6.3、创建 slave"></a>6.3、创建 slave</h3><p>针对 xtrabackup 备份的数据可以直接恢复成 slave 节点，具体步骤如下:</p>
+<p>首先将备份文件复制到目标机器，然后执行解压(默认备份工具采用 lz4 压缩)</p>
+<div class="hljs"><pre><code class="hljs sh">xtrabackup --decompress --target-dir=xxxxxx</code></pre></div>
+
+<p>解压完成后执行预处理操作(<strong>在执行预处理之前请确保 slave 机器上相关配置文件与 master 相同，并且处理好数据目录存放等</strong>)</p>
+<div class="hljs"><pre><code class="hljs sh">xtrabackup --user=root --password=xxxxxxx --prepare --target-dir=xxxx</code></pre></div>
+
+<p>预处理成功后便可执行恢复，以下命令将自动读取 <code>my.cnf</code> 配置，自动识别数据目录位置并将数据文件移动到该位置</p>
+<div class="hljs"><pre><code class="hljs sh">xtrabackup --move-back --target-dir=xxxxx</code></pre></div>
+
+<p>所由准备就绪后需要进行权限修复</p>
+<div class="hljs"><pre><code class="hljs sh">chown -R mysql:mysql MYSQL_DATA_DIR</code></pre></div>
+
+<p>最后在 mysql 内启动 slave 既可，slave 信息可通过从数据备份目录的 <code>xtrabackup_binlog_info</code> 中获取</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 获取备份 POS 信息</span>
+cat xxxxxx/xtrabackup_binlog_info
+
+<span class="hljs-comment"># 创建 slave 节点</span>
+CHANGE MASTER TO
+    MASTER_HOST=<span class="hljs-string">'192.168.2.48'</span>,
+    MASTER_USER=<span class="hljs-string">'repl'</span>,
+    MASTER_PASSWORD=<span class="hljs-string">'xxxxxxx'</span>,
+    MASTER_LOG_FILE=<span class="hljs-string">'mysql-bin.000005'</span>,
+    MASTER_LOG_POS=52500595;
+
+<span class="hljs-comment"># 启动 slave</span>
+start slave;
+show slave status \G;</code></pre></div>
+
+<h2 id="七、生产处理"><a href="#七、生产处理" class="headerlink" title="七、生产处理"></a>七、生产处理</h2><h3 id="7-1、数据目录"><a href="#7-1、数据目录" class="headerlink" title="7.1、数据目录"></a>7.1、数据目录</h3><p>目前生产环境数据目录位置调整到 <code>/home/mysql</code>，所以目录权限处理也要做对应调整</p>
+<div class="hljs"><pre><code class="hljs sh">mkdir -p /var/<span class="hljs-built_in">log</span>/mysql /home/mysql_tmp
+chown -R mysql:mysql /var/<span class="hljs-built_in">log</span>/mysql /home/mysql_tmp</code></pre></div>
+
+<h3 id="7-2、配置文件"><a href="#7-2、配置文件" class="headerlink" title="7.2、配置文件"></a>7.2、配置文件</h3><p>生产环境目前节点配置如下</p>
+<ul>
+<li>CPU: <code>Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz</code></li>
+<li>RAM: <code>128G</code></li>
+</ul>
+<p>所以配置文件也需要做相应的优化调整</p>
+<p><strong>mysql.cnf</strong></p>
+<div class="hljs"><pre><code class="hljs ini"><span class="hljs-section">[mysql]</span>
+auto-rehash
+<span class="hljs-attr">default_character_set</span>=utf8mb4</code></pre></div>
+
+<p><strong>mysqld.cnf</strong></p>
+<div class="hljs"><pre><code class="hljs ini"><span class="hljs-comment"># Percona Server template configuration</span>
+
+<span class="hljs-section">[mysqld]</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Remove leading # and set to the amount of RAM for the most important data</span>
+<span class="hljs-comment"># cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.</span>
+<span class="hljs-comment"># innodb_buffer_pool_size = 128M</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Remove leading # to turn on a very important data integrity option: logging</span>
+<span class="hljs-comment"># changes to the binary log between backups.</span>
+<span class="hljs-comment"># log_bin</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Remove leading # to set options mainly useful for reporting servers.</span>
+<span class="hljs-comment"># The server defaults are faster for transactions and fast SELECTs.</span>
+<span class="hljs-comment"># Adjust sizes as needed, experiment to find the optimal values.</span>
+<span class="hljs-comment"># join_buffer_size = 128M</span>
+<span class="hljs-comment"># sort_buffer_size = 2M</span>
+<span class="hljs-comment"># read_rnd_buffer_size = 2M</span>
+<span class="hljs-attr">port</span>=<span class="hljs-number">3306</span>
+<span class="hljs-attr">datadir</span>=/home/mysql/mysql
+<span class="hljs-attr">socket</span>=/home/mysql/mysql/mysql.sock
+<span class="hljs-attr">pid_file</span>=/home/mysql/mysql/mysqld.pid
+
+<span class="hljs-comment"># 服务端编码</span>
+<span class="hljs-attr">character_set_server</span>=utf8mb4
+<span class="hljs-comment"># 服务端排序</span>
+<span class="hljs-attr">collation_server</span>=utf8mb4_general_ci
+<span class="hljs-comment"># 强制使用 utf8mb4 编码集，忽略客户端设置</span>
+<span class="hljs-attr">skip_character_set_client_handshake</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 日志输出到文件</span>
+<span class="hljs-attr">log_output</span>=FILE
+<span class="hljs-comment"># 开启常规日志输出</span>
+<span class="hljs-attr">general_log</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 常规日志输出文件位置</span>
+<span class="hljs-attr">general_log_file</span>=/var/log/mysql/mysqld.log
+<span class="hljs-comment"># 错误日志位置</span>
+<span class="hljs-attr">log_error</span>=/var/log/mysql/mysqld-error.log
+<span class="hljs-comment"># 记录慢查询</span>
+<span class="hljs-attr">slow_query_log</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 慢查询时间(大于 1s 被视为慢查询)</span>
+<span class="hljs-attr">long_query_time</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 慢查询日志文件位置</span>
+<span class="hljs-attr">slow_query_log_file</span>=/var/log/mysql/mysqld-slow.log
+<span class="hljs-comment"># 临时文件位置</span>
+<span class="hljs-attr">tmpdir</span>=/home/mysql/mysql_tmp
+<span class="hljs-comment"># The number of open tables for all threads.(refs https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_table_open_cache)</span>
+<span class="hljs-attr">table_open_cache</span>=<span class="hljs-number">16384</span>
+<span class="hljs-comment"># 文件描述符(此处修改不生效，请修改 systemd service 配置) </span>
+<span class="hljs-comment"># refs https://www.percona.com/blog/2017/10/12/open_files_limit-mystery/</span>
+<span class="hljs-comment"># refs https://www.cnblogs.com/wxxjianchi/p/10370419.html</span>
+<span class="hljs-comment">#open_files_limit=65535</span>
+<span class="hljs-comment"># 表定义缓存(5.7 以后自动调整)</span>
+<span class="hljs-comment"># refs https://dev.mysql.com/doc/refman/5.6/en/server-system-variables.html#sysvar_table_definition_cache</span>
+<span class="hljs-comment"># refs http://mysql.taobao.org/monthly/2015/08/10/</span>
+<span class="hljs-comment">#table_definition_cache=16384</span>
+<span class="hljs-attr">sort_buffer_size</span>=<span class="hljs-number">1</span>M
+<span class="hljs-attr">join_buffer_size</span>=<span class="hljs-number">1</span>M
+<span class="hljs-comment"># MyiSAM 引擎专用(内部临时磁盘表可能会用)</span>
+<span class="hljs-attr">read_buffer_size</span>=<span class="hljs-number">1</span>M
+<span class="hljs-attr">read_rnd_buffer_size</span>=<span class="hljs-number">1</span>M
+<span class="hljs-comment"># MyiSAM 引擎专用(内部临时磁盘表可能会用)</span>
+<span class="hljs-attr">key_buffer_size</span>=<span class="hljs-number">32</span>M
+<span class="hljs-comment"># MyiSAM 引擎专用(内部临时磁盘表可能会用)</span>
+<span class="hljs-attr">bulk_insert_buffer_size</span>=<span class="hljs-number">16</span>M
+<span class="hljs-comment"># myisam_sort_buffer_size 与 sort_buffer_size 区别请参考(https://stackoverflow.com/questions/7871027/myisam-sort-buffer-size-vs-sort-buffer-size)</span>
+<span class="hljs-attr">myisam_sort_buffer_size</span>=<span class="hljs-number">64</span>M
+<span class="hljs-comment"># 内部内存临时表大小</span>
+<span class="hljs-attr">tmp_table_size</span>=<span class="hljs-number">32</span>M
+<span class="hljs-comment"># 用户创建的 MEMORY 表最大大小(tmp_table_size 受此值影响)</span>
+<span class="hljs-attr">max_heap_table_size</span>=<span class="hljs-number">32</span>M
+<span class="hljs-comment"># 开启查询缓存</span>
+<span class="hljs-attr">query_cache_type</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 查询缓存大小</span>
+<span class="hljs-attr">query_cache_size</span>=<span class="hljs-number">32</span>M
+<span class="hljs-comment"># sql mode</span>
+<span class="hljs-attr">sql_mode</span>=<span class="hljs-string">'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'</span>
+
+<span class="hljs-comment">########### Network ###########</span>
+<span class="hljs-comment"># 最大连接数(该参数受到最大文件描述符影响，如果不生效请检查最大文件描述符设置)</span>
+<span class="hljs-comment"># refs https://stackoverflow.com/questions/39976756/the-max-connections-in-mysql-5-7</span>
+<span class="hljs-attr">max_connections</span>=<span class="hljs-number">1500</span>
+<span class="hljs-comment"># mysql 堆栈内暂存的链接数量</span>
+<span class="hljs-comment"># 当短时间内链接数量超过 max_connections 时，部分链接会存储在堆栈内，存储数量受此参数控制</span>
+<span class="hljs-attr">back_log</span>=<span class="hljs-number">256</span>
+<span class="hljs-comment"># 最大链接错误，针对于 client 主机，超过此数量的链接错误将会导致 mysql server 针对此主机执行锁定(禁止链接 ERROR 1129 )</span>
+<span class="hljs-comment"># 此错误计数仅在 mysql 链接握手失败才会计算，一般出现问题时都是网络故障</span>
+<span class="hljs-comment"># refs https://www.cnblogs.com/kerrycode/p/8405862.html</span>
+<span class="hljs-attr">max_connect_errors</span>=<span class="hljs-number">100000</span>
+<span class="hljs-comment"># mysql server 允许的最大数据包大小</span>
+<span class="hljs-attr">max_allowed_packet</span>=<span class="hljs-number">64</span>M
+<span class="hljs-comment"># 交互式客户端链接超时(30分钟自动断开)</span>
+<span class="hljs-attr">interactive_timeout</span>=<span class="hljs-number">1800</span>
+<span class="hljs-comment"># 非交互式链接超时时间(10分钟)</span>
+<span class="hljs-comment"># 如果客户端有连接池，则需要协商此参数(refs https://database.51cto.com/art/201909/603519.htm)</span>
+<span class="hljs-attr">wait_timeout</span>=<span class="hljs-number">28800</span>
+<span class="hljs-comment"># 跳过外部文件系统锁定</span>
+<span class="hljs-comment"># If you run multiple servers that use the same database directory (not recommended), </span>
+<span class="hljs-comment"># each server must have external locking enabled.</span>
+<span class="hljs-comment"># refs https://dev.mysql.com/doc/refman/5.7/en/external-locking.html</span>
+<span class="hljs-attr">skip_external_locking</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 跳过链接的域名解析(开启此选项后 mysql 用户授权的 host 方式失效)</span>
+<span class="hljs-attr">skip_name_resolve</span>=<span class="hljs-number">0</span>
+<span class="hljs-comment"># 禁用主机名缓存，每次都会走 DNS</span>
+<span class="hljs-attr">host_cache_size</span>=<span class="hljs-number">0</span>
+
+<span class="hljs-comment">########### REPL ###########</span>
+<span class="hljs-comment"># 开启 binlog</span>
+<span class="hljs-attr">log_bin</span>=mysql-bin
+<span class="hljs-comment"># 作为从库时，同步信息依然写入 binlog，方便此从库再作为其他从库的主库</span>
+<span class="hljs-attr">log_slave_updates</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># server id，默认为 ipv4 地址去除第一段</span>
+<span class="hljs-comment"># eg: 192.168.2.48 =&gt; 168248</span>
+<span class="hljs-attr">server_id</span>=<span class="hljs-number">168248</span>
+<span class="hljs-comment"># 每 n 次事务 binlog 刷新到磁盘</span>
+<span class="hljs-comment"># refs http://liyangliang.me/posts/2014/03/innodb_flush_log_at_trx_commit-and-sync_binlog/</span>
+<span class="hljs-attr">sync_binlog</span>=<span class="hljs-number">100</span>
+<span class="hljs-comment"># binlog 格式(refs https://zhuanlan.zhihu.com/p/33504555)</span>
+<span class="hljs-attr">binlog_format</span>=row
+<span class="hljs-comment"># binlog 自动清理时间</span>
+<span class="hljs-attr">expire_logs_days</span>=<span class="hljs-number">20</span>
+<span class="hljs-comment"># 开启 relay-log，一般作为 slave 时开启</span>
+<span class="hljs-attr">relay_log</span>=mysql-replay
+<span class="hljs-comment"># 主从复制时跳过 test 库</span>
+<span class="hljs-attr">replicate_ignore_db</span>=test
+<span class="hljs-comment"># 每个 session binlog 缓存</span>
+<span class="hljs-attr">binlog_cache_size</span>=<span class="hljs-number">4</span>M
+<span class="hljs-comment"># binlog 滚动大小</span>
+<span class="hljs-attr">max_binlog_size</span>=<span class="hljs-number">1024</span>M
+<span class="hljs-comment"># GTID 相关(refs https://keithlan.github.io/2016/06/23/gtid/)</span>
+<span class="hljs-comment">#gtid_mode=1</span>
+<span class="hljs-comment">#enforce_gtid_consistency=1</span>
+
+<span class="hljs-comment">########### InnoDB ###########</span>
+<span class="hljs-comment"># 永久表默认存储引擎</span>
+<span class="hljs-attr">default_storage_engine</span>=InnoDB
+<span class="hljs-comment"># 系统表空间数据文件大小(初始化为 1G，并且自动增长)</span>
+<span class="hljs-attr">innodb_data_file_path</span>=ibdata1:<span class="hljs-number">1</span>G:autoextend
+<span class="hljs-comment"># InnoDB 缓存池大小(资源充足，为所欲为)</span>
+<span class="hljs-comment"># innodb_buffer_pool_size 必须等于 innodb_buffer_pool_chunk_size*innodb_buffer_pool_instances，或者是其整数倍</span>
+<span class="hljs-comment"># refs https://dev.mysql.com/doc/refman/5.7/en/innodb-buffer-pool-resize.html</span>
+<span class="hljs-comment"># refs https://zhuanlan.zhihu.com/p/60089484</span>
+<span class="hljs-attr">innodb_buffer_pool_size</span>=<span class="hljs-number">61440</span>M
+<span class="hljs-attr">innodb_buffer_pool_instances</span>=<span class="hljs-number">16</span>
+<span class="hljs-comment"># 默认 128M</span>
+<span class="hljs-attr">innodb_buffer_pool_chunk_size</span>=<span class="hljs-number">128</span>M
+<span class="hljs-comment"># InnoDB 强制恢复(refs https://www.askmaclean.com/archives/mysql-innodb-innodb_force_recovery.html)</span>
+<span class="hljs-attr">innodb_force_recovery</span>=<span class="hljs-number">0</span>
+<span class="hljs-comment"># InnoDB buffer 预热(refs http://www.dbhelp.net/2017/01/12/mysql-innodb-buffer-pool-warmup.html)</span>
+<span class="hljs-attr">innodb_buffer_pool_dump_at_shutdown</span>=<span class="hljs-number">1</span>
+<span class="hljs-attr">innodb_buffer_pool_load_at_startup</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># InnoDB 日志组中的日志文件数</span>
+<span class="hljs-attr">innodb_log_files_in_group</span>=<span class="hljs-number">2</span>
+<span class="hljs-comment"># InnoDB redo 日志大小</span>
+<span class="hljs-comment"># refs https://www.percona.com/blog/2017/10/18/chose-mysql-innodb_log_file_size/</span>
+<span class="hljs-attr">innodb_log_file_size</span>=<span class="hljs-number">256</span>MB
+<span class="hljs-comment"># 缓存还未提交的事务的缓冲区大小</span>
+<span class="hljs-attr">innodb_log_buffer_size</span>=<span class="hljs-number">16</span>M
+<span class="hljs-comment"># InnoDB 在事务提交后的日志写入频率</span>
+<span class="hljs-comment"># refs http://liyangliang.me/posts/2014/03/innodb_flush_log_at_trx_commit-and-sync_binlog/</span>
+<span class="hljs-attr">innodb_flush_log_at_trx_commit</span>=<span class="hljs-number">2</span>
+<span class="hljs-comment"># InnoDB DML 操作行级锁等待时间</span>
+<span class="hljs-comment"># 超时返回 ERROR 1205 (HY000): Lock wait timeout exceeded; try restarting transaction</span>
+<span class="hljs-comment"># refs https://ningyu1.github.io/site/post/75-mysql-lock-wait-timeout-exceeded/</span>
+<span class="hljs-attr">innodb_lock_wait_timeout</span>=<span class="hljs-number">30</span>
+<span class="hljs-comment"># InnoDB 行级锁超时是否回滚整个事务，默认为 OFF 仅回滚上一条语句</span>
+<span class="hljs-comment"># 此时应用程序可以接受到错误后选择是否继续提交事务(并没有违反 ACID 原子性)</span>
+<span class="hljs-comment"># refs https://www.cnblogs.com/hustcat/archive/2012/11/18/2775487.html</span>
+<span class="hljs-comment">#innodb_rollback_on_timeout=ON</span>
+<span class="hljs-comment"># InnoDB 数据写入磁盘的方式，具体见博客文章</span>
+<span class="hljs-comment"># refs https://www.cnblogs.com/gomysql/p/3595806.html</span>
+<span class="hljs-attr">innodb_flush_method</span>=O_DIRECT
+<span class="hljs-comment"># InnoDB 缓冲池脏页刷新百分比</span>
+<span class="hljs-comment"># refs https://dbarobin.com/2015/08/29/mysql-optimization-under-ssd</span>
+<span class="hljs-attr">innodb_max_dirty_pages_pct</span>=<span class="hljs-number">50</span>
+<span class="hljs-comment"># InnoDB 每秒执行的写IO量</span>
+<span class="hljs-comment"># refs https://www.centos.bz/2016/11/mysql-performance-tuning-15-config-item/#10.INNODB_IO_CAPACITY,%20INNODB_IO_CAPACITY_MAX</span>
+<span class="hljs-comment"># refs https://www.alibabacloud.com/blog/testing-io-performance-with-sysbench_594709</span>
+<span class="hljs-attr">innodb_io_capacity</span>=<span class="hljs-number">8000</span>
+<span class="hljs-attr">innodb_io_capacity_max</span>=<span class="hljs-number">16000</span>
+<span class="hljs-comment"># 请求并发 InnoDB 线程数</span>
+<span class="hljs-comment"># refs https://www.cnblogs.com/xinysu/p/6439715.html#_lab2_1_0</span>
+<span class="hljs-attr">innodb_thread_concurrency</span>=<span class="hljs-number">0</span>
+<span class="hljs-comment"># 再使用多个 InnoDB 表空间时，允许打开的最大 ".ibd" 文件个数，不设置默认 300，</span>
+<span class="hljs-comment"># 并且取与 table_open_cache 相比较大的一个，此选项独立于 open_files_limit</span>
+<span class="hljs-comment"># refs https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_open_files</span>
+<span class="hljs-attr">innodb_open_files</span>=<span class="hljs-number">65535</span>
+<span class="hljs-comment"># 每个 InnoDB 表都存储在独立的表空间(.ibd)中</span>
+<span class="hljs-attr">innodb_file_per_table</span>=<span class="hljs-number">1</span>
+<span class="hljs-comment"># 事务级别(可重复读，会出幻读)</span>
+<span class="hljs-attr">transaction_isolation</span>=REPEATABLE-READ
+<span class="hljs-comment"># 是否在搜索和索引扫描中使用间隙锁(gap locking)，不建议使用未来将删除</span>
+<span class="hljs-attr">innodb_locks_unsafe_for_binlog</span>=<span class="hljs-number">0</span>
+<span class="hljs-comment"># InnoDB 后台清理线程数，更大的值有助于 DML 执行性能，&gt;= 5.7.8 默认为 4</span>
+<span class="hljs-attr">innodb_purge_threads</span>=<span class="hljs-number">4</span></code></pre></div>
+
+<p><strong>mysqld_safe.cnf</strong></p>
+<div class="hljs"><pre><code class="hljs ini"><span class="hljs-comment">#</span>
+<span class="hljs-comment"># The Percona Server 5.7 configuration file.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># One can use all long options that the program supports.</span>
+<span class="hljs-comment"># Run program with --help to get a list of available options and with</span>
+<span class="hljs-comment"># --print-defaults to see which it would actually understand and use.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># For explanations see</span>
+<span class="hljs-comment"># http://dev.mysql.com/doc/mysql/en/server-system-variables.html</span>
+
+<span class="hljs-section">[mysqld_safe]</span>
+<span class="hljs-attr">pid-file</span> = /var/run/mysqld/mysqld.pid
+<span class="hljs-attr">socket</span>   = /var/run/mysqld/mysqld.sock
+<span class="hljs-attr">nice</span>     = <span class="hljs-number">0</span></code></pre></div>
+
+<p><strong>mysqldump.cnf</strong></p>
+<div class="hljs"><pre><code class="hljs ini"><span class="hljs-section">[mysqldump]</span>
+quick
+<span class="hljs-attr">default-character-set</span>=utf8mb4
+<span class="hljs-attr">max_allowed_packet</span>=<span class="hljs-number">256</span>M</code></pre></div>
+
+<h2 id="八、常用诊断"><a href="#八、常用诊断" class="headerlink" title="八、常用诊断"></a>八、常用诊断</h2><h3 id="8-1、动态配置-diff"><a href="#8-1、动态配置-diff" class="headerlink" title="8.1、动态配置 diff"></a>8.1、动态配置 diff</h3><p>mysql 默认允许在实例运行后使用 <code>set global VARIABLES=VALUE</code> 的方式动态调整一些配置，这可能导致在运行一段时间后(运维动态修改)实例运行配置和配置文件中配置不一致；所以<strong>建议定期 diff 运行时配置与配置文件配置差异，防制特殊情况下 mysql 重启后运行期配置丢失</strong></p>
+<div class="hljs"><pre><code class="hljs sh">pt-config-diff /etc/percona-server.conf.d/mysqld.cnf h=127.0.0.1 --user root --ask-pass --report-width 100
+Enter MySQL password:
+2 config differences
+Variable                  /etc/percona-server.conf.d/mysqld.cnf mysql47.test.com
+========================= ===================================== ==================
+innodb_max_dirty_pages... 50                                    50.000000
+skip_name_resolve         0                                     ON</code></pre></div>
+
+<h3 id="8-2、配置优化建议"><a href="#8-2、配置优化建议" class="headerlink" title="8.2、配置优化建议"></a>8.2、配置优化建议</h3><p>Percona Toolkit 提供了一个诊断工具，用于对 mysql 内的配置进行扫描并给出优化建议，在初始化时可以使用此工具评估 mysql 当前配置的具体情况</p>
+<div class="hljs"><pre><code class="hljs sh">pt-variable-advisor 127.0.0.1 --user root --ask-pass | grep -v <span class="hljs-string">'^$'</span>
+Enter password: 
+
+<span class="hljs-comment"># WARN delay_key_write: MyISAM index blocks are never flushed until necessary.</span>
+<span class="hljs-comment"># WARN innodb_flush_log_at_trx_commit-1: InnoDB is not configured in strictly ACID mode.</span>
+<span class="hljs-comment"># NOTE innodb_max_dirty_pages_pct: The innodb_max_dirty_pages_pct is lower than the default.</span>
+<span class="hljs-comment"># WARN max_connections: If the server ever really has more than a thousand threads running, then the system is likely to spend more time scheduling threads than really doing useful work.</span>
+<span class="hljs-comment"># NOTE read_buffer_size-1: The read_buffer_size variable should generally be left at its default unless an expert determines it is necessary to change it.</span>
+<span class="hljs-comment"># NOTE read_rnd_buffer_size-1: The read_rnd_buffer_size variable should generally be left at its default unless an expert determines it is necessary to change it.</span>
+<span class="hljs-comment"># NOTE sort_buffer_size-1: The sort_buffer_size variable should generally be left at its default unless an expert determines it is necessary to change it.</span>
+<span class="hljs-comment"># NOTE innodb_data_file_path: Auto-extending InnoDB files can consume a lot of disk space that is very difficult to reclaim later.</span>
+<span class="hljs-comment"># WARN myisam_recover_options: myisam_recover_options should be set to some value such as BACKUP,FORCE to ensure that table corruption is noticed.</span>
+<span class="hljs-comment"># WARN sync_binlog: Binary logging is enabled, but sync_binlog isn't configured so that every transaction is flushed to the binary log for durability.</span></code></pre></div>
+
+<h3 id="8-3、死锁诊断"><a href="#8-3、死锁诊断" class="headerlink" title="8.3、死锁诊断"></a>8.3、死锁诊断</h3><p>使用 pt-deadlock-logger 工具可以诊断当前的死锁状态，以下为对死锁检测的测试</p>
+<p>首先创建测试数据库和表</p>
+<div class="hljs"><pre><code class="hljs sql"><span class="hljs-comment"># 创建测试库</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">DATABASE</span> dbatest <span class="hljs-built_in">CHARACTER</span> <span class="hljs-keyword">SET</span> utf8mb4 <span class="hljs-keyword">COLLATE</span> utf8mb4_unicode_ci;
+<span class="hljs-comment"># 切换到测试库并建立测试表</span>
+<span class="hljs-keyword">USE</span> dbatest;
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-keyword">IF</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> <span class="hljs-keyword">test</span> (<span class="hljs-keyword">id</span> <span class="hljs-built_in">INT</span> AUTO_INCREMENT PRIMARY <span class="hljs-keyword">KEY</span>, <span class="hljs-keyword">value</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>), createtime <span class="hljs-built_in">TIMESTAMP</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CURRENT_TIMESTAMP</span>) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">INNODB</span>;</code></pre></div>
+
+<p>在一个其他终端上开启 pt-deadlock-logger 检测</p>
+<div class="hljs"><pre><code class="hljs sh">pt-deadlock-logger 127.0.0.1 --user root --ask-pass --tab</code></pre></div>
+
+<p>检测开启后进行死锁测试</p>
+<div class="hljs"><pre><code class="hljs sql"><span class="hljs-comment"># 插入两条测试数据</span>
+<span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> <span class="hljs-keyword">test</span>(<span class="hljs-keyword">value</span>) <span class="hljs-keyword">VALUES</span>(<span class="hljs-string">'test1'</span>);
+<span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> <span class="hljs-keyword">test</span>(<span class="hljs-keyword">value</span>) <span class="hljs-keyword">VALUES</span>(<span class="hljs-string">'test2'</span>);
+<span class="hljs-comment"># 在两个终端下进行交叉事务</span>
+
+<span class="hljs-comment"># 统一关闭自动提交</span>
+terminal_1 <span class="hljs-comment"># SET AUTOCOMMIT = 0;</span>
+terminal_2 <span class="hljs-comment"># SET AUTOCOMMIT = 0;</span>
+
+<span class="hljs-comment"># 交叉事务，终端 1 先更新第一条数据，终端 2 先更新第二条数据</span>
+terminal_1 <span class="hljs-comment"># BEGIN;</span>
+terminal_1 <span class="hljs-comment"># UPDATE test set value='x1' where id=1;</span>
+terminal_2 <span class="hljs-comment"># BEGIN;</span>
+terminal_2 <span class="hljs-comment"># UPDATE test set value='x2' where id=2;</span>
+
+<span class="hljs-comment"># 此后终端 1 再尝试更新第二条数据，终端 2 再尝试更新第一条数据；造成等待互向释放锁的死锁</span>
+terminal_1 <span class="hljs-comment"># UPDATE test set value='lock2' where id=2;</span>
+terminal_2 <span class="hljs-comment"># UPDATE test set value='lock1' where id=1;</span>
+
+<span class="hljs-comment"># 此时由于开启了 mysql innodb 的死锁自动检测机制，会导致终端 2 弹出错误</span>
+ERROR 1213 (40001): Deadlock found when trying to get <span class="hljs-keyword">lock</span>; try restarting transaction
+
+<span class="hljs-comment"># 同时 pt-deadlock-logger 有日志输出</span>
+server  ts      thread  txn_id  txn_time        user    hostname    ip      db      tbl     idx     lock_type       lock_mode       wait_hold       victim  query
+127.0.0.1       2019-12-24T14:57:10     87      0       52      root            127.0.0.1       dbatest test    PRIMARY RECORD  X       w       0       <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">test</span> <span class="hljs-keyword">set</span> <span class="hljs-keyword">value</span>=<span class="hljs-string">'lock2'</span> <span class="hljs-keyword">where</span> <span class="hljs-keyword">id</span>=<span class="hljs-number">2</span>
+<span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>       <span class="hljs-number">2019</span><span class="hljs-number">-12</span><span class="hljs-number">-24</span>T14:<span class="hljs-number">57</span>:<span class="hljs-number">10</span>     <span class="hljs-number">89</span>      <span class="hljs-number">0</span>       <span class="hljs-number">41</span>      root            <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>       dbatest <span class="hljs-keyword">test</span>    PRIMARY <span class="hljs-built_in">RECORD</span>  X       w       <span class="hljs-number">1</span>       <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">test</span> <span class="hljs-keyword">set</span> <span class="hljs-keyword">value</span>=<span class="hljs-string">'lock1'</span> <span class="hljs-keyword">where</span> <span class="hljs-keyword">id</span>=<span class="hljs-number">1</span></code></pre></div>
+
+<h3 id="8-4、查看-IO-详情"><a href="#8-4、查看-IO-详情" class="headerlink" title="8.4、查看 IO 详情"></a>8.4、查看 IO 详情</h3><p>不同于 <code>iostat</code>，<code>pt-diskstats</code> 提供了更加详细的 IO 详情统计，并且据有交互式处理，执行一下命令将会实时检测 IO 状态</p>
+<div class="hljs"><pre><code class="hljs sh">pt-diskstats --show-timestamps</code></pre></div>
+
+<p>其中几个关键值含义如下(更详细的请参考官方文档 <a href="https://www.percona.com/doc/percona-toolkit/LATEST/pt-diskstats.html#output" target="_blank" rel="noopener">https://www.percona.com/doc/percona-toolkit/LATEST/pt-diskstats.html#output</a>)</p>
+<ul>
+<li>rd_s: 每秒平均读取次数。这是发送到基础设备的 IO 请求数。通常，此数量少于应用程序发出的逻辑IO请求的数量。更多请求可能已排队到块设备，但是其中一些请求通常在发送到磁盘之前先进行合并。</li>
+<li>rd_avkb: 读取的平均大小，以千字节为单位。</li>
+<li>rd_mb_s: 每秒读取的平均兆字节数。</li>
+<li>rd_mrg: 在发送到物理设备之前在队列调度程序中合并在一起的读取请求的百分比。</li>
+<li>rd_rt: 读取操作的平均响应时间(以毫秒为单位)；这是端到端响应时间，包括在队列中花费的时间。这是发出 IO 请求的应用程序看到的响应时间，而不是块设备下的物理磁盘的响应时间。</li>
+<li>busy: 设备至少有一个请求 wall-clock 时间的比例；等同于 <code>iostat</code> 的 <code>％util</code>。</li>
+<li>in_prg: 正在进行的请求数。与读写并发是从可靠数字中生成的平均值不同，该数字是一个时样本，您可以看到它可能表示请求峰值，而不是真正的长期平均值。如果此数字很大，则从本质上讲意味着设备高负载运行。</li>
+<li>ios_s: 物理设备的平均吞吐量，以每秒 IO 操作(IOPS)为单位。此列显示基础设备正在处理的总 IOPS；它是 rd_s 和 wr_s 的总和。</li>
+<li>qtime: 平均排队时间；也就是说，请求在发送到物理设备之前在设备调度程序队列中花费的时间。</li>
+<li>stime: 平均服务时间；也就是说，请求完成在队列中的等待之后，物理设备处理请求的时间。</li>
+</ul>
+<h3 id="8-5、重复索引优化"><a href="#8-5、重复索引优化" class="headerlink" title="8.5、重复索引优化"></a>8.5、重复索引优化</h3><p>pt-duplicate-key-checker 工具提供了对数据库重复索引和外键的自动查找功能，工具使用如下</p>
+<div class="hljs"><pre><code class="hljs sh">pt-duplicate-key-checker 127.0.0.1 --user root --ask-pass
+Enter password:
+
+<span class="hljs-comment"># A software update is available:</span>
+<span class="hljs-comment"># ########################################################################</span>
+<span class="hljs-comment"># aaaaaa.aaaaaa_audit</span>
+<span class="hljs-comment"># ########################################################################</span>
+
+<span class="hljs-comment"># index_linkId is a duplicate of unique_linkId</span>
+<span class="hljs-comment"># Key definitions:</span>
+<span class="hljs-comment">#   KEY `index_linkId` (`link_id`)</span>
+<span class="hljs-comment">#   UNIQUE KEY `unique_linkId` (`link_id`),</span>
+<span class="hljs-comment"># Column types:</span>
+<span class="hljs-comment">#         `link_id` bigint(20) not null comment 'bdid'</span>
+<span class="hljs-comment"># To remove this duplicate index, execute:</span>
+ALTER TABLE `aaaaaa.aaaaaa_audit` DROP INDEX `index_linkId`;
+
+<span class="hljs-comment"># ########################################################################</span>
+<span class="hljs-comment"># Summary of indexes</span>
+<span class="hljs-comment"># ########################################################################</span>
+
+<span class="hljs-comment"># Size Duplicate Indexes   927420</span>
+<span class="hljs-comment"># Total Duplicate Indexes  3</span>
+<span class="hljs-comment"># Total Indexes            847</span></code></pre></div>
+
+<h3 id="8-6、表统计"><a href="#8-6、表统计" class="headerlink" title="8.6、表统计"></a>8.6、表统计</h3><p>pt-find 是一个很方便的表查找统计工具，默认的一些选项可以实现批量查找符合条件的表，甚至执行一些 SQL 处理命令</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 批量查找大于 5G 的表，并排序</span>
+pt-find --host 127.0.0.1 --user root --ask-pass --tablesize +5G | sort -rn
+Enter password: 
+
+`rss_service`.`test_feed_news`
+`db_log_history`.`test_mobile_click_201912`
+`db_log_history`.`test_mobile_click_201911`
+`db_log_history`.`test_mobile_click_201910`
+`test_dix`.`test_user_messages`
+`test_dix`.`test_user_link_history`
+`test_dix`.`test_mobile_click`
+`test_dix`.`test_message`
+`test_dix`.`test_link_votes`
+`test_dix`.`test_links_mobile_content`
+`test_dix`.`test_links`
+`test_dix`.`test_comment_votes`
+`test_dix`.`test_comments`</code></pre></div>
+
+<p>如果想要定制输出可以采用 <code>--printf</code> 选项</p>
+<div class="hljs"><pre><code class="hljs sh">pt-find --host 127.0.0.1 --user root --ask-pass --tablesize +5G --<span class="hljs-built_in">printf</span> <span class="hljs-string">"%T\t%D.%N\n"</span> | sort -rn
+Enter password: 
+
+13918404608     `test_dix`.`test_links_mobile_content`
+13735231488     `test_dix`.`test_comment_votes`
+12633227264     `test_dix`.`test_user_messages`
+12610174976     `test_dix`.`test_user_link_history`
+10506305536     `test_dix`.`test_links`
+9686745088      `test_dix`.`test_message`
+9603907584      `rss_service`.`test_feed_news`
+9004122112      `db_log_history`.`test_mobile_click_201910`
+8919007232      `test_dix`.`test_comments`
+8045707264      `db_log_history`.`test_mobile_click_201912`
+7855915008      `db_log_history`.`test_mobile_click_201911`
+6099566592      `test_dix`.`test_mobile_click`
+5892898816      `test_dix`.`test_link_votes`</code></pre></div>
+
+<p><strong>遗憾的是目前 <code>printf</code> 格式来源与 Perl 的 <code>sprintf</code> 函数，所以支持格式有限，不过简单的格式定制已经基本实现，复杂的建议通过 awk 处理</strong>；其他的可选参数具体参考官方文档 <a href="https://www.percona.com/doc/percona-toolkit/LATEST/pt-find.html" target="_blank" rel="noopener">https://www.percona.com/doc/percona-toolkit/LATEST/pt-find.html</a></p>
+<h3 id="8-7、其他命令"><a href="#8-7、其他命令" class="headerlink" title="8.7、其他命令"></a>8.7、其他命令</h3><p>迫于篇幅，其他更多的高级命令请自行查阅官方文档 <a href="https://www.percona.com/doc/percona-toolkit/LATEST/index.html" target="_blank" rel="noopener">https://www.percona.com/doc/percona-toolkit/LATEST/index.html</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/linux/">Linux</a>
+                    
+                      <a class="hover-with-bg" href="/categories/database/">Database</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/linux/">Linux</a>
+                    
+                      <a class="hover-with-bg" href="/tags/mysql/">MySQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/percona/">Percona</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/01/21/how-to-modify-dns-on-ubuntu18-server/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">云服务器下 Ubuntu 18 正确的 DNS 修改</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/11/05/writing-plugin-for-coredns/">
+                        <span class="hidden-mobile">Writing Plugin for Coredns</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2020/01/20/set-up-percona-server/';
+        this.page.identifier = '/2020/01/20/set-up-percona-server/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Percona MySQL 搭建&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

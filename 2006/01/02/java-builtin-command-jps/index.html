@@ -1,0 +1,577 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>Java 内置命令-jps - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2006-01-02 15:04" pubdate>
+        2006年1月2日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      637 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      8
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">Java 内置命令-jps</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <h2 id="jps-命令"><a href="#jps-命令" class="headerlink" title="jps 命令"></a>jps 命令</h2><blockquote>
+<p>本文参考自 <a href="http://www.hollischuang.com/archives/105" target="_blank" rel="noopener">HollisChuang’s Blog</a></p>
+</blockquote>
+<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>jps 命令用于查看当前 java 进程及其 pid 等相关信息，同 <code>ps -aux | grep java</code> 这种命令不同的是，<strong>jps 并不依赖于应用程序名来搜索进程(比如 <code>grep java</code> )</strong>； 这使得它可以显示出没有执行体的 java 进程；<strong>该命令 1.5+ 可用</strong>。</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>在 Java 程序运行后，其会在 <code>java.io.tmpdir</code> 参数指定的位置生成一个 <code>hsperfdata_{UserName}</code> 的目录，该目录下会生成类似 Linux 程序运行时的二进制 pid 文件，jsp 命令实质上就是列出该目录下的所有文件；其相关信息通过解析该文件获取。在 Linux 系统下，这个目录位于 <code>/tmp/hsperfdata_{UserName}</code>，示例如下：</p>
+<p><img src="https://cdn.oss.link/markdown/hexo_jps_dir.png" srcset="/img/loading.gif" alt="hexo_jps_dir"></p>
+<h3 id="命令详解"><a href="#命令详解" class="headerlink" title="命令详解"></a>命令详解</h3><p>首先可以查看 jps 命令的帮助，获取相关信息，执行 <code>jps --help</code> 如下：</p>
+<p><img src="https://cdn.oss.link/markdown/hexo_jps_help.png" srcset="/img/loading.gif" alt="hexo_jps_help.png"></p>
+<h4 id="q-参数"><a href="#q-参数" class="headerlink" title="-q 参数"></a>-q 参数</h4><p><code>-q</code> 参数只显示pid，不显示class名称,jar文件名和传递给main 方法的参数</p>
+<div class="hljs"><pre><code class="hljs sh">[mritd@iZ257uxyg2vZ ~]$ jps -q
+17433
+15645
+[mritd@iZ257uxyg2vZ ~]$</code></pre></div>
+
+<h4 id="m-参数"><a href="#m-参数" class="headerlink" title="-m 参数"></a>-m 参数</h4><p><code>-m</code> 输出传递给 <code>main</code> 方法的参数，在嵌入式jvm上可能是null</p>
+<div class="hljs"><pre><code class="hljs sh">[mritd@iZ257uxyg2vZ ~]$ jps -m
+17478 Jps -m
+15645 Bootstrap start
+[mritd@iZ257uxyg2vZ ~]$</code></pre></div>
+
+<h4 id="l-参数"><a href="#l-参数" class="headerlink" title="-l 参数"></a>-l 参数</h4><p><code>-l</code> 参数输出应用程序main class的完整package名 或者 应用程序的jar文件完整路径名</p>
+<div class="hljs"><pre><code class="hljs sh">[mritd@iZ257uxyg2vZ ~]$ jps -l
+17498 sun.tools.jps.Jps
+15645 org.apache.catalina.startup.Bootstrap
+[mritd@iZ257uxyg2vZ ~]$</code></pre></div>
+
+<h4 id="v-参数"><a href="#v-参数" class="headerlink" title="-v 参数"></a>-v 参数</h4><p><code>-v</code> 参数输出传递给JVM的参数</p>
+<div class="hljs"><pre><code class="hljs sh">[mritd@iZ257uxyg2vZ ~]$ jps -v
+15645 Bootstrap -Djava.util.logging.config.file=/home/mritd/usr/<span class="hljs-built_in">local</span>/apache-tomcat-8.0.32/conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.endorsed.dirs=/home/mritd/usr/<span class="hljs-built_in">local</span>/apache-tomcat-8.0.32/endorsed -Dcatalina.base=/home/mritd/usr/<span class="hljs-built_in">local</span>/apache-tomcat-8.0.32 -Dcatalina.home=/home/mritd/usr/<span class="hljs-built_in">local</span>/apache-tomcat-8.0.32 -Djava.io.tmpdir=/home/mritd/usr/<span class="hljs-built_in">local</span>/apache-tomcat-8.0.32/temp
+17518 Jps -Dapplication.home=/home/mritd/usr/<span class="hljs-built_in">local</span>/jdk1.8.0_73 -Xms8m
+[mritd@iZ257uxyg2vZ ~]$</code></pre></div>
+
+<h4 id="V-参数"><a href="#V-参数" class="headerlink" title="-V 参数"></a>-V 参数</h4><p><code>-V</code> 参数输出通过标记的文件传递给JVM的参数( <code>.hotspotrc</code> 文件，或者是通过参数 <code>-XX:Flags=&lt;filename&gt;</code> 指定的文件)。</p>
+<div class="hljs"><pre><code class="hljs sh">[mritd@iZ257uxyg2vZ ~]$ jps -V
+17595 Jps
+15645 Bootstrap
+[mritd@iZ257uxyg2vZ ~]$</code></pre></div>
+
+<h3 id="hostid-详解"><a href="#hostid-详解" class="headerlink" title="hostid 详解"></a>hostid 详解</h3><p><code>hostid</code> 即 <strong>服务器标识</strong>，它指定了目标的服务器，它的语法如下：</p>
+<div class="hljs"><pre><code class="hljs sh">[protocol:][[//]hostname][:port][/servername]</code></pre></div>
+<ul>
+<li>protocol: 如果 <code>protocol</code>及 <code>hostname</code> 都没有指定，那表示的是与当前环境相关的本地协议，如果指定了 <code>hostname</code> 却没有指定 <code>protocol</code>，那么 <code>protocol</code> 的默认就是 <code>rmi</code>。</li>
+<li>hostname: 服务器的IP或者名称，没有指定则表示本机。</li>
+<li>port: 远程 <code>rmi</code> 的端口，如果没有指定则默认为 <code>1099</code>。</li>
+<li>Servername: 注册到 <code>RMI</code> 注册中心中的 <code>jstatd</code> 的名称。</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/java/">Java</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/java/">Java</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2006/01/02/how-to-use-nexus/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Nexus 私服使用教程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2006/01/02/java-exception/">
+                        <span class="hidden-mobile">JAVA 异常处理</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2006/01/02/java-builtin-command-jps/';
+        this.page.identifier = '/2006/01/02/java-builtin-command-jps/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Java 内置命令-jps&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,593 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>Logical Volume Manager 笔记 - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2017-01-27 10:05" pubdate>
+        2017年1月27日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      801 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      9
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">Logical Volume Manager 笔记</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <blockquote>
+<p>Logical Volume Manager 简称 LVM，LVM 是一种可用在Linux内核的逻辑分卷管理器；可用于管理磁盘驱动器或其他类似的大容量存储设备；LVM 依赖于 内核 device mapper 机制，可以实现动态伸缩逻辑卷大小，而屏蔽底层硬件变化，为后期磁盘扩展提供便利</p>
+</blockquote>
+<h3 id="一、LVM-简介"><a href="#一、LVM-简介" class="headerlink" title="一、LVM 简介"></a>一、LVM 简介</h3><p>LVM 技术依据底层内核的 device mapper 机制，聚合底层硬件存储设备存储空间，在上层抽象出可扩展的逻辑分区；LVM 主要术语(磁盘术语)如下</p>
+<ul>
+<li><code>PV</code> : 底层物理存储设备，如 <code>/dev/sda</code></li>
+<li><code>VG</code> : 卷组，意将多个 <code>PV</code> 组合后的抽象存储介质统称</li>
+<li><code>PE</code> : <code>VG</code> 将 <code>PV</code> 聚合后，需向上层提供存储能力，而 <code>PE</code> 即为 <code>VG</code> 中最小的存储单位，<strong>一般默认为 4MB</strong></li>
+<li><code>LV</code> : 在 <code>VG</code> 之上划分一定量的存储空间，形成逻辑分区，即为 <code>LV</code></li>
+<li><code>LE</code> : <code>LV</code> 从 <code>VG</code> 之上划分，即 <code>LV</code> 实质上有 <code>VG</code> 上最小存储单位 <code>PE</code> 构成；但是 <code>PE</code> 构成 <code>LV</code> 之后，又称作 <code>LE</code></li>
+</ul>
+<p><strong>以上各术语(定义)之间关系如下图所示</strong></p>
+<p><img src="https://cdn.oss.link/markdown/mbzrv.jpg" srcset="/img/loading.gif" alt="PV_VG_LV"></p>
+<h3 id="二、LVM-相关命令"><a href="#二、LVM-相关命令" class="headerlink" title="二、LVM 相关命令"></a>二、LVM 相关命令</h3><h4 id="2-1、PV-管理工具"><a href="#2-1、PV-管理工具" class="headerlink" title="2.1、PV 管理工具"></a>2.1、PV 管理工具</h4><ul>
+<li>pvs : 简要显示 pv 信息</li>
+<li>pvdisplay : 详细显示 pv 信息</li>
+<li>pvcreate : 创建 pv</li>
+<li>pvmove : 移动 pv (再删除 vg 前必须移动有数据的 pv)</li>
+<li>pvremove : 删除 pv</li>
+</ul>
+<h4 id="2-2、VG-管理命令"><a href="#2-2、VG-管理命令" class="headerlink" title="2.2、VG 管理命令"></a>2.2、VG 管理命令</h4><ul>
+<li>vgs : 简要显示 vg 信息</li>
+<li>vgdisplay : 详细显示 vg 信息</li>
+<li>vgcreate : 创建 vg</li>
+<li>vgrename : 重命名 vg</li>
+<li>vgremove : 删除 vg</li>
+<li>vgscan : 扫描 vg</li>
+<li>vgextend : 扩展 vg</li>
+<li>vgsplit : 切割 vg (将 vg 中 pv 移动到已存在 vg 中)</li>
+<li>vgreduce : 缩减 vg (删除 vg 内指定 pv)</li>
+</ul>
+<h4 id="2-3、LV-管理命令"><a href="#2-3、LV-管理命令" class="headerlink" title="2.3、LV 管理命令"></a>2.3、LV 管理命令</h4><ul>
+<li>lvs : 简要显示 lv 信息</li>
+<li>lvdisplay : 详细显示 lv 信息</li>
+<li>lvcreate : 创建逻辑卷</li>
+<li>lvextend : 扩展逻辑卷</li>
+<li>lvreduce : 缩减逻辑分区</li>
+<li>lvremove : 删除逻辑卷</li>
+</ul>
+<h5 id="2-3-1、lvcreate"><a href="#2-3-1、lvcreate" class="headerlink" title="2.3.1、lvcreate"></a>2.3.1、lvcreate</h5><p>lvcreate 用于从 vg 上创建 lv 逻辑分区，基本命令格式如下 :</p>
+<div class="hljs"><pre><code class="hljs sh">lvcreate -L <span class="hljs-comment">#[mMgGtT] -n NAME VolumeGroup</span></code></pre></div>
+
+<p>其常用选项如下 : </p>
+<ul>
+<li>-L | –size : 指定要创建的 lv 大小，采用 <code>+5G</code> 这种方式</li>
+<li>-l | –extents : 指定大小范围，类似于 fdisk 分区时选择盘区范围</li>
+<li>-s | –snapshot : 创建一个快照卷，创建快照卷时后面必须跟快照卷名称</li>
+<li>p : 权限(r、rw)</li>
+</ul>
+<h5 id="2-3-2、lvextend"><a href="#2-3-2、lvextend" class="headerlink" title="2.3.2、lvextend"></a>2.3.2、lvextend</h5><p>lvextend 支持在线扩展扩展逻辑分区大小，命令格式如下 : </p>
+<div class="hljs"><pre><code class="hljs sh">lvextend -L [+]<span class="hljs-comment">#[mMgGtT] /dev/VG_NAME/LV_NAME</span></code></pre></div>
+
+<p><strong>注意 -L 选项后 + 可以省略，但是省略后代表总容量，如当前 LV 2G，需扩展 3G，则不写 + 需要输入 5G</strong></p>
+<p><strong>lv 扩展后并不能立即体现在 df 等命令上，因为虽然逻辑卷已经扩展，但是文件系统尚未扩展，对于 ext 系列的文件系统可采用 <code>resize2fs /dev/VG_NAME/LV_NAME</code> 的方式刷新文件系统，其他分区格式需采用其他工具</strong></p>
+<h5 id="2-3-3、lvreduce"><a href="#2-3-3、lvreduce" class="headerlink" title="2.3.3、lvreduce"></a>2.3.3、lvreduce</h5><p><strong>在缩减 lv 时，必须先卸载文件系统，然后缩减文件系统，并且缩减文件系统后要强制做文件系统检测，以防止发生损坏，操作命令及顺序如下 :</strong></p>
+<ul>
+<li>umount /dev/VG_NAME/LV_NAME</li>
+<li>e2fsck -f /dev/VG_NAME/LV_NAME</li>
+<li>resize2fs /dev/VG_NAME/LV_NAME #[mMgGtT]</li>
+<li>lvreduce [-]#[mMgGtT] /dev/VG_NAME/LV_NAME</li>
+<li>mount /dev/VG_NAME/LV_NAME DIR</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/linux/">Linux</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/linux/">Linux</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2017/02/06/java-cas/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Java CAS 理解</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2017/01/21/use-frp-for-internal-network-wear/">
+                        <span class="hidden-mobile">利用 frp 进行内网穿透</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2017/01/27/logical-volume-manager-note/';
+        this.page.identifier = '/2017/01/27/logical-volume-manager-note/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Logical Volume Manager 笔记&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

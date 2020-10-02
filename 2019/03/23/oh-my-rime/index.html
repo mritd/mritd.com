@@ -1,0 +1,682 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>Mac 下调校 Rime - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-03-23 21:03" pubdate>
+        2019年3月23日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      24
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">Mac 下调校 Rime</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <blockquote>
+<p>由于对国内输入法隐私问题的担忧，决定放弃搜狗等输入法；为了更加 Geek 一些，最终决定了折腾 Rime(鼠须管) 输入法，以下为一些折腾的过程</p>
+</blockquote>
+<p><strong>国际惯例先放点图压压惊</strong></p>
+<p><img src="https://cdn.oss.link/markdown/t3otb.jpg" srcset="/img/loading.gif" alt="example1"><br><img src="https://cdn.oss.link/markdown/ep8sl.jpg" srcset="/img/loading.gif" alt="example2"><br><img src="https://cdn.oss.link/markdown/wth6n.jpg" srcset="/img/loading.gif" alt="example3"><br><img src="https://cdn.oss.link/markdown/5b85o.jpg" srcset="/img/loading.gif" alt="example4"></p>
+<h2 id="一、安装"><a href="#一、安装" class="headerlink" title="一、安装"></a>一、安装</h2><p>安装 Rime 没啥好说的，直接从<a href="https://rime.im" target="_blank" rel="noopener">官网</a>下载最新版本的安装包既可；安装完成后配置文件位于 <code>~/Library/Rime</code> 位置；在进行后续折腾之前我建议还是先 <code>cp -r ~/Library/Rime ~/Library/Rime.bak</code> 备份一下配置文件，以防制后续折腾挂了还可以还原；安装完成以后按 <code>⌘ + 反引号(~)</code> 切换到 <code>朙月拼音-简化字</code> 既可开启简体中文输入</p>
+<h2 id="二、乱码解决"><a href="#二、乱码解决" class="headerlink" title="二、乱码解决"></a>二、乱码解决</h2><p>安装完成后在打字时可能出现乱码情况(俗称豆腐块)，这是由于 Rime 默认 UTF-8 字符集比较大，预选词内会出现生僻字，而 mac 字体内又不包含这些字体，从而导致乱码；解决方案很简单，下载 <a href="https://github.com/mritd/rime/tree/master/fonts" target="_blank" rel="noopener">花园明朝</a> A、B 两款字体安装既可，安装后重启一下就不会出现乱码了</p>
+<p><img src="https://cdn.oss.link/markdown/yfbis.png" srcset="/img/loading.gif" alt="fonts"></p>
+<h2 id="三、配置文件"><a href="#三、配置文件" class="headerlink" title="三、配置文件"></a>三、配置文件</h2><p>官方并不建议直接修改原始的配置文件，因为输入法更新时会重新覆盖默认配置，可能导致某些自定义配置丢失；推荐作法是创建一系列的 patch 配置，通过类似打补丁替换这种方式来实现无感的增加自定义配置；</p>
+<p>由于使用的是 <code>朙月拼音-简化字</code> 输入方案，所以需要创建 <code>luna_pinyin_simp.custom.yaml</code> 等配置文件，后面就是查文档 + 各种 Google 一顿魔改了；目前我将我自己用的配置放在了 <a href="https://github.com/mritd/rime" target="_blank" rel="noopener">Github</a> 上，有需要的可以直接 clone 下来，用里面的配置文件直接覆盖 <code>~/Library/Rime</code> 下的文件，然后重新部署既可，关于具体配置细节在下面写</p>
+<h2 id="四、自定义配色"><a href="#四、自定义配色" class="headerlink" title="四、自定义配色"></a>四、自定义配色</h2><p>皮肤配色配置方案位于 <code>squirrel.custom.yaml</code> 配置文件中，我的配置目前是参考搜狗输入法皮肤自己调试的；官方也提供了一些皮肤外观配置，详见 <a href="https://gist.github.com/lotem/2290714" target="_blank" rel="noopener">Gist</a>；想要切换皮肤配色只需要修改 <code>style/color_scheme</code> 为相应的皮肤配色名称既可</p>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">patch:</span>
+  <span class="hljs-attr">show_notifications_when:</span> <span class="hljs-string">appropriate</span>          <span class="hljs-comment"># 状态通知，适当，也可设为全开（always）全关（never）</span>
+
+  <span class="hljs-attr">style/color_scheme:</span> <span class="hljs-string">mritd_dark</span>                <span class="hljs-comment"># 方案命名，不能有空格</span>
+  <span class="hljs-attr">preset_color_schemes:</span>
+    <span class="hljs-attr">mritd_dark:</span>
+      <span class="hljs-attr">name:</span> <span class="hljs-string">漠然／mritd</span> <span class="hljs-string">dark</span>
+      <span class="hljs-attr">author:</span> <span class="hljs-string">mritd</span> <span class="hljs-string">&lt;mritd1234@gmail.com&gt;</span>
+      <span class="hljs-attr">horizontal:</span> <span class="hljs-literal">true</span>                          <span class="hljs-comment"># 水平排列</span>
+      <span class="hljs-attr">inline_preedit:</span> <span class="hljs-literal">true</span>                      <span class="hljs-comment"># 单行显示，false双行显示</span>
+      <span class="hljs-attr">candidate_format:</span> <span class="hljs-string">"%c\u2005%@"</span>            <span class="hljs-comment"># 用 1/6 em 空格 U+2005 来控制编号 %c 和候选词 %@ 前后的空间。</span>
+      <span class="hljs-attr">corner_radius:</span> <span class="hljs-number">5</span>                          <span class="hljs-comment"># 候选条圆角</span>
+      <span class="hljs-attr">hilited_corner_radius:</span> <span class="hljs-number">3</span>                  <span class="hljs-comment"># 高亮圆角</span>
+      <span class="hljs-attr">border_height:</span> <span class="hljs-number">6</span>                          <span class="hljs-comment"># 窗口边界高度，大于圆角半径才生效</span>
+      <span class="hljs-attr">border_width:</span> <span class="hljs-number">6</span>                           <span class="hljs-comment"># 窗口边界宽度，大于圆角半径才生效</span>
+      <span class="hljs-attr">border_color_width:</span> <span class="hljs-number">0</span>
+      <span class="hljs-comment">#font_face: "PingFangSC"                   # 候选词字体</span>
+      <span class="hljs-attr">font_point:</span> <span class="hljs-number">16</span>                            <span class="hljs-comment"># 候选字词大小</span>
+      <span class="hljs-attr">label_font_point:</span> <span class="hljs-number">14</span>                      <span class="hljs-comment"># 候选编号大小</span>
+
+      <span class="hljs-attr">text_color:</span> <span class="hljs-number">0xdedddd</span>                      <span class="hljs-comment"># 拼音行文字颜色，24位色值，16进制，BGR顺序</span>
+      <span class="hljs-attr">back_color:</span> <span class="hljs-number">0x4b4b4b</span>                      <span class="hljs-comment"># 候选条背景色</span>
+      <span class="hljs-attr">label_color:</span> <span class="hljs-number">0x888785</span>                     <span class="hljs-comment"># 预选栏编号颜色</span>
+      <span class="hljs-attr">border_color:</span> <span class="hljs-number">0x4b4b4b</span>                    <span class="hljs-comment"># 边框色</span>
+      <span class="hljs-attr">candidate_text_color:</span> <span class="hljs-number">0xffffff</span>            <span class="hljs-comment"># 预选项文字颜色</span>
+      <span class="hljs-attr">hilited_text_color:</span> <span class="hljs-number">0xdedddd</span>              <span class="hljs-comment"># 高亮拼音 (需要开启内嵌编码)</span>
+      <span class="hljs-attr">hilited_back_color:</span> <span class="hljs-number">0x252320</span>              <span class="hljs-comment"># 高亮拼音 (需要开启内嵌编码)</span>
+      <span class="hljs-attr">hilited_candidate_text_color:</span> <span class="hljs-number">0xFFE696</span>    <span class="hljs-comment"># 第一候选项文字颜色</span>
+      <span class="hljs-attr">hilited_candidate_back_color:</span> <span class="hljs-number">0x4b4b4b</span>    <span class="hljs-comment"># 第一候选项背景背景色</span>
+      <span class="hljs-attr">hilited_candidate_label_color:</span> <span class="hljs-number">0xffffff</span>   <span class="hljs-comment"># 第一候选项编号颜色</span>
+      <span class="hljs-attr">comment_text_color:</span> <span class="hljs-number">0xdedddd</span>              <span class="hljs-comment"># 拼音等提示文字颜色</span></code></pre></div>
+
+<h2 id="五、增加自定义快捷字符"><a href="#五、增加自定义快捷字符" class="headerlink" title="五、增加自定义快捷字符"></a>五、增加自定义快捷字符</h2><p>快捷字符例如在中文输入法状态下可以直接输入 <code>/dn</code> 来调出特殊符号输入；这些配置位于 <code>luna_pinyin_simp.custom.yaml</code> 的 <code>punctuator</code> 配置中，我目前自行定义了一些，有需要的可以依葫芦画瓢直接修改</p>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">punctuator:</span>
+    <span class="hljs-attr">import_preset:</span> <span class="hljs-string">symbols</span>
+    <span class="hljs-attr">symbols:</span>
+      <span class="hljs-string">"/fs"</span><span class="hljs-string">:</span> <span class="hljs-string">[½,‰,¼,⅓,⅔,¾,⅒]</span>
+      <span class="hljs-string">"/dq"</span><span class="hljs-string">:</span> <span class="hljs-string">[🌍,🌎,🌏,🌐,🌑,🌒,🌓,🌔,🌕,🌖,🌗,🌘,🌙,🌚,🌛,🌜,🌝,🌞,⭐,🌟,🌠,⛅,⚡,❄,🔥,💧,🌊]</span>
+      <span class="hljs-string">"/jt"</span><span class="hljs-string">:</span> <span class="hljs-string">[⬆,↗,➡,↘,⬇,↙,⬅,↖,↕,↔,↩,↪,⤴,⤵,🔃,🔄,🔙,🔚,🔛,🔜,🔝]</span>
+      <span class="hljs-string">"/sg"</span><span class="hljs-string">:</span> <span class="hljs-string">[🍇,🍈,🍉,🍊,🍋,🍌,🍍,🍎,🍏,🍐,🍑,🍒,🍓,🍅,🍆,🌽,🍄,🌰,🍞,🍖,🍗,🍔,🍟,🍕,🍳,🍲,🍱,🍘,🍙,🍚,🍛,🍜,🍝,🍠,🍢,🍣,🍤,🍥,🍡,🍦,🍧,🍨,🍩,🍪,🎂,🍰,🍫,🍬,🍭,🍮,🍯,🍼,🍵,🍶,🍷,🍸,🍹,🍺,🍻,🍴]</span>
+      <span class="hljs-string">"/dw"</span><span class="hljs-string">:</span> <span class="hljs-string">[🙈,🙉,🙊,🐵,🐒,🐶,🐕,🐩,🐺,🐱,😺,😸,😹,😻,😼,😽,🙀,😿,😾,🐈,🐯,🐅,🐆,🐴,🐎,🐮,🐂,🐃,🐄,🐷,🐖,🐗,🐽,🐏,🐑,🐐,🐪,🐫,🐘,🐭,🐁,🐀,🐹,🐰,🐇,🐻,🐨,🐼,🐾,🐔,🐓,🐣,🐤,🐥,🐦,🐧,🐸,🐊,🐢,🐍,🐲,🐉,🐳,🐋,🐬,🐟,🐠,🐡,🐙,🐚,🐌,🐛,🐜,🐝,🐞,🦋]</span>
+      <span class="hljs-string">"/bq"</span><span class="hljs-string">:</span> <span class="hljs-string">[😀,😁,😂,😃,😄,😅,😆,😉,😊,😋,😎,😍,😘,😗,😙,😚,😇,😐,😑,😶,😏,😣,😥,😮,😯,😪,😫,😴,😌,😛,😜,😝,😒,😓,😔,😕,😲,😷,😖,😞,😟,😤,😢,😭,😦,😧,😨,😬,😰,😱,😳,😵,😡,😠]</span>
+      <span class="hljs-string">"/ss"</span><span class="hljs-string">:</span> <span class="hljs-string">[💪,👈,👉,👆,👇,✋,👌,👍,👎,✊,👊,👋,👏,👐]</span>
+      <span class="hljs-string">"/dn"</span><span class="hljs-string">:</span> <span class="hljs-string">[⌘,</span> <span class="hljs-string">⌥,</span> <span class="hljs-string">⇧,</span> <span class="hljs-string">⌃,</span> <span class="hljs-string">⎋,</span> <span class="hljs-string">⇪,</span> <span class="hljs-string">,</span> <span class="hljs-string">⌫,</span> <span class="hljs-string">⌦,</span> <span class="hljs-string">↩︎,</span> <span class="hljs-string">⏎,</span> <span class="hljs-string">↑,</span> <span class="hljs-string">↓,</span> <span class="hljs-string">←,</span> <span class="hljs-string">→,</span> <span class="hljs-string">↖,</span> <span class="hljs-string">↘,</span> <span class="hljs-string">⇟,</span> <span class="hljs-string">⇞]</span>
+      <span class="hljs-string">"/fh"</span><span class="hljs-string">:</span> <span class="hljs-string">[©,®,℗,ⓘ,℠,™,℡,␡,♂,♀,☉,☊,☋,☌,☍,☑︎,☒,☜,☝,☞,☟,✎,✄,♻,⚐,⚑,⚠]</span>
+      <span class="hljs-string">"/xh"</span><span class="hljs-string">:</span> <span class="hljs-string">[＊,×,✱,★,☆,✩,✧,❋,❊,❉,❈,❅,✿,✲]</span></code></pre></div>
+
+<h2 id="六、设置输入方案"><a href="#六、设置输入方案" class="headerlink" title="六、设置输入方案"></a>六、设置输入方案</h2><p>在第一次按 <code>⌘ + 反引号(~)</code> 设置输入法时实际上我们可以看到很多的输入方案，而事实上很多方案我们根本用不上；想要删除和修改方案可以调整 <code>default.custom.yaml</code> 中的 <code>schema_list</code> 字段</p>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">patch:</span>
+  <span class="hljs-attr">menu:</span>
+    <span class="hljs-attr">page_size:</span> <span class="hljs-number">8</span>
+  <span class="hljs-attr">schema_list:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">schema:</span> <span class="hljs-string">luna_pinyin_simp</span>      <span class="hljs-comment"># 朙月拼音 简化字</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">schema:</span> <span class="hljs-string">luna_pinyin</span>           <span class="hljs-comment"># 朙月拼音</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">schema:</span> <span class="hljs-string">luna_pinyin_fluency</span>   <span class="hljs-comment"># 语句流</span>
+<span class="hljs-comment">#  - schema: double_pinyin         # 自然碼雙拼</span>
+<span class="hljs-comment">#  - schema: double_pinyin_flypy   # 小鹤雙拼</span>
+<span class="hljs-comment">#  - schema: double_pinyin_pyjj    # 拼音加加双拼</span>
+<span class="hljs-comment">#  - schema: wubi_pinyin           # 五笔拼音混合輸入</span></code></pre></div>
+
+<p><strong>实际上我只能用上第一个…毕竟写了好几年代码还得看键盘的人也只能这样了…</strong></p>
+<h2 id="七、调整特殊键行为"><a href="#七、调整特殊键行为" class="headerlink" title="七、调整特殊键行为"></a>七、调整特殊键行为</h2><p>在刚安装完以后发现在中文输入法状态下输入英文，按 <code>shift</code> 键后字符上屏，然后还得回车一下，这就很让我难受…最后找到了这篇 <a href="https://gist.github.com/lotem/2981316" target="_blank" rel="noopener">Gist</a>，目前将大写锁定、<code>shift</code> 键调整为了跟搜狗一致的配置，有需要调整的可以自行编辑 <code>default.custom.yaml</code> 中的 <code>ascii_composer/switch_key</code> 部分</p>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-comment"># capslock 键切换英文并输出大写</span>
+<span class="hljs-attr">ascii_composer/good_old_caps_lock:</span> <span class="hljs-literal">true</span>
+<span class="hljs-comment"># 输入法中英文状态快捷键</span>
+<span class="hljs-attr">ascii_composer/switch_key:</span>
+  <span class="hljs-attr">Caps_Lock:</span> <span class="hljs-string">commit_code</span>
+  <span class="hljs-attr">Control_L:</span> <span class="hljs-string">noop</span>
+  <span class="hljs-attr">Control_R:</span> <span class="hljs-string">noop</span>
+  <span class="hljs-comment"># 按下左 shift 英文字符直接上屏，不需要再次回车，输入法保持英文状态</span>
+  <span class="hljs-attr">Shift_L:</span> <span class="hljs-string">commit_code</span>
+  <span class="hljs-attr">Shift_R:</span> <span class="hljs-string">noop</span></code></pre></div>
+
+<h2 id="八、自定义词库"><a href="#八、自定义词库" class="headerlink" title="八、自定义词库"></a>八、自定义词库</h2><p>Rime 默认的词库稍为有点弱，我们可以下载一些搜狗词库来进行扩展；不过搜狗词库格式默认是无法解析的，好在有人开发了工具可以方便的将搜狗细胞词库转化为 Rime 的格式(工具<a href="https://github.com/studyzy/imewlconverter/releases" target="_blank" rel="noopener">点击这里</a>下载)；目前该工具只支持 Windows(也有些别人写的 py 脚本啥的，但是我没用)，所以词库转换这种操作还得需要一个 Windows 虚拟机；</p>
+<p>转换过程很简单，先从<a href="https://pinyin.sogou.com/dict/" target="_blank" rel="noopener">搜狗词库</a>下载一系列的 <code>scel</code> 文件，然后批量选中，接着调整一下输入和输出格式点击转换，最后保存成一个 <code>txt</code> 文本</p>
+<p><img src="https://cdn.oss.link/markdown/jtv97.png" srcset="/img/loading.gif" alt="input-setting"></p>
+<p><img src="https://cdn.oss.link/markdown/p7qha.png" srcset="/img/loading.gif" alt="convert"></p>
+<p>光有这个文本还不够，我们要将它塞到词库的 <code>yaml</code> 配置里，所以新建一个词库配置文件 <code>luna_pinyin.sougou.dict.yaml</code>，然后写上头部说明(<strong>注意最后三个点后面加一个换行</strong>)</p>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-comment"># Rime dictionary</span>
+<span class="hljs-comment"># encoding: utf-8</span>
+<span class="hljs-comment"># 搜狗词库 目前包含如下:</span>
+<span class="hljs-comment"># IT计算机 实用IT词汇 亲戚称呼 化学品名 数字时间 数学词汇 淘宝词库 编程语言 软件专业 颜色名称 程序猿词库 开发专用词库 搜狗标准词库</span>
+<span class="hljs-comment"># 摄影专业名词 计算机专业词库 计算机词汇大全 保险词汇 最详细的全国地名大全 饮食大全 常见花卉名称 房地产词汇大全 中国传统节日大全 财经金融词汇大全</span>
+
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">luna_pinyin.sougou</span>
+<span class="hljs-attr">version:</span> <span class="hljs-string">"1.0"</span>
+<span class="hljs-attr">sort:</span> <span class="hljs-string">by_weight</span>
+<span class="hljs-attr">use_preset_vocabulary:</span> <span class="hljs-literal">true</span>
+<span class="hljs-string">...</span></code></pre></div>
+
+<p>接着只需要把生成好的词库 <code>txt</code> 文件内容粘贴到三个点下面既可；但是词库太多的话你会发现这个文本有好几十 M，一般编辑器打开都会卡死，解决这种情况只需要用命令行 <code>cat</code> 一下就行</p>
+<div class="hljs"><pre><code class="hljs sh">cat sougou.txt &gt;&gt; luna_pinyin.sougou.dict.yaml</code></pre></div>
+
+<p>最后修改 <code>luna_pinyin.extended.dict.yaml</code> 中的 <code>import_tables</code> 字段，加入刚刚新建的词库既可</p>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-meta">---</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">luna_pinyin.extended</span>
+<span class="hljs-attr">version:</span> <span class="hljs-string">"2016.06.26"</span>
+<span class="hljs-attr">sort:</span> <span class="hljs-string">by_weight</span>  <span class="hljs-comment">#字典初始排序，可選original或by_weight</span>
+<span class="hljs-attr">use_preset_vocabulary:</span> <span class="hljs-literal">true</span>
+<span class="hljs-comment">#此處爲明月拼音擴充詞庫（基本）默認鏈接載入的詞庫，有朙月拼音官方詞庫、明月拼音擴充詞庫（漢語大詞典）、明月拼音擴充詞庫（詩詞）、明月拼音擴充詞庫（含西文的詞彙）。如果不需要加載某个詞庫請將其用「#」註釋掉。</span>
+<span class="hljs-comment">#雙拼不支持 luna_pinyin.cn_en 詞庫，請用戶手動禁用。</span>
+
+<span class="hljs-attr">import_tables:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">luna_pinyin</span>
+  <span class="hljs-comment"># 加入搜狗词库</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">luna_pinyin.sougou</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">luna_pinyin.poetry</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">luna_pinyin.cn_en</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">luna_pinyin.kaomoji</span></code></pre></div>
+
+<h2 id="九、定制特殊单词"><a href="#九、定制特殊单词" class="headerlink" title="九、定制特殊单词"></a>九、定制特殊单词</h2><p>由于长期撸码，24 小时离不开命令行，偶尔在中文输入法下输入了一些命令导致汉字直接出现在 terminal 上就很尴尬…这时候我们可以在 <code>luna_pinyin.cn_en.dict.yaml</code> 加入一些我们自己的专属词库，比如这样</p>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-meta">---</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">luna_pinyin.cn_en</span>
+<span class="hljs-attr">version:</span> <span class="hljs-string">"2017.9.13"</span>
+<span class="hljs-attr">sort:</span> <span class="hljs-string">by_weight</span>
+<span class="hljs-attr">use_preset_vocabulary:</span> <span class="hljs-literal">true</span>
+<span class="hljs-string">...</span>
+
+<span class="hljs-string">git</span>	<span class="hljs-string">git</span>
+<span class="hljs-string">ls</span>	<span class="hljs-string">ls</span>
+<span class="hljs-string">cd</span>	<span class="hljs-string">cd</span>
+<span class="hljs-string">pwd</span>	<span class="hljs-string">pwd</span>
+<span class="hljs-string">git</span> <span class="hljs-string">ps</span>	<span class="hljs-string">gitps</span>
+<span class="hljs-string">kubernetes</span>	<span class="hljs-string">kubernetes</span>
+<span class="hljs-string">kubernetes</span>	<span class="hljs-string">kuber</span>
+<span class="hljs-string">kubectl</span>	<span class="hljs-string">kubectl</span>
+<span class="hljs-string">kubectl</span>	<span class="hljs-string">kubec</span>
+<span class="hljs-string">docker</span>	<span class="hljs-string">docker</span>
+<span class="hljs-string">docker</span>	<span class="hljs-string">dock</span>
+<span class="hljs-string">ipvs</span>	<span class="hljs-string">ipvs</span>
+<span class="hljs-string">ps</span>	<span class="hljs-string">ps</span>
+<span class="hljs-string">bash</span>	<span class="hljs-string">bash</span>
+<span class="hljs-string">source</span>	<span class="hljs-string">source</span>
+<span class="hljs-string">source</span>	<span class="hljs-string">sou</span>
+<span class="hljs-string">rm</span>	<span class="hljs-string">rm</span></code></pre></div>
+
+<p>配置后如果我在中文输入法下输入 git 则会自动匹配 git 这个单词，避免错误的键入中文字符；<strong>需要注意的是第一列代表上屏的字符，第二列代表输入的单词，即 “当输入第二列时候选词为第一列”；两列之间要用 tag 制表符隔开，记住不是空格</strong></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/mac/">Mac</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/mac/">Mac</a>
+                    
+                      <a class="hover-with-bg" href="/tags/rime/">Rime</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/05/13/dockerfile-extended-syntax/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Dockerfile 目前可扩展的语法</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/03/19/how-to-set-multiple-apt-mirrors-for-ubuntu/">
+                        <span class="hidden-mobile">Ubuntu 设置多个源</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2019/03/23/oh-my-rime/';
+        this.page.identifier = '/2019/03/23/oh-my-rime/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Mac 下调校 Rime&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

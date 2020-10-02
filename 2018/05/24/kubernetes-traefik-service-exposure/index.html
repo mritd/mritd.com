@@ -1,0 +1,997 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>Traefik 另类的服务暴露方式 - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2018-05-24 23:53" pubdate>
+        2018年5月24日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.5k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      38
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">Traefik 另类的服务暴露方式</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <blockquote>
+<p>最近准备重新折腾一下 Kubernetes 的服务暴露方式，以前的方式是彻底剥离 Kubenretes 本身的服务发现，然后改动应用实现 应用+Consul+Fabio 的服务暴露方式；总感觉这种方式不算优雅，所以折腾了一下 Traefik，试了下效果还不错，以下记录了使用 Traefik 的新的服务暴露方式(本文仅针对 HTTP 协议)；</p>
+</blockquote>
+<h2 id="一、Traefik-服务暴露方案"><a href="#一、Traefik-服务暴露方案" class="headerlink" title="一、Traefik 服务暴露方案"></a>一、Traefik 服务暴露方案</h2><h3 id="1-1、以前的-Consul-Fabio-方案"><a href="#1-1、以前的-Consul-Fabio-方案" class="headerlink" title="1.1、以前的 Consul+Fabio 方案"></a>1.1、以前的 Consul+Fabio 方案</h3><p>以前的服务暴露方案是修改应用代码，使其能对接 Consul，然后 Consul 负责健康监测，检测通过后 Fabio 负责读取，最终上层 Nginx 将流量打到 Fabio 上，Fabio 再将流量路由到健康的 Pod 上；总体架构如下</p>
+<p><img src="https://cdn.oss.link/markdown/hkwp3.png" srcset="/img/loading.gif" alt="consul+fabio"></p>
+<p>这种架构目前有几点不太好的地方，首先是必须应用能成功集成 Consul，需要动应用代码不通用；其次组件过多增加维护成本，尤其是调用链日志不好追踪；这里面需要吐槽下 Consul 和 Fabio，Consul 的集群设计模式要想做到完全的 HA 那么需要在每个 pod 中启动一个 agent，因为只要这个 agent 挂了那么集群认为其上所有注册服务都挂了，这点很恶心人；而 Fabio 的日志目前好像还是不支持合理的输出，好像只能 stdout；目前来看不论是组件复杂度还是维护成本都不怎么友好</p>
+<h3 id="1-2、新的-Traefik-方案"><a href="#1-2、新的-Traefik-方案" class="headerlink" title="1.2、新的 Traefik 方案"></a>1.2、新的 Traefik 方案</h3><p>使用 Traefik 首先想到就是直接怼 Ingress，这个确实方便也简单；但是在集群 kube-proxy 不走 ipvs 的情况下 iptables 性能确实堪忧；虽说 Traefik 会直连 Pod，但是你 Ingress 暴露 80、443 端口在本机没有对应 Ingress Controller 的情况下还是会走一下 iptables；<strong>不论是换 kube-router、kube-proxy 走 ipvs 都不是我想要的，我们需要一种完全远离 Kubernetes Service 的新路子</strong>；在看 Traefik 文档的时候，其中说明了 Traefik 只利用 Kubernetes 的 API 来读取相关后端数据，那么我们就可以以此来使用如下的套路</p>
+<p><img src="https://cdn.oss.link/markdown/tfo2f.png" srcset="/img/loading.gif" alt="traefik"></p>
+<p>这个套路的方案很简单，<strong>将 Traefik 部署在物理机上，让其直连 Kubernets api 以读取 Ingress 配置和 Pod IP 等信息，然后在这几台物理机上部署好 Kubernetes 的网络组件使其能直连 Pod IP</strong>；这种方案能够让流量经过 Traefik 直接路由到后端 Pod，健康检测还是由集群来做；<strong>由于 Traefik 连接 Kubernetes api 需要获取一些数据；所以在集群内还是像往常一样创建 Ingress，只不过此时我们并没有 Ingress Controller；这样避免了经过 iptables 转发，不占用全部集群机器的 80、443 端口，同时还能做到高可控</strong></p>
+<h2 id="二、Traefik-部署"><a href="#二、Traefik-部署" class="headerlink" title="二、Traefik 部署"></a>二、Traefik 部署</h2><p>部署之前首先需要有一个正常访问的集群，然后在另外几台机器上部署 Kubernetes 的网络组件；最终要保证另外几台机器能够直接连通 Pod 的 IP，我这里偷懒直接在 Kubernetes 的其中几个 Node 上部署 Traefik</p>
+<h3 id="2-1、Docker-Compose"><a href="#2-1、Docker-Compose" class="headerlink" title="2.1、Docker Compose"></a>2.1、Docker Compose</h3><p>Traefik 的 Docker Compose 如下</p>
+<div class="hljs"><pre><code class="hljs yml"><span class="hljs-attr">version:</span> <span class="hljs-string">'3.5'</span>
+
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">traefik:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">traefik:v1.6.1-alpine</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">traefik</span>
+    <span class="hljs-attr">command:</span> <span class="hljs-string">--configFile=/etc/traefik.toml</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">"2080:2080"</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">"2180:2180"</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./traefik.toml:/etc/traefik.toml</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./k8s-root-ca.pem:/etc/kubernetes/ssl/k8s-root-ca.pem</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./log:/var/log/traefik</span></code></pre></div>
+
+<p>由于 Kubernetes 集群开启了 RBAC 认证同时采用 TLS 通讯，所以需要挂载 Kubernetes CA 证书，还需要为 Traefik 创建对应的 RBAC 账户以使其能够访问 Kubernetes API</p>
+<h3 id="2-2、创建-RBAC-账户"><a href="#2-2、创建-RBAC-账户" class="headerlink" title="2.2、创建 RBAC 账户"></a>2.2、创建 RBAC 账户</h3><p>Traefik 连接 Kubernetes API 时需要使用 Service Account 的 Token，Service Account 以及 ClusterRole 等配置具体见 <a href="https://docs.traefik.io/user-guide/kubernetes/" target="_blank" rel="noopener">官方文档</a>，下面是我从当前版本的文档中 Copy 出来的</p>
+<div class="hljs"><pre><code class="hljs yml"><span class="hljs-meta">---</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ServiceAccount</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">traefik-ingress-controller</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span>
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRole</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1beta1</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">traefik-ingress-controller</span>
+<span class="hljs-attr">rules:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">""</span>
+    <span class="hljs-attr">resources:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">services</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">endpoints</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">secrets</span>
+    <span class="hljs-attr">verbs:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">get</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">list</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">extensions</span>
+    <span class="hljs-attr">resources:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">ingresses</span>
+    <span class="hljs-attr">verbs:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">get</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">list</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span>
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRoleBinding</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1beta1</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">traefik-ingress-controller</span>
+<span class="hljs-attr">roleRef:</span>
+  <span class="hljs-attr">apiGroup:</span> <span class="hljs-string">rbac.authorization.k8s.io</span>
+  <span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRole</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">traefik-ingress-controller</span>
+<span class="hljs-attr">subjects:</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">kind:</span> <span class="hljs-string">ServiceAccount</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">traefik-ingress-controller</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span></code></pre></div>
+
+<p>创建好以后需要提取 Service Account 的 Token 方便下面使用，提取命令如下</p>
+<div class="hljs"><pre><code class="hljs sh">kubectl describe secret -n kube-system $(kubectl get secrets -n kube-system | grep traefik-ingress-controller | cut -f1 -d <span class="hljs-string">' '</span>) | grep -E <span class="hljs-string">'^token'</span></code></pre></div>
+
+<h3 id="2-3、创建-Traefik-配置"><a href="#2-3、创建-Traefik-配置" class="headerlink" title="2.3、创建 Traefik 配置"></a>2.3、创建 Traefik 配置</h3><p>Traefik 的具体配置细节请参考 <a href="https://docs.traefik.io/configuration/commons/" target="_blank" rel="noopener">官方文档</a>，以下仅给出一个样例配置</p>
+<div class="hljs"><pre><code class="hljs toml"><span class="hljs-comment"># DEPRECATED - for general usage instruction see [lifeCycle.graceTimeOut].</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># If both the deprecated option and the new one are given, the deprecated one</span>
+<span class="hljs-comment"># takes precedence.</span>
+<span class="hljs-comment"># A value of zero is equivalent to omitting the parameter, causing</span>
+<span class="hljs-comment"># [lifeCycle.graceTimeOut] to be effective. Pass zero to the new option in</span>
+<span class="hljs-comment"># order to disable the grace period.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: "0s"</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># graceTimeOut = "10s"</span>
+
+<span class="hljs-comment"># Enable debug mode.</span>
+<span class="hljs-comment"># This will install HTTP handlers to expose Go expvars under /debug/vars and</span>
+<span class="hljs-comment"># pprof profiling data under /debug/pprof.</span>
+<span class="hljs-comment"># The log level will be set to DEBUG unless `logLevel` is specified.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: false</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># debug = true</span>
+
+<span class="hljs-comment"># Periodically check if a new version has been released.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: true</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-attr">checkNewVersion</span> = <span class="hljs-literal">false</span>
+
+<span class="hljs-comment"># Backends throttle duration.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: "2s"</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># providersThrottleDuration = "2s"</span>
+
+<span class="hljs-comment"># Controls the maximum idle (keep-alive) connections to keep per-host.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: 200</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># maxIdleConnsPerHost = 200</span>
+
+<span class="hljs-comment"># If set to true invalid SSL certificates are accepted for backends.</span>
+<span class="hljs-comment"># This disables detection of man-in-the-middle attacks so should only be used on secure backend networks.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: false</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># insecureSkipVerify = true</span>
+
+<span class="hljs-comment"># Register Certificates in the rootCA.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: []</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># rootCAs = [ "/mycert.cert" ]</span>
+
+<span class="hljs-comment"># Entrypoints to be used by frontends that do not specify any entrypoint.</span>
+<span class="hljs-comment"># Each frontend can specify its own entrypoints.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: ["http"]</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># defaultEntryPoints = ["http", "https"]</span>
+
+<span class="hljs-comment"># Allow the use of 0 as server weight.</span>
+<span class="hljs-comment"># - false: a weight 0 means internally a weight of 1.</span>
+<span class="hljs-comment"># - true: a weight 0 means internally a weight of 0 (a server with a weight of 0 is removed from the available servers).</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: false</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># AllowMinWeightZero = true</span>
+
+<span class="hljs-attr">logLevel</span> = <span class="hljs-string">"INFO"</span>
+
+<span class="hljs-section">[traefikLog]</span>
+  filePath = "/var/log/traefik/traefik.log"
+  format   = "json"
+
+<span class="hljs-section">[accessLog]</span>
+  filePath = "/var/log/traefik/access.log"
+  format = "json"
+
+  <span class="hljs-section">[accessLog.filters]</span>
+    statusCodes = ["200-511"]
+    retryAttempts = true
+
+<span class="hljs-comment">#  [accessLog.fields]</span>
+<span class="hljs-comment">#    defaultMode = "keep"</span>
+<span class="hljs-comment">#    [accessLog.fields.names]</span>
+<span class="hljs-comment">#      "ClientUsername" = "drop"</span>
+<span class="hljs-comment">#      # ...</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#    [accessLog.fields.headers]</span>
+<span class="hljs-comment">#      defaultMode = "keep"</span>
+<span class="hljs-comment">#      [accessLog.fields.headers.names]</span>
+<span class="hljs-comment">#        "User-Agent" = "redact"</span>
+<span class="hljs-comment">#        "Authorization" = "drop"</span>
+<span class="hljs-comment">#        "Content-Type" = "keep"</span>
+<span class="hljs-comment">#        # ...</span>
+
+
+<span class="hljs-section">[entryPoints]</span>
+  <span class="hljs-section">[entryPoints.http]</span>
+    address = ":2080"
+    compress = true
+  <span class="hljs-section">[entryPoints.traefik]</span>
+    address = ":2180"
+    compress = true
+
+<span class="hljs-comment">#    [entryPoints.http.whitelist]</span>
+<span class="hljs-comment">#      sourceRange = ["192.168.1.0/24"]</span>
+<span class="hljs-comment">#      useXForwardedFor = true</span>
+
+<span class="hljs-comment">#    [entryPoints.http.tls]</span>
+<span class="hljs-comment">#      minVersion = "VersionTLS12"</span>
+<span class="hljs-comment">#      cipherSuites = [</span>
+<span class="hljs-comment">#        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",</span>
+<span class="hljs-comment">#        "TLS_RSA_WITH_AES_256_GCM_SHA384"</span>
+<span class="hljs-comment">#       ]</span>
+<span class="hljs-comment">#      [[entryPoints.http.tls.certificates]]</span>
+<span class="hljs-comment">#        certFile = "path/to/my.cert"</span>
+<span class="hljs-comment">#        keyFile = "path/to/my.key"</span>
+<span class="hljs-comment">#      [[entryPoints.http.tls.certificates]]</span>
+<span class="hljs-comment">#        certFile = "path/to/other.cert"</span>
+<span class="hljs-comment">#        keyFile = "path/to/other.key"</span>
+<span class="hljs-comment">#      # ...</span>
+<span class="hljs-comment">#      [entryPoints.http.tls.clientCA]</span>
+<span class="hljs-comment">#        files = ["path/to/ca1.crt", "path/to/ca2.crt"]</span>
+<span class="hljs-comment">#        optional = false</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#    [entryPoints.http.redirect]</span>
+<span class="hljs-comment">#      entryPoint = "https"</span>
+<span class="hljs-comment">#      regex = "^http://localhost/(.*)"</span>
+<span class="hljs-comment">#      replacement = "http://mydomain/$1"</span>
+<span class="hljs-comment">#      permanent = true</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#    [entryPoints.http.auth]</span>
+<span class="hljs-comment">#      headerField = "X-WebAuth-User"</span>
+<span class="hljs-comment">#      [entryPoints.http.auth.basic]</span>
+<span class="hljs-comment">#        users = [</span>
+<span class="hljs-comment">#          "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/",</span>
+<span class="hljs-comment">#          "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0",</span>
+<span class="hljs-comment">#        ]</span>
+<span class="hljs-comment">#        usersFile = "/path/to/.htpasswd"</span>
+<span class="hljs-comment">#      [entryPoints.http.auth.digest]</span>
+<span class="hljs-comment">#        users = [</span>
+<span class="hljs-comment">#          "test:traefik:a2688e031edb4be6a3797f3882655c05",</span>
+<span class="hljs-comment">#          "test2:traefik:518845800f9e2bfb1f1f740ec24f074e",</span>
+<span class="hljs-comment">#        ]</span>
+<span class="hljs-comment">#        usersFile = "/path/to/.htdigest"</span>
+<span class="hljs-comment">#      [entryPoints.http.auth.forward]</span>
+<span class="hljs-comment">#        address = "https://authserver.com/auth"</span>
+<span class="hljs-comment">#        trustForwardHeader = true</span>
+<span class="hljs-comment">#        [entryPoints.http.auth.forward.tls]</span>
+<span class="hljs-comment">#          ca =  [ "path/to/local.crt"]</span>
+<span class="hljs-comment">#          caOptional = true</span>
+<span class="hljs-comment">#          cert = "path/to/foo.cert"</span>
+<span class="hljs-comment">#          key = "path/to/foo.key"</span>
+<span class="hljs-comment">#          insecureSkipVerify = true</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#    [entryPoints.http.proxyProtocol]</span>
+<span class="hljs-comment">#      insecure = true</span>
+<span class="hljs-comment">#      trustedIPs = ["10.10.10.1", "10.10.10.2"]</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#    [entryPoints.http.forwardedHeaders]</span>
+<span class="hljs-comment">#      trustedIPs = ["10.10.10.1", "10.10.10.2"]</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#  [entryPoints.https]</span>
+<span class="hljs-comment">#    # ...</span>
+
+<span class="hljs-comment">################################################################</span>
+<span class="hljs-comment"># Kubernetes Ingress configuration backend</span>
+<span class="hljs-comment">################################################################</span>
+
+<span class="hljs-comment"># Enable Kubernetes Ingress configuration backend.</span>
+<span class="hljs-section">[kubernetes]</span>
+
+<span class="hljs-comment"># Kubernetes server endpoint.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional for in-cluster configuration, required otherwise.</span>
+<span class="hljs-comment"># Default: empty</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-attr">endpoint</span> = <span class="hljs-string">"https://172.16.0.36:6443"</span>
+
+<span class="hljs-comment"># Bearer token used for the Kubernetes client configuration.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: empty</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-attr">token</span> = <span class="hljs-string">"eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJ0cmFlZmlrLWluZ3Jlc3MtY29udHJvbGxlci10b2tlbi1zbm5iNSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJ0cmFlZmlrLWlyZ3Jlc3MtY29udHJvbGxlciIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImE4NmI3YWEzLTVmNjQtMTFlOC1hZjYxLWM4MWY2NmUwMzRhNyIsInN1YiI6InN5c3RlbTpxZXJ2aWNlYWNjb3VudDPrdWJlLXN5c3RlbTp0cmFlZmlrLWluZ3Jlc3MtY29udHJvbGxlciJ9.vOFEITuANWGnkER8gukWkTs54BmHXqNpzM55bOb5qXPmI3pZsbei3gtE6tZoqME9P5Lb85cav-8mGZJcoQqqxNBkZJ1YRqy_1O9Apkxa4jA68ipe_NB3L5-exH5cEIrU8iql_r7ycDaKwzsMnAWGPolp1dRkF31u5u8g68oLwF3GR8Z5g4_tLJlTvA53doX7k6Wd6vUygTS3EaQ_qvfXwbcIeaSdWWo2Mym6O0CvIap4jH2w21MbredGURqkRlXEPezKAgRVkr75CdvuvwORnT8YxFLVwuAJs70V-13Ib9v6HAK64GmzcqkAuJtZT8NZKl8Y4TfRGl2_RMq2tk86gD4ShDMedcrto44ZUYHQccsSlpaW5PsN2KBBNPN0-6ca3jIpOmnJojAFUYGM42Wymnx9_4XwHUeeA18-RrercmOaRMdlNq8BzBomAxQB99TqUzRIqpe6m5OotXvouCUnE7qjMwRWmQ5LHjqUGEw_A1pHcalFXQZK0sOCaJOJZIJbc_8rVX-4uxkCBxoIXmzjq8x5a_xPsN4L0aWifkP6co--agw3kOT0O6my8T_CbcZGO9e3OqYPdT4FSl92XlXW8EXHdDpCUJ10aoqJGG2vZSud7IoDxkcScpkj3n6TvyvSRVtk3CtYiIYBpgi7-X2JKkun1a7yFpLogyazz9VlUE4"</span>
+
+<span class="hljs-comment"># Path to the certificate authority file.</span>
+<span class="hljs-comment"># Used for the Kubernetes client configuration.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: empty</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-attr">certAuthFilePath</span> = <span class="hljs-string">"/etc/kubernetes/ssl/k8s-root-ca.pem"</span>
+
+<span class="hljs-comment"># Array of namespaces to watch.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: all namespaces (empty array).</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-attr">namespaces</span> = [<span class="hljs-string">"default"</span>]
+
+<span class="hljs-comment"># Ingress label selector to filter Ingress objects that should be processed.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: empty (process all Ingresses)</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># labelselector = "A and not B"</span>
+
+<span class="hljs-comment"># Value of `kubernetes.io/ingress.class` annotation that identifies Ingress objects to be processed.</span>
+<span class="hljs-comment"># If the parameter is non-empty, only Ingresses containing an annotation with the same value are processed.</span>
+<span class="hljs-comment"># Otherwise, Ingresses missing the annotation, having an empty value, or the value `traefik` are processed.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Note : `ingressClass` option must begin with the "traefik" prefix.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: empty</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># ingressClass = "traefik-internal"</span>
+
+<span class="hljs-comment"># Disable PassHost Headers.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: false</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># disablePassHostHeaders = true</span>
+
+<span class="hljs-comment"># Enable PassTLSCert Headers.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: false</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># enablePassTLSCert = true</span>
+
+<span class="hljs-comment"># Override default configuration template.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Optional</span>
+<span class="hljs-comment"># Default: &lt;built-in template&gt;</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># filename = "kubernetes.tmpl"</span>
+
+
+<span class="hljs-comment"># API definition</span>
+<span class="hljs-section">[api]</span>
+  <span class="hljs-comment"># Name of the related entry point</span>
+  <span class="hljs-comment">#</span>
+  <span class="hljs-comment"># Optional</span>
+  <span class="hljs-comment"># Default: "traefik"</span>
+  <span class="hljs-comment">#</span>
+  entryPoint = "traefik"
+
+  <span class="hljs-comment"># Enabled Dashboard</span>
+  <span class="hljs-comment">#</span>
+  <span class="hljs-comment"># Optional</span>
+  <span class="hljs-comment"># Default: true</span>
+  <span class="hljs-comment">#</span>
+  dashboard = true
+
+  <span class="hljs-comment"># Enable debug mode.</span>
+  <span class="hljs-comment"># This will install HTTP handlers to expose Go expvars under /debug/vars and</span>
+  <span class="hljs-comment"># pprof profiling data under /debug/pprof.</span>
+  <span class="hljs-comment"># Additionally, the log level will be set to DEBUG.</span>
+  <span class="hljs-comment">#</span>
+  <span class="hljs-comment"># Optional</span>
+  <span class="hljs-comment"># Default: false</span>
+  <span class="hljs-comment">#</span>
+  debug = false
+
+<span class="hljs-comment"># Ping definition</span>
+<span class="hljs-comment">#[ping]</span>
+<span class="hljs-comment">#  # Name of the related entry point</span>
+<span class="hljs-comment">#  #</span>
+<span class="hljs-comment">#  # Optional</span>
+<span class="hljs-comment">#  # Default: "traefik"</span>
+<span class="hljs-comment">#  #</span>
+<span class="hljs-comment">#  entryPoint = "traefik"</span></code></pre></div>
+
+<h3 id="2-4、启动-Traefik"><a href="#2-4、启动-Traefik" class="headerlink" title="2.4、启动 Traefik"></a>2.4、启动 Traefik</h3><p>所有文件准备好以后直接执行 <code>docker-compose up -d</code> 启动即可，所有文件目录结构如下</p>
+<div class="hljs"><pre><code class="hljs sh">traefik
+├── docker-compose.yaml
+├── k8s-root-ca.pem
+├── <span class="hljs-built_in">log</span>
+│   ├── access.log
+│   └── traefik.log
+├── rbac.yaml
+└── traefik.toml</code></pre></div>
+
+<p>启动成功后可以访问 <code>http://IP:2180</code> 查看 Traefik 的控制面板</p>
+<p><img src="https://cdn.oss.link/markdown/phrps.png" srcset="/img/loading.gif" alt="dashboard"></p>
+<h2 id="三、增加-Ingress-配置并测试"><a href="#三、增加-Ingress-配置并测试" class="headerlink" title="三、增加 Ingress 配置并测试"></a>三、增加 Ingress 配置并测试</h2><h3 id="3-1、增加-Ingress-配置"><a href="#3-1、增加-Ingress-配置" class="headerlink" title="3.1、增加 Ingress 配置"></a>3.1、增加 Ingress 配置</h3><p>虽然这种部署方式脱离了 Kubernetes 的 Service 与 Ingress 负载，但是 Traefik 还是需要通过 Kubernetes 的 Ingress 配置来确定后端负载规则，所以 Ingress 对象我们仍需照常创建；以下为一个 Demo 项目的 deployment、service、ingress 配置示例</p>
+<ul>
+<li>demo.deploy.yaml</li>
+</ul>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">apps/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Deployment</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">demo</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">replicas:</span> <span class="hljs-number">5</span>
+  <span class="hljs-attr">selector:</span>
+    <span class="hljs-attr">matchLabels:</span>
+      <span class="hljs-attr">app:</span> <span class="hljs-string">demo</span>
+  <span class="hljs-attr">template:</span>
+    <span class="hljs-attr">metadata:</span>
+      <span class="hljs-attr">labels:</span>
+        <span class="hljs-attr">app:</span> <span class="hljs-string">demo</span>
+    <span class="hljs-attr">spec:</span>
+      <span class="hljs-attr">containers:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">demo</span>
+        <span class="hljs-attr">image:</span> <span class="hljs-string">mritd/demo</span>
+        <span class="hljs-attr">imagePullPolicy:</span> <span class="hljs-string">IfNotPresent</span>
+        <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">containerPort:</span> <span class="hljs-number">80</span></code></pre></div>
+
+<ul>
+<li>demo.svc.yaml</li>
+</ul>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Service</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">demo</span>
+  <span class="hljs-attr">labels:</span>
+    <span class="hljs-attr">svc:</span> <span class="hljs-string">demo</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">ports:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">port:</span> <span class="hljs-number">8080</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">http</span>
+    <span class="hljs-attr">targetPort:</span> <span class="hljs-number">80</span>
+  <span class="hljs-attr">selector:</span>
+    <span class="hljs-attr">app:</span> <span class="hljs-string">demo</span></code></pre></div>
+
+<ul>
+<li>demo.ing.yaml</li>
+</ul>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">extensions/v1beta1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Ingress</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">demo</span>
+  <span class="hljs-attr">annotations:</span>
+    <span class="hljs-attr">traefik.ingress.kubernetes.io/preserve-host:</span> <span class="hljs-string">"true"</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">rules:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">host:</span> <span class="hljs-string">demo.mritd.me</span>
+    <span class="hljs-attr">http:</span>
+      <span class="hljs-attr">paths:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">backend:</span>
+          <span class="hljs-attr">serviceName:</span> <span class="hljs-string">demo</span>
+          <span class="hljs-attr">servicePort:</span> <span class="hljs-number">8080</span></code></pre></div>
+
+<h3 id="3-2、测试访问"><a href="#3-2、测试访问" class="headerlink" title="3.2、测试访问"></a>3.2、测试访问</h3><p>部署好后应当能从 Traefik 的 Dashboard 中看到新增的 demo ingress，如下所示</p>
+<p><img src="https://cdn.oss.link/markdown/zociy.png" srcset="/img/loading.gif" alt="dashboard-demo"></p>
+<p>最后我们使用 curl 测试即可</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 在不使用 Host 头的情况下 Traefik 会返 404(Traefik 根据 Host 路由后端，具体配置参考官方文档)</span>
+test36.node ➜  ~ curl http://172.16.0.36:2080
+404 page not found
+
+<span class="hljs-comment"># 指定 Host 头来路由到 demo 的相关 Pod</span>
+test36.node ➜  ~ curl -H <span class="hljs-string">"Host: demo.mritd.me"</span> http://172.16.0.36:2080
+&lt;!DOCTYPE html&gt;
+&lt;html lang=<span class="hljs-string">"zh"</span>&gt;
+&lt;head&gt;
+    &lt;meta http-equiv=<span class="hljs-string">"Content-Type"</span> content=<span class="hljs-string">"text/html; charset=UTF-8"</span>&gt;
+    &lt;title&gt;Running!&lt;/title&gt;
+    &lt;style <span class="hljs-built_in">type</span>=<span class="hljs-string">"text/css"</span>&gt;
+        body &#123;
+            width: 100%;
+            min-height: 100%;
+            background: linear-gradient(to bottom, <span class="hljs-comment">#fff 0, #b8edff 50%, #83dfff 100%);</span>
+            background-attachment: fixed;
+        &#125;
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=<span class="hljs-string">" hasGoogleVoiceExt"</span>&gt;
+&lt;div align=<span class="hljs-string">"center"</span>&gt;
+    &lt;h1&gt;Your container is running!&lt;/h1&gt;
+    &lt;img src=<span class="hljs-string">"./docker.png"</span> alt=<span class="hljs-string">"docker"</span>&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;<span class="hljs-comment">#</span></code></pre></div>
+
+<h2 id="四、其他说明"><a href="#四、其他说明" class="headerlink" title="四、其他说明"></a>四、其他说明</h2><p>写这篇文章的目的是给予一种新的服务暴露思路，这篇文章的某些配置并不适合生产使用；<strong>生产环境尽量使用独立的机器部署 Traefik，同时最好宿主机二进制方式部署；应用的 Deployment 也应当加入健康检测以防止错误的流量路由</strong>；至于 Traefik 的具体细节配置，比如访问日志、Entrypoints 配置、如何连接 Kubernets HA api 等不在本文范畴内，请自行查阅文档；</p>
+<p>最后说一下，关于 Traefik 的 HA 只需要部署多个实例即可，还有 Traefik 本身不做日志滚动等，需要自行处理一下日志。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/08/09/create-a-plugin-for-kubectl/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">编写 kubectl 插件</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/05/11/add-commit-message-style-check-to-your-gitlab/">
+                        <span class="hidden-mobile">为你的 GitLab 增加提交信息检测</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2018/05/24/kubernetes-traefik-service-exposure/';
+        this.page.identifier = '/2018/05/24/kubernetes-traefik-service-exposure/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Traefik 另类的服务暴露方式&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,771 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>Go 编写的一些常用小工具 - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2018-11-27 12:45" pubdate>
+        2018年11月27日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.7k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      29
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">Go 编写的一些常用小工具</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <blockquote>
+<p>迫于 Github 上 Star 的项目有点多，今天整理一下一些有意思的 Go 编写的小工具；大多数为终端下的实用工具，装逼的比如天气预报啥的就不写了</p>
+</blockquote>
+<h3 id="syncthing"><a href="#syncthing" class="headerlink" title="syncthing"></a>syncthing</h3><p>强大的文件同步工具，构建私人同步盘 👉 <a href="https://github.com/syncthing、syncthing" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/er3tj.jpg" srcset="/img/loading.gif" alt="syncthing"></p>
+<h3 id="fzf"><a href="#fzf" class="headerlink" title="fzf"></a>fzf</h3><p>一个强大的终端文件浏览器 👉 <a href="https://github.com/junegunn/fzf" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/ihhqy.jpg" srcset="/img/loading.gif" alt="fzf"></p>
+<h3 id="hey"><a href="#hey" class="headerlink" title="hey"></a>hey</h3><p>http 负载测试工具，简单好用 👉 <a href="https://github.com/rakyll/hey" target="_blank" rel="noopener">Github</a></p>
+<div class="hljs"><pre><code class="hljs sh">Usage: hey [options...] &lt;url&gt;
+
+Options:
+  -n  Number of requests to run. Default is 200.
+  -c  Number of requests to run concurrently. Total number of requests cannot
+      be smaller than the concurrency level. Default is 50.
+  -q  Rate <span class="hljs-built_in">limit</span>, <span class="hljs-keyword">in</span> queries per second (QPS). Default is no rate <span class="hljs-built_in">limit</span>.
+  -z  Duration of application to send requests. When duration is reached,
+      application stops and exits. If duration is specified, n is ignored.
+      Examples: -z 10s -z 3m.
+  -o  Output <span class="hljs-built_in">type</span>. If none provided, a summary is printed.
+      <span class="hljs-string">"csv"</span> is the only supported alternative. Dumps the response
+      metrics <span class="hljs-keyword">in</span> comma-separated values format.
+
+  -m  HTTP method, one of GET, POST, PUT, DELETE, HEAD, OPTIONS.
+  -H  Custom HTTP header. You can specify as many as needed by repeating the flag.
+      For example, -H <span class="hljs-string">"Accept: text/html"</span> -H <span class="hljs-string">"Content-Type: application/xml"</span> .
+  -t  Timeout <span class="hljs-keyword">for</span> each request <span class="hljs-keyword">in</span> seconds. Default is 20, use 0 <span class="hljs-keyword">for</span> infinite.
+  -A  HTTP Accept header.
+  -d  HTTP request body.
+  -D  HTTP request body from file. For example, /home/user/file.txt or ./file.txt.
+  -T  Content-type, defaults to <span class="hljs-string">"text/html"</span>.
+  -a  Basic authentication, username:password.
+  -x  HTTP Proxy address as host:port.
+  -h2 Enable HTTP/2.
+
+  -host    HTTP Host header.
+
+  -<span class="hljs-built_in">disable</span>-compression  Disable compression.
+  -<span class="hljs-built_in">disable</span>-keepalive    Disable keep-alive, prevents re-use of TCP
+                        connections between different HTTP requests.
+  -<span class="hljs-built_in">disable</span>-redirects    Disable following of HTTP redirects
+  -cpus                 Number of used cpu cores.
+                        (default <span class="hljs-keyword">for</span> current machine is 8 cores)</code></pre></div>
+
+<h3 id="vegeta"><a href="#vegeta" class="headerlink" title="vegeta"></a>vegeta</h3><p>http 负载测试工具，功能强大 👉 <a href="https://github.com/tsenart/vegeta" target="_blank" rel="noopener">Github</a></p>
+<div class="hljs"><pre><code class="hljs sh">Usage: vegeta [global flags] &lt;<span class="hljs-built_in">command</span>&gt; [<span class="hljs-built_in">command</span> flags]
+
+global flags:
+  -cpus int
+        Number of CPUs to use (default 8)
+  -profile string
+        Enable profiling of [cpu, heap]
+  -version
+        Print version and <span class="hljs-built_in">exit</span>
+
+attack <span class="hljs-built_in">command</span>:
+  -body string
+        Requests body file
+  -cert string
+        TLS client PEM encoded certificate file
+  -connections int
+        Max open idle connections per target host (default 10000)
+  -duration duration
+        Duration of the <span class="hljs-built_in">test</span> [0 = forever]
+  -format string
+        Targets format [http, json] (default <span class="hljs-string">"http"</span>)
+  -h2c
+        Send HTTP/2 requests without TLS encryption
+  -header value
+        Request header
+  -http2
+        Send HTTP/2 requests when supported by the server (default <span class="hljs-literal">true</span>)
+  -insecure
+        Ignore invalid server TLS certificates
+  -keepalive
+        Use persistent connections (default <span class="hljs-literal">true</span>)
+  -key string
+        TLS client PEM encoded private key file
+  -laddr value
+        Local IP address (default 0.0.0.0)
+  -lazy
+        Read targets lazily
+  -max-body value
+        Maximum number of bytes to capture from response bodies. [-1 = no <span class="hljs-built_in">limit</span>] (default -1)
+  -name string
+        Attack name
+  -output string
+        Output file (default <span class="hljs-string">"stdout"</span>)
+  -rate value
+        Number of requests per time unit (default 50/1s)
+  -redirects int
+        Number of redirects to follow. -1 will not follow but marks as success (default 10)
+  -resolvers value
+        List of addresses (ip:port) to use <span class="hljs-keyword">for</span> DNS resolution. Disables use of <span class="hljs-built_in">local</span> system DNS. (comma separated list)
+  -root-certs value
+        TLS root certificate files (comma separated list)
+  -targets string
+        Targets file (default <span class="hljs-string">"stdin"</span>)
+  -timeout duration
+        Requests timeout (default 30s)
+  -workers uint
+        Initial number of workers (default 10)
+
+encode <span class="hljs-built_in">command</span>:
+  -output string
+        Output file (default <span class="hljs-string">"stdout"</span>)
+  -to string
+        Output encoding [csv, gob, json] (default <span class="hljs-string">"json"</span>)
+
+plot <span class="hljs-built_in">command</span>:
+  -output string
+        Output file (default <span class="hljs-string">"stdout"</span>)
+  -threshold int
+        Threshold of data points above <span class="hljs-built_in">which</span> series are downsampled. (default 4000)
+  -title string
+        Title and header of the resulting HTML page (default <span class="hljs-string">"Vegeta Plot"</span>)
+
+report <span class="hljs-built_in">command</span>:
+  -every duration
+        Report interval
+  -output string
+        Output file (default <span class="hljs-string">"stdout"</span>)
+  -<span class="hljs-built_in">type</span> string
+        Report <span class="hljs-built_in">type</span> to generate [text, json, hist[buckets]] (default <span class="hljs-string">"text"</span>)
+
+examples:
+  <span class="hljs-built_in">echo</span> <span class="hljs-string">"GET http://localhost/"</span> | vegeta attack -duration=5s | tee results.bin | vegeta report
+  vegeta report -<span class="hljs-built_in">type</span>=json results.bin &gt; metrics.json
+  cat results.bin | vegeta plot &gt; plot.html
+  cat results.bin | vegeta report -<span class="hljs-built_in">type</span>=<span class="hljs-string">"hist[0,100ms,200ms,300ms]"</span></code></pre></div>
+
+<h3 id="dive"><a href="#dive" class="headerlink" title="dive"></a>dive</h3><p>功能强大的 Docker 镜像分析工具，可以查看每层镜像的具体差异等 👉 <a href="https://github.com/wagoodman/dive" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/ik3ng.gif" srcset="/img/loading.gif" alt="dive"></p>
+<h3 id="ctop"><a href="#ctop" class="headerlink" title="ctop"></a>ctop</h3><p>容器运行时资源分析，如 CPU、内存消耗等 👉 <a href="https://github.com/bcicen/ctop" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/mr3x3.gif" srcset="/img/loading.gif" alt="ctop"></p>
+<h3 id="container-diff"><a href="#container-diff" class="headerlink" title="container-diff"></a>container-diff</h3><p>Google 推出的工具，功能就顾名思义了 👉 <a href="https://github.com/GoogleContainerTools/container-diff" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/dtapx.png" srcset="/img/loading.gif" alt="container-diff"></p>
+<h3 id="transfer-sh"><a href="#transfer-sh" class="headerlink" title="transfer.sh"></a>transfer.sh</h3><p>快捷的终端文件分享工具 👉 <a href="https://github.com/dutchcoders/transfer.sh" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/76vh0.png" srcset="/img/loading.gif" alt="transfer.sh"></p>
+<h3 id="vuls"><a href="#vuls" class="headerlink" title="vuls"></a>vuls</h3><p> Linux/FreeBSD 漏洞扫描工具 👉 <a href="https://github.com/future-architect/vuls" target="_blank" rel="noopener">Github</a></p>
+<p> <img src="https://cdn.oss.link/markdown/bpsps.jpg" srcset="/img/loading.gif" alt="vuls"></p>
+<h3 id="restic"><a href="#restic" class="headerlink" title="restic"></a>restic</h3><p>高性能安全的文件备份工具 👉 <a href="https://github.com/restic/restic" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/g51z4.png" srcset="/img/loading.gif" alt="restic"></p>
+<h3 id="gitql"><a href="#gitql" class="headerlink" title="gitql"></a>gitql</h3><p>使用 sql 的方式查询 git 提交 👉 <a href="https://github.com/cloudson/gitql" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/4h095.gif" srcset="/img/loading.gif" alt="gitql"></p>
+<h3 id="gitflow-toolkit"><a href="#gitflow-toolkit" class="headerlink" title="gitflow-toolkit"></a>gitflow-toolkit</h3><p>帮助生成满足 Gitflow 格式 commit message 的小工具(自己写的) 👉 <a href="https://github.com/mritd/gitflow-toolkit" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/1e2v1.gif" srcset="/img/loading.gif" alt="gitflow-toolkit"></p>
+<h3 id="git-chglog"><a href="#git-chglog" class="headerlink" title="git-chglog"></a>git-chglog</h3><p>对主流的 Gitflow 格式的 commit message 生成 CHANGELOG 👉 <a href="https://github.com/git-chglog/git-chglog" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/zphxd.gif" srcset="/img/loading.gif" alt="git-chglog"></p>
+<h3 id="grv"><a href="#grv" class="headerlink" title="grv"></a>grv</h3><p>一个 git 终端图形化浏览工具 👉 <a href="https://github.com/rgburke/grv" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/k1vh2.jpg" srcset="/img/loading.gif" alt="grv"></p>
+<h3 id="jid"><a href="#jid" class="headerlink" title="jid"></a>jid</h3><p>命令行 json 格式化处理工具，类似 jq，不过感觉更加强大 👉 <a href="https://github.com/simeji/jid" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/3k4ue.gif" srcset="/img/loading.gif" alt="jid"></p>
+<h3 id="annie"><a href="#annie" class="headerlink" title="annie"></a>annie</h3><p>类似 youget 的一个视频下载工具，可以解析大部分视频网站直接下载 👉 <a href="https://github.com/iawia002/annie" target="_blank" rel="noopener">Github</a></p>
+<div class="hljs"><pre><code class="hljs sh">$ annie -i https://www.youtube.com/watch?v=dQw4w9WgXcQ
+
+ Site:      YouTube youtube.com
+ Title:     Rick Astley - Never Gonna Give You Up (Video)
+ Type:      video
+ Streams:   <span class="hljs-comment"># All available quality</span>
+     [248]  -------------------
+     Quality:         1080p video/webm; codecs=<span class="hljs-string">"vp9"</span>
+     Size:            49.29 MiB (51687554 Bytes)
+     <span class="hljs-comment"># download with: annie -f 248 ...</span>
+
+     [137]  -------------------
+     Quality:         1080p video/mp4; codecs=<span class="hljs-string">"avc1.640028"</span>
+     Size:            43.45 MiB (45564306 Bytes)
+     <span class="hljs-comment"># download with: annie -f 137 ...</span>
+
+     [398]  -------------------
+     Quality:         720p video/mp4; codecs=<span class="hljs-string">"av01.0.05M.08"</span>
+     Size:            37.12 MiB (38926432 Bytes)
+     <span class="hljs-comment"># download with: annie -f 398 ...</span>
+
+     [136]  -------------------
+     Quality:         720p video/mp4; codecs=<span class="hljs-string">"avc1.4d401f"</span>
+     Size:            31.34 MiB (32867324 Bytes)
+     <span class="hljs-comment"># download with: annie -f 136 ...</span>
+
+     [247]  -------------------
+     Quality:         720p video/webm; codecs=<span class="hljs-string">"vp9"</span>
+     Size:            31.03 MiB (32536181 Bytes)
+     <span class="hljs-comment"># download with: annie -f 247 ...</span></code></pre></div>
+
+<h3 id="up"><a href="#up" class="headerlink" title="up"></a>up</h3><p>Linux 下管道式终端搜索工具 👉 <a href="https://github.com/akavel/up" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/n8zdj.gif" srcset="/img/loading.gif" alt="up"></p>
+<h3 id="lego"><a href="#lego" class="headerlink" title="lego"></a>lego</h3><p>Let’s Encrypt 证书申请工具 👉 <a href="https://github.com/xenolf/lego" target="_blank" rel="noopener">Github</a></p>
+<div class="hljs"><pre><code class="hljs sh">NAME:
+   lego - Let<span class="hljs-string">'s Encrypt client written in Go</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">USAGE:</span>
+<span class="hljs-string">   lego [global options] command [command options] [arguments...]</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">COMMANDS:</span>
+<span class="hljs-string">     run      Register an account, then create and install a certificate</span>
+<span class="hljs-string">     revoke   Revoke a certificate</span>
+<span class="hljs-string">     renew    Renew a certificate</span>
+<span class="hljs-string">     dnshelp  Shows additional help for the --dns global option</span>
+<span class="hljs-string">     help, h  Shows a list of commands or help for one command</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">GLOBAL OPTIONS:</span>
+<span class="hljs-string">   --domains value, -d value   Add a domain to the process. Can be specified multiple times.</span>
+<span class="hljs-string">   --csr value, -c value       Certificate signing request filename, if an external CSR is to be used</span>
+<span class="hljs-string">   --server value, -s value    CA hostname (and optionally :port). The server certificate must be trusted in order to avoid further modifications to the client. (default: "https://acme-v02.api.letsencrypt.org/directory")</span>
+<span class="hljs-string">   --email value, -m value     Email used for registration and recovery contact.</span>
+<span class="hljs-string">   --filename value            Filename of the generated certificate</span>
+<span class="hljs-string">   --accept-tos, -a            By setting this flag to true you indicate that you accept the current Let'</span>s Encrypt terms of service.
+   --eab                       Use External Account Binding <span class="hljs-keyword">for</span> account registration. Requires --kid and --hmac.
+   --kid value                 Key identifier from External CA. Used <span class="hljs-keyword">for</span> External Account Binding.
+   --hmac value                MAC key from External CA. Should be <span class="hljs-keyword">in</span> Base64 URL Encoding without padding format. Used <span class="hljs-keyword">for</span> External Account Binding.
+   --key-type value, -k value  Key <span class="hljs-built_in">type</span> to use <span class="hljs-keyword">for</span> private keys. Supported: rsa2048, rsa4096, rsa8192, ec256, ec384 (default: <span class="hljs-string">"rsa2048"</span>)
+   --path value                Directory to use <span class="hljs-keyword">for</span> storing the data (default: <span class="hljs-string">"./.lego"</span>)
+   --exclude value, -x value   Explicitly disallow solvers by name from being used. Solvers: <span class="hljs-string">"http-01"</span>, <span class="hljs-string">"dns-01"</span>, <span class="hljs-string">"tls-alpn-01"</span>.
+   --webroot value             Set the webroot folder to use <span class="hljs-keyword">for</span> HTTP based challenges to write directly <span class="hljs-keyword">in</span> a file <span class="hljs-keyword">in</span> .well-known/acme-challenge
+   --memcached-host value      Set the memcached host(s) to use <span class="hljs-keyword">for</span> HTTP based challenges. Challenges will be written to all specified hosts.
+   --http value                Set the port and interface to use <span class="hljs-keyword">for</span> HTTP based challenges to listen on. Supported: interface:port or :port
+   --tls value                 Set the port and interface to use <span class="hljs-keyword">for</span> TLS based challenges to listen on. Supported: interface:port or :port
+   --dns value                 Solve a DNS challenge using the specified provider. Disables all other challenges. Run <span class="hljs-string">'lego dnshelp'</span> <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span> on usage.
+   --http-timeout value        Set the HTTP timeout value to a specific value <span class="hljs-keyword">in</span> seconds. The default is 10 seconds. (default: 0)
+   --dns-timeout value         Set the DNS timeout value to a specific value <span class="hljs-keyword">in</span> seconds. The default is 10 seconds. (default: 0)
+   --dns-resolvers value       Set the resolvers to use <span class="hljs-keyword">for</span> performing recursive DNS queries. Supported: host:port. The default is to use the system resolvers, or Google<span class="hljs-string">'s DNS resolvers if the system'</span>s cannot be determined.
+   --pem                       Generate a .pem file by concatenating the .key and .crt files together.
+   --<span class="hljs-built_in">help</span>, -h                  show <span class="hljs-built_in">help</span>
+   --version, -v               <span class="hljs-built_in">print</span> the version</code></pre></div>
+
+<h3 id="noti"><a href="#noti" class="headerlink" title="noti"></a>noti</h3><p>贼好用的终端命令异步执行通知工具 👉 <a href="https://github.com/variadico/noti" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/m2r1e.jpg" srcset="/img/loading.gif" alt="noti"></p>
+<h3 id="gosu"><a href="#gosu" class="headerlink" title="gosu"></a>gosu</h3><p>临时切换到指定用户运行特定命令，方便测试权限问题 👉 <a href="https://github.com/tianon/gosu" target="_blank" rel="noopener">Github</a></p>
+<div class="hljs"><pre><code class="hljs sh">$ gosu
+Usage: ./gosu user-spec <span class="hljs-built_in">command</span> [args]
+   eg: ./gosu tianon bash
+       ./gosu nobody:root bash -c <span class="hljs-string">'whoami &amp;&amp; id'</span>
+       ./gosu 1000:1 id</code></pre></div>
+
+<h3 id="sup"><a href="#sup" class="headerlink" title="sup"></a>sup</h3><p>类似 Ansible 的一个批量执行工具，暂且称之为低配版 Ansible 👉 <a href="https://github.com/pressly/sup" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/x0eaz.gif" srcset="/img/loading.gif" alt="sup"></p>
+<h3 id="aptly"><a href="#aptly" class="headerlink" title="aptly"></a>aptly</h3><p>Debian 仓库管理工具 👉 <a href="https://github.com/aptly-dev/aptly" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/8e0ml.jpg" srcset="/img/loading.gif" alt="aptly"></p>
+<h3 id="mmh"><a href="#mmh" class="headerlink" title="mmh"></a>mmh</h3><p>支持无限跳板机登录的 ssh 小工具(自己写的) 👉 <a href="https://github.com/mritd/mmh" target="_blank" rel="noopener">Github</a></p>
+<p><img src="https://cdn.oss.link/markdown/37638.gif" srcset="/img/loading.gif" alt="mmh"></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/golang/">Golang</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/golang/">Golang</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/11/30/kubectl-plugin-new-solution-on-kubernetes-1.12/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kubernetes 1.12 新的插件机制</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/11/25/kubeadm-remote-debug/">
+                        <span class="hidden-mobile">远程 Debug kubeadm</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2018/11/27/simple-tool-written-in-golang/';
+        this.page.identifier = '/2018/11/27/simple-tool-written-in-golang/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Go 编写的一些常用小工具&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

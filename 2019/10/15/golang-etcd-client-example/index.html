@@ -1,0 +1,689 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>Golang Etcd Client Example - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-10-15 12:21" pubdate>
+        2019年10月15日 中午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      877 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      14
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">Golang Etcd Client Example</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <blockquote>
+<p>准备开发点东西，需要用到 Etcd，由于生产 Etcd 全部开启了 TLS 加密，所以客户端需要相应修改，以下为 Golang 链接 Etcd 并且使用客户端证书验证的样例代码</p>
+</blockquote>
+<h2 id="API-V2"><a href="#API-V2" class="headerlink" title="API V2"></a>API V2</h2><div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">"context"</span>
+	<span class="hljs-string">"crypto/tls"</span>
+	<span class="hljs-string">"crypto/x509"</span>
+	<span class="hljs-string">"io/ioutil"</span>
+	<span class="hljs-string">"log"</span>
+	<span class="hljs-string">"net"</span>
+	<span class="hljs-string">"net/http"</span>
+	<span class="hljs-string">"time"</span>
+
+	<span class="hljs-string">"go.etcd.io/etcd/client"</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+
+	<span class="hljs-comment">// 为了保证 HTTPS 链接可信，需要预先加载目标证书签发机构的 CA 根证书</span>
+	etcdCA, err := ioutil.ReadFile(<span class="hljs-string">"/Users/mritd/tmp/etcd_ssl/etcd-root-ca.pem"</span>)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		log.Fatal(err)
+	&#125;
+
+	<span class="hljs-comment">// etcd 启用了双向 TLS 认证，所以客户端证书同样需要加载</span>
+	etcdClientCert, err := tls.LoadX509KeyPair(<span class="hljs-string">"/Users/mritd/tmp/etcd_ssl/etcd.pem"</span>, <span class="hljs-string">"/Users/mritd/tmp/etcd_ssl/etcd-key.pem"</span>)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		log.Fatal(err)
+	&#125;
+
+	<span class="hljs-comment">// 创建一个空的 CA Pool</span>
+	<span class="hljs-comment">// 因为后续只会链接 Etcd 的 api 端点，所以此处选择使用空的 CA Pool，然后只加入 Etcd CA 既可</span>
+	<span class="hljs-comment">// 如果期望链接其他 TLS 端点，那么最好使用 x509.SystemCertPool() 方法先 copy 一份系统根 CA</span>
+	<span class="hljs-comment">// 然后再向这个 Pool 中添加自定义 CA</span>
+	rootCertPool := x509.NewCertPool()
+	rootCertPool.AppendCertsFromPEM(etcdCA)
+
+	cfg := client.Config&#123;
+		<span class="hljs-comment">// Etcd HTTPS api 端点</span>
+		Endpoints: []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">"https://172.16.14.114:2379"</span>&#125;,
+		<span class="hljs-comment">// 自定义 Transport 实现自签 CA 加载以及 Client Cert 加载</span>
+		<span class="hljs-comment">// 其他参数最好从 client.DefaultTranspor copy，以保证与默认 client 相同的行为</span>
+		Transport: &amp;http.Transport&#123;
+			Proxy: http.ProxyFromEnvironment,
+			<span class="hljs-comment">// Dial 方法已被启用，采用新的 DialContext 设置超时</span>
+			DialContext: (&amp;net.Dialer&#123;
+				KeepAlive: <span class="hljs-number">30</span> * time.Second,
+				Timeout:   <span class="hljs-number">30</span> * time.Second,
+			&#125;).DialContext,
+			<span class="hljs-comment">// 自定义 CA 及 Client Cert 配置</span>
+			TLSClientConfig: &amp;tls.Config&#123;
+				RootCAs:      rootCertPool,
+				Certificates: []tls.Certificate&#123;etcdClientCert&#125;,
+			&#125;,
+			TLSHandshakeTimeout: <span class="hljs-number">10</span> * time.Second,
+		&#125;,
+		<span class="hljs-comment">// set timeout per request to fail fast when the target endpoint is unavailable</span>
+		HeaderTimeoutPerRequest: time.Second,
+	&#125;
+	c, err := client.New(cfg)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		log.Fatal(err)
+	&#125;
+	kapi := client.NewKeysAPI(c)
+	<span class="hljs-comment">// set "/foo" key with "bar" value</span>
+	log.Print(<span class="hljs-string">"Setting '/foo' key with 'bar' value"</span>)
+	resp, err := kapi.Set(context.Background(), <span class="hljs-string">"/foo"</span>, <span class="hljs-string">"bar"</span>, <span class="hljs-literal">nil</span>)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		log.Fatal(err)
+	&#125; <span class="hljs-keyword">else</span> &#123;
+		<span class="hljs-comment">// print common key info</span>
+		log.Printf(<span class="hljs-string">"Set is done. Metadata is %q\n"</span>, resp)
+	&#125;
+	<span class="hljs-comment">// get "/foo" key's value</span>
+	log.Print(<span class="hljs-string">"Getting '/foo' key value"</span>)
+	resp, err = kapi.Get(context.Background(), <span class="hljs-string">"/foo"</span>, <span class="hljs-literal">nil</span>)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		log.Fatal(err)
+	&#125; <span class="hljs-keyword">else</span> &#123;
+		<span class="hljs-comment">// print common key info</span>
+		log.Printf(<span class="hljs-string">"Get is done. Metadata is %q\n"</span>, resp)
+		<span class="hljs-comment">// print value</span>
+		log.Printf(<span class="hljs-string">"%q key has %q value\n"</span>, resp.Node.Key, resp.Node.Value)
+	&#125;
+&#125;</code></pre></div>
+
+<h2 id="API-V3"><a href="#API-V3" class="headerlink" title="API V3"></a>API V3</h2><div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">"context"</span>
+	<span class="hljs-string">"crypto/tls"</span>
+	<span class="hljs-string">"crypto/x509"</span>
+	<span class="hljs-string">"io/ioutil"</span>
+	<span class="hljs-string">"log"</span>
+	<span class="hljs-string">"time"</span>
+
+	<span class="hljs-string">"go.etcd.io/etcd/clientv3"</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+
+	<span class="hljs-comment">// 为了保证 HTTPS 链接可信，需要预先加载目标证书签发机构的 CA 根证书</span>
+	etcdCA, err := ioutil.ReadFile(<span class="hljs-string">"/Users/mritd/tmp/etcd_ssl/etcd-root-ca.pem"</span>)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		log.Fatal(err)
+	&#125;
+
+	<span class="hljs-comment">// etcd 启用了双向 TLS 认证，所以客户端证书同样需要加载</span>
+	etcdClientCert, err := tls.LoadX509KeyPair(<span class="hljs-string">"/Users/mritd/tmp/etcd_ssl/etcd.pem"</span>, <span class="hljs-string">"/Users/mritd/tmp/etcd_ssl/etcd-key.pem"</span>)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		log.Fatal(err)
+	&#125;
+
+	<span class="hljs-comment">// 创建一个空的 CA Pool</span>
+	<span class="hljs-comment">// 因为后续只会链接 Etcd 的 api 端点，所以此处选择使用空的 CA Pool，然后只加入 Etcd CA 既可</span>
+	<span class="hljs-comment">// 如果期望链接其他 TLS 端点，那么最好使用 x509.SystemCertPool() 方法先 copy 一份系统根 CA</span>
+	<span class="hljs-comment">// 然后再向这个 Pool 中添加自定义 CA</span>
+	rootCertPool := x509.NewCertPool()
+	rootCertPool.AppendCertsFromPEM(etcdCA)
+
+	<span class="hljs-comment">// 创建 api v3 的 client</span>
+	cli, err := clientv3.New(clientv3.Config&#123;
+		<span class="hljs-comment">// etcd https api 端点</span>
+		Endpoints:   []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">"https://172.16.14.114:2379"</span>&#125;,
+		DialTimeout: <span class="hljs-number">5</span> * time.Second,
+		<span class="hljs-comment">// 自定义 CA 及 Client Cert 配置</span>
+		TLS: &amp;tls.Config&#123;
+			RootCAs:      rootCertPool,
+			Certificates: []tls.Certificate&#123;etcdClientCert&#125;,
+		&#125;,
+	&#125;)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		log.Fatal(err)
+	&#125;
+	<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123; _ = cli.Close() &#125;()
+
+	ctx, cancel := context.WithTimeout(context.Background(), <span class="hljs-number">3</span>*time.Second)
+	putResp, err := cli.Put(ctx, <span class="hljs-string">"sample_key"</span>, <span class="hljs-string">"sample_value"</span>)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		log.Fatal(err)
+	&#125; <span class="hljs-keyword">else</span> &#123;
+		log.Println(putResp)
+	&#125;
+	cancel()
+
+	ctx, cancel = context.WithTimeout(context.Background(), <span class="hljs-number">3</span>*time.Second)
+	delResp, err := cli.Delete(ctx, <span class="hljs-string">"sample_key"</span>)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		log.Fatal(err)
+	&#125; <span class="hljs-keyword">else</span> &#123;
+		log.Println(delResp)
+	&#125;
+	cancel()
+&#125;</code></pre></div>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/golang/">Golang</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/golang/">Golang</a>
+                    
+                      <a class="hover-with-bg" href="/tags/etcd/">etcd</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/11/05/writing-plugin-for-coredns/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Writing Plugin for Coredns</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/06/26/podman-history-of-container/">
+                        <span class="hidden-mobile">Podman 初试 - 容器发展史</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2019/10/15/golang-etcd-client-example/';
+        this.page.identifier = '/2019/10/15/golang-etcd-client-example/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Golang Etcd Client Example&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

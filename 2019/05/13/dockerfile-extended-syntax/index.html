@@ -1,0 +1,793 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>Dockerfile 目前可扩展的语法 - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-05-13 22:57" pubdate>
+        2019年5月13日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.4k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      21
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">Dockerfile 目前可扩展的语法</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <blockquote>
+<p>最近在调整公司项目的 CI，目前主要使用 GitLab CI，在尝试多阶段构建中踩了点坑，然后发现了一些有意思的玩意</p>
+</blockquote>
+<p>本文参考:</p>
+<ul>
+<li><a href="https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/experimental.md" target="_blank" rel="noopener">Dockerfile frontend experimental syntaxes</a></li>
+<li><a href="https://medium.com/@tonistiigi/advanced-multi-stage-build-patterns-6f741b852fae" target="_blank" rel="noopener">Advanced multi-stage build patterns</a></li>
+<li><a href="https://docs.docker.com/engine/reference/commandline/build/" target="_blank" rel="noopener">docker build Document</a></li>
+</ul>
+<h2 id="一、起因"><a href="#一、起因" class="headerlink" title="一、起因"></a>一、起因</h2><p>公司目前主要使用 GitLab CI 作为主力 CI 构建工具，而且由于机器有限，我们对一些包管理器的本地 cache 直接持久化到了本机；比如 maven 的 <code>.m2</code> 目录，nodejs 的 <code>.npm</code> 目录等；虽然我们创建了对应的私服，但是在 build 时毕竟会下载，所以当时索性调整 GitLab Runner 在每个由 GitLab Runner 启动的容器中挂载这些缓存目录(GitLab CI 在 build 时会新启动容器运行 build 任务)；今天调整 nodejs 项目浪了一下，直接采用 Dockerfile 的 multi-stage build 功能进行 “Build =&gt; Package(docker image)” 的实现，基本 Dockerfile 如下</p>
+<div class="hljs"><pre><code class="hljs sh">FROM gozap/build as builder
+
+COPY . /xxxx
+
+WORKDIR /xxxx
+
+RUN <span class="hljs-built_in">source</span> ~/.bashrc \
+    &amp;&amp; cnpm install \
+    &amp;&amp; cnpm run build
+
+FROM gozap/nginx-react:v1.0.0
+
+LABEL maintainer=<span class="hljs-string">"mritd &lt;mritd@linux.com&gt;"</span>
+
+COPY --from=builder /xxxx/public /usr/share/nginx/html
+
+EXPOSE 80
+
+STOPSIGNAL SIGTERM
+
+CMD [<span class="hljs-string">"nginx"</span>, <span class="hljs-string">"-g"</span>, <span class="hljs-string">"daemon off;"</span>]</code></pre></div>
+
+<p>本来这个 <code>cnpm</code> 命令是带有 cache 的(<a href="https://github.com/Gozap/dockerfile/blob/master/build/cnpm" target="_blank" rel="noopener">见这里</a>)，不过运行完 build 以后发现很慢，检查宿主机 cache 目录发现根本没有 cache…然后突然感觉</p>
+<p><img src="https://cdn.oss.link/markdown/6ieh4.jpg" srcset="/img/loading.gif" alt="事情并没有这么简单"></p>
+<p>仔细想想，情况应该是这样事儿的…</p>
+<div class="hljs"><pre><code class="hljs sh">+------------+                +-------------+            +----------------+
+|            |                |             |            |                |
+|            |                |    build    |            |   Multi-stage  |
+|   Runner   +---------------&gt;+  conatiner  +-----------&gt;+     Build      |
+|            |                |             |            |                |
+|            |                |             |            |                |
++------------+                +------+------+            +----------------+
+                                     ^
+                                     |
+                                     |
+                                     |
+                                     |
+                              +------+------+
+                              |             |
+                              |    Cache    |
+                              |             |
+                              +-------------+</code></pre></div>
+
+<p><img src="https://cdn.oss.link/markdown/9ov8m.jpg" srcset="/img/loading.gif" alt="挂载不管用"></p>
+<p>后来经过查阅文档，发现 Dockerfile 是有扩展语法的(当然最终我还是没用)，具体请见<del>下篇文章</del>(我怕被打死)下面，<strong>先说好，下面的内容无法完美的解决上面的问题，目前只是支持了一部分功能，当然未来很可能支持类似 <code>IF ELSE</code> 语法、直接挂载宿主机目录等功能</strong></p>
+<h2 id="二、开启-Dockerfile-扩展语法"><a href="#二、开启-Dockerfile-扩展语法" class="headerlink" title="二、开启 Dockerfile 扩展语法"></a>二、开启 Dockerfile 扩展语法</h2><h3 id="2-1、开启实验性功能"><a href="#2-1、开启实验性功能" class="headerlink" title="2.1、开启实验性功能"></a>2.1、开启实验性功能</h3><p>目前这个扩展语法还处于实验性功能，所以需要配置 dockerd 守护进程，修改如下</p>
+<div class="hljs"><pre><code class="hljs sh">ExecStart=/usr/bin/dockerd  -H unix:// \
+                            --init \
+                            --live-restore \
+                            --data-root=/data/docker \
+                            --experimental \
+                            --<span class="hljs-built_in">log</span>-driver json-file \
+                            --<span class="hljs-built_in">log</span>-opt max-size=30m \
+                            --<span class="hljs-built_in">log</span>-opt max-file=3</code></pre></div>
+
+<p>主要是 <code>--experimental</code> 参数，参考<a href="https://docs.docker.com/engine/reference/commandline/dockerd/#description" target="_blank" rel="noopener">官方文档</a>；<strong>同时在 build 前声明 <code>export DOCKER_BUILDKIT=1</code> 变量</strong></p>
+<h3 id="2-2、修改-Dockerfile"><a href="#2-2、修改-Dockerfile" class="headerlink" title="2.2、修改 Dockerfile"></a>2.2、修改 Dockerfile</h3><p>开启实验性功能后，只需要在 Dockerfile 头部增加 <code># syntax=docker/dockerfile:experimental</code> 既可；为了保证稳定性，你也可以指定具体的版本号，类似这样</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># syntax=docker/dockerfile:1.1.1-experimental</span>
+FROM tomcat</code></pre></div>
+
+<h3 id="2-3、可用的扩展语法"><a href="#2-3、可用的扩展语法" class="headerlink" title="2.3、可用的扩展语法"></a>2.3、可用的扩展语法</h3><ul>
+<li><code>RUN --mount=type=bind</code></li>
+</ul>
+<p>这个是默认的挂载模式，这个允许将上下文或者镜像以可都可写/只读模式挂载到 build 容器中，可选参数如下(不翻译了)</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code> (required)</td>
+<td>Mount path.</td>
+</tr>
+<tr>
+<td><code>source</code></td>
+<td>Source path in the <code>from</code>. Defaults to the root of the <code>from</code>.</td>
+</tr>
+<tr>
+<td><code>from</code></td>
+<td>Build stage or image name for the root of the source. Defaults to the build context.</td>
+</tr>
+<tr>
+<td><code>rw</code>,<code>readwrite</code></td>
+<td>Allow writes on the mount. Written data will be discarded.</td>
+</tr>
+</tbody></table>
+<ul>
+<li><code>RUN --mount=type=cache</code></li>
+</ul>
+<p>专用于作为 cache 的挂载位置，一般用于 cache 包管理器的下载等</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>Optional ID to identify separate/different caches</td>
+</tr>
+<tr>
+<td><code>target</code> (required)</td>
+<td>Mount path.</td>
+</tr>
+<tr>
+<td><code>ro</code>,<code>readonly</code></td>
+<td>Read-only if set.</td>
+</tr>
+<tr>
+<td><code>sharing</code></td>
+<td>One of <code>shared</code>, <code>private</code>, or <code>locked</code>. Defaults to <code>shared</code>. A <code>shared</code> cache mount can be used concurrently by multiple writers. <code>private</code> creates a new mount if there are multiple writers. <code>locked</code> pauses the second writer until the first one releases the mount.</td>
+</tr>
+<tr>
+<td><code>from</code></td>
+<td>Build stage to use as a base of the cache mount. Defaults to empty directory.</td>
+</tr>
+<tr>
+<td><code>source</code></td>
+<td>Subpath in the <code>from</code> to mount. Defaults to the root of the <code>from</code>.</td>
+</tr>
+</tbody></table>
+<p><strong>Example: cache Go packages</strong></p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># syntax = docker/dockerfile:experimental</span>
+FROM golang
+...
+RUN --mount=<span class="hljs-built_in">type</span>=cache,target=/root/.cache/go-build go build ...</code></pre></div>
+
+<p><strong>Example: cache apt packages</strong></p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># syntax = docker/dockerfile:experimental</span>
+FROM ubuntu
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; <span class="hljs-built_in">echo</span> <span class="hljs-string">'Binary::apt::APT::Keep-Downloaded-Packages "true";'</span> &gt; /etc/apt/apt.conf.d/keep-cache
+RUN --mount=<span class="hljs-built_in">type</span>=cache,target=/var/cache/apt --mount=<span class="hljs-built_in">type</span>=cache,target=/var/lib/apt \
+  apt update &amp;&amp; apt install -y gcc</code></pre></div>
+
+<ul>
+<li><code>RUN --mount=type=tmpfs</code></li>
+</ul>
+<p>专用于挂载 tmpfs 的选项</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code> (required)</td>
+<td>Mount path.</td>
+</tr>
+</tbody></table>
+<ul>
+<li><code>RUN --mount=type=secret</code></li>
+</ul>
+<p>这个类似 k8s 的 secret，用来挂载一些不想打入镜像，但是构建时想使用的密钥等，例如 docker 的 <code>config.json</code>，S3 的 <code>credentials</code></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>ID of the secret. Defaults to basename of the target path.</td>
+</tr>
+<tr>
+<td><code>target</code></td>
+<td>Mount path. Defaults to <code>/run/secrets/</code> + <code>id</code>.</td>
+</tr>
+<tr>
+<td><code>required</code></td>
+<td>If set to <code>true</code>, the instruction errors out when the secret is unavailable. Defaults to <code>false</code>.</td>
+</tr>
+<tr>
+<td><code>mode</code></td>
+<td>File mode for secret file in octal. Default 0400.</td>
+</tr>
+<tr>
+<td><code>uid</code></td>
+<td>User ID for secret file. Default 0.</td>
+</tr>
+<tr>
+<td><code>gid</code></td>
+<td>Group ID for secret file. Default 0.</td>
+</tr>
+</tbody></table>
+<p><strong>Example: access to S3</strong></p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># syntax = docker/dockerfile:experimental</span>
+FROM python:3
+RUN pip install awscli
+RUN --mount=<span class="hljs-built_in">type</span>=secret,id=aws,target=/root/.aws/credentials aws s3 cp s3://... ...</code></pre></div>
+
+<p><strong>注意: <code>buildctl</code> 是 BuildKit 的命令，你要测试的话自己换成 <code>docker build</code> 相关参数</strong></p>
+<div class="hljs"><pre><code class="hljs console"><span class="hljs-meta">$</span><span class="bash"> buildctl build --frontend=dockerfile.v0 --<span class="hljs-built_in">local</span> context=. --<span class="hljs-built_in">local</span> dockerfile=. \</span>
+  --secret id=aws,src=$HOME/.aws/credentials</code></pre></div>
+
+<ul>
+<li><code>RUN --mount=type=ssh</code></li>
+</ul>
+<p>允许 build 容器通过 SSH agent 访问 SSH key，并且支持 <code>passphrases</code></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>ID of SSH agent socket or key. Defaults to “default”.</td>
+</tr>
+<tr>
+<td><code>target</code></td>
+<td>SSH agent socket path. Defaults to <code>/run/buildkit/ssh_agent.${N}</code>.</td>
+</tr>
+<tr>
+<td><code>required</code></td>
+<td>If set to <code>true</code>, the instruction errors out when the key is unavailable. Defaults to <code>false</code>.</td>
+</tr>
+<tr>
+<td><code>mode</code></td>
+<td>File mode for socket in octal. Default 0600.</td>
+</tr>
+<tr>
+<td><code>uid</code></td>
+<td>User ID for socket. Default 0.</td>
+</tr>
+<tr>
+<td><code>gid</code></td>
+<td>Group ID for socket. Default 0.</td>
+</tr>
+</tbody></table>
+<p><strong>Example: access to Gitlab</strong></p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># syntax = docker/dockerfile:experimental</span>
+FROM alpine
+RUN apk add --no-cache openssh-client
+RUN mkdir -p -m 0700 ~/.ssh &amp;&amp; ssh-keyscan gitlab.com &gt;&gt; ~/.ssh/known_hosts
+RUN --mount=<span class="hljs-built_in">type</span>=ssh ssh -q -T git@gitlab.com 2&gt;&amp;1 | tee /hello
+<span class="hljs-comment"># "Welcome to GitLab, @GITLAB_USERNAME_ASSOCIATED_WITH_SSHKEY" should be printed here</span>
+<span class="hljs-comment"># with the type of build progress is defined as `plain`.</span></code></pre></div>
+
+<div class="hljs"><pre><code class="hljs sh">$ <span class="hljs-built_in">eval</span> $(ssh-agent)
+$ ssh-add ~/.ssh/id_rsa
+(Input your passphrase here)
+$ buildctl build --frontend=dockerfile.v0 --<span class="hljs-built_in">local</span> context=. --<span class="hljs-built_in">local</span> dockerfile=. \
+  --ssh default=<span class="hljs-variable">$SSH_AUTH_SOCK</span></code></pre></div>
+
+<p>你也可以直接使用宿主机目录的 pem 文件，但是带有密码的 pem 目前不支持</p>
+<p><strong>目前根据文档测试，当前的挂载类型比如 <code>cache</code> 类型，仅用于 multi-stage 内的挂载，比如你有 2+ 个构建步骤，<code>cache</code> 挂载类型能帮你在各个阶段内共享文件；但是它目前无法解决直接将宿主机目录挂载到 multi-stage 的问题(可以采取些曲线救国方案，但是很不优雅)；但是未来还是很有展望的，可以关注一下</strong></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/docker/">Docker</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/docker/">Docker</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/06/18/calico-3.6-forward-network-traffic/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Calico 3.6 转发外部流量到集群 Pod</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/03/23/oh-my-rime/">
+                        <span class="hidden-mobile">Mac 下调校 Rime</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2019/05/13/dockerfile-extended-syntax/';
+        this.page.identifier = '/2019/05/13/dockerfile-extended-syntax/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Dockerfile 目前可扩展的语法&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

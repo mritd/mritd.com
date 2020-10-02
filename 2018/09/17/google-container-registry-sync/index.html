@@ -1,0 +1,592 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>Google container registry 同步 - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2018-09-17 21:19" pubdate>
+        2018年9月17日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      964 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      11
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">Google container registry 同步</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <h2 id="一、起因"><a href="#一、起因" class="headerlink" title="一、起因"></a>一、起因</h2><p>玩 Kubenretes 的基本都很清楚，Kubernetes 很多组件的镜像全部托管在 <code>gcr.io</code> 这个域名下(现在换成了 <code>k8s.gcr.io</code>)；由于众所周知的原因，这个网站在国内是不可达的；当时由于 Docker Hub 提供了 <code>Auto Build</code> 功能，机智的想到一个解决办法；就是利用 Docker Hub 的 <code>Auto Build</code>，创建只有一行的 Dockerfile，里面就一句 <code>FROM gcr.io/xxxx</code>，然后让 Docker Hub 帮你构建完成后拉取即可</p>
+<p>这种套路的基本方案就是利用一个第三方公共仓库，这个仓库可以访问不可达的 <code>gcr.io</code>，然后生成镜像，我们再从这个仓库 pull 即可；为此我创建了一个 Github 仓库(<a href="https://github.com/mritd/docker-library" target="_blank" rel="noopener">docker-library</a>)；时隔这么久以后，我猜想大家都已经有了这种自己的仓库…不过最近发现这个仓库仍然在有人 fork…</p>
+<p>为了一劳永逸的解决这个问题，只能撸点代码解决这个问题了</p>
+<h2 id="二、仓库使用"><a href="#二、仓库使用" class="headerlink" title="二、仓库使用"></a>二、仓库使用</h2><p>为了解决上述问题，我写了一个 <a href="https://github.com/mritd/gcrsync" target="_blank" rel="noopener">gcrsync</a> 工具，并且借助 <a href="https://travis-ci.org/mritd/gcrsync" target="_blank" rel="noopener">Travis CI</a> 让其每天自动运行，将所有用得到的 <code>gcr.io</code> 下的镜像同步到了 Docker Hub</p>
+<p><strong>目前对于一个 <code>gcr.io</code> 下的镜像，可以直接替换为 <code>gcrxio</code> 用户名，然后从 Docker Hub 直接拉取</strong>，以下为一个示例:</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 原始命令</span>
+docker pull k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.0
+
+<span class="hljs-comment"># 使用同步仓库</span>
+docker pull gcrxio/kubernetes-dashboard-amd64:v1.10.0</code></pre></div>
+
+<h2 id="三、同步细节说明"><a href="#三、同步细节说明" class="headerlink" title="三、同步细节说明"></a>三、同步细节说明</h2><p>为了保证同步镜像的安全性，同步工具已经开源在 <a href="https://github.com/mritd/gcrsync" target="_blank" rel="noopener">gcrsync</a> 仓库，同步细节如下:</p>
+<ul>
+<li>工具每天由 <a href="https://travis-ci.org/mritd/gcrsync" target="_blank" rel="noopener">Travis CI</a> 自动进行一次 build，然后进行推送</li>
+<li>工具每次推送前首先 clone 元数据仓库 <a href="https://github.com/mritd/gcr" target="_blank" rel="noopener">gcr</a></li>
+<li>工具每次推送首先获取 <code>gcr.io</code> 指定 <code>namespace</code> 下的所有镜像(<code>namesapce</code> 由 <a href="https://github.com/mritd/gcrsync/blob/master/.travis.yml" target="_blank" rel="noopener">.travis.yml</a> <code>script</code> 段定义)</li>
+<li>获取 <code>gcr.io</code> 镜像后，再读取元数据仓库(<a href="https://github.com/mritd/gcr" target="_blank" rel="noopener">gcr</a>) 中与 <code>namesapce</code> 同名文件(实际是个 json)</li>
+<li>接着对比双方差异，得出需要同步的镜像</li>
+<li>最后通过 API 调用本地的 docker 进行 <code>pull</code>、<code>tag</code>、<code>push</code> 操作，完成镜像推送</li>
+<li>所有镜像推送成功后，更新元数据仓库内 <code>namespace</code> 对应的 json 文件，最后在生成 <a href="https://github.com/mritd/gcr/blob/master/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>，执行 <code>git push</code> 到远程元数据仓库</li>
+</ul>
+<p>综上所述，如果想得知<strong>具体 <code>gcrxio</code> 用户下都有那些镜像，可直接访问 <a href="https://github.com/mritd/gcr" target="_blank" rel="noopener">gcr</a> 元数据仓库，查看对应 <code>namesapce</code> 同名的 json 文件即可；每天增量同步的信息会追加到 <a href="https://github.com/mritd/gcr" target="_blank" rel="noopener">gcr</a> 仓库的 <code>CHANGELOG.md</code> 文件中</strong></p>
+<h2 id="四、gcrsync"><a href="#四、gcrsync" class="headerlink" title="四、gcrsync"></a>四、gcrsync</h2><p>为方便审查镜像安全性，以下为 <a href="https://github.com/mritd/gcrsync" target="_blank" rel="noopener">gcrsync</a> 工具的代码简介，代码仓库文件如下:</p>
+<div class="hljs"><pre><code class="hljs sh">➜  gcrsync git:(master) tree -I vendor
+.
+├── CHANGELOG.md
+├── Gopkg.lock
+├── Gopkg.toml
+├── LICENSE
+├── README.md
+├── cmd
+│   ├── compare.go
+│   ├── monitor.go
+│   ├── root.go
+│   ├── sync.go
+│   └── test.go
+├── dist
+│   ├── gcrsync_darwin_amd64
+│   ├── gcrsync_linux_386
+│   └── gcrsync_linux_amd64
+├── main.go
+└── pkg
+    ├── gcrsync
+    │   ├── docker.go
+    │   ├── gcr.go
+    │   ├── git.go
+    │   ├── registry.go
+    │   └── sync.go
+    └── utils
+        └── common.go</code></pre></div>
+
+<p>cmd 目录下为标准的 <code>cobra</code> 框架生成的子命令文件，其中每个命令包含了对应的 flag 设置，如 <code>namesapce</code>、<code>proxy</code> 等；<code>pkg/gcrsync</code> 目录下的文件为核心代码:</p>
+<ul>
+<li><code>docker.go</code> 包含了对本地 docker daemon API 调用，包括 <code>pull</code>、<code>tag</code>、<code>push</code> 操作</li>
+<li><code>gcr.go</code> 包含了对 <code>gcr.io</code> 指定 <code>namespace</code> 下镜像列表获取操作</li>
+<li><code>registry.go</code> 包含了对 Docker Hub 下指定用户(默认 <code>gcrxio</code>)的镜像列表获取操作(其主要用于首次执行 <code>compare</code> 命令生成 json 文件)</li>
+<li><code>sync.go</code> 为主要的程序入口，其中包含了对其他文件内方法的调用，设置并发池等</li>
+</ul>
+<h2 id="五、其他说明"><a href="#五、其他说明" class="headerlink" title="五、其他说明"></a>五、其他说明</h2><p>该仓库不保证镜像实时同步，默认每天同步一次(由 <a href="https://travis-ci.org/mritd/gcrsync" target="_blank" rel="noopener">Travis CI</a> 执行)，如有特殊需求，如增加 <code>namesapce</code> 等请开启 issue；最后，请不要再 fork <a href="https://github.com/mritd/docker-library" target="_blank" rel="noopener">docker-library</a> 这个仓库了</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/docker/">Docker</a>
+                    
+                      <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/10/23/golang-code-plugin/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Go 代码的扩展套路</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/08/28/kubernetes-tls-bootstrapping-with-bootstrap-token/">
+                        <span class="hidden-mobile">使用 Bootstrap Token 完成 TLS Bootstrapping</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2018/09/17/google-container-registry-sync/';
+        this.page.identifier = '/2018/09/17/google-container-registry-sync/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Google container registry 同步&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

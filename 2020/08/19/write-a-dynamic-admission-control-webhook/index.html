@@ -1,0 +1,953 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>编写一个动态准入控制来实现自动化 - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-08-19 14:35" pubdate>
+        2020年8月19日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.5k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      48
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">编写一个动态准入控制来实现自动化</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <h2 id="一、准入控制介绍"><a href="#一、准入控制介绍" class="headerlink" title="一、准入控制介绍"></a>一、准入控制介绍</h2><p>在 Kubernetes 整个请求链路中，请求通过认证和授权之后、对象被持久化之前需要通过一连串的 “准入控制拦截器”；这些准入控制器负载验证请求的合法性，必要情况下也可以对请求进行修改；默认准入控制器编写在 kube-apiserver 的代码中，针对于当前 kube-apiserver 默认启用的准入控制器你可以通过以下命令查看:</p>
+<div class="hljs"><pre><code class="hljs sh">kube-apiserver -h | grep <span class="hljs-built_in">enable</span>-admission-plugins</code></pre></div>
+
+<p>具体每个准入控制器的作用可以通过 <a href="https://kubernetes.io/zh/docs/reference/access-authn-authz/admission-controllers/" target="_blank" rel="noopener">Using Admission Controllers</a> 文档查看。在这些准入控制器中有两个特殊的准入控制器 <code>MutatingAdmissionWebhook</code> 和 <code>ValidatingAdmissionWebhook</code>。<strong>这两个准入控制器以 WebHook 的方式提供扩展能力，从而我们可以实现自定义的一些功能。当我们在集群中创建相关 WebHook 配置后，我们配置中描述的想要关注的资源在集群中创建、修改等都会触发 WebHook，我们再编写具体的应用来响应 WebHook 即可完成特定功能。</strong></p>
+<h2 id="二、动态准入控制"><a href="#二、动态准入控制" class="headerlink" title="二、动态准入控制"></a>二、动态准入控制</h2><p>动态准入控制实际上指的就是上面所说的两个 WebHook，在使用动态准入控制时需要一些先决条件:</p>
+<ul>
+<li>确保 Kubernetes 集群版本至少为 v1.16 (以便使用 <code>admissionregistration.k8s.io/v1 API</code>)或者 v1.9 (以便使用 <code>admissionregistration.k8s.io/v1beta1</code> API)。</li>
+<li>确保启用 MutatingAdmissionWebhook 和 ValidatingAdmissionWebhook 控制器。 </li>
+<li>确保启用 <code>admissionregistration.k8s.io/v1</code> 或 <code>admissionregistration.k8s.io/v1beta1</code> API。</li>
+</ul>
+<p>如果要使用 Mutating Admission Webhook，在满足先决条件后，需要在系统中 create 一个 MutatingWebhookConfiguration:</p>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">admissionregistration.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">MutatingWebhookConfiguration</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">"mutating-webhook.mritd.me"</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-addons</span>
+<span class="hljs-attr">webhooks:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">"mutating-webhook.mritd.me"</span>
+    <span class="hljs-attr">rules:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span>   <span class="hljs-string">[""]</span>
+        <span class="hljs-attr">apiVersions:</span> <span class="hljs-string">["v1"]</span>
+        <span class="hljs-attr">operations:</span>  <span class="hljs-string">["CREATE","UPDATE"]</span>
+        <span class="hljs-attr">resources:</span>   <span class="hljs-string">["pods"]</span>
+        <span class="hljs-attr">scope:</span>       <span class="hljs-string">"Namespaced"</span>
+    <span class="hljs-attr">clientConfig:</span>
+      <span class="hljs-attr">service:</span>
+        <span class="hljs-attr">name:</span> <span class="hljs-string">"mutating-webhook"</span>
+        <span class="hljs-attr">namespace:</span> <span class="hljs-string">"kube-addons"</span>
+        <span class="hljs-attr">path:</span> <span class="hljs-string">/print</span>
+      <span class="hljs-attr">caBundle:</span> <span class="hljs-string">$&#123;CA_BUNDLE&#125;</span>
+    <span class="hljs-attr">admissionReviewVersions:</span> <span class="hljs-string">["v1",</span> <span class="hljs-string">"v1beta1"</span><span class="hljs-string">]</span>
+    <span class="hljs-attr">sideEffects:</span> <span class="hljs-string">None</span>
+    <span class="hljs-attr">timeoutSeconds:</span> <span class="hljs-number">5</span>
+    <span class="hljs-attr">failurePolicy:</span> <span class="hljs-string">Ignore</span>
+    <span class="hljs-attr">namespaceSelector:</span>
+      <span class="hljs-attr">matchLabels:</span>
+        <span class="hljs-attr">mutating-webhook.mritd.me:</span> <span class="hljs-string">"true"</span></code></pre></div>
+
+<p>同样要使用 Validating Admission Webhook 也需要类似的配置:</p>
+<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">admissionregistration.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ValidatingWebhookConfiguration</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">"validating-webhook.mritd.me"</span>
+<span class="hljs-attr">webhooks:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">"validating-webhook.mritd.me"</span>
+    <span class="hljs-attr">rules:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span>   <span class="hljs-string">[""]</span>
+        <span class="hljs-attr">apiVersions:</span> <span class="hljs-string">["v1"]</span>
+        <span class="hljs-attr">operations:</span>  <span class="hljs-string">["CREATE","UPDATE"]</span>
+        <span class="hljs-attr">resources:</span>   <span class="hljs-string">["pods"]</span>
+        <span class="hljs-attr">scope:</span>       <span class="hljs-string">"Namespaced"</span>
+    <span class="hljs-attr">clientConfig:</span>
+      <span class="hljs-attr">service:</span>
+        <span class="hljs-attr">name:</span> <span class="hljs-string">"validating-webhook"</span>
+        <span class="hljs-attr">namespace:</span> <span class="hljs-string">"kube-addons"</span>
+        <span class="hljs-attr">path:</span> <span class="hljs-string">/print</span>
+      <span class="hljs-attr">caBundle:</span> <span class="hljs-string">$&#123;CA_BUNDLE&#125;</span>
+    <span class="hljs-attr">admissionReviewVersions:</span> <span class="hljs-string">["v1",</span> <span class="hljs-string">"v1beta1"</span><span class="hljs-string">]</span>
+    <span class="hljs-attr">sideEffects:</span> <span class="hljs-string">None</span>
+    <span class="hljs-attr">timeoutSeconds:</span> <span class="hljs-number">5</span>
+    <span class="hljs-attr">failurePolicy:</span> <span class="hljs-string">Ignore</span>
+    <span class="hljs-attr">namespaceSelector:</span>
+      <span class="hljs-attr">matchLabels:</span>
+        <span class="hljs-attr">validating-webhook.mritd.me:</span> <span class="hljs-string">"true"</span></code></pre></div>
+
+
+<p>从配置文件中可以看到，<code>webhooks.rules</code> 段落中具体指定了我们想要关注的资源及其行为，<code>webhooks.clientConfig</code> 中指定了 webhook 触发后将其发送到那个地址以及证书配置等，这些具体字段的含义可以通过官方文档 <a href="https://kubernetes.io/zh/docs/reference/access-authn-authz/extensible-admission-controllers/" target="_blank" rel="noopener">Dynamic Admission Control</a> 来查看。</p>
+<p><strong>值得注意的是 Mutating Admission Webhook 会在 Validating Admission Webhook 之前触发；Mutating Admission Webhook 可以修改用户的请求，比如自动调整镜像名称、增加注解等，而 Validating Admission Webhook 只能做校验(true or false)，不可以进行修改操作。</strong></p>
+<h2 id="三、编写一个-WebHook"><a href="#三、编写一个-WebHook" class="headerlink" title="三、编写一个 WebHook"></a>三、编写一个 WebHook</h2><blockquote>
+<p><strong>郑重提示: 本部分文章请结合 <a href="https://github.com/mritd/goadmission" target="_blank" rel="noopener">goadmission</a> 框架源码进行阅读。</strong></p>
+</blockquote>
+<h3 id="3-1、大体思路"><a href="#3-1、大体思路" class="headerlink" title="3.1、大体思路"></a>3.1、大体思路</h3><p>在编写之前一般我们先大体了解一下流程并制订方案再去实现，边写边思考适合在细节实现上，对于整体的把控需要提前作好预习。针对于这个准入控制的 WebHook 来说，根据其官方文档大致总结重点如下:</p>
+<ul>
+<li>WebHook 接收者就是一个标准的 HTTP Server，请求方式是 POST + JSON</li>
+<li>请求响应都是一个 AdmissionReview 对象</li>
+<li>响应时需要请求时的 UID(<code>request.uid</code>)</li>
+<li>响应时 Mutating Admission Webhook 可以包含对请求的修改信息，格式为 JSONPatch</li>
+</ul>
+<p>有了以上信息以后便可以知道编写 WebHook 需要的东西，根据这些信息目前我作出的大体方案如下:</p>
+<ul>
+<li>最起码我们要有个 HTTP Server，考虑到后续可能会同时处理多种 WebHook，所以需要一个带有路径匹配的 HTTP 框架，Gin 什么的虽然不错但是太重，最终选择简单轻量的 <code>gorilla/mux</code>。</li>
+<li>应该做好适当的抽象，因为对于响应需要包含的 UID 等限制在每个请求都有可以提取出来自动化完成。</li>
+<li>针对于 Mutating Admission Webhook 响应的 JSONPatch 可以弄个结构体然后直接反序列化。</li>
+</ul>
+<h3 id="3-2、AdmissionReview-对象"><a href="#3-2、AdmissionReview-对象" class="headerlink" title="3.2、AdmissionReview 对象"></a>3.2、AdmissionReview 对象</h3><p>基于 3.1 部分的分析可以知道，WebHook 接收和响应都是一个 AdmissionReview 对象，在查看源码以后可以看到 AdmissionReview 结构如下:</p>
+<p><img src="https://cdn.oss.link/markdown/jro62.png" srcset="/img/loading.gif" alt="AdmissionReview"></p>
+<p>从代码的命名中可以很清晰的看出，在请求发送到 WebHook 时我们只需要关注内部的 AdmissionRequest(实际入参)，在我们编写的 WebHook 处理完成后只需要返回包含有 AdmissionResponse(实际返回体) 的 AdmissionReview 对象即可；总的来说 <strong>AdmissionReview 对象是个套壳，请求是里面的 AdmissionRequest，响应是里面的 AdmissionResponse</strong>。</p>
+<h3 id="3-3、Hello-World"><a href="#3-3、Hello-World" class="headerlink" title="3.3、Hello World"></a>3.3、Hello World</h3><p>有了上面的一些基础知识，我们就可以简单的实行一个什么也不干的 WebHook 方法(本地无法直接运行，重点在于思路):</p>
+<div class="hljs"><pre><code class="hljs go"><span class="hljs-comment">// printRequest 接收 AdmissionRequest 对象并将其打印到到控制台，接着不做任何处理直接返回一个 AdmissionResponse 对象</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">printRequest</span><span class="hljs-params">(request *admissionv1.AdmissionRequest)</span> <span class="hljs-params">(*admissionv1.AdmissionResponse, error)</span></span> &#123;
+	bs, err := jsoniter.MarshalIndent(request, <span class="hljs-string">""</span>, <span class="hljs-string">"    "</span>)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+	&#125;
+	logger.Infof(<span class="hljs-string">"print request: %s"</span>, <span class="hljs-keyword">string</span>(bs))
+
+	<span class="hljs-keyword">return</span> &amp;admissionv1.AdmissionResponse&#123;
+		Allowed: <span class="hljs-literal">true</span>,
+		Result: &amp;metav1.Status&#123;
+			Code:    http.StatusOK,
+			Message: <span class="hljs-string">"Hello World"</span>,
+		&#125;,
+	&#125;, <span class="hljs-literal">nil</span>
+&#125;</code></pre></div>
+
+<p>上面这个 <code>printRequest</code> 方法最细粒度的控制到只面向我们的实际请求和响应；而对于 WebHook Server 来说其接到的是 http 请求，<strong>所以我们还需要在外面包装一下，将 http 请求转换为 AdmissionReview 并提取 AdmissionRequest 再调用上面的 <code>printRequest</code> 来处理，最后将返回结果重新包装为 AdmissionReview 重新返回；整体的代码如下</strong></p>
+<div class="hljs"><pre><code class="hljs go"><span class="hljs-comment">// 通用的错误返回方法</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">responseErr</span><span class="hljs-params">(handlePath, msg <span class="hljs-keyword">string</span>, httpCode <span class="hljs-keyword">int</span>, w http.ResponseWriter)</span></span> &#123;
+	logger.Errorf(<span class="hljs-string">"handle func [%s] response err: %s"</span>, handlePath, msg)
+	review := &amp;admissionv1.AdmissionReview&#123;
+		Response: &amp;admissionv1.AdmissionResponse&#123;
+			Allowed: <span class="hljs-literal">false</span>,
+			Result: &amp;metav1.Status&#123;
+				Message: msg,
+			&#125;,
+		&#125;,
+	&#125;
+	bs, err := jsoniter.Marshal(review)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		logger.Errorf(<span class="hljs-string">"failed to marshal response: %v"</span>, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]<span class="hljs-keyword">byte</span>(fmt.Sprintf(<span class="hljs-string">"failed to marshal response: %s"</span>, err)))
+	&#125;
+
+	w.WriteHeader(httpCode)
+	_, err = w.Write(bs)
+	logger.Debugf(<span class="hljs-string">"write err response: %d: %v: %v"</span>, httpCode, review, err)
+&#125;
+
+<span class="hljs-comment">// printRequest 接收 AdmissionRequest 对象并将其打印到到控制台，接着不做任何处理直接返回一个 AdmissionResponse 对象</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">printRequest</span><span class="hljs-params">(request *admissionv1.AdmissionRequest)</span> <span class="hljs-params">(*admissionv1.AdmissionResponse, error)</span></span> &#123;
+	bs, err := jsoniter.MarshalIndent(request, <span class="hljs-string">""</span>, <span class="hljs-string">"    "</span>)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+	&#125;
+	logger.Infof(<span class="hljs-string">"print request: %s"</span>, <span class="hljs-keyword">string</span>(bs))
+
+	<span class="hljs-keyword">return</span> &amp;admissionv1.AdmissionResponse&#123;
+		Allowed: <span class="hljs-literal">true</span>,
+		Result: &amp;metav1.Status&#123;
+			Code:    http.StatusOK,
+			Message: <span class="hljs-string">"Hello World"</span>,
+		&#125;,
+	&#125;, <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-comment">// http server 的处理方法</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">headler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
+			<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123; _ = r.Body.Close() &#125;()
+			w.Header().Set(<span class="hljs-string">"Content-Type"</span>, <span class="hljs-string">"application/json"</span>)
+
+			<span class="hljs-comment">// 读取 body，出错直接返回</span>
+			reqBs, err := ioutil.ReadAll(r.Body)
+			<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+				responseErr(handlePath, err.Error(), http.StatusInternalServerError, w)
+				<span class="hljs-keyword">return</span>
+			&#125;
+			<span class="hljs-keyword">if</span> reqBs == <span class="hljs-literal">nil</span> || <span class="hljs-built_in">len</span>(reqBs) == <span class="hljs-number">0</span> &#123;
+				responseErr(handlePath, <span class="hljs-string">"request body is empty"</span>, http.StatusBadRequest, w)
+				<span class="hljs-keyword">return</span>
+			&#125;
+			logger.Debugf(<span class="hljs-string">"request body: %s"</span>, <span class="hljs-keyword">string</span>(reqBs))
+
+			<span class="hljs-comment">// 将 body 反序列化为 AdmissionReview</span>
+			reqReview := admissionv1.AdmissionReview&#123;&#125;
+			<span class="hljs-keyword">if</span> _, _, err := deserializer.Decode(reqBs, <span class="hljs-literal">nil</span>, &amp;reqReview); err != <span class="hljs-literal">nil</span> &#123;
+				responseErr(handlePath, fmt.Sprintf(<span class="hljs-string">"failed to decode req: %s"</span>, err), http.StatusInternalServerError, w)
+				<span class="hljs-keyword">return</span>
+			&#125;
+			<span class="hljs-keyword">if</span> reqReview.Request == <span class="hljs-literal">nil</span> &#123;
+				responseErr(handlePath, <span class="hljs-string">"admission review request is empty"</span>, http.StatusBadRequest, w)
+				<span class="hljs-keyword">return</span>
+			&#125;
+
+			<span class="hljs-comment">// 提取 AdmissionRequest 并调用 printRequest 处理</span>
+			resp, err := printRequest(reqReview.Request)
+			<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+				responseErr(handlePath, fmt.Sprintf(<span class="hljs-string">"admission func response: %s"</span>, err), http.StatusForbidden, w)
+				<span class="hljs-keyword">return</span>
+			&#125;
+			<span class="hljs-keyword">if</span> resp == <span class="hljs-literal">nil</span> &#123;
+				responseErr(handlePath, <span class="hljs-string">"admission func response is empty"</span>, http.StatusInternalServerError, w)
+				<span class="hljs-keyword">return</span>
+			&#125;
+			
+			<span class="hljs-comment">// 复制 AdmissionRequest 中的 UID 到 AdmissionResponse 中(必须进行，否则会导致响应无效)</span>
+			resp.UID = reqReview.Request.UID
+			<span class="hljs-comment">// 复制 reqReview.TypeMeta 到新的响应 AdmissionReview 中</span>
+			respReview := admissionv1.AdmissionReview&#123;
+				TypeMeta: reqReview.TypeMeta,
+				Response: resp,
+			&#125;
+			
+			<span class="hljs-comment">// 重新序列化响应并返回</span>
+			respBs, err := jsoniter.Marshal(respReview)
+			<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+				responseErr(handlePath, fmt.Sprintf(<span class="hljs-string">"failed to marshal response: %s"</span>, err), http.StatusInternalServerError, w)
+				logger.Errorf(<span class="hljs-string">"the expected response is: %v"</span>, respReview)
+				<span class="hljs-keyword">return</span>
+			&#125;
+			w.WriteHeader(http.StatusOK)
+			_, err = w.Write(respBs)
+			logger.Debugf(<span class="hljs-string">"write response: %d: %s: %v"</span>, http.StatusOK, <span class="hljs-keyword">string</span>(respBs), err)
+		&#125;</code></pre></div>
+
+<h3 id="3-4、抽象出框架"><a href="#3-4、抽象出框架" class="headerlink" title="3.4、抽象出框架"></a>3.4、抽象出框架</h3><p>编写了简单的 Hello World 以后可以看出，真正在编写时我们需要实现的都是处理 AdmissionRequest 并返回 AdmissionResponse 这部份(printRequest)；外部的包装为 AdmissionReview、复制 UID、复制 TypeMeta 等都是通用的方法，所以基于这一点我们可以进行适当的抽象:</p>
+<h4 id="3-4-1、AdmissionFunc"><a href="#3-4-1、AdmissionFunc" class="headerlink" title="3.4.1、AdmissionFunc"></a>3.4.1、AdmissionFunc</h4><p>针对每一个贴合业务的 WebHook 来说，其大致有三大属性:</p>
+<ul>
+<li>WebHook 的类型(Mutating/Validating)</li>
+<li>WebHook 拦截的 URL 路径(/print_request)</li>
+<li>WebHook 核心的处理逻辑(处理 Request 和返回 Response)</li>
+</ul>
+<p>我们将其抽象为 AdmissionFunc 结构体以后如下所示</p>
+<div class="hljs"><pre><code class="hljs go"><span class="hljs-comment">// WebHook 类型</span>
+<span class="hljs-keyword">const</span> (
+	Mutating   AdmissionFuncType = <span class="hljs-string">"Mutating"</span>
+	Validating AdmissionFuncType = <span class="hljs-string">"Validating"</span>
+)
+
+<span class="hljs-comment">// 每一个对应到我们业务的 WebHook 抽象的 struct</span>
+<span class="hljs-keyword">type</span> AdmissionFunc <span class="hljs-keyword">struct</span> &#123;
+	Type AdmissionFuncType
+	Path <span class="hljs-keyword">string</span>
+	Func <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(request *admissionv1.AdmissionRequest)</span> <span class="hljs-params">(*admissionv1.AdmissionResponse, error)</span></span>
+&#125;</code></pre></div>
+
+<h4 id="3-4-2、HandleFunc"><a href="#3-4-2、HandleFunc" class="headerlink" title="3.4.2、HandleFunc"></a>3.4.2、HandleFunc</h4><p>我们知道 WebHook 是基于 HTTP 的，所以上面抽象出的 AdmissionFunc 还不能直接用在 HTTP 请求代码中；如果直接偶合到 HTTP 请求代码中，我们就没法为 HTTP 代码再增加其他拦截路径等等特殊的底层设置；<strong>所以站在 HTTP 层面来说还需要抽象一个 “更高层面的且包含 AdmissionFunc 全部能力的 HandleFunc” 来使用；HandleFunc 抽象 HTTP 层面的需求:</strong></p>
+<ul>
+<li>HTTP 请求方法</li>
+<li>HTTP 请求路径</li>
+<li>HTTP 处理方法</li>
+</ul>
+<p>以下为 HandleFunc 的抽象:</p>
+<div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">type</span> HandleFunc <span class="hljs-keyword">struct</span> &#123;
+	Path   <span class="hljs-keyword">string</span>
+	Method <span class="hljs-keyword">string</span>
+	Func   <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span>
+&#125;</code></pre></div>
+
+<h3 id="3-5、goadmission-框架"><a href="#3-5、goadmission-框架" class="headerlink" title="3.5、goadmission 框架"></a>3.5、goadmission 框架</h3><p>有了以上两个角度的抽象，再结合 命令行参数解析、日志处理、配置文件读取等等，我揉合出了一个 <a href="https://github.com/mritd/goadmission" target="_blank" rel="noopener">goadmission</a> 框架，以方便动态准入控制的快速开发。</p>
+<h4 id="3-5-1、基本结构"><a href="#3-5-1、基本结构" class="headerlink" title="3.5.1、基本结构"></a>3.5.1、基本结构</h4><div class="hljs"><pre><code class="hljs sh">.
+├── main.go
+└── pkg
+    ├── adfunc
+    │   ├── adfuncs.go
+    │   ├── adfuncs_json.go
+    │   ├── func_check_deploy_time.go
+    │   ├── func_disable_service_links.go
+    │   ├── func_image_rename.go
+    │   └── func_print_request.go
+    ├── conf
+    │   └── conf.go
+    ├── route
+    │   ├── route_available.go
+    │   ├── route_health.go
+    │   └── router.go
+    └── zaplogger
+        ├── config.go
+        └── logger.go
+
+5 directories, 13 files</code></pre></div>
+
+<ul>
+<li>main.go 为程序运行入口，在此设置命令行 flag 参数等</li>
+<li>pkg/conf 为框架配置包，所有的配置读取只读取这个包即可</li>
+<li>pkg/zaplogger zap log 库的日志抽象和处理(copy 自 operator-sdk)</li>
+<li>pkg/route http 级别的路由抽象(HandleFunc)</li>
+<li>pkg/adfunc 动态准入控制 WebHook 级别的抽(AdmissionFunc)</li>
+</ul>
+<h4 id="3-5-2、增加动态准入控制"><a href="#3-5-2、增加动态准入控制" class="headerlink" title="3.5.2、增加动态准入控制"></a>3.5.2、增加动态准入控制</h4><p>由于框架已经作好了路由注册等相关抽象，所以只需要新建 go 文件，然后通过 init 方法注册到全局 WebHook 组中即可，新编写的 WebHook 对已有代码不会有任何侵入:</p>
+<p><img src="https://cdn.oss.link/markdown/lg6zc.png" srcset="/img/loading.gif" alt="add_adfunc"></p>
+<p><strong>需要注意的是所有 validating 类型的 WebHook 会在 URL 路径前自动拼接 <code>/validating</code> 路径，mutating 类型的 WebHook 会在 URL 路径前自动拼接 <code>/mutating</code> 路径；</strong>这么做是为了避免在更高层级的 HTTP Route 上添加冲突的路由。</p>
+<p><img src="https://cdn.oss.link/markdown/nd5ez.png" srcset="/img/loading.gif" alt="auto_fix_url"></p>
+<h4 id="3-5-3、实现-image-自动修改"><a href="#3-5-3、实现-image-自动修改" class="headerlink" title="3.5.3、实现 image 自动修改"></a>3.5.3、实现 image 自动修改</h4><p>所以一切准备就绪以后，就需要 “不忘初心”，撸一个自动修改镜像名称的 WebHook:</p>
+<div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">package</span> adfunc
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">"fmt"</span>
+	<span class="hljs-string">"net/http"</span>
+	<span class="hljs-string">"strings"</span>
+	<span class="hljs-string">"sync"</span>
+	<span class="hljs-string">"time"</span>
+
+	<span class="hljs-string">"github.com/mritd/goadmission/pkg/conf"</span>
+
+	jsoniter <span class="hljs-string">"github.com/json-iterator/go"</span>
+
+	corev1 <span class="hljs-string">"k8s.io/api/core/v1"</span>
+	metav1 <span class="hljs-string">"k8s.io/apimachinery/pkg/apis/meta/v1"</span>
+
+	<span class="hljs-string">"github.com/mritd/goadmission/pkg/route"</span>
+	admissionv1 <span class="hljs-string">"k8s.io/api/admission/v1"</span>
+)
+
+<span class="hljs-comment">// 只初始化一次 renameMap</span>
+<span class="hljs-keyword">var</span> renameOnce sync.Once
+<span class="hljs-comment">// renameMap 保存镜像名称的替换规则，目前粗略实现为纯文本替换</span>
+<span class="hljs-keyword">var</span> renameMap <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span> &#123;
+	route.Register(route.AdmissionFunc&#123;
+		Type: route.Mutating,
+		Path: <span class="hljs-string">"/rename"</span>,
+		Func: <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(request *admissionv1.AdmissionRequest)</span> <span class="hljs-params">(*admissionv1.AdmissionResponse, error)</span></span> &#123;
+			<span class="hljs-comment">// init rename rules map</span>
+			renameOnce.Do(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+				renameMap = <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span>, <span class="hljs-number">10</span>)
+				<span class="hljs-comment">// 将镜像重命名规则初始化到 renameMap 中，方便后续读取</span>
+				<span class="hljs-comment">// rename rule example: k8s.gcr.io/=gcrxio/k8s.gcr.io_</span>
+				<span class="hljs-keyword">for</span> _, s := <span class="hljs-keyword">range</span> conf.ImageRename &#123;
+					ss := strings.Split(s, <span class="hljs-string">"="</span>)
+					<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(ss) != <span class="hljs-number">2</span> &#123;
+						logger.Fatalf(<span class="hljs-string">"failed to parse image name rename rules: %s"</span>, s)
+					&#125;
+					renameMap[ss[<span class="hljs-number">0</span>]] = ss[<span class="hljs-number">1</span>]
+				&#125;
+			&#125;)
+
+			<span class="hljs-comment">// 这个准入控制的 WebHook 只针对 Pod 处理，非 Pod 类请求直接返回错误</span>
+			<span class="hljs-keyword">switch</span> request.Kind.Kind &#123;
+			<span class="hljs-keyword">case</span> <span class="hljs-string">"Pod"</span>:
+				<span class="hljs-comment">// 从 request 中反序列化出 Pod 实例</span>
+				<span class="hljs-keyword">var</span> pod corev1.Pod
+				err := jsoniter.Unmarshal(request.Object.Raw, &amp;pod)
+				<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+					errMsg := fmt.Sprintf(<span class="hljs-string">"[route.Mutating] /rename: failed to unmarshal object: %v"</span>, err)
+					logger.Error(errMsg)
+					<span class="hljs-keyword">return</span> &amp;admissionv1.AdmissionResponse&#123;
+						Allowed: <span class="hljs-literal">false</span>,
+						Result: &amp;metav1.Status&#123;
+							Code:    http.StatusBadRequest,
+							Message: errMsg,
+						&#125;,
+					&#125;, <span class="hljs-literal">nil</span>
+				&#125;
+
+				<span class="hljs-comment">// 后来我发现带有下面这个注解的 Pod 是没法更改成功的，这种 Pod 是由 kubelet 直接</span>
+				<span class="hljs-comment">// 启动的 static pod，在 api server 中只能看到它的 "mirror"，不能改的</span>
+				<span class="hljs-comment">// skip static pod</span>
+				<span class="hljs-keyword">for</span> k := <span class="hljs-keyword">range</span> pod.Annotations &#123;
+					<span class="hljs-keyword">if</span> k == <span class="hljs-string">"kubernetes.io/config.mirror"</span> &#123;
+						errMsg := fmt.Sprintf(<span class="hljs-string">"[route.Mutating] /rename: pod %s has kubernetes.io/config.mirror annotation, skip image rename"</span>, pod.Name)
+						logger.Warn(errMsg)
+						<span class="hljs-keyword">return</span> &amp;admissionv1.AdmissionResponse&#123;
+							Allowed: <span class="hljs-literal">true</span>,
+							Result: &amp;metav1.Status&#123;
+								Code:    http.StatusOK,
+								Message: errMsg,
+							&#125;,
+						&#125;, <span class="hljs-literal">nil</span>
+					&#125;
+				&#125;
+
+				<span class="hljs-comment">// 遍历所有 Pod，然后生成 JSONPatch</span>
+				<span class="hljs-comment">// 注意: 返回结果必须是 JSONPatch，k8s api server 再将 JSONPatch 应用到 Pod 上 </span>
+				
+				<span class="hljs-comment">// 由于有多个 Pod，所以最终会产生一个补丁数组</span>
+				<span class="hljs-keyword">var</span> patches []Patch
+				<span class="hljs-keyword">for</span> i, c := <span class="hljs-keyword">range</span> pod.Spec.Containers &#123;
+					<span class="hljs-keyword">for</span> s, t := <span class="hljs-keyword">range</span> renameMap &#123;
+						<span class="hljs-keyword">if</span> strings.HasPrefix(c.Image, s) &#123;
+							patches = <span class="hljs-built_in">append</span>(patches, Patch&#123;
+								<span class="hljs-comment">// 指定 JSONPatch 动作为 replace </span>
+								Option: PatchOptionReplace,
+								<span class="hljs-comment">// 打补丁的绝对位置</span>
+								Path:   fmt.Sprintf(<span class="hljs-string">"/spec/containers/%d/image"</span>, i),
+								<span class="hljs-comment">// replace 为处理过的镜像名</span>
+								Value:  strings.Replace(c.Image, s, t, <span class="hljs-number">1</span>),
+							&#125;)
+
+							<span class="hljs-comment">// 为了后期调试和留存历史，我们再为修改过的 Pod 加个注解</span>
+							patches = <span class="hljs-built_in">append</span>(patches, Patch&#123;
+								Option: PatchOptionAdd,
+								Path:   <span class="hljs-string">"/metadata/annotations"</span>,
+								Value: <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span>&#123;
+									fmt.Sprintf(<span class="hljs-string">"rename-mutatingwebhook-%d.mritd.me"</span>, time.Now().Unix()): fmt.Sprintf(<span class="hljs-string">"%d-%s-%s"</span>, i, strings.ReplaceAll(s, <span class="hljs-string">"/"</span>, <span class="hljs-string">"_"</span>), strings.ReplaceAll(t, <span class="hljs-string">"/"</span>, <span class="hljs-string">"_"</span>)),
+								&#125;,
+							&#125;)
+							<span class="hljs-keyword">break</span>
+						&#125;
+					&#125;
+				&#125;
+
+				<span class="hljs-comment">// 将所有 JSONPatch 序列化成 json，然后返回即可</span>
+				patch, err := jsoniter.Marshal(patches)
+				<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+					errMsg := fmt.Sprintf(<span class="hljs-string">"[route.Mutating] /rename: failed to marshal patch: %v"</span>, err)
+					logger.Error(errMsg)
+					<span class="hljs-keyword">return</span> &amp;admissionv1.AdmissionResponse&#123;
+						Allowed: <span class="hljs-literal">false</span>,
+						Result: &amp;metav1.Status&#123;
+							Code:    http.StatusInternalServerError,
+							Message: errMsg,
+						&#125;,
+					&#125;, <span class="hljs-literal">nil</span>
+				&#125;
+
+				logger.Infof(<span class="hljs-string">"[route.Mutating] /rename: patches: %s"</span>, <span class="hljs-keyword">string</span>(patch))
+				<span class="hljs-keyword">return</span> &amp;admissionv1.AdmissionResponse&#123;
+					Allowed:   <span class="hljs-literal">true</span>,
+					Patch:     patch,
+					PatchType: JSONPatch(),
+					Result: &amp;metav1.Status&#123;
+						Code:    http.StatusOK,
+						Message: <span class="hljs-string">"success"</span>,
+					&#125;,
+				&#125;, <span class="hljs-literal">nil</span>
+			<span class="hljs-keyword">default</span>:
+				errMsg := fmt.Sprintf(<span class="hljs-string">"[route.Mutating] /rename: received wrong kind request: %s, Only support Kind: Pod"</span>, request.Kind.Kind)
+				logger.Error(errMsg)
+				<span class="hljs-keyword">return</span> &amp;admissionv1.AdmissionResponse&#123;
+					Allowed: <span class="hljs-literal">false</span>,
+					Result: &amp;metav1.Status&#123;
+						Code:    http.StatusForbidden,
+						Message: errMsg,
+					&#125;,
+				&#125;, <span class="hljs-literal">nil</span>
+			&#125;
+		&#125;,
+	&#125;)
+&#125;</code></pre></div>
+
+<h2 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h2><ul>
+<li>动态准入控制其实就是个 WebHook，我们弄个 HTTP Server 接收 AdmissionRequest 响应 AdmissionResponse 就行。</li>
+<li>Request、Response 会包装到 AdmissionReview 中，我们还需要做一些边缘处理，比如复制 UID、TypeMeta 等</li>
+<li>MutatingWebHook 想要修改东西时，要返回描述修改操作的 JSONPatch 补丁</li>
+<li>单个 WebHook 很简单，写多个的时候要自己抽好框架，尽量优雅的作好复用和封装</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/admission/">Admission</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/08/19/use-etcdadm-to-build-etcd-cluster-in-3-minutes/">
+                        <span class="hidden-mobile">使用 etcdadm 三分钟搭建 etcd 集群</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2020/08/19/write-a-dynamic-admission-control-webhook/';
+        this.page.identifier = '/2020/08/19/write-a-dynamic-admission-control-webhook/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "编写一个动态准入控制来实现自动化&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

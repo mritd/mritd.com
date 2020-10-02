@@ -1,0 +1,862 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>快速部署 kubernetes 高可用集群 - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2017-03-03 23:16" pubdate>
+        2017年3月3日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.4k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      33
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">快速部署 kubernetes 高可用集群</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <blockquote>
+<p>鼓捣 kubernetes 好长一段时间了，kubernetes 1.5 后新增了 kubeadm 工具用于快速部署 kubernetes 集群，不过该工具尚未稳定，无法自动部署高可用集群，而且还存在一些 BUG，所以生产环境还无法使用；本文基于 kargo 工具实现一键部署 kubernetes 容器化(可选) 高可用集群</p>
+</blockquote>
+<h3 id="一、基本环境准备"><a href="#一、基本环境准备" class="headerlink" title="一、基本环境准备"></a>一、基本环境准备</h3><p>本文基本环境如下:</p>
+<p><strong>五台虚拟机，基于 vagrant 启动(穷)，vagrant 配置文件参考 <a href="https://github.com/mritd/config/tree/master/vagrant" target="_blank" rel="noopener">这里</a></strong></p>
+<table>
+<thead>
+<tr>
+<th>主机地址</th>
+<th>节点角色</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>192.168.1.11</td>
+<td>master</td>
+</tr>
+<tr>
+<td>192.168.1.12</td>
+<td>master</td>
+</tr>
+<tr>
+<td>192.168.1.13</td>
+<td>node</td>
+</tr>
+<tr>
+<td>192.168.1.14</td>
+<td>node</td>
+</tr>
+<tr>
+<td>192.168.1.15</td>
+<td>node</td>
+</tr>
+</tbody></table>
+<p>同时保证部署机器对集群内节点拥有 root 免密登录权限，<strong>由于墙的原因，部署所需镜像已经全部打包到百度云，点击 <a href="https://pan.baidu.com/s/1jHMvMn0" target="_blank" rel="noopener">这里</a> 下载，然后进行 load 即可；注意: 直接使用我的 <code>vagrant</code> 文件时，请删除我在 <code>init.sh</code> 脚本里对 docker 设置的本地代理，直接使用可能导致 docker 无法 pull 任何镜像；vagrant 可能需要执行 <code>vagrant plugin install vagrant-hosts</code> 安装插件以支持自动设置 host；如果自己采用其他虚拟机请保证单台虚拟机最低 1.5G 内存，否则会导致安装失败，别问我怎么知道的</strong></p>
+<p><strong>最新更新：经过测试，请使用 pip 安装 ansible，保证 <code>ansible &gt;= 2.2.1</code> &amp;&amp; <code>jinja2 &gt;= 2.8,&lt; 2.9</code>；否则可能出现安装时校验失败问题</strong></p>
+<h3 id="二、搭建集群"><a href="#二、搭建集群" class="headerlink" title="二、搭建集群"></a>二、搭建集群</h3><h4 id="2-1、获取源码"><a href="#2-1、获取源码" class="headerlink" title="2.1、获取源码"></a>2.1、获取源码</h4><p><strong>kargo 是基于 ansible 的 Playbooks 的，其官方推荐的 kargo-cli 目前只适用于各种云平台部署安装，所以我们需要手动使用 Playbooks 部署，当然第一步先把源码搞下来</strong></p>
+<div class="hljs"><pre><code class="hljs sh">git <span class="hljs-built_in">clone</span> https://github.com/kubernetes-incubator/kargo.git</code></pre></div>
+
+<h4 id="2-2、安装-ansible"><a href="#2-2、安装-ansible" class="headerlink" title="2.2、安装 ansible"></a>2.2、安装 ansible</h4><p>既然 kargo 是基于 ansible 的(实际上就是 Playbooks)，那么自然要先安装 ansible，同时下面配置生成会用到 python3，所以也一并安装</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 安装 python 及 epel</span>
+yum install -y epel-release python-pip python34 python34-pip
+<span class="hljs-comment"># 安装 ansible(必须先安装 epel 源再安装 ansible)</span>
+yum install -y ansible</code></pre></div>
+
+<h4 id="2-3、编辑配置文件"><a href="#2-3、编辑配置文件" class="headerlink" title="2.3、编辑配置文件"></a>2.3、编辑配置文件</h4><p><strong>注意：以下配置段中，所有双大括号 <code>{ {</code> 、<code>} }</code>，中间全部加了空格，因为双大括号会跟主题模板引擎产生冲突，默认应该是没有的，请自行 vim 替换</strong></p>
+<p>首先根据自己需要更改 kargo 的配置，配置文件位于 <code>inventory/group_vars/k8s-cluster.yml</code>，<strong>最新稳定版本版本(2.1.0) 配置文件还未更名，全部在 <code>inventory/group_vars/all.yml</code> 中，这里采用最新版本的原因是…借着写博客我也看看更新了啥(偷笑…)</strong></p>
+<div class="hljs"><pre><code class="hljs sh">vim inventory/group_vars/k8s-cluster.yml
+
+<span class="hljs-comment"># 配置文件如下</span>
+<span class="hljs-comment"># 启动集群的基础系统</span>
+bootstrap_os: centos
+
+<span class="hljs-comment"># etcd 数据存放位置</span>
+etcd_data_dir: /var/lib/etcd
+
+<span class="hljs-comment"># 二进制文件将要安装的位置</span>
+bin_dir: /usr/<span class="hljs-built_in">local</span>/bin
+
+<span class="hljs-comment"># Kubernetes 配置文件存放目录以及命名空间</span>
+kube_config_dir: /etc/kubernetes
+kube_script_dir: <span class="hljs-string">"&#123; &#123; bin_dir &#125; &#125;/kubernetes-scripts"</span>
+kube_manifest_dir: <span class="hljs-string">"&#123; &#123; kube_config_dir &#125; &#125;/manifests"</span>
+system_namespace: kube-system
+
+<span class="hljs-comment"># 日志存放位置</span>
+kube_log_dir: <span class="hljs-string">"/var/log/kubernetes"</span>
+
+<span class="hljs-comment"># kubernetes 证书存放位置</span>
+kube_cert_dir: <span class="hljs-string">"&#123; &#123; kube_config_dir &#125; &#125;/ssl"</span>
+
+<span class="hljs-comment"># token存放位置</span>
+kube_token_dir: <span class="hljs-string">"&#123; &#123; kube_config_dir &#125; &#125;/tokens"</span>
+
+<span class="hljs-comment"># basic auth 认证文件存放位置</span>
+kube_users_dir: <span class="hljs-string">"&#123; &#123; kube_config_dir &#125; &#125;/users"</span>
+
+<span class="hljs-comment"># 关闭匿名授权</span>
+kube_api_anonymous_auth: <span class="hljs-literal">false</span>
+
+<span class="hljs-comment">## 使用的 kubernetes 版本</span>
+kube_version: v1.5.3
+
+<span class="hljs-comment"># 安装过程中缓存文件下载位置(最少 1G)</span>
+local_release_dir: <span class="hljs-string">"/tmp/releases"</span>
+<span class="hljs-comment"># 重试次数，比如下载失败等情况</span>
+retry_stagger: 5
+
+<span class="hljs-comment"># 证书组</span>
+kube_cert_group: kube-cert
+
+<span class="hljs-comment"># 集群日志等级</span>
+kube_log_level: 2
+
+<span class="hljs-comment"># HTTP 下 api server 密码及用户</span>
+kube_api_pwd: <span class="hljs-string">"changeme"</span>
+kube_users:
+  kube:
+    pass: <span class="hljs-string">"&#123; &#123;kube_api_pwd&#125; &#125;"</span>
+    role: admin
+  root:
+    pass: <span class="hljs-string">"&#123; &#123;kube_api_pwd&#125; &#125;"</span>
+    role: admin
+
+<span class="hljs-comment"># 网络 CNI 组件 (calico, weave or flannel)</span>
+kube_network_plugin: calico
+
+<span class="hljs-comment"># 服务地址分配</span>
+kube_service_addresses: 10.233.0.0/18
+
+<span class="hljs-comment"># pod 地址分配</span>
+kube_pods_subnet: 10.233.64.0/18
+
+<span class="hljs-comment"># 网络节点大小分配</span>
+kube_network_node_prefix: 24
+
+<span class="hljs-comment"># api server 监听地址及端口</span>
+kube_apiserver_ip: <span class="hljs-string">"&#123; &#123; kube_service_addresses|ipaddr('net')|ipaddr(1)|ipaddr('address') &#125; &#125;"</span>
+kube_apiserver_port: 6443 <span class="hljs-comment"># (https)</span>
+kube_apiserver_insecure_port: 8080 <span class="hljs-comment"># (http)</span>
+
+<span class="hljs-comment"># 默认 dns 后缀</span>
+cluster_name: cluster.local
+<span class="hljs-comment"># Subdomains of DNS domain to be resolved via /etc/resolv.conf for hostnet pods</span>
+ndots: 2
+<span class="hljs-comment"># DNS 组件 dnsmasq_kubedns/kubedns</span>
+dns_mode: dnsmasq_kubedns
+<span class="hljs-comment"># Can be docker_dns, host_resolvconf or none</span>
+resolvconf_mode: docker_dns
+<span class="hljs-comment"># 部署 netchecker 来检测 DNS 和 HTTP 状态</span>
+deploy_netchecker: <span class="hljs-literal">false</span>
+<span class="hljs-comment"># skydns service IP 配置</span>
+skydns_server: <span class="hljs-string">"&#123; &#123; kube_service_addresses|ipaddr('net')|ipaddr(3)|ipaddr('address') &#125; &#125;"</span>
+dns_server: <span class="hljs-string">"&#123; &#123; kube_service_addresses|ipaddr('net')|ipaddr(2)|ipaddr('address') &#125; &#125;"</span>
+dns_domain: <span class="hljs-string">"&#123; &#123; cluster_name &#125; &#125;"</span>
+
+<span class="hljs-comment"># docker 存储目录</span>
+docker_daemon_graph: <span class="hljs-string">"/var/lib/docker"</span>
+
+<span class="hljs-comment"># docker 的额外配置参数，默认会在 /etc/systemd/system/docker.service.d/ 创建相关配置，如果节点已经安装了 docker，并且做了自己的配置，比如启用了 devicemapper ，那么要更改这里，并把自己的 devicemapper 参数加到这里，因为 kargo 会复写 systemd service 文件，会导致自己在 service 中配置的参数被清空，最后 docker 将无法启动</span>
+<span class="hljs-comment">## A string of extra options to pass to the docker daemon.</span>
+<span class="hljs-comment">## This string should be exactly as you wish it to appear.</span>
+<span class="hljs-comment">## An obvious use case is allowing insecure-registry access</span>
+<span class="hljs-comment">## to self hosted registries like so:</span>
+docker_options: <span class="hljs-string">"--insecure-registry=&#123; &#123; kube_service_addresses &#125; &#125; --graph=&#123; &#123; docker_daemon_graph &#125; &#125; --iptables=false"</span>
+docker_bin_dir: <span class="hljs-string">"/usr/bin"</span>
+
+<span class="hljs-comment"># 组件部署方式</span>
+<span class="hljs-comment"># Settings for containerized control plane (etcd/kubelet/secrets)</span>
+etcd_deployment_type: docker
+kubelet_deployment_type: docker
+cert_management: script
+vault_deployment_type: docker
+
+<span class="hljs-comment"># K8s image pull policy (imagePullPolicy)</span>
+k8s_image_pull_policy: IfNotPresent
+
+<span class="hljs-comment"># Monitoring apps for k8s</span>
+efk_enabled: <span class="hljs-literal">false</span></code></pre></div>
+
+<h4 id="2-4、生成集群配置"><a href="#2-4、生成集群配置" class="headerlink" title="2.4、生成集群配置"></a>2.4、生成集群配置</h4><p>配置完基本集群参数后，还需要生成一个集群配置文件，用于指定需要在哪几台服务器安装，和指定 master、node 节点分布，以及 etcd 集群等安装在那几台机器上</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 定义集群 IP</span>
+IPS=(192.168.1.11 192.168.1.12 192.168.1.13 192.168.1.14 192.168.1.15)
+<span class="hljs-comment"># 生成配置</span>
+<span class="hljs-built_in">cd</span> kargo
+CONFIG_FILE=inventory/inventory.cfg python3 contrib/inventory_builder/inventory.py <span class="hljs-variable">$&#123;IPS[@]&#125;</span></code></pre></div>
+
+<p>生成的配置如下，已经很简单了，怎么改动相信猜也能猜到</p>
+<div class="hljs"><pre><code class="hljs sh">vim inventory/inventory.cfg
+
+[all]
+node1    ansible_host=192.168.1.11 ip=192.168.1.11
+node2    ansible_host=192.168.1.12 ip=192.168.1.12
+node3    ansible_host=192.168.1.13 ip=192.168.1.13
+node4    ansible_host=192.168.1.14 ip=192.168.1.14
+node5    ansible_host=192.168.1.15 ip=192.168.1.15
+
+[kube-master]
+node1
+node2
+
+[kube-node]
+node1
+node2
+node3
+node4
+node5
+
+[etcd]
+node1
+node2
+node3
+
+[k8s-cluster:children]
+kube-node
+kube-master
+
+[calico-rr]</code></pre></div>
+
+<h4 id="2-5、一键部署"><a href="#2-5、一键部署" class="headerlink" title="2.5、一键部署"></a>2.5、一键部署</h4><p>首先启动 vagrant 虚拟机，<strong>不过注意的是本文提供的 vagrant 文件默认安装了 docker，并配置了 devicemapper 和docker 代理，所以使用时上面的 docker 参数需要替换成自己的，因为默认 kargo 会覆盖 docker 的 service 文件；会导致我已经配置完的 docker devicemapper 参数失效，所以要把自己配置的参数加到配置文件中，如下</strong></p>
+<div class="hljs"><pre><code class="hljs sh">docker_options: <span class="hljs-string">"--insecure-registry=&#123; &#123; kube_service_addresses &#125; &#125; --graph=&#123; &#123; docker_daemon_graph &#125; &#125; --iptables=false --storage-driver=devicemapper --storage-opt=dm.thinpooldev=/dev/mapper/docker-thinpool --storage-opt dm.use_deferred_removal=true --storage-opt=dm.use_deferred_deletion=true"</span></code></pre></div>
+
+<p><strong>这个 vagrant 配置文件自动设置了主机名、host、ssh 密钥，实际生产环境仍需自己处理</strong></p>
+<p><strong>每个虚拟机需要自己登陆并生成 ssh-key(ssh-keygen)，因为 ansible 会用到</strong></p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 启动虚拟机</span>
+<span class="hljs-built_in">cd</span> vagrant &amp;&amp; vagrant up
+<span class="hljs-comment"># 走你(没梯子先 load 好镜像)</span>
+<span class="hljs-built_in">cd</span> kargo 
+<span class="hljs-comment"># 私钥指定的是每个虚拟机 ssh 目录下的私钥</span>
+ansible-playbook -i inventory/inventory.cfg cluster.yml -b -v --private-key=~/.ssh/id_rsa</code></pre></div>
+
+<p>部署成功后截图如下</p>
+<p><img src="https://cdn.oss.link/markdown/ksgtg.jpg" srcset="/img/loading.gif" alt="deploy success"></p>
+<p>相关 pod 启动情况如下 </p>
+<p><img src="https://cdn.oss.link/markdown/c7zaz.jpg" srcset="/img/loading.gif" alt="deploy pods"></p>
+<p><strong>最后附上我部署是的 kargo 配置</strong></p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 启动集群的基础系统</span>
+bootstrap_os: centos
+
+<span class="hljs-comment"># etcd 数据存放位置</span>
+etcd_data_dir: /var/lib/etcd
+
+<span class="hljs-comment"># 二进制文件将要安装的位置</span>
+bin_dir: /usr/<span class="hljs-built_in">local</span>/bin
+
+<span class="hljs-comment"># Kubernetes 配置文件存放目录以及命名空间</span>
+kube_config_dir: /etc/kubernetes
+kube_script_dir: <span class="hljs-string">"&#123; &#123; bin_dir &#125; &#125;/kubernetes-scripts"</span>
+kube_manifest_dir: <span class="hljs-string">"&#123; &#123; kube_config_dir &#125; &#125;/manifests"</span>
+system_namespace: kube-system
+
+<span class="hljs-comment"># 日志存放位置</span>
+kube_log_dir: <span class="hljs-string">"/var/log/kubernetes"</span>
+
+<span class="hljs-comment"># kubernetes 证书存放位置</span>
+kube_cert_dir: <span class="hljs-string">"&#123; &#123; kube_config_dir &#125; &#125;/ssl"</span>
+
+<span class="hljs-comment"># token存放位置</span>
+kube_token_dir: <span class="hljs-string">"&#123; &#123; kube_config_dir &#125; &#125;/tokens"</span>
+
+<span class="hljs-comment"># basic auth 认证文件存放位置</span>
+kube_users_dir: <span class="hljs-string">"&#123; &#123; kube_config_dir &#125; &#125;/users"</span>
+
+<span class="hljs-comment"># 关闭匿名授权</span>
+kube_api_anonymous_auth: <span class="hljs-literal">false</span>
+
+<span class="hljs-comment">## 使用的 kubernetes 版本</span>
+kube_version: v1.5.3
+
+<span class="hljs-comment"># 安装过程中缓存文件下载位置(最少 1G)</span>
+local_release_dir: <span class="hljs-string">"/tmp/releases"</span>
+<span class="hljs-comment"># 重试次数，比如下载失败等情况</span>
+retry_stagger: 5
+
+<span class="hljs-comment"># 证书组</span>
+kube_cert_group: kube-cert
+
+<span class="hljs-comment"># 集群日志等级</span>
+kube_log_level: 2
+
+<span class="hljs-comment"># HTTP 下 api server 密码及用户</span>
+kube_api_pwd: <span class="hljs-string">"test123"</span>
+kube_users:
+  kube:
+    pass: <span class="hljs-string">"&#123; &#123;kube_api_pwd&#125; &#125;"</span>
+    role: admin
+  root:
+    pass: <span class="hljs-string">"&#123; &#123;kube_api_pwd&#125; &#125;"</span>
+    role: admin
+
+<span class="hljs-comment"># 网络 CNI 组件 (calico, weave or flannel)</span>
+kube_network_plugin: calico
+
+<span class="hljs-comment"># 服务地址分配</span>
+kube_service_addresses: 10.233.0.0/18
+
+<span class="hljs-comment"># pod 地址分配</span>
+kube_pods_subnet: 10.233.64.0/18
+
+<span class="hljs-comment"># 网络节点大小分配</span>
+kube_network_node_prefix: 24
+
+<span class="hljs-comment"># api server 监听地址及端口</span>
+kube_apiserver_ip: <span class="hljs-string">"&#123; &#123; kube_service_addresses|ipaddr('net')|ipaddr(1)|ipaddr('address') &#125; &#125;"</span>
+kube_apiserver_port: 6443 <span class="hljs-comment"># (https)</span>
+kube_apiserver_insecure_port: 8080 <span class="hljs-comment"># (http)</span>
+
+<span class="hljs-comment"># 默认 dns 后缀</span>
+cluster_name: cluster.local
+<span class="hljs-comment"># Subdomains of DNS domain to be resolved via /etc/resolv.conf for hostnet pods</span>
+ndots: 2
+<span class="hljs-comment"># DNS 组件 dnsmasq_kubedns/kubedns</span>
+dns_mode: dnsmasq_kubedns
+<span class="hljs-comment"># Can be docker_dns, host_resolvconf or none</span>
+resolvconf_mode: docker_dns
+<span class="hljs-comment"># 部署 netchecker 来检测 DNS 和 HTTP 状态</span>
+deploy_netchecker: <span class="hljs-literal">true</span> 
+<span class="hljs-comment"># skydns service IP 配置</span>
+skydns_server: <span class="hljs-string">"&#123; &#123; kube_service_addresses|ipaddr('net')|ipaddr(3)|ipaddr('address') &#125; &#125;"</span>
+dns_server: <span class="hljs-string">"&#123; &#123; kube_service_addresses|ipaddr('net')|ipaddr(2)|ipaddr('address') &#125; &#125;"</span>
+dns_domain: <span class="hljs-string">"&#123; &#123; cluster_name &#125; &#125;"</span>
+
+<span class="hljs-comment"># docker 存储目录</span>
+docker_daemon_graph: <span class="hljs-string">"/var/lib/docker"</span>
+
+<span class="hljs-comment"># docker 的额外配置参数，默认会在 /etc/systemd/system/docker.service.d/ 创建相关配置，如果节点已经安装了 docker，并且做了自己的配置，比如启用的 device mapper ，那么要删除/更改这里，防止冲突导致 docker 无法启动</span>
+<span class="hljs-comment">## A string of extra options to pass to the docker daemon.</span>
+<span class="hljs-comment">## This string should be exactly as you wish it to appear.</span>
+<span class="hljs-comment">## An obvious use case is allowing insecure-registry access</span>
+<span class="hljs-comment">## to self hosted registries like so:</span>
+docker_options: <span class="hljs-string">"--insecure-registry=&#123; &#123; kube_service_addresses &#125; &#125; --graph=&#123; &#123; docker_daemon_graph &#125; &#125; --iptables=false --storage-driver=devicemapper --storage-opt=dm.thinpooldev=/dev/mapper/docker-thinpool --storage-opt dm.use_deferred_removal=true --storage-opt=dm.use_deferred_deletion=true"</span>
+docker_bin_dir: <span class="hljs-string">"/usr/bin"</span>
+
+<span class="hljs-comment"># 组件部署方式</span>
+<span class="hljs-comment"># Settings for containerized control plane (etcd/kubelet/secrets)</span>
+etcd_deployment_type: docker
+kubelet_deployment_type: docker
+cert_management: script
+vault_deployment_type: docker
+
+<span class="hljs-comment"># K8s image pull policy (imagePullPolicy)</span>
+k8s_image_pull_policy: IfNotPresent
+
+<span class="hljs-comment"># Monitoring apps for k8s</span>
+efk_enabled: <span class="hljs-literal">true</span></code></pre></div>
+
+
+
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/linux/">Linux</a>
+                    
+                      <a class="hover-with-bg" href="/tags/docker/">Docker</a>
+                    
+                      <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2017/03/04/how-to-use-nginx-ingress/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kubernetes Nginx Ingress 教程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2017/03/01/how-to-use-vagrant/">
+                        <span class="hidden-mobile">Vagrant 使用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2017/03/03/set-up-kubernetes-ha-cluster-by-kargo/';
+        this.page.identifier = '/2017/03/03/set-up-kubernetes-ha-cluster-by-kargo/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "快速部署 kubernetes 高可用集群&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

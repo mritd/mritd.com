@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Upward, not Northward.">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="漠然,bleem,mritd">
+  <title>使用 Nexus 搭建 Docker 仓库 - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
+    
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container page-header text-center fade-in-up">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2017-01-08 23:02" pubdate>
+        2017年1月8日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      15
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto" id="post">
+            <!-- SEO header -->
+            <h1 style="display: none">使用 Nexus 搭建 Docker 仓库</h1>
+            
+            <div class="markdown-body" id="post-body">
+              <blockquote>
+<p>nexus 最初用于搭建 maven 私服，提供企业级 maven jar 包管理等功能；2.x 后续支持了 npm、rpm 等包管理；最新版本 3.x 开始支持 Docker 仓库，以下为使用 neuxs 撸一个 docker 仓库的教程</p>
+</blockquote>
+<h3 id="一、环境准备"><a href="#一、环境准备" class="headerlink" title="一、环境准备"></a>一、环境准备</h3><p>初始环境如下</p>
+<ul>
+<li>Centos 7 x86_64</li>
+<li>OpenJDK 8</li>
+<li>Nexus 3.2.0-01</li>
+</ul>
+<p>安装 OpenJDK 命令如下</p>
+<div class="hljs"><pre><code class="hljs sh">yum install java-1.8.0-openjdk -y</code></pre></div>
+
+<p>安装完成后验证是否安装成功</p>
+<div class="hljs"><pre><code class="hljs sh">➜  ~ java -version
+openjdk version <span class="hljs-string">"1.8.0_111"</span>
+OpenJDK Runtime Environment (build 1.8.0_111-b15)
+OpenJDK 64-Bit Server VM (build 25.111-b15, mixed mode)</code></pre></div>
+
+<p>下载 neuxs3 安装包并解压</p>
+<div class="hljs"><pre><code class="hljs sh">wget --no-check-certificate https://download.sonatype.com/nexus/3/nexus-3.2.0-01-unix.tar.gz
+tar -zxvf nexus-3.2.0-01-unix.tar.gz</code></pre></div>
+
+<h3 id="二、安装-nexus"><a href="#二、安装-nexus" class="headerlink" title="二、安装 nexus"></a>二、安装 nexus</h3><p>首先将 nexus 移动到任意位置</p>
+<div class="hljs"><pre><code class="hljs sh">mv nexus-3.2.0-01 /usr/<span class="hljs-built_in">local</span></code></pre></div>
+
+<p>创建 nexus 用户</p>
+<div class="hljs"><pre><code class="hljs sh">adduser -r -s /sbin/nologin -d /data/nexus-data nexus</code></pre></div>
+
+<p><strong>默认 nexus 运行后会在同级目录下创建一个 <code>sonatype-work</code> 工作目录，并将其数据保存在此目录中，所以为了数据持久化先手动创建并设置其数据存储位置</strong></p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建基本目录结构</span>
+mkdir -p /usr/<span class="hljs-built_in">local</span>/sonatype-work
+<span class="hljs-comment"># 创建建数据目录</span>
+mkdir -p /data/nexus-data/&#123;etc,<span class="hljs-built_in">log</span>,tmp&#125;
+<span class="hljs-comment"># 将数据目录软连接到工作目录</span>
+ln -s /data/nexus-data /usr/<span class="hljs-built_in">local</span>/sonatype-work/nexus3
+<span class="hljs-comment"># 更新所有目录权限</span>
+chmod -R 755 /usr/<span class="hljs-built_in">local</span>/&#123;sonatype-work,nexus-3.2.0-01&#125; /data/nexus-data
+chown -R nexus:nexus /usr/<span class="hljs-built_in">local</span>/&#123;sonatype-work,nexus-3.2.0-01&#125; /data/nexus-data</code></pre></div>
+
+<p>最后启动 nexus 访问 8081 端口即可</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 以前台方式运行</span>
+sudo -u nexus /usr/<span class="hljs-built_in">local</span>/nexus-3.2.0-01/bin/nexus run
+<span class="hljs-comment"># 后台运行</span>
+sudo -u nexus /usr/<span class="hljs-built_in">local</span>/nexus-3.2.0-01/bin/nexus start</code></pre></div>
+
+<p>默认账户 <code>admin</code> 密码 <code>admin123</code>，登录如下</p>
+<p><img src="https://cdn.oss.link/markdown/sb9dw.jpg" srcset="/img/loading.gif" alt="nexus_homepage"></p>
+<h3 id="三、创建-docker-仓库"><a href="#三、创建-docker-仓库" class="headerlink" title="三、创建 docker 仓库"></a>三、创建 docker 仓库</h3><p>在设置 <code>Repositories</code> 选项卡中中选择 <code>Create repository</code></p>
+<p><img src="https://cdn.oss.link/markdown/m7m53.jpg" srcset="/img/loading.gif" alt="Create repository"></p>
+<p>仓库类型有很多，docker 相关总共有三种类型，其秉承 maven 私服的概念</p>
+<p><img src="https://cdn.oss.link/markdown/pm0r8.jpg" srcset="/img/loading.gif" alt="repository type"></p>
+<ul>
+<li>hosted: 本地存储，即同 docker 官方仓库一样提供本地私服功能</li>
+<li>proxy: 提供代理其他仓库的类型，如 docker 中央仓库</li>
+<li>group: 组类型，实质作用是组合多个仓库为一个地址</li>
+</ul>
+<h4 id="3-1、创建一个私服"><a href="#3-1、创建一个私服" class="headerlink" title="3.1、创建一个私服"></a>3.1、创建一个私服</h4><p>选择 <code>hosted</code> 类型仓库，然后输入一个仓库名，<strong>并勾选 HTTP 选项，端口任意即可(下面截图失误，不补了)</strong></p>
+<p><img src="https://cdn.oss.link/markdown/972cl.jpg" srcset="/img/loading.gif" alt="create hosted repository"></p>
+<h4 id="3-2、测试私服"><a href="#3-2、测试私服" class="headerlink" title="3.2、测试私服"></a>3.2、测试私服</h4><p>创建好以后更改 docker 参数，测试即可</p>
+<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 增加非安全仓库</span>
+vim /usr/lib/systemd/system/docker.service
+<span class="hljs-comment"># 在 ExecStart 后面增加(这里改了 host，上面端口用的 8800)</span>
+--insecure-registry registry.com:8800
+<span class="hljs-comment"># 重启 docker</span>
+systemctl daemon-reload
+systemctl restart docker</code></pre></div>
+
+<p>测试 push 和 pull 镜像</p>
+<div class="hljs"><pre><code class="hljs sh">➜  ~ docker tag mritd/alpine registry.com:8800/alpine
+➜  ~ docker push registry.com:8800/alpine
+The push refers to a repository [registry.com:8800/alpine]
+754684812d65: Pushed
+60ab55d3379d: Pushed
+latest: digest: sha256:28f397aca53eb3e8ea1627f4af9c262fca7db17f0c6db492b53adc7bca7d0f91 size: 739
+➜  ~ docker rmi registry.com:8800/alpine
+Untagged: registry.com:8800/alpine:latest
+Untagged: registry.com:8800/alpine@sha256:28f397aca53eb3e8ea1627f4af9c262fca7db17f0c6db492b53adc7bca7d0f91
+➜  ~ docker rmi mritd/alpine
+Untagged: mritd/alpine:latest
+Untagged: mritd/alpine@sha256:28f397aca53eb3e8ea1627f4af9c262fca7db17f0c6db492b53adc7bca7d0f91
+Deleted: sha256:090c790ee6f28f495d92d5be43641573b0d1b5502b35f7662d88cdbf8d548afd
+Deleted: sha256:378e2b887fcdffcbd113a7cf6f97e9f8a58851b0a205b31a93acdb887912850d
+➜  ~ docker pull registry.com:8800/alpine
+Using default tag: latest
+latest: Pulling from alpine
+
+0a8490d0dfd3: Already exists
+8fb018fb4173: Pull complete
+Digest: sha256:28f397aca53eb3e8ea1627f4af9c262fca7db17f0c6db492b53adc7bca7d0f91
+Status: Downloaded newer image <span class="hljs-keyword">for</span> registry.com:8800/alpine:latest</code></pre></div>
+
+<h4 id="3-2、创建代理仓库"><a href="#3-2、创建代理仓库" class="headerlink" title="3.2、创建代理仓库"></a>3.2、创建代理仓库</h4><p>代理仓库参考官方文档 <a href="http://books.sonatype.com/nexus-book/reference3/docker.html#docker-introduction" target="_blank" rel="noopener">点这里</a>，本人不才….没成功，有爱探索的可以尝试一下，如果成功可以探讨一下…..个人怀疑是 index 有问题</p>
+<p> 根据官方文档的这段提示</p>
+<blockquote>
+<p>Just to recap, in order to configure a proxy for Docker Hub you configure the Remote Storage URL to <a href="https://registry-1.docker.io" target="_blank" rel="noopener">https://registry-1.docker.io</a>, enable Docker V1 API support and for the choice of Docker Index select the Use Docker Hub option.</p>
+</blockquote>
+<p>创建仓库类型选择 <code>proxy</code>，Remote storage 填写 <code>https://registry-1.docker.io</code>，Docker index 选择 <code>Use Docker Hub</code>，然后从 代理仓库地址 pull 就可以，但是本人百试不成功，截图如下</p>
+<p><img src="https://cdn.oss.link/markdown/q350r.jpg" srcset="/img/loading.gif" alt="proxy registry"></p>
+<h4 id="3-4、创建-group-仓库"><a href="#3-4、创建-group-仓库" class="headerlink" title="3.4、创建 group 仓库"></a>3.4、创建 group 仓库</h4><p>group 不提供具体存储服务，其主要作用就是类似一个前端反代，可以把多个仓库(比如 hosted 私服和 proxy)组合成一个地址提供访问，创建方法基本相同，主要是添加多个 hosted 或者 proxy 类型的其他仓库即可，这里不再详细阐述，截图如下</p>
+<p><img src="https://cdn.oss.link/markdown/2q1qv.jpg" srcset="/img/loading.gif" alt="group registry"></p>
+<h3 id="四、其他相关"><a href="#四、其他相关" class="headerlink" title="四、其他相关"></a>四、其他相关</h3><p>由于 nexus 在 maven jar 管理方面已经是很成熟的产品，增加了 docker 等支持以后基本思想没有太大变化，所以关于其他仓库配置这里不再提及，具体可以参考<a href="http://books.sonatype.com/nexus-book/reference3/index.html" target="_blank" rel="noopener">官方文档</a>；2.x 可以通过图形界面上传 jar，3.x 目前只能通过 maven deploy 插件实现，可以参考<a href="https://maven.apache.org/guides/mini/guide-3rd-party-jars-remote.html" target="_blank" rel="noopener">这里</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/docker/">Docker</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/linux/">Linux</a>
+                    
+                      <a class="hover-with-bg" href="/tags/docker/">Docker</a>
+                    
+                      <a class="hover-with-bg" href="/tags/nexus/">Nexus</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2017/01/12/git-uses-the-socks5-proxy/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Git 使用 socks5 代理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2016/12/30/configure-nginx-https-under-centos-to-support-ios-ats/">
+                        <span class="hidden-mobile">从 WWDC16 ATS 说起</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://mritd.com/2017/01/08/set-up-docker-registry-by-nexus/';
+        this.page.identifier = '/2017/01/08/set-up-docker-registry-by-nexus/';
+      };
+      function loadDisqus() {
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + 'mritd' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      waitElementVisible('disqus_thread', loadDisqus);
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '#post-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 3,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "使用 Nexus 搭建 Docker 仓库&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
