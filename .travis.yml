@@ -1,6 +1,6 @@
 language: go
 
 git:
-  clone: false
+  quiet: true
 
 script: curl -XPOST https://mritd.com/update

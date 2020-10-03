@@ -658,9 +658,9 @@
       <category domain="https://mritd.com/categories/kubernetes/">Kubernetes</category>
       
       
-      <category domain="https://mritd.com/tags/kubernetes/">Kubernetes</category>
-      
       <category domain="https://mritd.com/tags/docker/">Docker</category>
+      
+      <category domain="https://mritd.com/tags/kubernetes/">Kubernetes</category>
       
       
       <comments>https://mritd.com/2018/09/17/google-container-registry-sync/#disqus_thread</comments>
@@ -877,9 +877,9 @@
       
       <category domain="https://mritd.com/tags/linux/">Linux</category>
       
-      <category domain="https://mritd.com/tags/kubernetes/">Kubernetes</category>
-      
       <category domain="https://mritd.com/tags/docker/">Docker</category>
+      
+      <category domain="https://mritd.com/tags/kubernetes/">Kubernetes</category>
       
       
       <comments>https://mritd.com/2018/03/20/use-rbac-to-control-kubectl-permissions/#disqus_thread</comments>
@@ -904,9 +904,9 @@
       
       <category domain="https://mritd.com/tags/linux/">Linux</category>
       
-      <category domain="https://mritd.com/tags/kubernetes/">Kubernetes</category>
-      
       <category domain="https://mritd.com/tags/docker/">Docker</category>
+      
+      <category domain="https://mritd.com/tags/kubernetes/">Kubernetes</category>
       
       
       <comments>https://mritd.com/2018/01/07/kubernetes-tls-bootstrapping-note/#disqus_thread</comments>
@@ -958,9 +958,9 @@
       
       <category domain="https://mritd.com/tags/linux/">Linux</category>
       
-      <category domain="https://mritd.com/tags/kubernetes/">Kubernetes</category>
-      
       <category domain="https://mritd.com/tags/docker/">Docker</category>
+      
+      <category domain="https://mritd.com/tags/kubernetes/">Kubernetes</category>
       
       
       <comments>https://mritd.com/2017/11/12/ci-cd-dockerfile/#disqus_thread</comments>
