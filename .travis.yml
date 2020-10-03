@@ -1,0 +1,6 @@
+language: go
+
+git:
+  clone: false
+
+script: curl -XPOST https://mritd.com/update
