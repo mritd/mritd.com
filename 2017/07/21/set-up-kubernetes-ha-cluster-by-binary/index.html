@@ -1,327 +1,8 @@
-
-
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
-
-
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/img/favicon.ico">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="Upward, not Northward.">
-  <meta name="author" content="bleem">
-  <meta name="keywords" content="漠然,bleem,mritd">
-  <title>手动档搭建 Kubernetes HA 集群 - bleem</title>
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
-    
-  
-
-  
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
-<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
-</head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/friends/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner intro-2" id="background" parallax=true
-         style="background: url('/img/default.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container page-header text-center fade-in-up">
-            <span class="h2" id="subtitle">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2017-07-21 16:23" pubdate>
-        2017年7月21日 下午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      5.4k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      86
-       分钟
-    </span>
-  
-
-  
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid">
-  <div class="row">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto" id="post">
-            <!-- SEO header -->
-            <h1 style="display: none">手动档搭建 Kubernetes HA 集群</h1>
-            
-            <div class="markdown-body" id="post-body">
-              <blockquote>
-<p>以前一直用 Kargo(基于 ansible) 来搭建 Kubernetes 集群，最近发现 ansible 部署的时候有些东西有点 bug，而且 Kargo 对 rkt 等也做了适配，感觉问题已经有点复杂化了；在 2.2 release 没出来这个时候，准备自己纯手动挡部署一下，Master HA 直接抄 Kargo 的就行了，以下记录一下;<strong>本文以下部分所有用到的 rpm 、配置文件等全部已经上传到了 <a href="http://pan.baidu.com/s/1o8PZLKA" target="_blank" rel="noopener">百度云</a>  密码: x5v4</strong></p>
-</blockquote>
-<h3 id="一、环境准备"><a href="#一、环境准备" class="headerlink" title="一、环境准备"></a>一、环境准备</h3><blockquote>
-<p>以下文章本着 <strong>多写代码少哔哔</strong> 的原则，会主要以实际操作为主，不会过多介绍每步细节动作，如果纯小白想要更详细的了解，可以参考 <a href="https://github.com/rootsongjc/kubernetes-handbook" target="_blank" rel="noopener">这里</a></p>
-</blockquote>
-<p><strong>环境总共 5 台虚拟机，2 个 master，3 个 etcd 节点，master 同时也作为 node 负载 pod，在分发证书等阶段将在另外一台主机上执行，该主机对集群内所有节点配置了 ssh 秘钥登录</strong></p>
-<table>
-<thead>
-<tr>
-<th>IP</th>
-<th>节点</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>192.168.1.11</td>
-<td>master、node、etcd</td>
-</tr>
-<tr>
-<td>192.168.1.12</td>
-<td>master、node、etcd</td>
-</tr>
-<tr>
-<td>192.168.1.13</td>
-<td>master、node、etcd</td>
-</tr>
-<tr>
-<td>192.168.1.14</td>
-<td>node</td>
-</tr>
-<tr>
-<td>192.168.1.15</td>
-<td>node</td>
-</tr>
-</tbody></table>
-<p>网络方案这里采用性能比较好的 Calico，集群开启 RBAC，RBAC 相关可参考 <a href="https://mritd.me/2017/07/17/kubernetes-rbac-chinese-translation/" target="_blank" rel="noopener">这里的胡乱翻译版本</a></p>
-<h3 id="二、证书相关处理"><a href="#二、证书相关处理" class="headerlink" title="二、证书相关处理"></a>二、证书相关处理</h3><h4 id="2-1、证书说明"><a href="#2-1、证书说明" class="headerlink" title="2.1、证书说明"></a>2.1、证书说明</h4><p>由于 Etcd 和 Kubernetes 全部采用 TLS 通讯，所以先要生成 TLS 证书，<strong>证书生成工具采用 <a href="https://github.com/cloudflare/cfssl/releases" target="_blank" rel="noopener">cfssl</a>，具体使用方法这里不再详细阐述，生成证书时可在任一节点完成，这里在宿主机执行</strong>，证书列表如下</p>
-<table>
-<thead>
-<tr>
-<th>证书名称</th>
-<th>配置文件</th>
-<th>用途</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>etcd-root-ca.pem</td>
-<td>etcd-root-ca-csr.json</td>
-<td>etcd 根 CA 证书</td>
-</tr>
-<tr>
-<td>etcd.pem</td>
-<td>etcd-gencert.json、etcd-csr.json</td>
-<td>etcd 集群证书</td>
-</tr>
-<tr>
-<td>k8s-root-ca.pem</td>
-<td>k8s-root-ca-csr.json</td>
-<td>k8s 根 CA 证书</td>
-</tr>
-<tr>
-<td>kube-proxy.pem</td>
-<td>k8s-gencert.json、kube-proxy-csr.json</td>
-<td>kube-proxy 使用的证书</td>
-</tr>
-<tr>
-<td>admin.pem</td>
-<td>k8s-gencert.json、admin-csr.json</td>
-<td>kubectl 使用的证书</td>
-</tr>
-<tr>
-<td>kubernetes.pem</td>
-<td>k8s-gencert.json、kubernetes-csr.json</td>
-<td>kube-apiserver 使用的证书</td>
-</tr>
-</tbody></table>
-<h4 id="2-2、CFSSL-工具安装"><a href="#2-2、CFSSL-工具安装" class="headerlink" title="2.2、CFSSL 工具安装"></a>2.2、CFSSL 工具安装</h4><p><strong>首先下载 cfssl，并给予可执行权限，然后扔到 PATH 目录下</strong></p>
-<div class="hljs"><pre><code class="hljs sh">wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;auto&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Upward, not Northward."><meta name="author" content="bleem"><meta name="keywords" content="漠然,bleem,mritd"><title>手动档搭建 Kubernetes HA 集群 - bleem</title><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml"><link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"> <a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"> <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"> <a class="nav-link" href="javascript:">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner intro-2" id="background" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="container page-header text-center fade-in-up"><span class="h2" id="subtitle"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2017-07-21 16:23" pubdate>2017年7月21日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 5.4k 字</span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 86 分钟</span></div></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto" id="post"><h1 style="display:none">手动档搭建 Kubernetes HA 集群</h1><div class="markdown-body" id="post-body"><blockquote><p>以前一直用 Kargo(基于 ansible) 来搭建 Kubernetes 集群，最近发现 ansible 部署的时候有些东西有点 bug，而且 Kargo 对 rkt 等也做了适配，感觉问题已经有点复杂化了；在 2.2 release 没出来这个时候，准备自己纯手动挡部署一下，Master HA 直接抄 Kargo 的就行了，以下记录一下;<strong>本文以下部分所有用到的 rpm 、配置文件等全部已经上传到了 <a href="http://pan.baidu.com/s/1o8PZLKA" target="_blank" rel="noopener">百度云</a> 密码: x5v4</strong></p></blockquote><h3 id="一、环境准备"><a href="#一、环境准备" class="headerlink" title="一、环境准备"></a>一、环境准备</h3><blockquote><p>以下文章本着 <strong>多写代码少哔哔</strong> 的原则，会主要以实际操作为主，不会过多介绍每步细节动作，如果纯小白想要更详细的了解，可以参考 <a href="https://github.com/rootsongjc/kubernetes-handbook" target="_blank" rel="noopener">这里</a></p></blockquote><p><strong>环境总共 5 台虚拟机，2 个 master，3 个 etcd 节点，master 同时也作为 node 负载 pod，在分发证书等阶段将在另外一台主机上执行，该主机对集群内所有节点配置了 ssh 秘钥登录</strong></p><table><thead><tr><th>IP</th><th>节点</th></tr></thead><tbody><tr><td>192.168.1.11</td><td>master、node、etcd</td></tr><tr><td>192.168.1.12</td><td>master、node、etcd</td></tr><tr><td>192.168.1.13</td><td>master、node、etcd</td></tr><tr><td>192.168.1.14</td><td>node</td></tr><tr><td>192.168.1.15</td><td>node</td></tr></tbody></table><p>网络方案这里采用性能比较好的 Calico，集群开启 RBAC，RBAC 相关可参考 <a href="https://mritd.me/2017/07/17/kubernetes-rbac-chinese-translation/" target="_blank" rel="noopener">这里的胡乱翻译版本</a></p><h3 id="二、证书相关处理"><a href="#二、证书相关处理" class="headerlink" title="二、证书相关处理"></a>二、证书相关处理</h3><h4 id="2-1、证书说明"><a href="#2-1、证书说明" class="headerlink" title="2.1、证书说明"></a>2.1、证书说明</h4><p>由于 Etcd 和 Kubernetes 全部采用 TLS 通讯，所以先要生成 TLS 证书，<strong>证书生成工具采用 <a href="https://github.com/cloudflare/cfssl/releases" target="_blank" rel="noopener">cfssl</a>，具体使用方法这里不再详细阐述，生成证书时可在任一节点完成，这里在宿主机执行</strong>，证书列表如下</p><table><thead><tr><th>证书名称</th><th>配置文件</th><th>用途</th></tr></thead><tbody><tr><td>etcd-root-ca.pem</td><td>etcd-root-ca-csr.json</td><td>etcd 根 CA 证书</td></tr><tr><td>etcd.pem</td><td>etcd-gencert.json、etcd-csr.json</td><td>etcd 集群证书</td></tr><tr><td>k8s-root-ca.pem</td><td>k8s-root-ca-csr.json</td><td>k8s 根 CA 证书</td></tr><tr><td>kube-proxy.pem</td><td>k8s-gencert.json、kube-proxy-csr.json</td><td>kube-proxy 使用的证书</td></tr><tr><td>admin.pem</td><td>k8s-gencert.json、admin-csr.json</td><td>kubectl 使用的证书</td></tr><tr><td>kubernetes.pem</td><td>k8s-gencert.json、kubernetes-csr.json</td><td>kube-apiserver 使用的证书</td></tr></tbody></table><h4 id="2-2、CFSSL-工具安装"><a href="#2-2、CFSSL-工具安装" class="headerlink" title="2.2、CFSSL 工具安装"></a>2.2、CFSSL 工具安装</h4><p><strong>首先下载 cfssl，并给予可执行权限，然后扔到 PATH 目录下</strong></p><div class="hljs"><pre><code class="hljs sh">wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
 chmod +x cfssl_linux-amd64 cfssljson_linux-amd64
 mv cfssl_linux-amd64 /usr/<span class="hljs-built_in">local</span>/bin/cfssl
-mv cfssljson_linux-amd64 /usr/<span class="hljs-built_in">local</span>/bin/cfssljson</code></pre></div>
-
-<h4 id="2-3、生成-Etcd-证书"><a href="#2-3、生成-Etcd-证书" class="headerlink" title="2.3、生成 Etcd 证书"></a>2.3、生成 Etcd 证书</h4><p>Etcd 证书生成所需配置文件如下: </p>
-<ul>
-<li>etcd-root-ca-csr.json</li>
-</ul>
-<div class="hljs"><pre><code class="hljs json">&#123;
+mv cfssljson_linux-amd64 /usr/<span class="hljs-built_in">local</span>/bin/cfssljson</code></pre></div><h4 id="2-3、生成-Etcd-证书"><a href="#2-3、生成-Etcd-证书" class="headerlink" title="2.3、生成 Etcd 证书"></a>2.3、生成 Etcd 证书</h4><p>Etcd 证书生成所需配置文件如下:</p><ul><li>etcd-root-ca-csr.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
   <span class="hljs-attr">"key"</span>: &#123;
     <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
     <span class="hljs-attr">"size"</span>: <span class="hljs-number">4096</span>
@@ -336,12 +17,7 @@ mv cfssljson_linux-amd64 /usr/<span class="hljs-built_in">local</span>/bin/cfssl
     &#125;
   ],
   <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"etcd-root-ca"</span>
-&#125;</code></pre></div>
-
-<ul>
-<li>etcd-gencert.json</li>
-</ul>
-<div class="hljs"><pre><code class="hljs json">&#123;
+&#125;</code></pre></div><ul><li>etcd-gencert.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
   <span class="hljs-attr">"signing"</span>: &#123;
     <span class="hljs-attr">"default"</span>: &#123;
         <span class="hljs-attr">"usages"</span>: [
@@ -353,12 +29,7 @@ mv cfssljson_linux-amd64 /usr/<span class="hljs-built_in">local</span>/bin/cfssl
         <span class="hljs-attr">"expiry"</span>: <span class="hljs-string">"87600h"</span>
     &#125;
   &#125;
-&#125;</code></pre></div>
-
-<ul>
-<li>etcd-csr.json</li>
-</ul>
-<div class="hljs"><pre><code class="hljs json">&#123;
+&#125;</code></pre></div><ul><li>etcd-csr.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
   <span class="hljs-attr">"key"</span>: &#123;
     <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
     <span class="hljs-attr">"size"</span>: <span class="hljs-number">4096</span>
@@ -382,19 +53,8 @@ mv cfssljson_linux-amd64 /usr/<span class="hljs-built_in">local</span>/bin/cfssl
     <span class="hljs-string">"192.168.1.14"</span>,
     <span class="hljs-string">"192.168.1.15"</span>
   ]
-&#125;</code></pre></div>
-
-<p>最后生成 Etcd 证书</p>
-<div class="hljs"><pre><code class="hljs sh">cfssl gencert --initca=<span class="hljs-literal">true</span> etcd-root-ca-csr.json | cfssljson --bare etcd-root-ca
-cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-gencert.json etcd-csr.json | cfssljson --bare etcd</code></pre></div>
-
-<p>生成的证书列表如下</p>
-<p><img src="https://cdn.oss.link/markdown/2x0ja.jpg" srcset="/img/loading.gif" alt="Etcd Certs"></p>
-<h4 id="2-4、生成-Kubernetes-证书"><a href="#2-4、生成-Kubernetes-证书" class="headerlink" title="2.4、生成 Kubernetes 证书"></a>2.4、生成 Kubernetes 证书</h4><p>Kubernetes 证书生成所需配置文件如下:</p>
-<ul>
-<li>k8s-root-ca-csr.json</li>
-</ul>
-<div class="hljs"><pre><code class="hljs json">&#123;
+&#125;</code></pre></div><p>最后生成 Etcd 证书</p><div class="hljs"><pre><code class="hljs sh">cfssl gencert --initca=<span class="hljs-literal">true</span> etcd-root-ca-csr.json | cfssljson --bare etcd-root-ca
+cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-gencert.json etcd-csr.json | cfssljson --bare etcd</code></pre></div><p>生成的证书列表如下</p><p><img src="https://cdn.oss.link/markdown/2x0ja.jpg" srcset="/img/loading.gif" alt="Etcd Certs"></p><h4 id="2-4、生成-Kubernetes-证书"><a href="#2-4、生成-Kubernetes-证书" class="headerlink" title="2.4、生成 Kubernetes 证书"></a>2.4、生成 Kubernetes 证书</h4><p>Kubernetes 证书生成所需配置文件如下:</p><ul><li>k8s-root-ca-csr.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
   <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"kubernetes"</span>,
   <span class="hljs-attr">"key"</span>: &#123;
     <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
@@ -409,12 +69,7 @@ cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-
       <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
     &#125;
   ]
-&#125;</code></pre></div>
-
-<ul>
-<li>k8s-gencert.json</li>
-</ul>
-<div class="hljs"><pre><code class="hljs json">&#123;
+&#125;</code></pre></div><ul><li>k8s-gencert.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
   <span class="hljs-attr">"signing"</span>: &#123;
     <span class="hljs-attr">"default"</span>: &#123;
       <span class="hljs-attr">"expiry"</span>: <span class="hljs-string">"87600h"</span>
@@ -431,12 +86,7 @@ cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-
       &#125;
     &#125;
   &#125;
-&#125;</code></pre></div>
-
-<ul>
-<li>kubernetes-csr.json</li>
-</ul>
-<div class="hljs"><pre><code class="hljs json">&#123;
+&#125;</code></pre></div><ul><li>kubernetes-csr.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
     <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"kubernetes"</span>,
     <span class="hljs-attr">"hosts"</span>: [
         <span class="hljs-string">"127.0.0.1"</span>,
@@ -466,12 +116,7 @@ cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-
             <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
         &#125;
     ]
-&#125;</code></pre></div>
-
-<ul>
-<li>kube-proxy-csr.json</li>
-</ul>
-<div class="hljs"><pre><code class="hljs json">&#123;
+&#125;</code></pre></div><ul><li>kube-proxy-csr.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
   <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"system:kube-proxy"</span>,
   <span class="hljs-attr">"hosts"</span>: [],
   <span class="hljs-attr">"key"</span>: &#123;
@@ -487,12 +132,7 @@ cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-
       <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
     &#125;
   ]
-&#125;</code></pre></div>
-
-<ul>
-<li>admin-csr.json</li>
-</ul>
-<div class="hljs"><pre><code class="hljs json">&#123;
+&#125;</code></pre></div><ul><li>admin-csr.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
   <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"admin"</span>,
   <span class="hljs-attr">"hosts"</span>: [],
   <span class="hljs-attr">"key"</span>: &#123;
@@ -508,27 +148,14 @@ cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-
       <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
     &#125;
   ]
-&#125;</code></pre></div>
-
-<p>生成 Kubernetes 证书</p>
-<div class="hljs"><pre><code class="hljs sh">cfssl gencert --initca=<span class="hljs-literal">true</span> k8s-root-ca-csr.json | cfssljson --bare k8s-root-ca
+&#125;</code></pre></div><p>生成 Kubernetes 证书</p><div class="hljs"><pre><code class="hljs sh">cfssl gencert --initca=<span class="hljs-literal">true</span> k8s-root-ca-csr.json | cfssljson --bare k8s-root-ca
 
 <span class="hljs-keyword">for</span> targetName <span class="hljs-keyword">in</span> kubernetes admin kube-proxy; <span class="hljs-keyword">do</span>
     cfssl gencert --ca k8s-root-ca.pem --ca-key k8s-root-ca-key.pem --config k8s-gencert.json --profile kubernetes <span class="hljs-variable">$targetName</span>-csr.json | cfssljson --bare <span class="hljs-variable">$targetName</span>
-<span class="hljs-keyword">done</span></code></pre></div>
-
-<p>生成后证书列表如下</p>
-<p><img src="https://cdn.oss.link/markdown/uj9q0.jpg" srcset="/img/loading.gif" alt="Kubernetes Certs"></p>
-<h4 id="2-5、生成-token-及-kubeconfig"><a href="#2-5、生成-token-及-kubeconfig" class="headerlink" title="2.5、生成 token 及 kubeconfig"></a>2.5、生成 token 及 kubeconfig</h4><p>生成 token 如下</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-built_in">export</span> BOOTSTRAP_TOKEN=$(head -c 16 /dev/urandom | od -An -t x | tr -d <span class="hljs-string">' '</span>)
+<span class="hljs-keyword">done</span></code></pre></div><p>生成后证书列表如下</p><p><img src="https://cdn.oss.link/markdown/uj9q0.jpg" srcset="/img/loading.gif" alt="Kubernetes Certs"></p><h4 id="2-5、生成-token-及-kubeconfig"><a href="#2-5、生成-token-及-kubeconfig" class="headerlink" title="2.5、生成 token 及 kubeconfig"></a>2.5、生成 token 及 kubeconfig</h4><p>生成 token 如下</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-built_in">export</span> BOOTSTRAP_TOKEN=$(head -c 16 /dev/urandom | od -An -t x | tr -d <span class="hljs-string">' '</span>)
 cat &gt; token.csv &lt;&lt;EOF
 <span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN&#125;</span>,kubelet-bootstrap,10001,<span class="hljs-string">"system:kubelet-bootstrap"</span>
-EOF</code></pre></div>
-
-<p>创建 kubelet bootstrapping kubeconfig 配置(需要提前安装 kubectl 命令)，<strong>对于 node 节点，api server 地址为本地 nginx 监听的 127.0.0.1:6443，如果想把 master 也当做 node 使用，那么 master 上 api server 地址应该为 masterIP:6443，因为在 master 上没必要也无法启动 nginx 来监听 127.0.0.1:6443(6443 已经被 master 上的 api server 占用了)</strong></p>
-<p><strong>所以以下配置只适合 node 节点，如果想把 master 也当做 node，那么需要重新生成下面的 kubeconfig 配置，并把 api server 地址修改为当前 master 的 api server 地址</strong></p>
-<p><strong>没看懂上面这段话，照着下面的操作就行，看完下面的 Master HA 示意图就懂了</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># Master 上该地址应为 https://MasterIP:6443</span>
+EOF</code></pre></div><p>创建 kubelet bootstrapping kubeconfig 配置(需要提前安装 kubectl 命令)，<strong>对于 node 节点，api server 地址为本地 nginx 监听的 127.0.0.1:6443，如果想把 master 也当做 node 使用，那么 master 上 api server 地址应该为 masterIP:6443，因为在 master 上没必要也无法启动 nginx 来监听 127.0.0.1:6443(6443 已经被 master 上的 api server 占用了)</strong></p><p><strong>所以以下配置只适合 node 节点，如果想把 master 也当做 node，那么需要重新生成下面的 kubeconfig 配置，并把 api server 地址修改为当前 master 的 api server 地址</strong></p><p><strong>没看懂上面这段话，照着下面的操作就行，看完下面的 Master HA 示意图就懂了</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># Master 上该地址应为 https://MasterIP:6443</span>
 <span class="hljs-built_in">export</span> KUBE_APISERVER=<span class="hljs-string">"https://127.0.0.1:6443"</span>
 <span class="hljs-comment"># 设置集群参数</span>
 kubectl config <span class="hljs-built_in">set</span>-cluster kubernetes \
@@ -546,10 +173,7 @@ kubectl config <span class="hljs-built_in">set</span>-context default \
   --user=kubelet-bootstrap \
   --kubeconfig=bootstrap.kubeconfig
 <span class="hljs-comment"># 设置默认上下文</span>
-kubectl config use-context default --kubeconfig=bootstrap.kubeconfig</code></pre></div>
-
-<p>创建 kube-proxy kubeconfig 配置，同上面一样，如果想要把 master 当 node 使用，需要修改 api server</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 设置集群参数</span>
+kubectl config use-context default --kubeconfig=bootstrap.kubeconfig</code></pre></div><p>创建 kube-proxy kubeconfig 配置，同上面一样，如果想要把 master 当 node 使用，需要修改 api server</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 设置集群参数</span>
 kubectl config <span class="hljs-built_in">set</span>-cluster kubernetes \
   --certificate-authority=k8s-root-ca.pem \
   --embed-certs=<span class="hljs-literal">true</span> \
@@ -567,28 +191,18 @@ kubectl config <span class="hljs-built_in">set</span>-context default \
   --user=kube-proxy \
   --kubeconfig=kube-proxy.kubeconfig
 <span class="hljs-comment"># 设置默认上下文</span>
-kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig</code></pre></div>
-
-
-
-<h3 id="三、部署-HA-ETCD"><a href="#三、部署-HA-ETCD" class="headerlink" title="三、部署 HA ETCD"></a>三、部署 HA ETCD</h3><h4 id="3-1、安装-Etcd"><a href="#3-1、安装-Etcd" class="headerlink" title="3.1、安装 Etcd"></a>3.1、安装 Etcd</h4><p>ETCD 直接采用 rpm 安装，RPM 可以从 <a href="https://src.fedoraproject.org/cgit/rpms/etcd.git/" target="_blank" rel="noopener">Fedora 官方仓库</a> 获取 spec 文件自己 build，或者直接从 <a href="https://www.rpmfind.net/" target="_blank" rel="noopener">rpmFind 网站</a> 搜索</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 下载 rpm 包</span>
+kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig</code></pre></div><h3 id="三、部署-HA-ETCD"><a href="#三、部署-HA-ETCD" class="headerlink" title="三、部署 HA ETCD"></a>三、部署 HA ETCD</h3><h4 id="3-1、安装-Etcd"><a href="#3-1、安装-Etcd" class="headerlink" title="3.1、安装 Etcd"></a>3.1、安装 Etcd</h4><p>ETCD 直接采用 rpm 安装，RPM 可以从 <a href="https://src.fedoraproject.org/cgit/rpms/etcd.git/" target="_blank" rel="noopener">Fedora 官方仓库</a> 获取 spec 文件自己 build，或者直接从 <a href="https://www.rpmfind.net/" target="_blank" rel="noopener">rpmFind 网站</a> 搜索</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 下载 rpm 包</span>
 wget ftp://195.220.108.108/linux/fedora/linux/development/rawhide/Everything/x86_64/os/Packages/e/etcd-3.1.9-1.fc27.x86_64.rpm
 <span class="hljs-comment"># 分发并安装 rpm</span>
 <span class="hljs-keyword">for</span> IP <span class="hljs-keyword">in</span> `seq 1 3`; <span class="hljs-keyword">do</span>
     scp etcd-3.1.9-1.fc27.x86_64.rpm root@192.168.1.1<span class="hljs-variable">$IP</span>:~
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> rpm -ivh etcd-3.1.9-1.fc27.x86_64.rpm
-<span class="hljs-keyword">done</span></code></pre></div>
-
-<h4 id="3-2、分发证书"><a href="#3-2、分发证书" class="headerlink" title="3.2、分发证书"></a>3.2、分发证书</h4><div class="hljs"><pre><code class="hljs sh"><span class="hljs-keyword">for</span> IP <span class="hljs-keyword">in</span> `seq 1 3`;<span class="hljs-keyword">do</span>
+<span class="hljs-keyword">done</span></code></pre></div><h4 id="3-2、分发证书"><a href="#3-2、分发证书" class="headerlink" title="3.2、分发证书"></a>3.2、分发证书</h4><div class="hljs"><pre><code class="hljs sh"><span class="hljs-keyword">for</span> IP <span class="hljs-keyword">in</span> `seq 1 3`;<span class="hljs-keyword">do</span>
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> mkdir /etc/etcd/ssl
     scp *.pem root@192.168.1.1<span class="hljs-variable">$IP</span>:/etc/etcd/ssl
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> chown -R etcd:etcd /etc/etcd/ssl
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> chmod -R 755 /etc/etcd
-<span class="hljs-keyword">done</span></code></pre></div>
-
-<h4 id="3-3、修改配置"><a href="#3-3、修改配置" class="headerlink" title="3.3、修改配置"></a>3.3、修改配置</h4><p>rpm 安装好以后直接修改 <code>/etc/etcd/etcd.conf</code> 配置文件即可，其中单个节点配置如下(其他节点只是名字和 IP 不同)</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># [member]</span>
+<span class="hljs-keyword">done</span></code></pre></div><h4 id="3-3、修改配置"><a href="#3-3、修改配置" class="headerlink" title="3.3、修改配置"></a>3.3、修改配置</h4><p>rpm 安装好以后直接修改 <code>/etc/etcd/etcd.conf</code> 配置文件即可，其中单个节点配置如下(其他节点只是名字和 IP 不同)</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># [member]</span>
 ETCD_NAME=etcd1
 ETCD_DATA_DIR=<span class="hljs-string">"/var/lib/etcd/etcd1.etcd"</span>
 ETCD_WAL_DIR=<span class="hljs-string">"/var/lib/etcd/wal"</span>
@@ -638,48 +252,25 @@ ETCD_PEER_AUTO_TLS=<span class="hljs-string">"true"</span>
 <span class="hljs-comment"># [logging]</span>
 <span class="hljs-comment">#ETCD_DEBUG="false"</span>
 <span class="hljs-comment"># examples for -log-package-levels etcdserver=WARNING,security=DEBUG</span>
-<span class="hljs-comment">#ETCD_LOG_PACKAGE_LEVELS=""</span></code></pre></div>
-
-<h4 id="3-4、启动及验证"><a href="#3-4、启动及验证" class="headerlink" title="3.4、启动及验证"></a>3.4、启动及验证</h4><p>配置修改后在每个节点进行启动即可，<strong>注意，Etcd 各个节点间必须保证时钟同步，否则会造成启动失败等错误</strong></p>
-<div class="hljs"><pre><code class="hljs sh">systemctl daemon-reload
+<span class="hljs-comment">#ETCD_LOG_PACKAGE_LEVELS=""</span></code></pre></div><h4 id="3-4、启动及验证"><a href="#3-4、启动及验证" class="headerlink" title="3.4、启动及验证"></a>3.4、启动及验证</h4><p>配置修改后在每个节点进行启动即可，<strong>注意，Etcd 各个节点间必须保证时钟同步，否则会造成启动失败等错误</strong></p><div class="hljs"><pre><code class="hljs sh">systemctl daemon-reload
 systemctl start etcd
-systemctl <span class="hljs-built_in">enable</span> etcd</code></pre></div>
-
-<p>启动成功后验证节点状态</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-built_in">export</span> ETCDCTL_API=3
-etcdctl --cacert=/etc/etcd/ssl/etcd-root-ca.pem --cert=/etc/etcd/ssl/etcd.pem --key=/etc/etcd/ssl/etcd-key.pem --endpoints=https://192.168.1.11:2379,https://192.168.1.12:2379,https://192.168.1.13:2379 endpoint health</code></pre></div>
-
-<p>最后截图如下，警告可忽略</p>
-<p><img src="https://cdn.oss.link/markdown/yr6k4.jpg" srcset="/img/loading.gif" alt="Etcd Healthy"></p>
-<h3 id="四、部署-HA-Master"><a href="#四、部署-HA-Master" class="headerlink" title="四、部署 HA Master"></a>四、部署 HA Master</h3><h4 id="4-1、HA-Master-简述"><a href="#4-1、HA-Master-简述" class="headerlink" title="4.1、HA Master 简述"></a>4.1、HA Master 简述</h4><p>目前所谓的 Kubernetes HA 其实主要的就是 API Server 的 HA，master 上其他组件比如 controller-manager 等都是可以通过 Etcd 做选举；而 API Server 只是提供一个请求接收服务，所以对于 API Server 一般有两种方式做 HA；一种是对多个 API Server 做 vip，另一种使用 nginx 反向代理，本文采用 nginx 方式，以下为 HA 示意图</p>
-<p><img src="https://cdn.oss.link/markdown/m2sug.jpg" srcset="/img/loading.gif" alt="master ha"></p>
-<p><strong>master 之间除 api server 以外其他组件通过 etcd 选举，api server 默认不作处理；在每个 node 上启动一个 nginx，每个 nginx 反向代理所有 api server，node 上 kubelet、kube-proxy 连接本地的 nginx 代理端口，当 nginx 发现无法连接后端时会自动踢掉出问题的 api server，从而实现 api server 的 HA</strong></p>
-<h4 id="4-2、部署前预处理"><a href="#4-2、部署前预处理" class="headerlink" title="4.2、部署前预处理"></a>4.2、部署前预处理</h4><p>一切以偷懒为主，所以我们仍然采用 rpm 的方式来安装 kubernetes 各个组件，关于 rpm 获取方式可以参考 <a href="https://mritd.me/2017/07/12/how-to-build-kubernetes-rpm/" target="_blank" rel="noopener">How to build Kubernetes RPM</a>，以下文章默认认为你已经搞定了 rpm</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 分发 rpm</span>
+systemctl <span class="hljs-built_in">enable</span> etcd</code></pre></div><p>启动成功后验证节点状态</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-built_in">export</span> ETCDCTL_API=3
+etcdctl --cacert=/etc/etcd/ssl/etcd-root-ca.pem --cert=/etc/etcd/ssl/etcd.pem --key=/etc/etcd/ssl/etcd-key.pem --endpoints=https://192.168.1.11:2379,https://192.168.1.12:2379,https://192.168.1.13:2379 endpoint health</code></pre></div><p>最后截图如下，警告可忽略</p><p><img src="https://cdn.oss.link/markdown/yr6k4.jpg" srcset="/img/loading.gif" alt="Etcd Healthy"></p><h3 id="四、部署-HA-Master"><a href="#四、部署-HA-Master" class="headerlink" title="四、部署 HA Master"></a>四、部署 HA Master</h3><h4 id="4-1、HA-Master-简述"><a href="#4-1、HA-Master-简述" class="headerlink" title="4.1、HA Master 简述"></a>4.1、HA Master 简述</h4><p>目前所谓的 Kubernetes HA 其实主要的就是 API Server 的 HA，master 上其他组件比如 controller-manager 等都是可以通过 Etcd 做选举；而 API Server 只是提供一个请求接收服务，所以对于 API Server 一般有两种方式做 HA；一种是对多个 API Server 做 vip，另一种使用 nginx 反向代理，本文采用 nginx 方式，以下为 HA 示意图</p><p><img src="https://cdn.oss.link/markdown/m2sug.jpg" srcset="/img/loading.gif" alt="master ha"></p><p><strong>master 之间除 api server 以外其他组件通过 etcd 选举，api server 默认不作处理；在每个 node 上启动一个 nginx，每个 nginx 反向代理所有 api server，node 上 kubelet、kube-proxy 连接本地的 nginx 代理端口，当 nginx 发现无法连接后端时会自动踢掉出问题的 api server，从而实现 api server 的 HA</strong></p><h4 id="4-2、部署前预处理"><a href="#4-2、部署前预处理" class="headerlink" title="4.2、部署前预处理"></a>4.2、部署前预处理</h4><p>一切以偷懒为主，所以我们仍然采用 rpm 的方式来安装 kubernetes 各个组件，关于 rpm 获取方式可以参考 <a href="https://mritd.me/2017/07/12/how-to-build-kubernetes-rpm/" target="_blank" rel="noopener">How to build Kubernetes RPM</a>，以下文章默认认为你已经搞定了 rpm</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 分发 rpm</span>
 <span class="hljs-keyword">for</span> IP <span class="hljs-keyword">in</span> `seq 1 3`; <span class="hljs-keyword">do</span>
     scp kubernetes*.rpm root@192.168.1.1<span class="hljs-variable">$IP</span>:~; 
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> yum install -y conntrack-tools socat
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> rpm -ivh kubernetes*.rpm
-<span class="hljs-keyword">done</span></code></pre></div>
-
-<p>rpm 安装好以后还需要进行分发证书配置等</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-keyword">for</span> IP <span class="hljs-keyword">in</span> `seq 1 3`;<span class="hljs-keyword">do</span>
+<span class="hljs-keyword">done</span></code></pre></div><p>rpm 安装好以后还需要进行分发证书配置等</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-keyword">for</span> IP <span class="hljs-keyword">in</span> `seq 1 3`;<span class="hljs-keyword">do</span>
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> mkdir /etc/kubernetes/ssl
     scp *.pem root@192.168.1.1<span class="hljs-variable">$IP</span>:/etc/kubernetes/ssl
     scp *.kubeconfig root@192.168.1.1<span class="hljs-variable">$IP</span>:/etc/kubernetes
     scp token.csv root@192.168.1.1<span class="hljs-variable">$IP</span>:/etc/kubernetes
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> chown -R kube:kube /etc/kubernetes/ssl
-<span class="hljs-keyword">done</span></code></pre></div>
-
-<p><strong>最后由于 api server 会写入一些日志，所以先创建好相关目录，并做好授权，防止因为权限错误导致 api server 无法启动</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-keyword">for</span> IP <span class="hljs-keyword">in</span> `seq 1 3`;<span class="hljs-keyword">do</span>
+<span class="hljs-keyword">done</span></code></pre></div><p><strong>最后由于 api server 会写入一些日志，所以先创建好相关目录，并做好授权，防止因为权限错误导致 api server 无法启动</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-keyword">for</span> IP <span class="hljs-keyword">in</span> `seq 1 3`;<span class="hljs-keyword">do</span>
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> mkdir /var/<span class="hljs-built_in">log</span>/kube-audit  
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> chown -R kube:kube /var/<span class="hljs-built_in">log</span>/kube-audit
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> chmod -R 755 /var/<span class="hljs-built_in">log</span>/kube-audit
-<span class="hljs-keyword">done</span></code></pre></div>
-
-<h4 id="4-3、修改-master-配置"><a href="#4-3、修改-master-配置" class="headerlink" title="4.3、修改 master 配置"></a>4.3、修改 master 配置</h4><p>rpm 安装好以后，默认会生成 <code>/etc/kubernetes</code> 目录，并且该目录中会有很多配置，其中 config 配置文件为通用配置，具体文件如下</p>
-<div class="hljs"><pre><code class="hljs sh">➜  kubernetes tree
+<span class="hljs-keyword">done</span></code></pre></div><h4 id="4-3、修改-master-配置"><a href="#4-3、修改-master-配置" class="headerlink" title="4.3、修改 master 配置"></a>4.3、修改 master 配置</h4><p>rpm 安装好以后，默认会生成 <code>/etc/kubernetes</code> 目录，并且该目录中会有很多配置，其中 config 配置文件为通用配置，具体文件如下</p><div class="hljs"><pre><code class="hljs sh">➜  kubernetes tree
 .
 ├── apiserver
 ├── config
@@ -688,13 +279,7 @@ etcdctl --cacert=/etc/etcd/ssl/etcd-root-ca.pem --cert=/etc/etcd/ssl/etcd.pem --
 ├── proxy
 └── scheduler
 
-0 directories, 6 files</code></pre></div>
-
-<p><strong>master 需要编辑 <code>config</code>、<code>apiserver</code>、<code>controller-manager</code>、<code>scheduler</code>这四个文件，具体修改如下</strong></p>
-<ul>
-<li>config 通用配置</li>
-</ul>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
+0 directories, 6 files</code></pre></div><p><strong>master 需要编辑 <code>config</code>、<code>apiserver</code>、<code>controller-manager</code>、<code>scheduler</code>这四个文件，具体修改如下</strong></p><ul><li>config 通用配置</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># kubernetes system config</span>
 <span class="hljs-comment">#</span>
 <span class="hljs-comment"># The following values are used to configure various aspects of all</span>
@@ -715,12 +300,7 @@ KUBE_LOG_LEVEL=<span class="hljs-string">"--v=2"</span>
 KUBE_ALLOW_PRIV=<span class="hljs-string">"--allow-privileged=true"</span>
 
 <span class="hljs-comment"># How the controller-manager, scheduler, and proxy find the apiserver</span>
-KUBE_MASTER=<span class="hljs-string">"--master=http://127.0.0.1:8080"</span></code></pre></div>
-
-<ul>
-<li>apiserver 配置(其他节点只有 IP 不同)</li>
-</ul>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
+KUBE_MASTER=<span class="hljs-string">"--master=http://127.0.0.1:8080"</span></code></pre></div><ul><li>apiserver 配置(其他节点只有 IP 不同)</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># kubernetes system config</span>
 <span class="hljs-comment">#</span>
 <span class="hljs-comment"># The following values are used to configure the kube-apiserver</span>
@@ -767,12 +347,7 @@ KUBE_API_ARGS=<span class="hljs-string">"--authorization-mode=RBAC \</span>
 <span class="hljs-string">               --audit-log-maxbackup=3 \</span>
 <span class="hljs-string">               --audit-log-maxsize=100 \</span>
 <span class="hljs-string">               --audit-log-path=/var/log/kube-audit/audit.log \</span>
-<span class="hljs-string">               --event-ttl=1h"</span></code></pre></div>
-
-<ul>
-<li>controller-manager 配置</li>
-</ul>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
+<span class="hljs-string">               --event-ttl=1h"</span></code></pre></div><ul><li>controller-manager 配置</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># The following values are used to configure the kubernetes controller-manager</span>
 
 <span class="hljs-comment"># defaults from config and apiserver should be adequate</span>
@@ -789,32 +364,19 @@ KUBE_CONTROLLER_MANAGER_ARGS=<span class="hljs-string">"--address=0.0.0.0 \</spa
 <span class="hljs-string">                              --leader-elect=true \</span>
 <span class="hljs-string">                              --node-monitor-grace-period=40s \</span>
 <span class="hljs-string">                              --node-monitor-period=5s \</span>
-<span class="hljs-string">                              --pod-eviction-timeout=5m0s"</span></code></pre></div>
-
-<ul>
-<li>scheduler 配置</li>
-</ul>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
+<span class="hljs-string">                              --pod-eviction-timeout=5m0s"</span></code></pre></div><ul><li>scheduler 配置</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># kubernetes scheduler config</span>
 
 <span class="hljs-comment"># default config should be adequate</span>
 
 <span class="hljs-comment"># Add your own!</span>
-KUBE_SCHEDULER_ARGS=<span class="hljs-string">"--leader-elect=true --address=0.0.0.0"</span></code></pre></div>
-
-<p>其他 master 节点配置相同，只需要修改以下 IP 地址即可，修改完成后启动 api server</p>
-<div class="hljs"><pre><code class="hljs sh">systemctl daemon-reload
+KUBE_SCHEDULER_ARGS=<span class="hljs-string">"--leader-elect=true --address=0.0.0.0"</span></code></pre></div><p>其他 master 节点配置相同，只需要修改以下 IP 地址即可，修改完成后启动 api server</p><div class="hljs"><pre><code class="hljs sh">systemctl daemon-reload
 systemctl start kube-apiserver
 systemctl start kube-controller-manager
 systemctl start kube-scheduler
 systemctl <span class="hljs-built_in">enable</span> kube-apiserver
 systemctl <span class="hljs-built_in">enable</span> kube-controller-manager
-systemctl <span class="hljs-built_in">enable</span> kube-scheduler</code></pre></div>
-
-<p>各个节点启动成功后，验证组件状态(kubectl 在不做任何配置的情况下默认链接本地 8080 端口)如下，<strong>其中 etcd 全部为 Unhealthy 状态，并且提示 <code>remote error: tls: bad certificate</code> 这是个 bug，不影响实际使用，具体可参考 <a href="https://github.com/kubernetes/kubernetes/issues/29330" target="_blank" rel="noopener">issue</a></strong></p>
-<p><img src="https://cdn.oss.link/markdown/0j7k2.jpg" srcset="/img/loading.gif" alt="api status"></p>
-<h3 id="五、部署-Node"><a href="#五、部署-Node" class="headerlink" title="五、部署 Node"></a>五、部署 Node</h3><h4 id="5-1、部署前预处理"><a href="#5-1、部署前预处理" class="headerlink" title="5.1、部署前预处理"></a>5.1、部署前预处理</h4><p>部署前分发 rpm 以及证书、token 等配置</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 分发 rpm</span>
+systemctl <span class="hljs-built_in">enable</span> kube-scheduler</code></pre></div><p>各个节点启动成功后，验证组件状态(kubectl 在不做任何配置的情况下默认链接本地 8080 端口)如下，<strong>其中 etcd 全部为 Unhealthy 状态，并且提示 <code>remote error: tls: bad certificate</code> 这是个 bug，不影响实际使用，具体可参考 <a href="https://github.com/kubernetes/kubernetes/issues/29330" target="_blank" rel="noopener">issue</a></strong></p><p><img src="https://cdn.oss.link/markdown/0j7k2.jpg" srcset="/img/loading.gif" alt="api status"></p><h3 id="五、部署-Node"><a href="#五、部署-Node" class="headerlink" title="五、部署 Node"></a>五、部署 Node</h3><h4 id="5-1、部署前预处理"><a href="#5-1、部署前预处理" class="headerlink" title="5.1、部署前预处理"></a>5.1、部署前预处理</h4><p>部署前分发 rpm 以及证书、token 等配置</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 分发 rpm</span>
 <span class="hljs-keyword">for</span> IP <span class="hljs-keyword">in</span> `seq 4 5`;<span class="hljs-keyword">do</span>
     scp kubernetes-node-1.6.7-1.el7.centos.x86_64.rpm kubernetes-client-1.6.7-1.el7.centos.x86_64.rpm root@192.168.1.1<span class="hljs-variable">$IP</span>:~; 
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> yum install -y conntrack-tools socat
@@ -827,14 +389,7 @@ systemctl <span class="hljs-built_in">enable</span> kube-scheduler</code></pre><
     scp *.kubeconfig root@192.168.1.1<span class="hljs-variable">$IP</span>:/etc/kubernetes
     scp token.csv root@192.168.1.1<span class="hljs-variable">$IP</span>:/etc/kubernetes
     ssh root@192.168.1.1<span class="hljs-variable">$IP</span> chown -R kube:kube /etc/kubernetes/ssl
-<span class="hljs-keyword">done</span></code></pre></div>
-
-<h4 id="5-2、修改-node-配置"><a href="#5-2、修改-node-配置" class="headerlink" title="5.2、修改 node 配置"></a>5.2、修改 node 配置</h4><p>node 节点上配置文件同样位于 <code>/etc/kubernetes</code> 目录，node 节点只需要修改 <code>config</code>、<code>kubelet</code>、<code>proxy</code> 这三个配置文件，修改如下</p>
-<ul>
-<li>config 通用配置</li>
-</ul>
-<p><strong>注意: config 配置文件(包括下面的 kubelet、proxy)中全部未 定义 API Server 地址，因为 kubelet 和 kube-proxy 组件启动时使用了 <code>--require-kubeconfig</code> 选项，该选项会使其从 <code>*.kubeconfig</code> 中读取 API Server 地址，而忽略配置文件中设置的；所以配置文件中设置的地址其实是无效的</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
+<span class="hljs-keyword">done</span></code></pre></div><h4 id="5-2、修改-node-配置"><a href="#5-2、修改-node-配置" class="headerlink" title="5.2、修改 node 配置"></a>5.2、修改 node 配置</h4><p>node 节点上配置文件同样位于 <code>/etc/kubernetes</code> 目录，node 节点只需要修改 <code>config</code>、<code>kubelet</code>、<code>proxy</code> 这三个配置文件，修改如下</p><ul><li>config 通用配置</li></ul><p><strong>注意: config 配置文件(包括下面的 kubelet、proxy)中全部未 定义 API Server 地址，因为 kubelet 和 kube-proxy 组件启动时使用了 <code>--require-kubeconfig</code> 选项，该选项会使其从 <code>*.kubeconfig</code> 中读取 API Server 地址，而忽略配置文件中设置的；所以配置文件中设置的地址其实是无效的</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># kubernetes system config</span>
 <span class="hljs-comment">#</span>
 <span class="hljs-comment"># The following values are used to configure various aspects of all</span>
@@ -855,12 +410,7 @@ KUBE_LOG_LEVEL=<span class="hljs-string">"--v=2"</span>
 KUBE_ALLOW_PRIV=<span class="hljs-string">"--allow-privileged=true"</span>
 
 <span class="hljs-comment"># How the controller-manager, scheduler, and proxy find the apiserver</span>
-<span class="hljs-comment"># KUBE_MASTER="--master=http://127.0.0.1:8080"</span></code></pre></div>
-
-<ul>
-<li>kubelet 配置</li>
-</ul>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
+<span class="hljs-comment"># KUBE_MASTER="--master=http://127.0.0.1:8080"</span></code></pre></div><ul><li>kubelet 配置</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># kubernetes kubelet (minion) config</span>
 
 <span class="hljs-comment"># The address for the info server to serve on (set to 0.0.0.0 or "" for all interfaces)</span>
@@ -886,12 +436,7 @@ KUBELET_ARGS=<span class="hljs-string">"--cgroup-driver=cgroupfs \</span>
 <span class="hljs-string">              --cluster-domain=cluster.local. \</span>
 <span class="hljs-string">              --hairpin-mode promiscuous-bridge \</span>
 <span class="hljs-string">              --serialize-image-pulls=false \</span>
-<span class="hljs-string">              --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0"</span></code></pre></div>
-
-<ul>
-<li>proxy 配置</li>
-</ul>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
+<span class="hljs-string">              --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0"</span></code></pre></div><ul><li>proxy 配置</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># kubernetes proxy config</span>
 
 <span class="hljs-comment"># default config should be adequate</span>
@@ -900,16 +445,10 @@ KUBELET_ARGS=<span class="hljs-string">"--cgroup-driver=cgroupfs \</span>
 KUBE_PROXY_ARGS=<span class="hljs-string">"--bind-address=192.168.1.14 \</span>
 <span class="hljs-string">                 --hostname-override=docker4.node \</span>
 <span class="hljs-string">                 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig \</span>
-<span class="hljs-string">                 --cluster-cidr=10.254.0.0/16"</span></code></pre></div>
-
-<h4 id="5-3、创建-ClusterRoleBinding"><a href="#5-3、创建-ClusterRoleBinding" class="headerlink" title="5.3、创建 ClusterRoleBinding"></a>5.3、创建 ClusterRoleBinding</h4><p>由于 kubelet 采用了 <a href="https://kubernetes.io/docs/admin/kubelet-tls-bootstrapping/" target="_blank" rel="noopener">TLS Bootstrapping</a>，所有根绝 RBAC 控制策略，kubelet 使用的用户 <code>kubelet-bootstrap</code> 是不具备任何访问 API 权限的，这是需要预先在集群内创建 ClusterRoleBinding 授予其 <code>system:node-bootstrapper</code> Role</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 在任意 master 执行即可</span>
+<span class="hljs-string">                 --cluster-cidr=10.254.0.0/16"</span></code></pre></div><h4 id="5-3、创建-ClusterRoleBinding"><a href="#5-3、创建-ClusterRoleBinding" class="headerlink" title="5.3、创建 ClusterRoleBinding"></a>5.3、创建 ClusterRoleBinding</h4><p>由于 kubelet 采用了 <a href="https://kubernetes.io/docs/admin/kubelet-tls-bootstrapping/" target="_blank" rel="noopener">TLS Bootstrapping</a>，所有根绝 RBAC 控制策略，kubelet 使用的用户 <code>kubelet-bootstrap</code> 是不具备任何访问 API 权限的，这是需要预先在集群内创建 ClusterRoleBinding 授予其 <code>system:node-bootstrapper</code> Role</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 在任意 master 执行即可</span>
 kubectl create clusterrolebinding kubelet-bootstrap \
   --clusterrole=system:node-bootstrapper \
-  --user=kubelet-bootstrap</code></pre></div>
-
-<h4 id="5-4、创建-nginx-代理"><a href="#5-4、创建-nginx-代理" class="headerlink" title="5.4、创建 nginx 代理"></a>5.4、创建 nginx 代理</h4><p><strong>根据上面描述的 master HA 架构，此时所有 node 应该连接本地的 nginx 代理，然后 nginx 来负载所有 api server；以下为 nginx 代理相关配置</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建配置目录</span>
+  --user=kubelet-bootstrap</code></pre></div><h4 id="5-4、创建-nginx-代理"><a href="#5-4、创建-nginx-代理" class="headerlink" title="5.4、创建 nginx 代理"></a>5.4、创建 nginx 代理</h4><p><strong>根据上面描述的 master HA 架构，此时所有 node 应该连接本地的 nginx 代理，然后 nginx 来负载所有 api server；以下为 nginx 代理相关配置</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建配置目录</span>
 mkdir -p /etc/nginx
 
 <span class="hljs-comment"># 写入代理配置</span>
@@ -941,10 +480,7 @@ stream &#123;
 EOF
 
 <span class="hljs-comment"># 更新权限</span>
-chmod +r /etc/nginx/nginx.conf</code></pre></div>
-
-<p>为了保证 nginx 的可靠性，综合便捷性考虑，<strong>node 节点上的 nginx 使用 docker 启动，同时 使用 systemd 来守护，</strong> systemd 配置如下</p>
-<div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; /etc/systemd/system/nginx-proxy.service
+chmod +r /etc/nginx/nginx.conf</code></pre></div><p>为了保证 nginx 的可靠性，综合便捷性考虑，<strong>node 节点上的 nginx 使用 docker 启动，同时 使用 systemd 来守护，</strong> systemd 配置如下</p><div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; /etc/systemd/system/nginx-proxy.service
 [Unit]
 Description=kubernetes apiserver docker wrapper
 Wants=docker.socket
@@ -968,28 +504,12 @@ TimeoutStartSec=30s
 
 [Install]
 WantedBy=multi-user.target
-EOF</code></pre></div>
-
-<p><strong>最后启动 nginx，同时在每个 node 安装 kubectl，然后使用 kubectl 测试 api server 负载情况</strong></p>
-<div class="hljs"><pre><code class="hljs sh">systemctl daemon-reload
+EOF</code></pre></div><p><strong>最后启动 nginx，同时在每个 node 安装 kubectl，然后使用 kubectl 测试 api server 负载情况</strong></p><div class="hljs"><pre><code class="hljs sh">systemctl daemon-reload
 systemctl start nginx-proxy
-systemctl <span class="hljs-built_in">enable</span> nginx-proxy</code></pre></div>
-
-<p>启动成功后如下</p>
-<p><img src="https://cdn.oss.link/markdown/0shgz.jpg" srcset="/img/loading.gif" alt="nginx-proxy"></p>
-<p>kubectl 测试联通性如下</p>
-<p><img src="https://cdn.oss.link/markdown/maiz2.jpg" srcset="/img/loading.gif" alt="test nginx-proxy"></p>
-<h4 id="5-5、添加-Node"><a href="#5-5、添加-Node" class="headerlink" title="5.5、添加 Node"></a>5.5、添加 Node</h4><p>一起准备就绪以后就可以启动 node 相关组件了</p>
-<div class="hljs"><pre><code class="hljs sh">systemctl daemon-reload
+systemctl <span class="hljs-built_in">enable</span> nginx-proxy</code></pre></div><p>启动成功后如下</p><p><img src="https://cdn.oss.link/markdown/0shgz.jpg" srcset="/img/loading.gif" alt="nginx-proxy"></p><p>kubectl 测试联通性如下</p><p><img src="https://cdn.oss.link/markdown/maiz2.jpg" srcset="/img/loading.gif" alt="test nginx-proxy"></p><h4 id="5-5、添加-Node"><a href="#5-5、添加-Node" class="headerlink" title="5.5、添加 Node"></a>5.5、添加 Node</h4><p>一起准备就绪以后就可以启动 node 相关组件了</p><div class="hljs"><pre><code class="hljs sh">systemctl daemon-reload
 systemctl start kubelet
-systemctl <span class="hljs-built_in">enable</span> kubelet</code></pre></div>
-
-<p>由于采用了 <a href="https://kubernetes.io/docs/admin/kubelet-tls-bootstrapping/" target="_blank" rel="noopener">TLS Bootstrapping</a>，所以 kubelet 启动后不会立即加入集群，而是进行证书申请，从日志中可以看到如下输出</p>
-<div class="hljs"><pre><code class="hljs sh">Jul 19 14:15:31 docker4.node kubelet[18213]: I0719 14:15:31.810914   18213 feature_gate.go:144] feature gates: map[]
-Jul 19 14:15:31 docker4.node kubelet[18213]: I0719 14:15:31.811025   18213 bootstrap.go:58] Using bootstrap kubeconfig to generate TLS client cert, key and kubeconfig file</code></pre></div>
-
-<p><strong>此时只需要在 master 允许其证书申请即可</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 查看 csr</span>
+systemctl <span class="hljs-built_in">enable</span> kubelet</code></pre></div><p>由于采用了 <a href="https://kubernetes.io/docs/admin/kubelet-tls-bootstrapping/" target="_blank" rel="noopener">TLS Bootstrapping</a>，所以 kubelet 启动后不会立即加入集群，而是进行证书申请，从日志中可以看到如下输出</p><div class="hljs"><pre><code class="hljs sh">Jul 19 14:15:31 docker4.node kubelet[18213]: I0719 14:15:31.810914   18213 feature_gate.go:144] feature gates: map[]
+Jul 19 14:15:31 docker4.node kubelet[18213]: I0719 14:15:31.811025   18213 bootstrap.go:58] Using bootstrap kubeconfig to generate TLS client cert, key and kubeconfig file</code></pre></div><p><strong>此时只需要在 master 允许其证书申请即可</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 查看 csr</span>
 ➜  kubectl get csr
 NAME        AGE       REQUESTOR           CONDITION
 csr-l9d25   2m        kubelet-bootstrap   Pending
@@ -1001,29 +521,12 @@ certificatesigningrequest <span class="hljs-string">"csr-l9d25"</span> approved
 <span class="hljs-comment"># 查看 node</span>
 ➜  kubectl get node
 NAME           STATUS    AGE       VERSION
-docker4.node   Ready     26s       v1.6.7</code></pre></div>
-
-<p>最后再启动 kube-proxy 组件即可</p>
-<div class="hljs"><pre><code class="hljs sh">systemctl start kube-proxy
-systemctl <span class="hljs-built_in">enable</span> kube-proxy</code></pre></div>
-
-<h4 id="5-6、Master-开启-Pod-负载"><a href="#5-6、Master-开启-Pod-负载" class="headerlink" title="5.6、Master 开启 Pod 负载"></a>5.6、Master 开启 Pod 负载</h4><p>Master 上部署 Node 与单独 Node 部署大致相同，<strong>只需要修改 <code>bootstrap.kubeconfig</code>、<code>kube-proxy.kubeconfig</code> 中的 API Server 地址即可</strong></p>
-<p><img src="https://cdn.oss.link/markdown/2gkyj.jpg" srcset="/img/loading.gif" alt="modify api server"></p>
-<p>然后修改 <code>kubelet</code>、<code>proxy</code> 配置启动即可</p>
-<div class="hljs"><pre><code class="hljs sh">systemctl daemon-reload
+docker4.node   Ready     26s       v1.6.7</code></pre></div><p>最后再启动 kube-proxy 组件即可</p><div class="hljs"><pre><code class="hljs sh">systemctl start kube-proxy
+systemctl <span class="hljs-built_in">enable</span> kube-proxy</code></pre></div><h4 id="5-6、Master-开启-Pod-负载"><a href="#5-6、Master-开启-Pod-负载" class="headerlink" title="5.6、Master 开启 Pod 负载"></a>5.6、Master 开启 Pod 负载</h4><p>Master 上部署 Node 与单独 Node 部署大致相同，<strong>只需要修改 <code>bootstrap.kubeconfig</code>、<code>kube-proxy.kubeconfig</code> 中的 API Server 地址即可</strong></p><p><img src="https://cdn.oss.link/markdown/2gkyj.jpg" srcset="/img/loading.gif" alt="modify api server"></p><p>然后修改 <code>kubelet</code>、<code>proxy</code> 配置启动即可</p><div class="hljs"><pre><code class="hljs sh">systemctl daemon-reload
 systemctl start kubelet
 systemctl <span class="hljs-built_in">enable</span> kubelet
 systemctl start kube-proxy
-systemctl <span class="hljs-built_in">enable</span> kube-proxy</code></pre></div>
-
-<p>最后在 master 签发一下相关证书</p>
-<div class="hljs"><pre><code class="hljs sh">kubectl certificate approve csr-z090b</code></pre></div>
-
-<p>整体部署完成后如下</p>
-<p><img src="https://cdn.oss.link/markdown/fsddv.jpg" srcset="/img/loading.gif" alt="read"></p>
-<h3 id="六、部署-Calico"><a href="#六、部署-Calico" class="headerlink" title="六、部署 Calico"></a>六、部署 Calico</h3><p>网路组件这里采用 Calico，Calico 目前部署也相对比较简单，只需要创建一下 yml 文件即可，具体可参考 <a href="http://docs.projectcalico.org/v2.3/getting-started/kubernetes/" target="_blank" rel="noopener">Calico 官方文档</a></p>
-<p><strong>Cliaco 官方文档要求 kubelet 启动时要配置使用 cni 插件 <code>--network-plugin=cni</code>，同时 kube-proxy 不能使用 <code>--masquerade-all</code> 启动(会与 Calico policy 冲突)，所以需要修改所有 kubelet 和 proxy 配置文件，以下默认为这两项已经调整完毕，这里不做演示</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 获取相关 Cliaco.yml</span>
+systemctl <span class="hljs-built_in">enable</span> kube-proxy</code></pre></div><p>最后在 master 签发一下相关证书</p><div class="hljs"><pre><code class="hljs sh">kubectl certificate approve csr-z090b</code></pre></div><p>整体部署完成后如下</p><p><img src="https://cdn.oss.link/markdown/fsddv.jpg" srcset="/img/loading.gif" alt="read"></p><h3 id="六、部署-Calico"><a href="#六、部署-Calico" class="headerlink" title="六、部署 Calico"></a>六、部署 Calico</h3><p>网路组件这里采用 Calico，Calico 目前部署也相对比较简单，只需要创建一下 yml 文件即可，具体可参考 <a href="http://docs.projectcalico.org/v2.3/getting-started/kubernetes/" target="_blank" rel="noopener">Calico 官方文档</a></p><p><strong>Cliaco 官方文档要求 kubelet 启动时要配置使用 cni 插件 <code>--network-plugin=cni</code>，同时 kube-proxy 不能使用 <code>--masquerade-all</code> 启动(会与 Calico policy 冲突)，所以需要修改所有 kubelet 和 proxy 配置文件，以下默认为这两项已经调整完毕，这里不做演示</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 获取相关 Cliaco.yml</span>
 wget http://docs.projectcalico.org/v2.3/getting-started/kubernetes/installation/hosted/calico.yaml
 
 <span class="hljs-comment"># 修改 Etcd 相关配置，以下列出主要修改部分(etcd 证书内容需要被 base64 转码)</span>
@@ -1042,16 +545,8 @@ sed -i <span class="hljs-string">'s@.*etcd_ca:.*@\ \ etcd_ca:\ "/calico-secrets/
 sed -i <span class="hljs-string">'s@.*etcd_cert:.*@\ \ etcd_cert:\ "/calico-secrets/etcd-cert"@gi'</span> calico.yaml
 sed -i <span class="hljs-string">'s@.*etcd_key:.*@\ \ etcd_key:\ "/calico-secrets/etcd-key"@gi'</span> calico.yaml
 
-sed -i <span class="hljs-string">'s@192.168.0.0/16@10.254.64.0/18@gi'</span> calico.yaml</code></pre></div>
-
-<p>执行部署操作，<strong>注意，在开启 RBAC 的情况下需要单独创建 ClusterRole 和 ClusterRoleBinding</strong></p>
-<div class="hljs"><pre><code class="hljs sh">kubectl create -f calico.yaml
-kubectl apply -f http://docs.projectcalico.org/v2.3/getting-started/kubernetes/installation/rbac.yaml</code></pre></div>
-
-<p>部署完成后如下 </p>
-<p><img src="https://cdn.oss.link/markdown/ocqsf.jpg" srcset="/img/loading.gif" alt="caliaco"></p>
-<p><strong>最后测试一下跨主机通讯</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建 deployment</span>
+sed -i <span class="hljs-string">'s@192.168.0.0/16@10.254.64.0/18@gi'</span> calico.yaml</code></pre></div><p>执行部署操作，<strong>注意，在开启 RBAC 的情况下需要单独创建 ClusterRole 和 ClusterRoleBinding</strong></p><div class="hljs"><pre><code class="hljs sh">kubectl create -f calico.yaml
+kubectl apply -f http://docs.projectcalico.org/v2.3/getting-started/kubernetes/installation/rbac.yaml</code></pre></div><p>部署完成后如下</p><p><img src="https://cdn.oss.link/markdown/ocqsf.jpg" srcset="/img/loading.gif" alt="caliaco"></p><p><strong>最后测试一下跨主机通讯</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建 deployment</span>
 cat &lt;&lt; EOF &gt;&gt; demo.deploy.yml
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -1070,13 +565,7 @@ spec:
         ports:
         - containerPort: 80
 EOF
-kubectl create -f demo.deploy.yml</code></pre></div>
-
-<p>exec 到一台主机 pod 内 ping 另一个不同 node 上的 pod 如下</p>
-<p><img src="https://cdn.oss.link/markdown/phkgr.jpg" srcset="/img/loading.gif" alt="ping"></p>
-<h3 id="七、部署-DNS"><a href="#七、部署-DNS" class="headerlink" title="七、部署 DNS"></a>七、部署 DNS</h3><h4 id="7-1、DNS-组件部署"><a href="#7-1、DNS-组件部署" class="headerlink" title="7.1、DNS 组件部署"></a>7.1、DNS 组件部署</h4><p>DNS 部署目前有两种方式，一种是纯手动，另一种是使用 <a href="https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/addon-manager/README.md" target="_blank" rel="noopener">Addon-manager</a>，目前个人感觉 Addon-manager 有点繁琐，所以以下采取纯手动部署 DNS 组件</p>
-<p>DNS 组件相关文件位于 <a href="https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/dns/README.md" target="_blank" rel="noopener">kubernetes addons</a> 目录下，把相关文件下载下来然后稍作修改即可</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 获取文件</span>
+kubectl create -f demo.deploy.yml</code></pre></div><p>exec 到一台主机 pod 内 ping 另一个不同 node 上的 pod 如下</p><p><img src="https://cdn.oss.link/markdown/phkgr.jpg" srcset="/img/loading.gif" alt="ping"></p><h3 id="七、部署-DNS"><a href="#七、部署-DNS" class="headerlink" title="七、部署 DNS"></a>七、部署 DNS</h3><h4 id="7-1、DNS-组件部署"><a href="#7-1、DNS-组件部署" class="headerlink" title="7.1、DNS 组件部署"></a>7.1、DNS 组件部署</h4><p>DNS 部署目前有两种方式，一种是纯手动，另一种是使用 <a href="https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/addon-manager/README.md" target="_blank" rel="noopener">Addon-manager</a>，目前个人感觉 Addon-manager 有点繁琐，所以以下采取纯手动部署 DNS 组件</p><p>DNS 组件相关文件位于 <a href="https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/dns/README.md" target="_blank" rel="noopener">kubernetes addons</a> 目录下，把相关文件下载下来然后稍作修改即可</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 获取文件</span>
 mkdir dns &amp;&amp; <span class="hljs-built_in">cd</span> dns
 wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/kubedns-cm.yaml
 wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/kubedns-sa.yaml
@@ -1088,256 +577,9 @@ mv kubedns-svc.yaml.sed kubedns-svc.yaml
 sed -i <span class="hljs-string">'s/$DNS_DOMAIN/cluster.local/gi'</span> kubedns-controller.yaml
 sed -i <span class="hljs-string">'s/$DNS_SERVER_IP/10.254.0.2/gi'</span> kubedns-svc.yaml
 <span class="hljs-comment"># 创建(我把所有 yml 放到的 dns 目录中)</span>
-kubectl create -f ../dns</code></pre></div>
-
-<p><strong>接下来测试 DNS，</strong>测试方法创建两个 deployment 和 svc，通过在 pod 内通过 svc 域名方式访问另一个 deployment 下的 pod，相关测试的 deploy、svc 配置在这里不在展示，基本情况如下图所示</p>
-<p><img src="https://cdn.oss.link/markdown/o94qb.jpg" srcset="/img/loading.gif" alt="deployment"></p>
-<p><img src="https://cdn.oss.link/markdown/586mm.jpg" srcset="/img/loading.gif" alt="test dns"></p>
-<h4 id="7-2、DNS-自动扩容部署"><a href="#7-2、DNS-自动扩容部署" class="headerlink" title="7.2、DNS 自动扩容部署"></a>7.2、DNS 自动扩容部署</h4><p>关于 DNS 自动扩容详细可参考 <a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-horizontal-autoscaling/" target="_blank" rel="noopener">Autoscale the DNS Service in a Cluster</a>，以下直接操作</p>
-<p>首先获取 Dns horizontal autoscaler 配置文件</p>
-<div class="hljs"><pre><code class="hljs sh">wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns-horizontal-autoscaler/dns-horizontal-autoscaler-rbac.yaml
-wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns-horizontal-autoscaler/dns-horizontal-autoscaler.yaml</code></pre></div>
-
-<p>然后直接 <code>kubectl create -f</code> 即可，<strong>DNS 自动扩容计算公式为 <code>replicas = max( ceil( cores * 1/coresPerReplica ) , ceil( nodes * 1/nodesPerReplica ) )</code>，如果想调整 DNS 数量(负载因子)，只需要调整 ConfigMap 中对应参数即可，具体计算细节参考上面的官方文档</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 编辑 Config Map</span>
-kubectl edit cm kube-dns-autoscaler --namespace=kube-system</code></pre></div>
-
-
-
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/linux/">Linux</a>
-                    
-                      <a class="hover-with-bg" href="/tags/docker/">Docker</a>
-                    
-                      <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
-              
-              
-                <div class="post-prevnext row">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2017/07/31/calico-yml-bug/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Calico 部署踩坑记录</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2017/07/17/kubernetes-rbac-chinese-translation/">
-                        <span class="hidden-mobile">Kubernetes RBAC</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                
-  <div class="disqus" style="width:100%">
-    <div id="disqus_thread"></div>
-    <script type="text/javascript">
-      var disqus_config = function () {
-        this.page.url = 'https://mritd.com/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/';
-        this.page.identifier = '/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/';
-      };
-      function loadDisqus() {
-        (function () {
-          var d = document,
-            s = d.createElement('script');
-          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
-          s.setAttribute('data-timestamp', new Date());
-          (d.head || d.body).appendChild(s);
-        })();
-      }
-      waitElementVisible('disqus_thread', loadDisqus);
-    </script>
-    <noscript>Please enable JavaScript to view the
-      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
-    </noscript>
-  </div>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-  </main>
-
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
-
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
-    
-
-    
-
-    
-  </div>
-</footer>
-
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
-
-<!-- Plugins -->
-
-
-  
-    <script  src="/js/lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
-
-
-
-
-
-
-
-  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: '#post-body',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        collapseDepth: 3,
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc').css('visibility', 'visible');
-      }
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "手动档搭建 Kubernetes HA 集群&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 80,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
+kubectl create -f ../dns</code></pre></div><p><strong>接下来测试 DNS，</strong>测试方法创建两个 deployment 和 svc，通过在 pod 内通过 svc 域名方式访问另一个 deployment 下的 pod，相关测试的 deploy、svc 配置在这里不在展示，基本情况如下图所示</p><p><img src="https://cdn.oss.link/markdown/o94qb.jpg" srcset="/img/loading.gif" alt="deployment"></p><p><img src="https://cdn.oss.link/markdown/586mm.jpg" srcset="/img/loading.gif" alt="test dns"></p><h4 id="7-2、DNS-自动扩容部署"><a href="#7-2、DNS-自动扩容部署" class="headerlink" title="7.2、DNS 自动扩容部署"></a>7.2、DNS 自动扩容部署</h4><p>关于 DNS 自动扩容详细可参考 <a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-horizontal-autoscaling/" target="_blank" rel="noopener">Autoscale the DNS Service in a Cluster</a>，以下直接操作</p><p>首先获取 Dns horizontal autoscaler 配置文件</p><div class="hljs"><pre><code class="hljs sh">wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns-horizontal-autoscaler/dns-horizontal-autoscaler-rbac.yaml
+wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns-horizontal-autoscaler/dns-horizontal-autoscaler.yaml</code></pre></div><p>然后直接 <code>kubectl create -f</code> 即可，<strong>DNS 自动扩容计算公式为 <code>replicas = max( ceil( cores * 1/coresPerReplica ) , ceil( nodes * 1/nodesPerReplica ) )</code>，如果想调整 DNS 数量(负载因子)，只需要调整 ConfigMap 中对应参数即可，具体计算细节参考上面的官方文档</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 编辑 Config Map</span>
+kubectl edit cm kube-dns-autoscaler --namespace=kube-system</code></pre></div></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/linux/">Linux</a> <a class="hover-with-bg" href="/tags/docker/">Docker</a> <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext row"><article class="post-prev col-6"><a href="/2017/07/31/calico-yml-bug/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">Calico 部署踩坑记录</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"> <a href="/2017/07/17/kubernetes-rbac-chinese-translation/"><span class="hidden-mobile">Kubernetes RBAC</span> <span class="visible-mobile">下一篇</span><i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments"><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/",this.page.identifier="/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/"};function loadDisqus(){var e,t;e=document,(t=e.createElement("script")).src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}waitElementVisible("disqus_thread",loadDisqus)</script><noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a></noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4> <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"> <input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a><i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="/js/debouncer.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script defer="defer" src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js"></script><script>$(document).ready(function(){var t=$("#board-ctn").offset().top;tocbot.init({tocSelector:"#tocbot",contentSelector:"#post-body",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",collapseDepth:3,scrollSmooth:!0,headingsOffset:-t}),0<$(".toc-list-item").length&&$("#toc").css("visibility","visible")})</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","手动档搭建 Kubernetes HA 集群&nbsp;"],cursorChar:"_",typeSpeed:80,loop:!1});typed.stop(),$(document).ready(function(){$(".typed-cursor").addClass("h2"),typed.start()})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>
     anchors.options = {
       placement: "right",
       visible: "hover",
@@ -1351,54 +593,4 @@ kubectl edit cm kube-dns-autoscaler --namespace=kube-system</code></pre></div>
       res.push(".markdown-body > " + item)
     }
     anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <script>
-    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
-      function () {
-        var element = document.createElement('a');
-        $(element).attr('data-fancybox', 'images');
-        $(element).attr('href', $(this).attr('src'));
-        $(this).wrap(element);
-      }
-    );
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</body>
-</html>
+  </script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){searchFunc(path,"local-search-input","local-search-result"),this.onclick=null}</script><script src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><link rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><script>$("#post img:not(.no-zoom img, img[no-zoom]), img[zoom]").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script></body></html>

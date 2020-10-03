@@ -1,279 +1,4 @@
-
-
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
-
-
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/img/favicon.ico">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="Upward, not Northward.">
-  <meta name="author" content="bleem">
-  <meta name="keywords" content="漠然,bleem,mritd">
-  <title>Kubernetes 使用 Ceph 存储 - bleem</title>
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
-    
-  
-
-  
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
-<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
-</head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/friends/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner intro-2" id="background" parallax=true
-         style="background: url('/img/default.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container page-header text-center fade-in-up">
-            <span class="h2" id="subtitle">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2017-06-03 12:38" pubdate>
-        2017年6月3日 下午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      1.2k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      18
-       分钟
-    </span>
-  
-
-  
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid">
-  <div class="row">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto" id="post">
-            <!-- SEO header -->
-            <h1 style="display: none">Kubernetes 使用 Ceph 存储</h1>
-            
-            <div class="markdown-body" id="post-body">
-              <blockquote>
-<p>本文主要记录一下 Kubernetes 使用 Ceph 存储的相关配置过程，Kubernetes 集群环境采用的 kargo 部署方式，并且所有组件以容器化运行</p>
-</blockquote>
-<h3 id="一、基础环境准备"><a href="#一、基础环境准备" class="headerlink" title="一、基础环境准备"></a>一、基础环境准备</h3><p>Kubernetes 集群总共有 5 台，部署方式为 kargo 容器化部署，<strong>采用 kargo 部署时确保配置中开启内核模块加载( <code>kubelet_load_modules: true</code> )</strong>；Kubernetes 版本为 1.6.4，Ceph 采用最新的稳定版 Jewel</p>
-<table>
-<thead>
-<tr>
-<th>节点</th>
-<th>IP</th>
-<th>部署</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>docker1</td>
-<td>192.168.1.11</td>
-<td>master、monitor、osd</td>
-</tr>
-<tr>
-<td>docker2</td>
-<td>192.168.1.12</td>
-<td>master、monitor、osd</td>
-</tr>
-<tr>
-<td>docker3</td>
-<td>192.168.1.13</td>
-<td>node、monitor、osd</td>
-</tr>
-<tr>
-<td>docker4</td>
-<td>192.168.1.14</td>
-<td>node、osd</td>
-</tr>
-<tr>
-<td>docker5</td>
-<td>192.168.1.15</td>
-<td>node、osd</td>
-</tr>
-</tbody></table>
-<h3 id="二、部署-Ceph-集群"><a href="#二、部署-Ceph-集群" class="headerlink" title="二、部署 Ceph 集群"></a>二、部署 Ceph 集群</h3><p>具体安装请参考 <a href="https://mritd.me/2017/05/27/ceph-note-1/" target="_blank" rel="noopener">Ceph 笔记(一)</a>、<a href="https://mritd.me/2017/05/30/ceph-note-2/" target="_blank" rel="noopener">Ceph 笔记(二)</a>，以下直接上命令</p>
-<h4 id="2-1、部署集群"><a href="#2-1、部署集群" class="headerlink" title="2.1、部署集群"></a>2.1、部署集群</h4><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建集群配置目录</span>
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;auto&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Upward, not Northward."><meta name="author" content="bleem"><meta name="keywords" content="漠然,bleem,mritd"><title>Kubernetes 使用 Ceph 存储 - bleem</title><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml"><link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"> <a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"> <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"> <a class="nav-link" href="javascript:">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner intro-2" id="background" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="container page-header text-center fade-in-up"><span class="h2" id="subtitle"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2017-06-03 12:38" pubdate>2017年6月3日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 1.2k 字</span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 18 分钟</span></div></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto" id="post"><h1 style="display:none">Kubernetes 使用 Ceph 存储</h1><div class="markdown-body" id="post-body"><blockquote><p>本文主要记录一下 Kubernetes 使用 Ceph 存储的相关配置过程，Kubernetes 集群环境采用的 kargo 部署方式，并且所有组件以容器化运行</p></blockquote><h3 id="一、基础环境准备"><a href="#一、基础环境准备" class="headerlink" title="一、基础环境准备"></a>一、基础环境准备</h3><p>Kubernetes 集群总共有 5 台，部署方式为 kargo 容器化部署，<strong>采用 kargo 部署时确保配置中开启内核模块加载( <code>kubelet_load_modules: true</code> )</strong>；Kubernetes 版本为 1.6.4，Ceph 采用最新的稳定版 Jewel</p><table><thead><tr><th>节点</th><th>IP</th><th>部署</th></tr></thead><tbody><tr><td>docker1</td><td>192.168.1.11</td><td>master、monitor、osd</td></tr><tr><td>docker2</td><td>192.168.1.12</td><td>master、monitor、osd</td></tr><tr><td>docker3</td><td>192.168.1.13</td><td>node、monitor、osd</td></tr><tr><td>docker4</td><td>192.168.1.14</td><td>node、osd</td></tr><tr><td>docker5</td><td>192.168.1.15</td><td>node、osd</td></tr></tbody></table><h3 id="二、部署-Ceph-集群"><a href="#二、部署-Ceph-集群" class="headerlink" title="二、部署 Ceph 集群"></a>二、部署 Ceph 集群</h3><p>具体安装请参考 <a href="https://mritd.me/2017/05/27/ceph-note-1/" target="_blank" rel="noopener">Ceph 笔记(一)</a>、<a href="https://mritd.me/2017/05/30/ceph-note-2/" target="_blank" rel="noopener">Ceph 笔记(二)</a>，以下直接上命令</p><h4 id="2-1、部署集群"><a href="#2-1、部署集群" class="headerlink" title="2.1、部署集群"></a>2.1、部署集群</h4><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建集群配置目录</span>
 mkdir ceph-cluster &amp;&amp; <span class="hljs-built_in">cd</span> ceph-cluster
 <span class="hljs-comment"># 创建 monitor-node</span>
 ceph-deploy new docker1 docker2 docker3
@@ -292,9 +17,7 @@ ceph-deploy admin docker1 docker2 docker3 docker4 docker5
 <span class="hljs-comment"># 确保秘钥有读取权限</span>
 chmod +r /etc/ceph/ceph.client.admin.keyring
 <span class="hljs-comment"># 检测集群状态</span>
-ceph health</code></pre></div>
-
-<h4 id="2-2、创建块设备"><a href="#2-2、创建块设备" class="headerlink" title="2.2、创建块设备"></a>2.2、创建块设备</h4><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建存储池</span>
+ceph health</code></pre></div><h4 id="2-2、创建块设备"><a href="#2-2、创建块设备" class="headerlink" title="2.2、创建块设备"></a>2.2、创建块设备</h4><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建存储池</span>
 rados mkpool data
 <span class="hljs-comment"># 创建 image</span>
 rbd create data --size 10240 -p data
@@ -303,11 +26,7 @@ rbd feature <span class="hljs-built_in">disable</span> data exclusive-lock, obje
 <span class="hljs-comment"># 映射(每个节点都要映射)</span>
 rbd map data --name client.admin -p data
 <span class="hljs-comment"># 格式化块设备(单节点即可)</span>
-mkfs.xfs /dev/rbd0</code></pre></div>
-
-<h3 id="三、kubernetes-使用-Ceph"><a href="#三、kubernetes-使用-Ceph" class="headerlink" title="三、kubernetes 使用 Ceph"></a>三、kubernetes 使用 Ceph</h3><h4 id="3-1、PV-amp-PVC-方式"><a href="#3-1、PV-amp-PVC-方式" class="headerlink" title="3.1、PV &amp; PVC 方式"></a>3.1、PV &amp; PVC 方式</h4><p>传统的使用分布式存储的方案一般为 <code>PV &amp; PVC</code> 方式，也就是说管理员预先创建好相关 PV 和 PVC，然后对应的 deployment 或者 replication 挂载 PVC 来使用</p>
-<p><strong>创建 Secret</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 获取管理 key 并进行 base64 编码</span>
+mkfs.xfs /dev/rbd0</code></pre></div><h3 id="三、kubernetes-使用-Ceph"><a href="#三、kubernetes-使用-Ceph" class="headerlink" title="三、kubernetes 使用 Ceph"></a>三、kubernetes 使用 Ceph</h3><h4 id="3-1、PV-amp-PVC-方式"><a href="#3-1、PV-amp-PVC-方式" class="headerlink" title="3.1、PV &amp; PVC 方式"></a>3.1、PV &amp; PVC 方式</h4><p>传统的使用分布式存储的方案一般为 <code>PV &amp; PVC</code> 方式，也就是说管理员预先创建好相关 PV 和 PVC，然后对应的 deployment 或者 replication 挂载 PVC 来使用</p><p><strong>创建 Secret</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 获取管理 key 并进行 base64 编码</span>
 ceph auth get-key client.admin | base64
 
 <span class="hljs-comment"># 创建一个 secret 配置(key 为上条命令生成的)</span>
@@ -319,10 +38,7 @@ metadata:
 data:
   key: QVFDaWtERlpzODcwQWhBQTdxMWRGODBWOFZxMWNGNnZtNmJHVGc9PQo=
 EOF
-kubectl create -f ceph-secret.yml</code></pre></div>
-
-<p><strong>创建 PV</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># monitor 需要多个，pool 和 image 填写上面创建的</span>
+kubectl create -f ceph-secret.yml</code></pre></div><p><strong>创建 PV</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># monitor 需要多个，pool 和 image 填写上面创建的</span>
 cat &lt;&lt; EOF &gt;&gt; test.pv.yml
 apiVersion: v1
 kind: PersistentVolume
@@ -348,10 +64,7 @@ spec:
   persistentVolumeReclaimPolicy: Recycle
 EOF
 
-kubectl create -f test.pv.yml</code></pre></div>
-
-<p><strong>创建 PVC</strong></p>
-<div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; test.pvc.yml
+kubectl create -f test.pv.yml</code></pre></div><p><strong>创建 PVC</strong></p><div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; test.pvc.yml
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -364,10 +77,7 @@ spec:
       storage: 2Gi
 EOF
 
-kubectl create -f test.pvc.yml</code></pre></div>
-
-<p><strong>创建 Deployment并挂载</strong></p>
-<div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; test.deploy.yml
+kubectl create -f test.pvc.yml</code></pre></div><p><strong>创建 Deployment并挂载</strong></p><div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; test.deploy.yml
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -393,17 +103,9 @@ spec:
             claimName: <span class="hljs-built_in">test</span>-pvc
 EOF
 
-kubectl create -f test.deploy.yml</code></pre></div>
-
-<h4 id="3-2、StoragaClass-方式"><a href="#3-2、StoragaClass-方式" class="headerlink" title="3.2、StoragaClass 方式"></a>3.2、StoragaClass 方式</h4><p>在 1.4 以后，kubernetes 提供了一种更加方便的动态创建 PV 的方式；也就是说使用 StoragaClass 时无需预先创建固定大小的 PV，等待使用者创建 PVC 来使用；而是直接创建 PVC 即可分配使用</p>
-<p><strong>创建系统级 Secret</strong></p>
-<p><strong>注意: 由于 StorageClass 要求 Ceph 的 Secret type 必须为 <code>kubernetes.io/rbd</code>，所以上一步创建的 <code>ceph-secret</code> 需要先被删除，然后使用如下命令重新创建；此时的 key 并没有经过 base64</strong></p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 这个 secret type 必须为 kubernetes.io/rbd，否则会造成 PVC 无法使用</span>
+kubectl create -f test.deploy.yml</code></pre></div><h4 id="3-2、StoragaClass-方式"><a href="#3-2、StoragaClass-方式" class="headerlink" title="3.2、StoragaClass 方式"></a>3.2、StoragaClass 方式</h4><p>在 1.4 以后，kubernetes 提供了一种更加方便的动态创建 PV 的方式；也就是说使用 StoragaClass 时无需预先创建固定大小的 PV，等待使用者创建 PVC 来使用；而是直接创建 PVC 即可分配使用</p><p><strong>创建系统级 Secret</strong></p><p><strong>注意: 由于 StorageClass 要求 Ceph 的 Secret type 必须为 <code>kubernetes.io/rbd</code>，所以上一步创建的 <code>ceph-secret</code> 需要先被删除，然后使用如下命令重新创建；此时的 key 并没有经过 base64</strong></p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 这个 secret type 必须为 kubernetes.io/rbd，否则会造成 PVC 无法使用</span>
 kubectl create secret generic ceph-secret --<span class="hljs-built_in">type</span>=<span class="hljs-string">"kubernetes.io/rbd"</span> --from-literal=key=<span class="hljs-string">'AQCikDFZs870AhAA7q1dF80V8Vq1cF6vm6bGTg=='</span> --namespace=kube-system
-kubectl create secret generic ceph-secret --<span class="hljs-built_in">type</span>=<span class="hljs-string">"kubernetes.io/rbd"</span> --from-literal=key=<span class="hljs-string">'AQCikDFZs870AhAA7q1dF80V8Vq1cF6vm6bGTg=='</span> --namespace=default</code></pre></div>
-
-<p><strong>创建 StorageClass</strong></p>
-<div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; test.storageclass.yml
+kubectl create secret generic ceph-secret --<span class="hljs-built_in">type</span>=<span class="hljs-string">"kubernetes.io/rbd"</span> --from-literal=key=<span class="hljs-string">'AQCikDFZs870AhAA7q1dF80V8Vq1cF6vm6bGTg=='</span> --namespace=default</code></pre></div><p><strong>创建 StorageClass</strong></p><div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; test.storageclass.yml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -420,11 +122,7 @@ parameters:
   userSecretName: ceph-secret
 EOF
 
-kubectl create -f test.storageclass.yml</code></pre></div>
-
-<p><strong>关于上面的 adminId 等字段具体含义请参考这里 <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#ceph-rbd" target="_blank" rel="noopener">Ceph RBD</a></strong></p>
-<p><strong>创建 PVC</strong></p>
-<div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; test.sc.pvc.yml
+kubectl create -f test.storageclass.yml</code></pre></div><p><strong>关于上面的 adminId 等字段具体含义请参考这里 <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#ceph-rbd" target="_blank" rel="noopener">Ceph RBD</a></strong></p><p><strong>创建 PVC</strong></p><div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; test.sc.pvc.yml
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -439,10 +137,7 @@ spec:
       storage: 2Gi
 EOF
 
-kubectl create -f test.sc.pvc.yml</code></pre></div>
-
-<p><strong>创建 Deployment</strong></p>
-<div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; test.sc.deploy.yml
+kubectl create -f test.sc.pvc.yml</code></pre></div><p><strong>创建 Deployment</strong></p><div class="hljs"><pre><code class="hljs sh">cat &lt;&lt; EOF &gt;&gt; test.sc.deploy.yml
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -468,244 +163,7 @@ spec:
             claimName: <span class="hljs-built_in">test</span>-sc-pvc
 EOF
 
-kubectl create -f test.sc.deploy.yml</code></pre></div>
-
-<p>到此完成，检测是否成功最简单的方式就是看相关 pod 是否正常运行</p>
-
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/linux/">Linux</a>
-                    
-                      <a class="hover-with-bg" href="/tags/docker/">Docker</a>
-                    
-                      <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
-              
-              
-                <div class="post-prevnext row">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2017/07/12/how-to-build-kubernetes-rpm/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">How to build Kubernetes RPM</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2017/05/30/ceph-note-2/">
-                        <span class="hidden-mobile">Ceph 笔记(二)</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                
-  <div class="disqus" style="width:100%">
-    <div id="disqus_thread"></div>
-    <script type="text/javascript">
-      var disqus_config = function () {
-        this.page.url = 'https://mritd.com/2017/06/03/use-ceph-storage-on-kubernetes/';
-        this.page.identifier = '/2017/06/03/use-ceph-storage-on-kubernetes/';
-      };
-      function loadDisqus() {
-        (function () {
-          var d = document,
-            s = d.createElement('script');
-          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
-          s.setAttribute('data-timestamp', new Date());
-          (d.head || d.body).appendChild(s);
-        })();
-      }
-      waitElementVisible('disqus_thread', loadDisqus);
-    </script>
-    <noscript>Please enable JavaScript to view the
-      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
-    </noscript>
-  </div>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-  </main>
-
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
-
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
-    
-
-    
-
-    
-  </div>
-</footer>
-
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
-
-<!-- Plugins -->
-
-
-  
-    <script  src="/js/lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
-
-
-
-
-
-
-
-  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: '#post-body',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        collapseDepth: 3,
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc').css('visibility', 'visible');
-      }
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "Kubernetes 使用 Ceph 存储&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 80,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
+kubectl create -f test.sc.deploy.yml</code></pre></div><p>到此完成，检测是否成功最简单的方式就是看相关 pod 是否正常运行</p></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/linux/">Linux</a> <a class="hover-with-bg" href="/tags/docker/">Docker</a> <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext row"><article class="post-prev col-6"><a href="/2017/07/12/how-to-build-kubernetes-rpm/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">How to build Kubernetes RPM</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"> <a href="/2017/05/30/ceph-note-2/"><span class="hidden-mobile">Ceph 笔记(二)</span> <span class="visible-mobile">下一篇</span><i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments"><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2017/06/03/use-ceph-storage-on-kubernetes/",this.page.identifier="/2017/06/03/use-ceph-storage-on-kubernetes/"};function loadDisqus(){var e,t;e=document,(t=e.createElement("script")).src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}waitElementVisible("disqus_thread",loadDisqus)</script><noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a></noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4> <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"> <input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a><i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="/js/debouncer.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script defer="defer" src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js"></script><script>$(document).ready(function(){var t=$("#board-ctn").offset().top;tocbot.init({tocSelector:"#tocbot",contentSelector:"#post-body",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",collapseDepth:3,scrollSmooth:!0,headingsOffset:-t}),0<$(".toc-list-item").length&&$("#toc").css("visibility","visible")})</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","Kubernetes 使用 Ceph 存储&nbsp;"],cursorChar:"_",typeSpeed:80,loop:!1});typed.stop(),$(document).ready(function(){$(".typed-cursor").addClass("h2"),typed.start()})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>
     anchors.options = {
       placement: "right",
       visible: "hover",
@@ -719,54 +177,4 @@ kubectl create -f test.sc.deploy.yml</code></pre></div>
       res.push(".markdown-body > " + item)
     }
     anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <script>
-    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
-      function () {
-        var element = document.createElement('a');
-        $(element).attr('data-fancybox', 'images');
-        $(element).attr('href', $(this).attr('src'));
-        $(this).wrap(element);
-      }
-    );
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</body>
-</html>
+  </script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){searchFunc(path,"local-search-input","local-search-result"),this.onclick=null}</script><script src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><link rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><script>$("#post img:not(.no-zoom img, img[no-zoom]), img[zoom]").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script></body></html>

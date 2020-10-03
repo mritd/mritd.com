@@ -1,263 +1,13 @@
-
-
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
-
-
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/img/favicon.ico">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="Upward, not Northward.">
-  <meta name="author" content="bleem">
-  <meta name="keywords" content="漠然,bleem,mritd">
-  <title>如何在 Filebeat 端进行日志处理 - bleem</title>
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
-    
-  
-
-  
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
-<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
-</head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/friends/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner intro-2" id="background" parallax=true
-         style="background: url('/img/default.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container page-header text-center fade-in-up">
-            <span class="h2" id="subtitle">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-08-19 14:01" pubdate>
-        2020年8月19日 下午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      3.1k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      39
-       分钟
-    </span>
-  
-
-  
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid">
-  <div class="row">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto" id="post">
-            <!-- SEO header -->
-            <h1 style="display: none">如何在 Filebeat 端进行日志处理</h1>
-            
-            <div class="markdown-body" id="post-body">
-              <h2 id="一、起因"><a href="#一、起因" class="headerlink" title="一、起因"></a>一、起因</h2><p>目前某项目组日志需要做切割处理，针对日志信息进行分割并提取 k/v 放入 es 中方便查询。这种需求在传统 ELK 中应当由 logstash 组件完成，通过 <code>gork</code> 等操作对日志进行过滤、切割等处理。不过很尴尬的是我并不会 ruby，logstash pipeline 的一些配置我也是极其头疼，而且还不想学…更不凑巧的是我会写点 go，<strong>那么理所应当的此时的我对 filebeat 源码产生了一些想法，比如我直接在 filebeat 端完成日志处理，然后直接发 es/logstash，这样似乎更方便，而且还能分摊 logstash 的压力，我感觉这个操作并不过分😂…</strong></p>
-<h2 id="二、需求"><a href="#二、需求" class="headerlink" title="二、需求"></a>二、需求</h2><p>目前某项目组 java 日志格式如下:</p>
-<div class="hljs"><pre><code class="hljs sh">2020-04-30 21:56:30.117$<span class="hljs-variable">$api</span>-<span class="hljs-built_in">test</span>-65c8c7cf7f-lng7h$<span class="hljs-variable">$http</span>-nio-8080-exec-3$<span class="hljs-variable">$INFO</span>$<span class="hljs-variable">$com</span>.example.api.common.filter.GlobalDataFilter$<span class="hljs-variable">$GlobalDataFilter</span>.java$<span class="hljs-variable">$95</span>$<span class="hljs-variable">$test</span>
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;auto&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Upward, not Northward."><meta name="author" content="bleem"><meta name="keywords" content="漠然,bleem,mritd"><title>如何在 Filebeat 端进行日志处理 - bleem</title><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml"><link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"> <a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"> <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"> <a class="nav-link" href="javascript:">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner intro-2" id="background" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="container page-header text-center fade-in-up"><span class="h2" id="subtitle"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2020-08-19 14:01" pubdate>2020年8月19日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 3.1k 字</span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 39 分钟</span></div></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto" id="post"><h1 style="display:none">如何在 Filebeat 端进行日志处理</h1><div class="markdown-body" id="post-body"><h2 id="一、起因"><a href="#一、起因" class="headerlink" title="一、起因"></a>一、起因</h2><p>目前某项目组日志需要做切割处理，针对日志信息进行分割并提取 k/v 放入 es 中方便查询。这种需求在传统 ELK 中应当由 logstash 组件完成，通过 <code>gork</code> 等操作对日志进行过滤、切割等处理。不过很尴尬的是我并不会 ruby，logstash pipeline 的一些配置我也是极其头疼，而且还不想学…更不凑巧的是我会写点 go，<strong>那么理所应当的此时的我对 filebeat 源码产生了一些想法，比如我直接在 filebeat 端完成日志处理，然后直接发 es/logstash，这样似乎更方便，而且还能分摊 logstash 的压力，我感觉这个操作并不过分😂…</strong></p><h2 id="二、需求"><a href="#二、需求" class="headerlink" title="二、需求"></a>二、需求</h2><p>目前某项目组 java 日志格式如下:</p><div class="hljs"><pre><code class="hljs sh">2020-04-30 21:56:30.117$<span class="hljs-variable">$api</span>-<span class="hljs-built_in">test</span>-65c8c7cf7f-lng7h$<span class="hljs-variable">$http</span>-nio-8080-exec-3$<span class="hljs-variable">$INFO</span>$<span class="hljs-variable">$com</span>.example.api.common.filter.GlobalDataFilter$<span class="hljs-variable">$GlobalDataFilter</span>.java$<span class="hljs-variable">$95</span>$<span class="hljs-variable">$test</span>
 build commonData from header :&#123;<span class="hljs-string">"romVersion"</span>:<span class="hljs-string">"W_V2.1.4"</span>,<span class="hljs-string">"softwareVersion"</span>:<span class="hljs-string">"15"</span>,<span class="hljs-string">"token"</span>:<span class="hljs-string">"aFxANNM3pnRYpohvLMSmENydgFSfsmFMgCbFWAosIE="</span>&#125;
-$$$$</code></pre></div>
-
-<p>目前开发约定格式为日志通过 <code>$$</code> 进行分割，日志格式比较简单，但是 logstash 共用(nginx 等各种日志都会往这个 logstash 输出)，不想去折腾 logstash 配置的情况下，只需要让 filebeat 能够直接切割并设置好 k/v 对应既可。</p>
-<h2 id="三、filebeat-module"><a href="#三、filebeat-module" class="headerlink" title="三、filebeat module"></a>三、filebeat module</h2><blockquote>
-<p>module 部份只做简介，以为实际上依托 es 完成，意义不大。</p>
-</blockquote>
-<p>当然在考虑修改 filebeat 源码后，我第一想到的是 filebeat 的 module，这个 module 在官方文档中是个很神奇的东西；通过开启一个 module 就可以对某种日志直接做处理，这种东西似乎就是我想要的；比如我写一个 “项目名” module，然后 filebeat 直接开启这个 module，这个项目的日志就直接自动处理好(听起来就很 “上流”)…</p>
-<p>针对于自定义 module，官方给出了文档: <a href="https://www.elastic.co/guide/en/beats/devguide/current/filebeat-modules-devguide.html" target="_blank" rel="noopener">Creating a New Filebeat Module</a></p>
-<p>按照文档操作如下(假设我们的项目名为 cdm):</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 克隆源码</span>
+$$$$</code></pre></div><p>目前开发约定格式为日志通过 <code>$$</code> 进行分割，日志格式比较简单，但是 logstash 共用(nginx 等各种日志都会往这个 logstash 输出)，不想去折腾 logstash 配置的情况下，只需要让 filebeat 能够直接切割并设置好 k/v 对应既可。</p><h2 id="三、filebeat-module"><a href="#三、filebeat-module" class="headerlink" title="三、filebeat module"></a>三、filebeat module</h2><blockquote><p>module 部份只做简介，以为实际上依托 es 完成，意义不大。</p></blockquote><p>当然在考虑修改 filebeat 源码后，我第一想到的是 filebeat 的 module，这个 module 在官方文档中是个很神奇的东西；通过开启一个 module 就可以对某种日志直接做处理，这种东西似乎就是我想要的；比如我写一个 “项目名” module，然后 filebeat 直接开启这个 module，这个项目的日志就直接自动处理好(听起来就很 “上流”)…</p><p>针对于自定义 module，官方给出了文档: <a href="https://www.elastic.co/guide/en/beats/devguide/current/filebeat-modules-devguide.html" target="_blank" rel="noopener">Creating a New Filebeat Module</a></p><p>按照文档操作如下(假设我们的项目名为 cdm):</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 克隆源码</span>
 git <span class="hljs-built_in">clone</span> git@github.com:elastic/beats.git
 <span class="hljs-comment"># 切换到稳定分支</span>
 <span class="hljs-built_in">cd</span> bests &amp;&amp; git checkout -b v7.6.2 v7.6.2-module
 <span class="hljs-comment"># 创建 module，GO111MODULE 需要设置为 off</span>
 <span class="hljs-comment"># 在 7.6.2 版本官方尚未开始支持 go mod</span>
 <span class="hljs-built_in">cd</span> filebeat
-GO111MODULE=off make create-module MODULE=cdm</code></pre></div>
-
-<p>创建完成后目录结构如下</p>
-<div class="hljs"><pre><code class="hljs sh">➜  filebeat git:(v7.6.2-module) ✗ tree module/cdm
+GO111MODULE=off make create-module MODULE=cdm</code></pre></div><p>创建完成后目录结构如下</p><div class="hljs"><pre><code class="hljs sh">➜  filebeat git:(v7.6.2-module) ✗ tree module/cdm
 module/cdm
 ├── _meta
 │   ├── config.yml
@@ -265,27 +15,7 @@ module/cdm
 │   └── fields.yml
 └── module.yml
 
-1 directory, 4 files</code></pre></div>
-
-<p>这几个文件具体作用<a href="https://www.elastic.co/guide/en/beats/devguide/current/filebeat-modules-devguide.html" target="_blank" rel="noopener">官方文档</a>都有详细的描述；但是根据文档描述光有这几个文件是不够的，<strong>module 只是一个处理集合的定义，尚未包含任何处理，针对真正的处理需要继续创建 fileset，fileset 简单的理解就是针对具体的一组文件集合的处理；</strong>例如官方 nginx module 中包含两个 fileset: <code>access</code> 和 <code>error</code>，这两个一个针对 access 日志处理一个针对 error 日志进行处理；在 fileset 中可以设置默认文件位置、处理方式。</p>
-<p><strong>But… 我翻了 nginx module 的样例配置才发现，module 这个东西实质上只做定义和存储处理表达式，具体的切割处理实际上交由 es 的 <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest.html" target="_blank" rel="noopener">Ingest Node</a> 处理；表达式里仍需要定义 <code>grok</code> 等操作，而且这东西最终会编译到 go 静态文件里；</strong>此时的我想说一句 “MMP”，本来我是不像写 grok 啥的才来折腾 filebeat，结果这个 module 折腾一圈还是要写 grok 啥的，而且这东西直接借助 es 完成导致压力回到了 es 同时每次修改还得重新编译 filebeat… 所以折腾到这我就放弃了，这已经违背了当初的目的，有兴趣的可以参考以下文档继续折腾:</p>
-<ul>
-<li><a href="https://www.elastic.co/guide/en/beats/devguide/current/filebeat-modules-devguide.html" target="_blank" rel="noopener">Creating a New Filebeat Module</a></li>
-<li><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest.html" target="_blank" rel="noopener">Ingest nodeedit</a></li>
-<li><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest-apis.html" target="_blank" rel="noopener">Ingest APIs</a></li>
-<li><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest-processors.html" target="_blank" rel="noopener">Processors</a></li>
-</ul>
-<h2 id="四、filebeat-processors"><a href="#四、filebeat-processors" class="headerlink" title="四、filebeat processors"></a>四、filebeat processors</h2><p>经历了 module 的失望以后，我把目光对准了 processors；processors 是 filebeat 一个强大的功能，顾名思义它可以对 filbeat 收集到的日志进行一些处理；从官方 <a href="https://www.elastic.co/guide/en/beats/filebeat/current/filtering-and-enhancing-data.html" target="_blank" rel="noopener">Processors</a> 页面可以看到其内置了大量的 processor；这些 processor 大部份都是直接对日志进行 “写” 操作，所以理论上我们自己写一个 processor 就可以 “为所欲为+为所欲为=为所欲为”。</p>
-<p>不过不幸的是关于 processor 的开发官方并未给出文档，官方认为这是一个 <code>high level</code> 的东西，不过也找到了一个 issue 对其做了相关回答: <a href="https://github.com/elastic/beats/issues/6760" target="_blank" rel="noopener">How do I write a processor plugin by myself</a>；所以最好的办法就是直接看已有 processor 的源码抄一个。</p>
-<p>理所应当的找了一个软柿子捏: <code>add_host_metadata</code>，add_host_metadata processor 顾名思义在每个日志事件(以下简称为 event)中加入宿主机的信息，比如 hostname 啥的；以下为 add_host_metadata processor 的文件结构(processors 代码存储在 <code>libbeat/processors</code> 目录下)。</p>
-<p><img src="https://cdn.oss.link/markdown/axucc.jpg" srcset="/img/loading.gif" alt="dir_tree"></p>
-<p>通过阅读源码和 issue 的回答可以看出，我们自定义的 processor 只需要实现 <a href="https://godoc.org/github.com/elastic/beats/libbeat/processors#Processor" target="_blank" rel="noopener">Processor interface</a> 既可，这个接口定义如下:</p>
-<p><img src="https://cdn.oss.link/markdown/xuja6.png" srcset="/img/loading.gif" alt="Processor interface"></p>
-<p>通过查看 add_host_metadata 的源码，<code>String() string</code> 方法只需要返回这个 processor 名称既可(可以包含必要的配置信息)；<strong>而 <code>Run(event *beat.Event) (*beat.Event, error)</code> 方法表示在每一条日志被读取后都会转换为一个 event 对象，我们在方法内进行处理然后把 event 返回既可(其他 processor 可能也要处理)。</strong></p>
-<p><img src="https://cdn.oss.link/markdown/jhtnx.png" srcset="/img/loading.gif" alt="add_host_metadata source"></p>
-<p>有了这些信息就简单得多了，毕竟作为<strong>一名合格的 CCE(Ctrl C + Ctrl V + Engineer)</strong> 抄这种操作还是很简单的，直接照猫画虎写一个就行了</p>
-<p>config.go</p>
-<div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">package</span> cmd
+1 directory, 4 files</code></pre></div><p>这几个文件具体作用<a href="https://www.elastic.co/guide/en/beats/devguide/current/filebeat-modules-devguide.html" target="_blank" rel="noopener">官方文档</a>都有详细的描述；但是根据文档描述光有这几个文件是不够的，<strong>module 只是一个处理集合的定义，尚未包含任何处理，针对真正的处理需要继续创建 fileset，fileset 简单的理解就是针对具体的一组文件集合的处理；</strong>例如官方 nginx module 中包含两个 fileset: <code>access</code> 和 <code>error</code>，这两个一个针对 access 日志处理一个针对 error 日志进行处理；在 fileset 中可以设置默认文件位置、处理方式。</p><p><strong>But… 我翻了 nginx module 的样例配置才发现，module 这个东西实质上只做定义和存储处理表达式，具体的切割处理实际上交由 es 的 <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest.html" target="_blank" rel="noopener">Ingest Node</a> 处理；表达式里仍需要定义 <code>grok</code> 等操作，而且这东西最终会编译到 go 静态文件里；</strong>此时的我想说一句 “MMP”，本来我是不像写 grok 啥的才来折腾 filebeat，结果这个 module 折腾一圈还是要写 grok 啥的，而且这东西直接借助 es 完成导致压力回到了 es 同时每次修改还得重新编译 filebeat… 所以折腾到这我就放弃了，这已经违背了当初的目的，有兴趣的可以参考以下文档继续折腾:</p><ul><li><a href="https://www.elastic.co/guide/en/beats/devguide/current/filebeat-modules-devguide.html" target="_blank" rel="noopener">Creating a New Filebeat Module</a></li><li><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest.html" target="_blank" rel="noopener">Ingest nodeedit</a></li><li><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest-apis.html" target="_blank" rel="noopener">Ingest APIs</a></li><li><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest-processors.html" target="_blank" rel="noopener">Processors</a></li></ul><h2 id="四、filebeat-processors"><a href="#四、filebeat-processors" class="headerlink" title="四、filebeat processors"></a>四、filebeat processors</h2><p>经历了 module 的失望以后，我把目光对准了 processors；processors 是 filebeat 一个强大的功能，顾名思义它可以对 filbeat 收集到的日志进行一些处理；从官方 <a href="https://www.elastic.co/guide/en/beats/filebeat/current/filtering-and-enhancing-data.html" target="_blank" rel="noopener">Processors</a> 页面可以看到其内置了大量的 processor；这些 processor 大部份都是直接对日志进行 “写” 操作，所以理论上我们自己写一个 processor 就可以 “为所欲为+为所欲为=为所欲为”。</p><p>不过不幸的是关于 processor 的开发官方并未给出文档，官方认为这是一个 <code>high level</code> 的东西，不过也找到了一个 issue 对其做了相关回答: <a href="https://github.com/elastic/beats/issues/6760" target="_blank" rel="noopener">How do I write a processor plugin by myself</a>；所以最好的办法就是直接看已有 processor 的源码抄一个。</p><p>理所应当的找了一个软柿子捏: <code>add_host_metadata</code>，add_host_metadata processor 顾名思义在每个日志事件(以下简称为 event)中加入宿主机的信息，比如 hostname 啥的；以下为 add_host_metadata processor 的文件结构(processors 代码存储在 <code>libbeat/processors</code> 目录下)。</p><p><img src="https://cdn.oss.link/markdown/axucc.jpg" srcset="/img/loading.gif" alt="dir_tree"></p><p>通过阅读源码和 issue 的回答可以看出，我们自定义的 processor 只需要实现 <a href="https://godoc.org/github.com/elastic/beats/libbeat/processors#Processor" target="_blank" rel="noopener">Processor interface</a> 既可，这个接口定义如下:</p><p><img src="https://cdn.oss.link/markdown/xuja6.png" srcset="/img/loading.gif" alt="Processor interface"></p><p>通过查看 add_host_metadata 的源码，<code>String() string</code> 方法只需要返回这个 processor 名称既可(可以包含必要的配置信息)；<strong>而 <code>Run(event *beat.Event) (*beat.Event, error)</code> 方法表示在每一条日志被读取后都会转换为一个 event 对象，我们在方法内进行处理然后把 event 返回既可(其他 processor 可能也要处理)。</strong></p><p><img src="https://cdn.oss.link/markdown/jhtnx.png" srcset="/img/loading.gif" alt="add_host_metadata source"></p><p>有了这些信息就简单得多了，毕竟作为<strong>一名合格的 CCE(Ctrl C + Ctrl V + Engineer)</strong> 抄这种操作还是很简单的，直接照猫画虎写一个就行了</p><p>config.go</p><div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">package</span> cmd
 
 <span class="hljs-comment">// Config for cdm processor.</span>
 <span class="hljs-keyword">type</span> Config <span class="hljs-keyword">struct</span> &#123;
@@ -295,10 +25,7 @@ module/cdm
 <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">defaultConfig</span><span class="hljs-params">()</span> <span class="hljs-title">Config</span></span> &#123;
 	<span class="hljs-keyword">return</span> Config&#123;
 	&#125;
-&#125;</code></pre></div>
-
-<p>cdm.go</p>
-<div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">package</span> cmd
+&#125;</code></pre></div><p>cdm.go</p><div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">package</span> cmd
 
 <span class="hljs-keyword">import</span> (
 	<span class="hljs-string">"strings"</span>
@@ -383,15 +110,9 @@ module/cdm
 
 <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(p *cdm)</span> <span class="hljs-title">String</span><span class="hljs-params">()</span> <span class="hljs-title">string</span></span> &#123;
 	<span class="hljs-keyword">return</span> processorName
-&#125;</code></pre></div>
-
-<p>写好代码以后就可以编译一个自己的 filebeat 了(开心ing)</p>
-<div class="hljs"><pre><code class="hljs sh"><span class="hljs-built_in">cd</span> filebeat
+&#125;</code></pre></div><p>写好代码以后就可以编译一个自己的 filebeat 了(开心ing)</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-built_in">cd</span> filebeat
 <span class="hljs-comment"># 如果想交叉编译 linux 需要增加 GOOS=linux 变量 </span>
-GO111MODULE=off make</code></pre></div>
-
-<p>然后编写配置文件进行测试，日志相关字段已经成功塞到了 event 中，这样我直接发到 es 或者 logstash 就行了。</p>
-<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">filebeat.inputs:</span>
+GO111MODULE=off make</code></pre></div><p>然后编写配置文件进行测试，日志相关字段已经成功塞到了 event 中，这样我直接发到 es 或者 logstash 就行了。</p><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">filebeat.inputs:</span>
 <span class="hljs-bullet">-</span> <span class="hljs-attr">type:</span> <span class="hljs-string">log</span>
   <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
   <span class="hljs-attr">paths:</span>
@@ -401,11 +122,7 @@ GO111MODULE=off make</code></pre></div>
   <span class="hljs-attr">multiline.pattern:</span> <span class="hljs-string">^\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125;</span>
   <span class="hljs-attr">multiline.match:</span> <span class="hljs-string">after</span>
   <span class="hljs-attr">multiline.negate:</span> <span class="hljs-literal">true</span>
-  <span class="hljs-attr">multiline.timeout:</span> <span class="hljs-string">5s</span></code></pre></div>
-
-<h2 id="五、script-processor"><a href="#五、script-processor" class="headerlink" title="五、script processor"></a>五、script processor</h2><p>在我折腾完源码以后，反思一下其实这种方式需要自己编译 filebeat，而且每次规则修改也很不方便，唯一的好处真的就是用代码可以 “为所欲为”；反过来一想 “filebeat 有没有 processor 的扩展呢？脚本热加载那种？” 答案是使用 script processor，<strong>script processor 虽然名字上是个 processor，实际上其包含了完整的 ECMA 5.1 js 规范实现；结论就是我们可以写一些 js 脚本来处理日志，然后 filebeat 每次启动后加载这些脚本既可。</strong></p>
-<p>script processor 的使用方式很简单，js 文件中只需要包含一个 <code>function process(event)</code> 方法既可，与自己用 go 实现的 processor 类似，每行日志也会形成一个 event 对象然后调用这个方法进行处理；目前 event 对象可用的 api 需要参考<a href="https://www.elastic.co/guide/en/beats/filebeat/current/processor-script.html#_event_api" target="_blank" rel="noopener">官方文档</a>；<strong>需要注意的是 script processor 目前只支持 ECMA 5.1 语法规范，超过这个范围的语法是不被支持；</strong>实际上其根本是借助了 <a href="https://github.com/dop251/goja" target="_blank" rel="noopener">https://github.com/dop251/goja</a> 这个库来实现的。同时为了方便开发调试，script processor 也增加了一些 nodejs 的兼容 module，比如 <code>console.log</code> 等方法是可用的；以下为 js 处理上面日志的逻辑:</p>
-<div class="hljs"><pre><code class="hljs js"><span class="hljs-keyword">var</span> <span class="hljs-built_in">console</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">'console'</span>);
+  <span class="hljs-attr">multiline.timeout:</span> <span class="hljs-string">5s</span></code></pre></div><h2 id="五、script-processor"><a href="#五、script-processor" class="headerlink" title="五、script processor"></a>五、script processor</h2><p>在我折腾完源码以后，反思一下其实这种方式需要自己编译 filebeat，而且每次规则修改也很不方便，唯一的好处真的就是用代码可以 “为所欲为”；反过来一想 “filebeat 有没有 processor 的扩展呢？脚本热加载那种？” 答案是使用 script processor，<strong>script processor 虽然名字上是个 processor，实际上其包含了完整的 ECMA 5.1 js 规范实现；结论就是我们可以写一些 js 脚本来处理日志，然后 filebeat 每次启动后加载这些脚本既可。</strong></p><p>script processor 的使用方式很简单，js 文件中只需要包含一个 <code>function process(event)</code> 方法既可，与自己用 go 实现的 processor 类似，每行日志也会形成一个 event 对象然后调用这个方法进行处理；目前 event 对象可用的 api 需要参考<a href="https://www.elastic.co/guide/en/beats/filebeat/current/processor-script.html#_event_api" target="_blank" rel="noopener">官方文档</a>；<strong>需要注意的是 script processor 目前只支持 ECMA 5.1 语法规范，超过这个范围的语法是不被支持；</strong>实际上其根本是借助了 <a href="https://github.com/dop251/goja" target="_blank" rel="noopener">https://github.com/dop251/goja</a> 这个库来实现的。同时为了方便开发调试，script processor 也增加了一些 nodejs 的兼容 module，比如 <code>console.log</code> 等方法是可用的；以下为 js 处理上面日志的逻辑:</p><div class="hljs"><pre><code class="hljs js"><span class="hljs-keyword">var</span> <span class="hljs-built_in">console</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">'console'</span>);
 <span class="hljs-keyword">var</span> fileds = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(<span class="hljs-string">"timestamp"</span>, <span class="hljs-string">"hostname"</span>, <span class="hljs-string">"thread"</span>, <span class="hljs-string">"level"</span>, <span class="hljs-string">"logger"</span>, <span class="hljs-string">"file"</span>, <span class="hljs-string">"line"</span>, <span class="hljs-string">"serviceName"</span>, <span class="hljs-string">"traceId"</span>, <span class="hljs-string">"feTraceId"</span>, <span class="hljs-string">"msg"</span>, <span class="hljs-string">"exception"</span>)
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">process</span>(<span class="hljs-params">event</span>) </span>&#123;
@@ -422,10 +139,7 @@ GO111MODULE=off make</code></pre></div>
     <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; fileds.length; ++i) &#123;
         event.Put(fileds[i],fieldValues[i].trim())
     &#125;
-&#125;</code></pre></div>
-
-<p>写好脚本后调整配置测试既可，如果 js 编写有问题，可以通过 <code>console.log</code> 来打印日志进行不断的调试</p>
-<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">filebeat.inputs:</span>
+&#125;</code></pre></div><p>写好脚本后调整配置测试既可，如果 js 编写有问题，可以通过 <code>console.log</code> 来打印日志进行不断的调试</p><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">filebeat.inputs:</span>
 <span class="hljs-bullet">-</span> <span class="hljs-attr">type:</span> <span class="hljs-string">log</span>
   <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
   <span class="hljs-attr">paths:</span>
@@ -438,257 +152,10 @@ GO111MODULE=off make</code></pre></div>
   <span class="hljs-attr">multiline.pattern:</span> <span class="hljs-string">^\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125;</span>
   <span class="hljs-attr">multiline.match:</span> <span class="hljs-string">after</span>
   <span class="hljs-attr">multiline.negate:</span> <span class="hljs-literal">true</span>
-  <span class="hljs-attr">multiline.timeout:</span> <span class="hljs-string">5s</span></code></pre></div>
-
-<p><strong>需要注意的是目前 <code>lang</code> 的值只能为 <code>javascript</code> 和 <code>js</code>(官方文档写的只能是 <code>javascript</code>)；根据代码来看后续 script processor 有可能支持其他脚本语言，个人认为主要取决于其他脚本语言有没有纯 go 实现的 runtime，如果有的话未来很有可能被整合到 script processor 中。</strong></p>
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gegg80j1gmj31nc0u0wpa.jpg" srcset="/img/loading.gif" alt="script processor"></p>
-<h2 id="六、其他-processor"><a href="#六、其他-processor" class="headerlink" title="六、其他 processor"></a>六、其他 processor</h2><p>研究完 script processor 后我顿时对其他 processor 也产生了兴趣，随着更多的查看processor 文档，我发现其实大部份过滤分割能力已经有很多 processor 进行了实现，<strong>其完善程度外加可扩展的 script processor 实际能力已经足矣替换掉 logstash 的日志分割过滤处理了。</strong>比如上面的日志切割其实使用 dissect processor 实现更加简单(这个配置并不完善，只是样例):</p>
-<div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">multiline.timeout:</span> <span class="hljs-string">5s</span></code></pre></div><p><strong>需要注意的是目前 <code>lang</code> 的值只能为 <code>javascript</code> 和 <code>js</code>(官方文档写的只能是 <code>javascript</code>)；根据代码来看后续 script processor 有可能支持其他脚本语言，个人认为主要取决于其他脚本语言有没有纯 go 实现的 runtime，如果有的话未来很有可能被整合到 script processor 中。</strong></p><p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gegg80j1gmj31nc0u0wpa.jpg" srcset="/img/loading.gif" alt="script processor"></p><h2 id="六、其他-processor"><a href="#六、其他-processor" class="headerlink" title="六、其他 processor"></a>六、其他 processor</h2><p>研究完 script processor 后我顿时对其他 processor 也产生了兴趣，随着更多的查看processor 文档，我发现其实大部份过滤分割能力已经有很多 processor 进行了实现，<strong>其完善程度外加可扩展的 script processor 实际能力已经足矣替换掉 logstash 的日志分割过滤处理了。</strong>比如上面的日志切割其实使用 dissect processor 实现更加简单(这个配置并不完善，只是样例):</p><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">processors:</span>
   <span class="hljs-bullet">-</span> <span class="hljs-attr">dissect:</span>
       <span class="hljs-attr">field:</span> <span class="hljs-string">"message"</span>
-      <span class="hljs-attr">tokenizer:</span> <span class="hljs-string">"<span class="hljs-template-variable">%&#123;timestamp&#125;</span>$$<span class="hljs-template-variable">%&#123;hostname&#125;</span>$$<span class="hljs-template-variable">%&#123;thread&#125;</span>$$<span class="hljs-template-variable">%&#123;level&#125;</span>$$<span class="hljs-template-variable">%&#123;logger&#125;</span>$$<span class="hljs-template-variable">%&#123;file&#125;</span>$$<span class="hljs-template-variable">%&#123;line&#125;</span>$$<span class="hljs-template-variable">%&#123;serviceName&#125;</span>$$<span class="hljs-template-variable">%&#123;traceId&#125;</span>$$<span class="hljs-template-variable">%&#123;feTraceId&#125;</span>$$<span class="hljs-template-variable">%&#123;msg&#125;</span>$$<span class="hljs-template-variable">%&#123;exception&#125;</span>$$"</span></code></pre></div>
-
-<p>除此之外还有很多 processor，例如 <code>drop_event</code>、<code>drop_fields</code>、<code>timestamp</code> 等等，感兴趣的可以自行研究。</p>
-<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p>基本上折腾完以后做了一个总结:</p>
-<ul>
-<li><strong>filebeat module</strong>: 这就是个华而不实的东西，每次修改需要重新编译且扩展能力几近于零，最蛋疼的是实际逻辑通过 es 来完成；我能想到的是唯一应用场景就是官方给我们弄一些 demo 来炫耀用的，比如 nginx module；实际生产中 nginx 日志格式保持原封不动的人我相信少之又少。</li>
-<li><strong>filebeat custom processor</strong>: 每次修改也需要重新编译且需要会 go 语言还有相关工具链，但是好处就是完全通过代码实现真正的为所欲为；扩展性取决于外部是否对特定位置做了可配置化，比如预留可以配置切割用正则表达式的变量等，最终取决于代码编写者(怎么为所欲为的问题)。</li>
-<li><strong>filebeat script processor</strong>: 完整 ECMA 5.1 js 规范支持，代码化对日志进行为所欲为，修改不需要重新编译；普通用户我个人觉得是首选，当然同时会写 go 和 js 的就看你想用哪个了。</li>
-<li><strong>filebeat other processor</strong>: 基本上实现了很多 logstash 的功能，简单用用很舒服，复杂场景还是得撸代码；但是一些特定的 processor 很实用，比如加入宿主机信息的 add_host_metadata processor 等。</li>
-</ul>
-
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/golang/">Golang</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a>
-                    
-                      <a class="hover-with-bg" href="/tags/golang/">Golang</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
-              
-              
-                <div class="post-prevnext row">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2020/08/19/make-a-custom-manjaro-image-for-rpi4/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">树莓派4 Manjaro 系统定制</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2020/03/31/how-to-download-docker-image-without-docker/">
-                        <span class="hidden-mobile">如何不通过 docker 下载 docker image</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                
-  <div class="disqus" style="width:100%">
-    <div id="disqus_thread"></div>
-    <script type="text/javascript">
-      var disqus_config = function () {
-        this.page.url = 'https://mritd.com/2020/08/19/how-to-modify-filebeat-source-code-to-processing-logs/';
-        this.page.identifier = '/2020/08/19/how-to-modify-filebeat-source-code-to-processing-logs/';
-      };
-      function loadDisqus() {
-        (function () {
-          var d = document,
-            s = d.createElement('script');
-          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
-          s.setAttribute('data-timestamp', new Date());
-          (d.head || d.body).appendChild(s);
-        })();
-      }
-      waitElementVisible('disqus_thread', loadDisqus);
-    </script>
-    <noscript>Please enable JavaScript to view the
-      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
-    </noscript>
-  </div>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-  </main>
-
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
-
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
-    
-
-    
-
-    
-  </div>
-</footer>
-
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
-
-<!-- Plugins -->
-
-
-  
-    <script  src="/js/lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
-
-
-
-
-
-
-
-  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: '#post-body',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        collapseDepth: 3,
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc').css('visibility', 'visible');
-      }
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "如何在 Filebeat 端进行日志处理&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 80,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
+      <span class="hljs-attr">tokenizer:</span> <span class="hljs-string">"<span class="hljs-template-variable">%&#123;timestamp&#125;</span>$$<span class="hljs-template-variable">%&#123;hostname&#125;</span>$$<span class="hljs-template-variable">%&#123;thread&#125;</span>$$<span class="hljs-template-variable">%&#123;level&#125;</span>$$<span class="hljs-template-variable">%&#123;logger&#125;</span>$$<span class="hljs-template-variable">%&#123;file&#125;</span>$$<span class="hljs-template-variable">%&#123;line&#125;</span>$$<span class="hljs-template-variable">%&#123;serviceName&#125;</span>$$<span class="hljs-template-variable">%&#123;traceId&#125;</span>$$<span class="hljs-template-variable">%&#123;feTraceId&#125;</span>$$<span class="hljs-template-variable">%&#123;msg&#125;</span>$$<span class="hljs-template-variable">%&#123;exception&#125;</span>$$"</span></code></pre></div><p>除此之外还有很多 processor，例如 <code>drop_event</code>、<code>drop_fields</code>、<code>timestamp</code> 等等，感兴趣的可以自行研究。</p><h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p>基本上折腾完以后做了一个总结:</p><ul><li><strong>filebeat module</strong>: 这就是个华而不实的东西，每次修改需要重新编译且扩展能力几近于零，最蛋疼的是实际逻辑通过 es 来完成；我能想到的是唯一应用场景就是官方给我们弄一些 demo 来炫耀用的，比如 nginx module；实际生产中 nginx 日志格式保持原封不动的人我相信少之又少。</li><li><strong>filebeat custom processor</strong>: 每次修改也需要重新编译且需要会 go 语言还有相关工具链，但是好处就是完全通过代码实现真正的为所欲为；扩展性取决于外部是否对特定位置做了可配置化，比如预留可以配置切割用正则表达式的变量等，最终取决于代码编写者(怎么为所欲为的问题)。</li><li><strong>filebeat script processor</strong>: 完整 ECMA 5.1 js 规范支持，代码化对日志进行为所欲为，修改不需要重新编译；普通用户我个人觉得是首选，当然同时会写 go 和 js 的就看你想用哪个了。</li><li><strong>filebeat other processor</strong>: 基本上实现了很多 logstash 的功能，简单用用很舒服，复杂场景还是得撸代码；但是一些特定的 processor 很实用，比如加入宿主机信息的 add_host_metadata processor 等。</li></ul></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/golang/">Golang</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a> <a class="hover-with-bg" href="/tags/golang/">Golang</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext row"><article class="post-prev col-6"><a href="/2020/08/19/make-a-custom-manjaro-image-for-rpi4/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">树莓派4 Manjaro 系统定制</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"> <a href="/2020/03/31/how-to-download-docker-image-without-docker/"><span class="hidden-mobile">如何不通过 docker 下载 docker image</span> <span class="visible-mobile">下一篇</span><i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments"><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2020/08/19/how-to-modify-filebeat-source-code-to-processing-logs/",this.page.identifier="/2020/08/19/how-to-modify-filebeat-source-code-to-processing-logs/"};function loadDisqus(){var e,t;e=document,(t=e.createElement("script")).src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}waitElementVisible("disqus_thread",loadDisqus)</script><noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a></noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4> <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"> <input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a><i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="/js/debouncer.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script defer="defer" src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js"></script><script>$(document).ready(function(){var t=$("#board-ctn").offset().top;tocbot.init({tocSelector:"#tocbot",contentSelector:"#post-body",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",collapseDepth:3,scrollSmooth:!0,headingsOffset:-t}),0<$(".toc-list-item").length&&$("#toc").css("visibility","visible")})</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","如何在 Filebeat 端进行日志处理&nbsp;"],cursorChar:"_",typeSpeed:80,loop:!1});typed.stop(),$(document).ready(function(){$(".typed-cursor").addClass("h2"),typed.start()})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>
     anchors.options = {
       placement: "right",
       visible: "hover",
@@ -702,54 +169,4 @@ GO111MODULE=off make</code></pre></div>
       res.push(".markdown-body > " + item)
     }
     anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <script>
-    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
-      function () {
-        var element = document.createElement('a');
-        $(element).attr('data-fancybox', 'images');
-        $(element).attr('href', $(this).attr('src'));
-        $(this).wrap(element);
-      }
-    );
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</body>
-</html>
+  </script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){searchFunc(path,"local-search-input","local-search-result"),this.onclick=null}</script><script src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><link rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><script>$("#post img:not(.no-zoom img, img[no-zoom]), img[zoom]").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script></body></html>

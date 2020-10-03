@@ -1,277 +1,9 @@
-
-
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
-
-
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/img/favicon.ico">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="Upward, not Northward.">
-  <meta name="author" content="bleem">
-  <meta name="keywords" content="漠然,bleem,mritd">
-  <title>如何编写 CSI 插件 - bleem</title>
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css" />
-    
-  
-
-  
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
-<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
-</head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/friends/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner intro-2" id="background" parallax=true
-         style="background: url('/img/default.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container page-header text-center fade-in-up">
-            <span class="h2" id="subtitle">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-08-19 14:10" pubdate>
-        2020年8月19日 下午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      5.5k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      69
-       分钟
-    </span>
-  
-
-  
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid">
-  <div class="row">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto" id="post">
-            <!-- SEO header -->
-            <h1 style="display: none">如何编写 CSI 插件</h1>
-            
-            <div class="markdown-body" id="post-body">
-              <h2 id="一、为什么需要-CSI"><a href="#一、为什么需要-CSI" class="headerlink" title="一、为什么需要 CSI"></a>一、为什么需要 CSI</h2><p>在 Kubernetes 以前的版本中，其所有受官方支持的存储驱动全部在 Kubernetes 的主干代码中，其他第三方开发的自定义插件通过 <a href="https://github.com/kubernetes/community/blob/master/contributors/devel/sig-storage/flexvolume.md" target="_blank" rel="noopener">FlexVolume</a> 插件的形势提供服务；<strong>相对于 kubernetes 的源码树来说，内置的存储我们称之为 “树内存储”，外部第三方实现我们称之为 “树外存储”；</strong>在很长一段时间里树内存储和树外存储并行开发和使用，但是随着时间推移渐渐的就出现了很严重的问题:</p>
-<ul>
-<li>想要添加官方支持的存储必须在树内修改，这意味着需要 Kubernetes 发版</li>
-<li>如果树内存储出现问题则也必须等待 Kubernetes 发版才能修复</li>
-</ul>
-<p>为了解决这种尴尬的问题，Kubernetes 必须抽象出一个合适的存储接口，并将所有存储驱动全部适配到这个接口上，存储驱动最好与 Kubernetes 之间进行 RPC 调用完成解耦，这样就造就了 CSI(Container Storage Interface)。</p>
-<h2 id="二、CSI-基础知识"><a href="#二、CSI-基础知识" class="headerlink" title="二、CSI 基础知识"></a>二、CSI 基础知识</h2><h3 id="2-1、CSI-Sidecar-Containers"><a href="#2-1、CSI-Sidecar-Containers" class="headerlink" title="2.1、CSI Sidecar Containers"></a>2.1、CSI Sidecar Containers</h3><p>在开发 CSI 之前我们最好熟悉一下 CSI 开发中的一些常识；了解过 Kubernetes API 开发的朋友应该清楚，所有的资源定义(Deployment、Service…)在 Kubernetes 中其实就是一个 Object，此时可以将 Kubernetes 看作是一个 Database，无论是 Operator 还是 CSI 其核心本质都是不停的 Watch 特定的 Object，一但 kubectl 或者其他客户端 “动了” 这个 Object，我们的对应实现程序就 Watch 到变更然后作出相应的响应；<strong>对于 CSI 编写者来说，这些 Watch 动作已经不必自己实现 <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#custom-controllers" target="_blank" rel="noopener">Custom Controller</a>，官方为我们提供了 <a href="https://kubernetes-csi.github.io/docs/sidecar-containers.html" target="_blank" rel="noopener">CSI Sidecar Containers</a>；</strong>并且在新版本中这些 Sidecar Containers 实现极其完善，比如自动的多节点 HA(Etcd 选举)等。</p>
-<p><strong>所以到迄今为止，所谓的 CSI 插件开发事实上并非面向 Kubernetes API 开发，而是面向 Sidecar Containers 的 gRPC 开发，Sidecar Containers 一般会和我们自己开发的 CSI 驱动程序在同一个 Pod 中启动，然后 Sidecar Containers Watch API 中 CSI 相关 Object 的变动，接着通过本地 unix 套接字调用我们编写的 CSI 驱动：</strong></p>
-<p><img src="https://cdn.oss.link/markdown/10w5g.png" srcset="/img/loading.gif" alt="CSI_Sidecar_Containers"></p>
-<p>目前官方提供的 Sidecar Containers 如下:</p>
-<ul>
-<li><a href="https://kubernetes-csi.github.io/docs/external-provisioner.html" target="_blank" rel="noopener">external-provisioner</a></li>
-<li><a href="https://kubernetes-csi.github.io/docs/external-attacher.html" target="_blank" rel="noopener">external-attacher</a></li>
-<li><a href="https://kubernetes-csi.github.io/docs/external-snapshotter.html" target="_blank" rel="noopener">external-snapshotter</a></li>
-<li><a href="https://kubernetes-csi.github.io/docs/external-resizer.html" target="_blank" rel="noopener">external-resizer</a></li>
-<li><a href="https://kubernetes-csi.github.io/docs/node-driver-registrar.html" target="_blank" rel="noopener">node-driver-registrar</a></li>
-<li><a href="https://kubernetes-csi.github.io/docs/cluster-driver-registrar.html" target="_blank" rel="noopener">cluster-driver-registrar (deprecated)</a></li>
-<li><a href="https://kubernetes-csi.github.io/docs/livenessprobe.html" target="_blank" rel="noopener">livenessprobe</a></li>
-</ul>
-<p>每个 Sidecar Container 的作用可以通过对应链接查看，需要注意的是 cluster-driver-registrar 已经停止维护，请改用 node-driver-registrar。</p>
-<h3 id="2-2、CSI-处理阶段"><a href="#2-2、CSI-处理阶段" class="headerlink" title="2.2、CSI 处理阶段"></a>2.2、CSI 处理阶段</h3><blockquote>
-<p>在理解了 CSI Sidecar Containers 以后，我们仍需要大致的了解 CSI 挂载过程中的大致流程，以此来针对性的实现每个阶段所需要的功能；CSI 整个流程实际上大致分为以下三大阶段:</p>
-</blockquote>
-<h4 id="2-2-1、Provisioning-and-Deleting"><a href="#2-2-1、Provisioning-and-Deleting" class="headerlink" title="2.2.1、Provisioning and Deleting"></a>2.2.1、Provisioning and Deleting</h4><p><a href="https://github.com/kubernetes/community/blob/master/contributors/design-proposals/storage/container-storage-interface.md#provisioning-and-deleting" target="_blank" rel="noopener">Provisioning and Deleting</a> 阶段实现与外部存储供应商协调卷的创建/删除处理，简单地说就是需要实现 CreateVolume 和 DeleteVolume；假设外部存储供应商为阿里云存储那么此阶段应该完成在阿里云存储商创建一个指定大小的块设备，或者在用户删除 volume 时完成在阿里云存储上删除这个块设备；除此之外此阶段还应当响应存储拓扑分布从而保证 volume 分布在正确的集群拓扑上(此处描述不算清晰，推荐查看设计文档)。</p>
-<h4 id="2-2-2、Attaching-and-Detaching"><a href="#2-2-2、Attaching-and-Detaching" class="headerlink" title="2.2.2、Attaching and Detaching"></a>2.2.2、Attaching and Detaching</h4><p><a href="https://github.com/kubernetes/community/blob/master/contributors/design-proposals/storage/container-storage-interface.md#attaching-and-detaching" target="_blank" rel="noopener">Attaching and Detaching</a> 阶段实现将外部存储供应商提供好的卷设备挂载到本地或者从本地卸载，简单地说就是实现 ControllerPublishVolume 和 ControllerUnpublishVolume；同样以外部存储供应商为阿里云存储为例，在 Provisioning 阶段创建好的卷的块设备，在此阶段应该实现将其挂载到服务器本地或从本地卸载，在必要的情况下还需要进行格式化等操作。</p>
-<h4 id="2-2-3、Mount-and-Umount"><a href="#2-2-3、Mount-and-Umount" class="headerlink" title="2.2.3、Mount and Umount"></a>2.2.3、Mount and Umount</h4><p>这个阶段在 CSI 设计文档中没有做详细描述，在前两个阶段完成后，当一个目标 Pod 在某个 Node 节点上调度时，kubelet 会根据前两个阶段返回的结果来创建这个 Pod；同样以外部存储供应商为阿里云存储为例，此阶段将会把已经 Attaching 的本地块设备以目录形式挂载到 Pod 中或者从 Pod 中卸载这个块设备。</p>
-<h3 id="2-3、CSI-gRPC-Server"><a href="#2-3、CSI-gRPC-Server" class="headerlink" title="2.3、CSI gRPC Server"></a>2.3、CSI gRPC Server</h3><p>CSI 的三大阶段实际上更细粒度的划分到 CSI Sidecar Containers 中，上面已经说过我们开发 CSI 实际上是面向 CSI Sidecar Containers 编程，针对于 CSI Sidecar Containers 我们主要需要实现以下三个 gRPC Server:</p>
-<h4 id="2-3-1、Identity-Server"><a href="#2-3-1、Identity-Server" class="headerlink" title="2.3.1、Identity Server"></a>2.3.1、Identity Server</h4><p>在当前 CSI Spec v1.3.0 中 IdentityServer 定义如下:</p>
-<div class="hljs"><pre><code class="hljs go"><span class="hljs-comment">// IdentityServer is the server API for Identity service.</span>
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;auto&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Upward, not Northward."><meta name="author" content="bleem"><meta name="keywords" content="漠然,bleem,mritd"><title>如何编写 CSI 插件 - bleem</title><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml"><link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"> <a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"> <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"> <a class="nav-link" href="javascript:">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner intro-2" id="background" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="container page-header text-center fade-in-up"><span class="h2" id="subtitle"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2020-08-19 14:10" pubdate>2020年8月19日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 5.5k 字</span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 69 分钟</span></div></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto" id="post"><h1 style="display:none">如何编写 CSI 插件</h1><div class="markdown-body" id="post-body"><h2 id="一、为什么需要-CSI"><a href="#一、为什么需要-CSI" class="headerlink" title="一、为什么需要 CSI"></a>一、为什么需要 CSI</h2><p>在 Kubernetes 以前的版本中，其所有受官方支持的存储驱动全部在 Kubernetes 的主干代码中，其他第三方开发的自定义插件通过 <a href="https://github.com/kubernetes/community/blob/master/contributors/devel/sig-storage/flexvolume.md" target="_blank" rel="noopener">FlexVolume</a> 插件的形势提供服务；<strong>相对于 kubernetes 的源码树来说，内置的存储我们称之为 “树内存储”，外部第三方实现我们称之为 “树外存储”；</strong>在很长一段时间里树内存储和树外存储并行开发和使用，但是随着时间推移渐渐的就出现了很严重的问题:</p><ul><li>想要添加官方支持的存储必须在树内修改，这意味着需要 Kubernetes 发版</li><li>如果树内存储出现问题则也必须等待 Kubernetes 发版才能修复</li></ul><p>为了解决这种尴尬的问题，Kubernetes 必须抽象出一个合适的存储接口，并将所有存储驱动全部适配到这个接口上，存储驱动最好与 Kubernetes 之间进行 RPC 调用完成解耦，这样就造就了 CSI(Container Storage Interface)。</p><h2 id="二、CSI-基础知识"><a href="#二、CSI-基础知识" class="headerlink" title="二、CSI 基础知识"></a>二、CSI 基础知识</h2><h3 id="2-1、CSI-Sidecar-Containers"><a href="#2-1、CSI-Sidecar-Containers" class="headerlink" title="2.1、CSI Sidecar Containers"></a>2.1、CSI Sidecar Containers</h3><p>在开发 CSI 之前我们最好熟悉一下 CSI 开发中的一些常识；了解过 Kubernetes API 开发的朋友应该清楚，所有的资源定义(Deployment、Service…)在 Kubernetes 中其实就是一个 Object，此时可以将 Kubernetes 看作是一个 Database，无论是 Operator 还是 CSI 其核心本质都是不停的 Watch 特定的 Object，一但 kubectl 或者其他客户端 “动了” 这个 Object，我们的对应实现程序就 Watch 到变更然后作出相应的响应；<strong>对于 CSI 编写者来说，这些 Watch 动作已经不必自己实现 <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#custom-controllers" target="_blank" rel="noopener">Custom Controller</a>，官方为我们提供了 <a href="https://kubernetes-csi.github.io/docs/sidecar-containers.html" target="_blank" rel="noopener">CSI Sidecar Containers</a>；</strong>并且在新版本中这些 Sidecar Containers 实现极其完善，比如自动的多节点 HA(Etcd 选举)等。</p><p><strong>所以到迄今为止，所谓的 CSI 插件开发事实上并非面向 Kubernetes API 开发，而是面向 Sidecar Containers 的 gRPC 开发，Sidecar Containers 一般会和我们自己开发的 CSI 驱动程序在同一个 Pod 中启动，然后 Sidecar Containers Watch API 中 CSI 相关 Object 的变动，接着通过本地 unix 套接字调用我们编写的 CSI 驱动：</strong></p><p><img src="https://cdn.oss.link/markdown/10w5g.png" srcset="/img/loading.gif" alt="CSI_Sidecar_Containers"></p><p>目前官方提供的 Sidecar Containers 如下:</p><ul><li><a href="https://kubernetes-csi.github.io/docs/external-provisioner.html" target="_blank" rel="noopener">external-provisioner</a></li><li><a href="https://kubernetes-csi.github.io/docs/external-attacher.html" target="_blank" rel="noopener">external-attacher</a></li><li><a href="https://kubernetes-csi.github.io/docs/external-snapshotter.html" target="_blank" rel="noopener">external-snapshotter</a></li><li><a href="https://kubernetes-csi.github.io/docs/external-resizer.html" target="_blank" rel="noopener">external-resizer</a></li><li><a href="https://kubernetes-csi.github.io/docs/node-driver-registrar.html" target="_blank" rel="noopener">node-driver-registrar</a></li><li><a href="https://kubernetes-csi.github.io/docs/cluster-driver-registrar.html" target="_blank" rel="noopener">cluster-driver-registrar (deprecated)</a></li><li><a href="https://kubernetes-csi.github.io/docs/livenessprobe.html" target="_blank" rel="noopener">livenessprobe</a></li></ul><p>每个 Sidecar Container 的作用可以通过对应链接查看，需要注意的是 cluster-driver-registrar 已经停止维护，请改用 node-driver-registrar。</p><h3 id="2-2、CSI-处理阶段"><a href="#2-2、CSI-处理阶段" class="headerlink" title="2.2、CSI 处理阶段"></a>2.2、CSI 处理阶段</h3><blockquote><p>在理解了 CSI Sidecar Containers 以后，我们仍需要大致的了解 CSI 挂载过程中的大致流程，以此来针对性的实现每个阶段所需要的功能；CSI 整个流程实际上大致分为以下三大阶段:</p></blockquote><h4 id="2-2-1、Provisioning-and-Deleting"><a href="#2-2-1、Provisioning-and-Deleting" class="headerlink" title="2.2.1、Provisioning and Deleting"></a>2.2.1、Provisioning and Deleting</h4><p><a href="https://github.com/kubernetes/community/blob/master/contributors/design-proposals/storage/container-storage-interface.md#provisioning-and-deleting" target="_blank" rel="noopener">Provisioning and Deleting</a> 阶段实现与外部存储供应商协调卷的创建/删除处理，简单地说就是需要实现 CreateVolume 和 DeleteVolume；假设外部存储供应商为阿里云存储那么此阶段应该完成在阿里云存储商创建一个指定大小的块设备，或者在用户删除 volume 时完成在阿里云存储上删除这个块设备；除此之外此阶段还应当响应存储拓扑分布从而保证 volume 分布在正确的集群拓扑上(此处描述不算清晰，推荐查看设计文档)。</p><h4 id="2-2-2、Attaching-and-Detaching"><a href="#2-2-2、Attaching-and-Detaching" class="headerlink" title="2.2.2、Attaching and Detaching"></a>2.2.2、Attaching and Detaching</h4><p><a href="https://github.com/kubernetes/community/blob/master/contributors/design-proposals/storage/container-storage-interface.md#attaching-and-detaching" target="_blank" rel="noopener">Attaching and Detaching</a> 阶段实现将外部存储供应商提供好的卷设备挂载到本地或者从本地卸载，简单地说就是实现 ControllerPublishVolume 和 ControllerUnpublishVolume；同样以外部存储供应商为阿里云存储为例，在 Provisioning 阶段创建好的卷的块设备，在此阶段应该实现将其挂载到服务器本地或从本地卸载，在必要的情况下还需要进行格式化等操作。</p><h4 id="2-2-3、Mount-and-Umount"><a href="#2-2-3、Mount-and-Umount" class="headerlink" title="2.2.3、Mount and Umount"></a>2.2.3、Mount and Umount</h4><p>这个阶段在 CSI 设计文档中没有做详细描述，在前两个阶段完成后，当一个目标 Pod 在某个 Node 节点上调度时，kubelet 会根据前两个阶段返回的结果来创建这个 Pod；同样以外部存储供应商为阿里云存储为例，此阶段将会把已经 Attaching 的本地块设备以目录形式挂载到 Pod 中或者从 Pod 中卸载这个块设备。</p><h3 id="2-3、CSI-gRPC-Server"><a href="#2-3、CSI-gRPC-Server" class="headerlink" title="2.3、CSI gRPC Server"></a>2.3、CSI gRPC Server</h3><p>CSI 的三大阶段实际上更细粒度的划分到 CSI Sidecar Containers 中，上面已经说过我们开发 CSI 实际上是面向 CSI Sidecar Containers 编程，针对于 CSI Sidecar Containers 我们主要需要实现以下三个 gRPC Server:</p><h4 id="2-3-1、Identity-Server"><a href="#2-3-1、Identity-Server" class="headerlink" title="2.3.1、Identity Server"></a>2.3.1、Identity Server</h4><p>在当前 CSI Spec v1.3.0 中 IdentityServer 定义如下:</p><div class="hljs"><pre><code class="hljs go"><span class="hljs-comment">// IdentityServer is the server API for Identity service.</span>
 <span class="hljs-keyword">type</span> IdentityServer <span class="hljs-keyword">interface</span> &#123;
 	GetPluginInfo(context.Context, *GetPluginInfoRequest) (*GetPluginInfoResponse, error)
 	GetPluginCapabilities(context.Context, *GetPluginCapabilitiesRequest) (*GetPluginCapabilitiesResponse, error)
 	Probe(context.Context, *ProbeRequest) (*ProbeResponse, error)
-&#125;</code></pre></div>
-
-<p>从代码上可以看出 IdentityServer 主要负责像 Kubernetes 提供 CSI 插件名称可选功能等，所以此 Server 是必须实现的。</p>
-<h4 id="2-3-2、Node-Server"><a href="#2-3-2、Node-Server" class="headerlink" title="2.3.2、Node Server"></a>2.3.2、Node Server</h4><p>同样当前 CSI v1.3.0 Spec 中 NodeServer 定义如下:</p>
-<div class="hljs"><pre><code class="hljs go"><span class="hljs-comment">// NodeServer is the server API for Node service.</span>
+&#125;</code></pre></div><p>从代码上可以看出 IdentityServer 主要负责像 Kubernetes 提供 CSI 插件名称可选功能等，所以此 Server 是必须实现的。</p><h4 id="2-3-2、Node-Server"><a href="#2-3-2、Node-Server" class="headerlink" title="2.3.2、Node Server"></a>2.3.2、Node Server</h4><p>同样当前 CSI v1.3.0 Spec 中 NodeServer 定义如下:</p><div class="hljs"><pre><code class="hljs go"><span class="hljs-comment">// NodeServer is the server API for Node service.</span>
 <span class="hljs-keyword">type</span> NodeServer <span class="hljs-keyword">interface</span> &#123;
 	NodeStageVolume(context.Context, *NodeStageVolumeRequest) (*NodeStageVolumeResponse, error)
 	NodeUnstageVolume(context.Context, *NodeUnstageVolumeRequest) (*NodeUnstageVolumeResponse, error)
@@ -281,11 +13,7 @@
 	NodeExpandVolume(context.Context, *NodeExpandVolumeRequest) (*NodeExpandVolumeResponse, error)
 	NodeGetCapabilities(context.Context, *NodeGetCapabilitiesRequest) (*NodeGetCapabilitiesResponse, error)
 	NodeGetInfo(context.Context, *NodeGetInfoRequest) (*NodeGetInfoResponse, error)
-&#125;</code></pre></div>
-
-<p>在最小化的实现中，NodeServer 中仅仅需要实现 <code>NodePublishVolume</code>、<code>NodeUnpublishVolume</code>、<code>NodeGetCapabilities</code> 三个方法，在 Mount 阶段 kubelet 会通过 <a href="https://kubernetes-csi.github.io/docs/node-driver-registrar.html" target="_blank" rel="noopener">node-driver-registrar</a> 容器调用这三个方法。</p>
-<h4 id="2-3-3、Controller-Server"><a href="#2-3-3、Controller-Server" class="headerlink" title="2.3.3、Controller Server"></a>2.3.3、Controller Server</h4><p>在当前 CSI Spec v1.3.0 ControllerServer 定义如下:</p>
-<div class="hljs"><pre><code class="hljs go"><span class="hljs-comment">// ControllerServer is the server API for Controller service.</span>
+&#125;</code></pre></div><p>在最小化的实现中，NodeServer 中仅仅需要实现 <code>NodePublishVolume</code>、<code>NodeUnpublishVolume</code>、<code>NodeGetCapabilities</code> 三个方法，在 Mount 阶段 kubelet 会通过 <a href="https://kubernetes-csi.github.io/docs/node-driver-registrar.html" target="_blank" rel="noopener">node-driver-registrar</a> 容器调用这三个方法。</p><h4 id="2-3-3、Controller-Server"><a href="#2-3-3、Controller-Server" class="headerlink" title="2.3.3、Controller Server"></a>2.3.3、Controller Server</h4><p>在当前 CSI Spec v1.3.0 ControllerServer 定义如下:</p><div class="hljs"><pre><code class="hljs go"><span class="hljs-comment">// ControllerServer is the server API for Controller service.</span>
 <span class="hljs-keyword">type</span> ControllerServer <span class="hljs-keyword">interface</span> &#123;
 	CreateVolume(context.Context, *CreateVolumeRequest) (*CreateVolumeResponse, error)
 	DeleteVolume(context.Context, *DeleteVolumeRequest) (*DeleteVolumeResponse, error)
@@ -300,42 +28,7 @@
 	ListSnapshots(context.Context, *ListSnapshotsRequest) (*ListSnapshotsResponse, error)
 	ControllerExpandVolume(context.Context, *ControllerExpandVolumeRequest) (*ControllerExpandVolumeResponse, error)
 	ControllerGetVolume(context.Context, *ControllerGetVolumeRequest) (*ControllerGetVolumeResponse, error)
-&#125;</code></pre></div>
-
-<p>从这些方法上可以看出，大部分的核心逻辑应该在 ControllerServer 中实现，比如创建/销毁 Volume，创建/销毁 Snapshot 等；在一般情况下我们自己编写的 CSI 都会实现 <code>CreateVolume</code> 和 <code>DeleteVolume</code>，至于其他方法根据业务需求以及外部存储供应商实际情况来决定是否进行实现。</p>
-<h4 id="2-3-4、整体部署加构图"><a href="#2-3-4、整体部署加构图" class="headerlink" title="2.3.4、整体部署加构图"></a>2.3.4、整体部署加构图</h4><p><img src="https://cdn.oss.link/markdown/vopox.jpg" srcset="/img/loading.gif" alt="CSI Deploy Mechanism"></p>
-<p><strong>从这个部署架构图上可以看出在实际上 CSI 部署时，Mount and Umount 阶段(对应 Node Server 实现)以 Daemonset 方式保证其部署到每个节点，当 Volume 创建完成后由其挂载到 Pod 中；其他阶段(Provisioning and Deleting 和 Attaching and Detaching) 只要部署多个实例保证 HA 即可(最新版本的 Sidecar Containers 已经实现了多节点自动选举)；每次 PV 创建时首先由其他两个阶段的 Sidecar Containers 做处理，处理完成后信息返回给 Kubernetes 再传递到 Node Driver(Node Server) 上，然后 Node Driver 将其 Mount 到 Pod 中。</strong></p>
-<h2 id="三、编写一个-NFS-CSI-插件"><a href="#三、编写一个-NFS-CSI-插件" class="headerlink" title="三、编写一个 NFS CSI 插件"></a>三、编写一个 NFS CSI 插件</h2><h3 id="3-1、前置准备及分析"><a href="#3-1、前置准备及分析" class="headerlink" title="3.1、前置准备及分析"></a>3.1、前置准备及分析</h3><p>根据以上文档的描述，针对于需要编写一个 NFS CSI 插件这个需求，大致我们可以作出如下分析:</p>
-<ul>
-<li>三大阶段中我们只需要实现 Provisioning and Deleting 和 Mount and Umount；因为以 NFS 作为外部存储供应商来说我们并非是块设备，所以也不需要挂载到宿主机(Attaching and Detaching)。</li>
-<li>Provisioning and Deleting 阶段我们需要实现 <code>CreateVolume</code> 和 <code>DeleteVolume</code> 逻辑，其核心逻辑应该是针对每个 PV 在 NFS Server 目录下执行 <code>mkdir</code>，并将生成的目录名称等信息返回给 Kubernetes。</li>
-<li>Mount and Umount 阶段需要实现 Node Server 的 <code>NodePublishVolume</code> 和 <code>NodeUnpublishVolume</code> 方法，然后将上一阶段提供的目录名称等信息组合成挂载命令 Mount 到 Pod 即可。</li>
-</ul>
-<p>在明确了这个需求以后我们需要开始编写 gRPC Server，当然不能盲目的自己乱造轮子，<strong>因为这些 gRPC Server 需要是 <code>NonBlocking</code> 的，</strong>所以最佳实践就是参考官方给出的样例项目 <a href="https://github.com/kubernetes-csi/csi-driver-host-path" target="_blank" rel="noopener">csi-driver-host-path</a>，这是一名合格的 CCE 必备的技能(CCE = Ctrl C + Ctrl V + Engineer)。</p>
-<h3 id="3-2、Hostpath-CSI-源码分析"><a href="#3-2、Hostpath-CSI-源码分析" class="headerlink" title="3.2、Hostpath CSI 源码分析"></a>3.2、Hostpath CSI 源码分析</h3><p>针对官方给出的 CSI 样例，首先把源码弄到本地，然后通过 IDE 打开；这里默认为读者熟悉 Go 语言相关语法以及 go mod 等依赖配置，开发 IDE 默认为 GoLand</p>
-<p><img src="https://cdn.oss.link/markdown/jlsdg.png" srcset="/img/loading.gif" alt="source tree"></p>
-<p>从源码树上可以看到，hostpath 的 CSI 实现非常简单；首先是 <code>cmd</code> 包下的命令行部分，main 方法在这里定义，然后就是 <code>pkg/hostpath</code> 包的具体实现部分，CSI 需要实现的三大 gRPC Server 全部在此。</p>
-<h4 id="3-2-1、命令行解析"><a href="#3-2-1、命令行解析" class="headerlink" title="3.2.1、命令行解析"></a>3.2.1、命令行解析</h4><p><code>cmd</code> 包下主要代码就是一些命令行解析，方便从外部传入一些参数供 CSI 使用；针对于 NFS CSI 我们需要从外部传入 NFS Server 地址、挂载目录等参数，如果外部存储供应商为其他云存储可能就需要从命令行传入 AccessKey、AccessToken 等参数。</p>
-<p><img src="https://cdn.oss.link/markdown/t4mje.png" srcset="/img/loading.gif" alt="flag_parse"></p>
-<p>目前 go 原生的命令行解析非常弱鸡，所以更推荐使用 <a href="https://github.com/spf13/cobra" target="_blank" rel="noopener">cobra</a> 命令行库完成解析。</p>
-<h4 id="3-2-2、Hostpath-结构体"><a href="#3-2-2、Hostpath-结构体" class="headerlink" title="3.2.2、Hostpath 结构体"></a>3.2.2、Hostpath 结构体</h4><p>从上面命令行解析的图中可以看到，在完成命令行解析后交由 <code>handle</code> 方法处理；<code>handle</code> 方法很简单，通过命令行拿到的参数创建一个 <code>hostpath</code> 结构体指针，然后 <code>Run</code> 起来就行了，所以接下来要着重看一下这个结构体</p>
-<p><img src="https://cdn.oss.link/markdown/0dc0j.png" srcset="/img/loading.gif" alt="hostpath_struct"></p>
-<p>从代码上可以看到，<code>hostpath</code> 结构体内有一系列的字段用来存储命令行传入的特定参数，然后还有三个 gRPC Server 的引用；命令行参数解析完成后通过 <code>NewHostPathDriver</code> 方法设置到 <code>hostpath</code> 结构体内，然后通过调用结构体的 <code>Run</code> 方法创建三个 gRPC Server 并运行</p>
-<p><img src="https://cdn.oss.link/markdown/wt4ha.png" srcset="/img/loading.gif" alt="hostpath_run"></p>
-<h4 id="3-2-3、代码分布"><a href="#3-2-3、代码分布" class="headerlink" title="3.2.3、代码分布"></a>3.2.3、代码分布</h4><p>经过这么简单的一看，基本上一个最小化的 CSI 代码分布已经可以出来了:</p>
-<ul>
-<li>首先需要做命令行解析，一般放在 <code>cmd</code> 包</li>
-<li>然后需要一个一般与 CSI 插件名称相同的结构体用来承载参数</li>
-<li>结构体内持有三个 gRPC Server 引用，并通过适当的方法使用内部参数还初始化这个三个 gRPC Server</li>
-<li>有了这些 gRPC Server 以后通过 <code>server.go</code> 中的 <code>NewNonBlockingGRPCServer</code> 方法将其启动(这里也可以看出 server.go 里面的方法我们后面可以 copy 直接用)</li>
-</ul>
-<h3 id="3-3、创建-CSI-插件骨架"><a href="#3-3、创建-CSI-插件骨架" class="headerlink" title="3.3、创建 CSI 插件骨架"></a>3.3、创建 CSI 插件骨架</h3><blockquote>
-<p>项目骨架已经提交到 Github <a href="https://github.com/mritd/csi-archetype" target="_blank" rel="noopener">mritd/csi-archetype</a> 项目，可直接 clone 并使用。</p>
-</blockquote>
-<p>大致的研究完 Hostpath 的 CSI 源码，我们就可以根据其实现细节抽象出一个项目 CSI 骨架:</p>
-<p><img src="https://cdn.oss.link/markdown/7y8qu.png" srcset="/img/loading.gif" alt="csi_archetype"></p>
-<p>在这个骨架中我们采用 <a href="https://github.com/spf13/cobra" target="_blank" rel="noopener">corba</a> 完成命令行参数解析，同时使用 <a href="github.com/sirupsen/logrus">logrus</a> 作为日志输出库，这两个库都是 Kubernetes 以及 docker 比较常用的库；我们创建了一个叫 <code>archetype</code> 的结构体作为 CSI 的主承载类，这个结构体需要定义一些参数(parameter1…)方便后面初始化相关 gRPC Server 实现相关调用。</p>
-<div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">type</span> archetype <span class="hljs-keyword">struct</span> &#123;
+&#125;</code></pre></div><p>从这些方法上可以看出，大部分的核心逻辑应该在 ControllerServer 中实现，比如创建/销毁 Volume，创建/销毁 Snapshot 等；在一般情况下我们自己编写的 CSI 都会实现 <code>CreateVolume</code> 和 <code>DeleteVolume</code>，至于其他方法根据业务需求以及外部存储供应商实际情况来决定是否进行实现。</p><h4 id="2-3-4、整体部署加构图"><a href="#2-3-4、整体部署加构图" class="headerlink" title="2.3.4、整体部署加构图"></a>2.3.4、整体部署加构图</h4><p><img src="https://cdn.oss.link/markdown/vopox.jpg" srcset="/img/loading.gif" alt="CSI Deploy Mechanism"></p><p><strong>从这个部署架构图上可以看出在实际上 CSI 部署时，Mount and Umount 阶段(对应 Node Server 实现)以 Daemonset 方式保证其部署到每个节点，当 Volume 创建完成后由其挂载到 Pod 中；其他阶段(Provisioning and Deleting 和 Attaching and Detaching) 只要部署多个实例保证 HA 即可(最新版本的 Sidecar Containers 已经实现了多节点自动选举)；每次 PV 创建时首先由其他两个阶段的 Sidecar Containers 做处理，处理完成后信息返回给 Kubernetes 再传递到 Node Driver(Node Server) 上，然后 Node Driver 将其 Mount 到 Pod 中。</strong></p><h2 id="三、编写一个-NFS-CSI-插件"><a href="#三、编写一个-NFS-CSI-插件" class="headerlink" title="三、编写一个 NFS CSI 插件"></a>三、编写一个 NFS CSI 插件</h2><h3 id="3-1、前置准备及分析"><a href="#3-1、前置准备及分析" class="headerlink" title="3.1、前置准备及分析"></a>3.1、前置准备及分析</h3><p>根据以上文档的描述，针对于需要编写一个 NFS CSI 插件这个需求，大致我们可以作出如下分析:</p><ul><li>三大阶段中我们只需要实现 Provisioning and Deleting 和 Mount and Umount；因为以 NFS 作为外部存储供应商来说我们并非是块设备，所以也不需要挂载到宿主机(Attaching and Detaching)。</li><li>Provisioning and Deleting 阶段我们需要实现 <code>CreateVolume</code> 和 <code>DeleteVolume</code> 逻辑，其核心逻辑应该是针对每个 PV 在 NFS Server 目录下执行 <code>mkdir</code>，并将生成的目录名称等信息返回给 Kubernetes。</li><li>Mount and Umount 阶段需要实现 Node Server 的 <code>NodePublishVolume</code> 和 <code>NodeUnpublishVolume</code> 方法，然后将上一阶段提供的目录名称等信息组合成挂载命令 Mount 到 Pod 即可。</li></ul><p>在明确了这个需求以后我们需要开始编写 gRPC Server，当然不能盲目的自己乱造轮子，<strong>因为这些 gRPC Server 需要是 <code>NonBlocking</code> 的，</strong>所以最佳实践就是参考官方给出的样例项目 <a href="https://github.com/kubernetes-csi/csi-driver-host-path" target="_blank" rel="noopener">csi-driver-host-path</a>，这是一名合格的 CCE 必备的技能(CCE = Ctrl C + Ctrl V + Engineer)。</p><h3 id="3-2、Hostpath-CSI-源码分析"><a href="#3-2、Hostpath-CSI-源码分析" class="headerlink" title="3.2、Hostpath CSI 源码分析"></a>3.2、Hostpath CSI 源码分析</h3><p>针对官方给出的 CSI 样例，首先把源码弄到本地，然后通过 IDE 打开；这里默认为读者熟悉 Go 语言相关语法以及 go mod 等依赖配置，开发 IDE 默认为 GoLand</p><p><img src="https://cdn.oss.link/markdown/jlsdg.png" srcset="/img/loading.gif" alt="source tree"></p><p>从源码树上可以看到，hostpath 的 CSI 实现非常简单；首先是 <code>cmd</code> 包下的命令行部分，main 方法在这里定义，然后就是 <code>pkg/hostpath</code> 包的具体实现部分，CSI 需要实现的三大 gRPC Server 全部在此。</p><h4 id="3-2-1、命令行解析"><a href="#3-2-1、命令行解析" class="headerlink" title="3.2.1、命令行解析"></a>3.2.1、命令行解析</h4><p><code>cmd</code> 包下主要代码就是一些命令行解析，方便从外部传入一些参数供 CSI 使用；针对于 NFS CSI 我们需要从外部传入 NFS Server 地址、挂载目录等参数，如果外部存储供应商为其他云存储可能就需要从命令行传入 AccessKey、AccessToken 等参数。</p><p><img src="https://cdn.oss.link/markdown/t4mje.png" srcset="/img/loading.gif" alt="flag_parse"></p><p>目前 go 原生的命令行解析非常弱鸡，所以更推荐使用 <a href="https://github.com/spf13/cobra" target="_blank" rel="noopener">cobra</a> 命令行库完成解析。</p><h4 id="3-2-2、Hostpath-结构体"><a href="#3-2-2、Hostpath-结构体" class="headerlink" title="3.2.2、Hostpath 结构体"></a>3.2.2、Hostpath 结构体</h4><p>从上面命令行解析的图中可以看到，在完成命令行解析后交由 <code>handle</code> 方法处理；<code>handle</code> 方法很简单，通过命令行拿到的参数创建一个 <code>hostpath</code> 结构体指针，然后 <code>Run</code> 起来就行了，所以接下来要着重看一下这个结构体</p><p><img src="https://cdn.oss.link/markdown/0dc0j.png" srcset="/img/loading.gif" alt="hostpath_struct"></p><p>从代码上可以看到，<code>hostpath</code> 结构体内有一系列的字段用来存储命令行传入的特定参数，然后还有三个 gRPC Server 的引用；命令行参数解析完成后通过 <code>NewHostPathDriver</code> 方法设置到 <code>hostpath</code> 结构体内，然后通过调用结构体的 <code>Run</code> 方法创建三个 gRPC Server 并运行</p><p><img src="https://cdn.oss.link/markdown/wt4ha.png" srcset="/img/loading.gif" alt="hostpath_run"></p><h4 id="3-2-3、代码分布"><a href="#3-2-3、代码分布" class="headerlink" title="3.2.3、代码分布"></a>3.2.3、代码分布</h4><p>经过这么简单的一看，基本上一个最小化的 CSI 代码分布已经可以出来了:</p><ul><li>首先需要做命令行解析，一般放在 <code>cmd</code> 包</li><li>然后需要一个一般与 CSI 插件名称相同的结构体用来承载参数</li><li>结构体内持有三个 gRPC Server 引用，并通过适当的方法使用内部参数还初始化这个三个 gRPC Server</li><li>有了这些 gRPC Server 以后通过 <code>server.go</code> 中的 <code>NewNonBlockingGRPCServer</code> 方法将其启动(这里也可以看出 server.go 里面的方法我们后面可以 copy 直接用)</li></ul><h3 id="3-3、创建-CSI-插件骨架"><a href="#3-3、创建-CSI-插件骨架" class="headerlink" title="3.3、创建 CSI 插件骨架"></a>3.3、创建 CSI 插件骨架</h3><blockquote><p>项目骨架已经提交到 Github <a href="https://github.com/mritd/csi-archetype" target="_blank" rel="noopener">mritd/csi-archetype</a> 项目，可直接 clone 并使用。</p></blockquote><p>大致的研究完 Hostpath 的 CSI 源码，我们就可以根据其实现细节抽象出一个项目 CSI 骨架:</p><p><img src="https://cdn.oss.link/markdown/7y8qu.png" srcset="/img/loading.gif" alt="csi_archetype"></p><p>在这个骨架中我们采用 <a href="https://github.com/spf13/cobra" target="_blank" rel="noopener">corba</a> 完成命令行参数解析，同时使用 <a href="github.com/sirupsen/logrus">logrus</a> 作为日志输出库，这两个库都是 Kubernetes 以及 docker 比较常用的库；我们创建了一个叫 <code>archetype</code> 的结构体作为 CSI 的主承载类，这个结构体需要定义一些参数(parameter1…)方便后面初始化相关 gRPC Server 实现相关调用。</p><div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">type</span> archetype <span class="hljs-keyword">struct</span> &#123;
 	name     <span class="hljs-keyword">string</span>
 	nodeID   <span class="hljs-keyword">string</span>
 	version  <span class="hljs-keyword">string</span>
@@ -348,10 +41,7 @@
 
 	<span class="hljs-built_in">cap</span>   []*csi.VolumeCapability_AccessMode
 	cscap []*csi.ControllerServiceCapability
-&#125;</code></pre></div>
-
-<p>与 Hostpath CSI 实现相同，我们创建一个 <code>NewCSIDriver</code> 方法来返回 <code>archetype</code> 结构体实例，在 <code>NewCSIDriver</code> 方法中将命令行解析得到的相关参数设置进结构体中并添加一些 <code>AccessModes</code> 和 <code>ServiceCapabilities</code> 方便后面 <code>Identity Server</code> 调用。</p>
-<div class="hljs"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewCSIDriver</span><span class="hljs-params">(version, nodeID, endpoint, parameter1 <span class="hljs-keyword">string</span>, parameter2 <span class="hljs-keyword">int</span>, parameter3 time.Duration)</span> *<span class="hljs-title">archetype</span></span> &#123;
+&#125;</code></pre></div><p>与 Hostpath CSI 实现相同，我们创建一个 <code>NewCSIDriver</code> 方法来返回 <code>archetype</code> 结构体实例，在 <code>NewCSIDriver</code> 方法中将命令行解析得到的相关参数设置进结构体中并添加一些 <code>AccessModes</code> 和 <code>ServiceCapabilities</code> 方便后面 <code>Identity Server</code> 调用。</p><div class="hljs"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewCSIDriver</span><span class="hljs-params">(version, nodeID, endpoint, parameter1 <span class="hljs-keyword">string</span>, parameter2 <span class="hljs-keyword">int</span>, parameter3 time.Duration)</span> *<span class="hljs-title">archetype</span></span> &#123;
 	logrus.Infof(<span class="hljs-string">"Driver: %s version: %s"</span>, driverName, version)
 
 	<span class="hljs-comment">// Add some check here</span>
@@ -382,15 +72,7 @@
 	&#125;)
 
 	<span class="hljs-keyword">return</span> n
-&#125;</code></pre></div>
-
-<p><strong>整个骨架源码树中，命令行解析自己重构使用一些更加方便的命令行解析、日志输出库；结构体部分参考 Hostpath 结构体自己调整，<code>server.go</code> 用来创建 <code>NonBlocking</code> 的 gRPC Server(直接从 Hotspath 样例项目 copy 即可)；然后就是三大 gRPC Server 的实现，由于是 “项目骨架” 所以相关方法我们都返回未实现，后续我们主要来实现这些方法就能让自己写的这个 CSI 插件 work。</strong></p>
-<p><img src="https://cdn.oss.link/markdown/876sk.png" srcset="/img/loading.gif" alt="Unimplemented_gRPC_Server"></p>
-<h3 id="3-4、创建-NFS-CSI-插件骨架"><a href="#3-4、创建-NFS-CSI-插件骨架" class="headerlink" title="3.4、创建 NFS CSI 插件骨架"></a>3.4、创建 NFS CSI 插件骨架</h3><p>有了 CSI 的项目骨架以后，我们只需要简单地修改名字将其重命名为 NFS CSI 插件即可；由于这篇文章是先实现好了 NFS CSI(已经 work) 再来写的，所以 NFS CSI 的源码可以直接参考 <a href="https://github.com/Gozap/csi-nfs" target="_blank" rel="noopener">Gozap/csi-nfs</a> 即可，下面的部分主要介绍三大 gRPC Server 的实现</p>
-<p><img src="https://cdn.oss.link/markdown/kk42j.png" srcset="/img/loading.gif" alt="csi-nfs"></p>
-<h3 id="3-5、实现-Identity-Server"><a href="#3-5、实现-Identity-Server" class="headerlink" title="3.5、实现 Identity Server"></a>3.5、实现 Identity Server</h3><p><img src="https://cdn.oss.link/markdown/r8etm.png" srcset="/img/loading.gif" alt="Identity Server"></p>
-<p>Identity Server 实现相对简单，总共就三个接口；<code>GetPluginInfo</code> 接口返回插件名称版本即可(注意版本号好像只能是 <code>1.1.1</code> 这种，<code>v1.1.1</code> 好像会报错)；<code>Probe</code> 接口用来做健康检测可以直接返回空 response 即可，当然最理想的情况应该是做一些业务逻辑判活；<code>GetPluginCapabilities</code> 接口看起来简单但是要清楚返回的 <code>Capabilities</code> 含义，由于我们的 NFS 插件必然需要响应 <code>CreateVolume</code> 等请求(实现 Controller Server)，所以 cap 必须给予 <code>PluginCapability_Service_CONTROLLER_SERVICE</code>，除此之外如果节点不支持均匀的创建外部存储供应商的 Volume，那么应当同时返回 <code>PluginCapability_Service_VOLUME_ACCESSIBILITY_CONSTRAINTS</code> 以表示 CSI 处理时需要根据集群拓扑作调整；具体的可以查看 gRPC 注释:</p>
-<div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">const</span> (
+&#125;</code></pre></div><p><strong>整个骨架源码树中，命令行解析自己重构使用一些更加方便的命令行解析、日志输出库；结构体部分参考 Hostpath 结构体自己调整，<code>server.go</code> 用来创建 <code>NonBlocking</code> 的 gRPC Server(直接从 Hotspath 样例项目 copy 即可)；然后就是三大 gRPC Server 的实现，由于是 “项目骨架” 所以相关方法我们都返回未实现，后续我们主要来实现这些方法就能让自己写的这个 CSI 插件 work。</strong></p><p><img src="https://cdn.oss.link/markdown/876sk.png" srcset="/img/loading.gif" alt="Unimplemented_gRPC_Server"></p><h3 id="3-4、创建-NFS-CSI-插件骨架"><a href="#3-4、创建-NFS-CSI-插件骨架" class="headerlink" title="3.4、创建 NFS CSI 插件骨架"></a>3.4、创建 NFS CSI 插件骨架</h3><p>有了 CSI 的项目骨架以后，我们只需要简单地修改名字将其重命名为 NFS CSI 插件即可；由于这篇文章是先实现好了 NFS CSI(已经 work) 再来写的，所以 NFS CSI 的源码可以直接参考 <a href="https://github.com/Gozap/csi-nfs" target="_blank" rel="noopener">Gozap/csi-nfs</a> 即可，下面的部分主要介绍三大 gRPC Server 的实现</p><p><img src="https://cdn.oss.link/markdown/kk42j.png" srcset="/img/loading.gif" alt="csi-nfs"></p><h3 id="3-5、实现-Identity-Server"><a href="#3-5、实现-Identity-Server" class="headerlink" title="3.5、实现 Identity Server"></a>3.5、实现 Identity Server</h3><p><img src="https://cdn.oss.link/markdown/r8etm.png" srcset="/img/loading.gif" alt="Identity Server"></p><p>Identity Server 实现相对简单，总共就三个接口；<code>GetPluginInfo</code> 接口返回插件名称版本即可(注意版本号好像只能是 <code>1.1.1</code> 这种，<code>v1.1.1</code> 好像会报错)；<code>Probe</code> 接口用来做健康检测可以直接返回空 response 即可，当然最理想的情况应该是做一些业务逻辑判活；<code>GetPluginCapabilities</code> 接口看起来简单但是要清楚返回的 <code>Capabilities</code> 含义，由于我们的 NFS 插件必然需要响应 <code>CreateVolume</code> 等请求(实现 Controller Server)，所以 cap 必须给予 <code>PluginCapability_Service_CONTROLLER_SERVICE</code>，除此之外如果节点不支持均匀的创建外部存储供应商的 Volume，那么应当同时返回 <code>PluginCapability_Service_VOLUME_ACCESSIBILITY_CONSTRAINTS</code> 以表示 CSI 处理时需要根据集群拓扑作调整；具体的可以查看 gRPC 注释:</p><div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">const</span> (
 	PluginCapability_Service_UNKNOWN PluginCapability_Service_Type = <span class="hljs-number">0</span>
 	<span class="hljs-comment">// CONTROLLER_SERVICE indicates that the Plugin provides RPCs for</span>
 	<span class="hljs-comment">// the ControllerService. Plugins SHOULD provide this capability.</span>
@@ -408,18 +90,10 @@
 	<span class="hljs-comment">// returned by NodeGetInfo to ensure that a given volume is</span>
 	<span class="hljs-comment">// accessible from a given node when scheduling workloads.</span>
 	PluginCapability_Service_VOLUME_ACCESSIBILITY_CONSTRAINTS PluginCapability_Service_Type = <span class="hljs-number">2</span>
-)</code></pre></div>
-
-<h3 id="3-6、实现-Controller-Server"><a href="#3-6、实现-Controller-Server" class="headerlink" title="3.6、实现 Controller Server"></a>3.6、实现 Controller Server</h3><p>Controller Server 实际上对应着 Provisioning and Deleting 阶段；换句话说核心的创建/删除卷、快照等都应在此做实现，针对于本次编写的 NFS 插件仅做最小实现(创建/删除卷)；需要注意的是除了核心的创建删除卷要实现以外还需要实现 <code>ControllerGetCapabilities</code> 方法，该方法返回 Controller Server 的 cap:</p>
-<p><img src="https://cdn.oss.link/markdown/pl0n3.png" srcset="/img/loading.gif" alt="ControllerGetCapabilities"></p>
-<p><code>ControllerGetCapabilities</code> 返回的实际上是在创建驱动时设置的 cscap:</p>
-<div class="hljs"><pre><code class="hljs go">n.AddControllerServiceCapabilities([]csi.ControllerServiceCapability_RPC_Type&#123;
+)</code></pre></div><h3 id="3-6、实现-Controller-Server"><a href="#3-6、实现-Controller-Server" class="headerlink" title="3.6、实现 Controller Server"></a>3.6、实现 Controller Server</h3><p>Controller Server 实际上对应着 Provisioning and Deleting 阶段；换句话说核心的创建/删除卷、快照等都应在此做实现，针对于本次编写的 NFS 插件仅做最小实现(创建/删除卷)；需要注意的是除了核心的创建删除卷要实现以外还需要实现 <code>ControllerGetCapabilities</code> 方法，该方法返回 Controller Server 的 cap:</p><p><img src="https://cdn.oss.link/markdown/pl0n3.png" srcset="/img/loading.gif" alt="ControllerGetCapabilities"></p><p><code>ControllerGetCapabilities</code> 返回的实际上是在创建驱动时设置的 cscap:</p><div class="hljs"><pre><code class="hljs go">n.AddControllerServiceCapabilities([]csi.ControllerServiceCapability_RPC_Type&#123;
 	csi.ControllerServiceCapability_RPC_CREATE_DELETE_VOLUME,
 	csi.ControllerServiceCapability_RPC_CREATE_DELETE_SNAPSHOT,
-&#125;)</code></pre></div>
-
-<p><code>ControllerServiceCapability_RPC_CREATE_DELETE_VOLUME</code> 表示这个 Controller Server 支持创建/删除卷，<code>ControllerServiceCapability_RPC_CREATE_DELETE_SNAPSHOT</code> 表示支持创建/删除快照(快照功能是后来闲的没事加的)；<strong>应该明确的是我们返回了特定的 cap 那就要针对特定方法做实现，因为你一旦声明了这些 cap Kubernetes 就认为有相应请求可以让你处理(你不能吹完牛逼然后关键时刻掉链子)。</strong>针对于可以返回哪些 cscap 可以通过这些 gRPC 常量来查看:</p>
-<div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">const</span> (
+&#125;)</code></pre></div><p><code>ControllerServiceCapability_RPC_CREATE_DELETE_VOLUME</code> 表示这个 Controller Server 支持创建/删除卷，<code>ControllerServiceCapability_RPC_CREATE_DELETE_SNAPSHOT</code> 表示支持创建/删除快照(快照功能是后来闲的没事加的)；<strong>应该明确的是我们返回了特定的 cap 那就要针对特定方法做实现，因为你一旦声明了这些 cap Kubernetes 就认为有相应请求可以让你处理(你不能吹完牛逼然后关键时刻掉链子)。</strong>针对于可以返回哪些 cscap 可以通过这些 gRPC 常量来查看:</p><div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">const</span> (
 	ControllerServiceCapability_RPC_UNKNOWN                  ControllerServiceCapability_RPC_Type = <span class="hljs-number">0</span>
 	ControllerServiceCapability_RPC_CREATE_DELETE_VOLUME     ControllerServiceCapability_RPC_Type = <span class="hljs-number">1</span>
 	ControllerServiceCapability_RPC_PUBLISH_UNPUBLISH_VOLUME ControllerServiceCapability_RPC_Type = <span class="hljs-number">2</span>
@@ -460,21 +134,7 @@
 	<span class="hljs-comment">// This enables COs to, for example, fetch per volume</span>
 	<span class="hljs-comment">// condition after a volume is provisioned.</span>
 	ControllerServiceCapability_RPC_GET_VOLUME ControllerServiceCapability_RPC_Type = <span class="hljs-number">12</span>
-)</code></pre></div>
-
-<p>当声明了 <code>ControllerServiceCapability_RPC_CREATE_DELETE_VOLUME</code> 以后针对创建删除卷方法 <code>CreateVolume</code>、<code>DeleteVolume</code> 做实现即可；这两个方法实现就是常规的业务逻辑层面没什么技术含量，对于外部存储供应商是 NFS 来说无非就是接到一个 <code>CreateVolumeRequest</code> ，然后根据 request 给的 volume name 啥的信息自己执行一下在 NFS Server 上 <code>mkdir</code> ，删除卷处理就是反向的 <code>rm -rf dir</code>；在两个方法的处理中可能额外掺杂一些校验等其他的辅助实现。</p>
-<p><img src="https://cdn.oss.link/markdown/jkhb6.png" srcset="/img/loading.gif" alt="CreateVolume"></p>
-<p><img src="https://cdn.oss.link/markdown/96ij8.png" srcset="/img/loading.gif" alt="DeleteVolume"></p>
-<p><strong>最后有几点需要注意的地方:</strong></p>
-<ul>
-<li><strong>幂等性: Kubernetes 可能由于一些其他原因会重复发出请求(比如超时重试)，此时一定要保证创建/删除卷实现的幂等性，简单地说 Kubernetes 连续两次调用同一个卷创建 CSI 插件应当实现自动去重过滤，不能调用两次返回两个新卷。</strong></li>
-<li><strong>数据回写: 要明白的是 Controller Server 是 Provisioning and Deleting 阶段，此时还没有真正挂载到 Pod，所以就本地使用 NFS 作为存储后端来说 <code>mkdir</code> 以后要把目录、NFS Server 地址等必要信息通过 VolumeContext 返回给 Kubernetes，Kubernetes 接下来会传递给 Node Driver(Mount/Umount)用。</strong></li>
-<li><strong>预挂载: 当然这个问题目前只存在在 NFS 作为存储后端中，问题核心在于在创建卷进行 <code>mkdir</code> 之前，NFS 应该已经确保 mount 到了 Controller Server 容器本地，所以目前的做法就是启动 Controller Server 时就执行 NFS 挂载；如果用其他的后端存储比如阿里云存储时也要考虑在创建卷之前相关的 API Client 是否可用。</strong></li>
-</ul>
-<h3 id="3-7、实现-Node-Server"><a href="#3-7、实现-Node-Server" class="headerlink" title="3.7、实现 Node Server"></a>3.7、实现 Node Server</h3><p>Node Server 实际上就是 Node Driver，简单地说当 Controller Server 完成一个卷的创建，并且已经 Attach 到 Node 以后(当然这里的 NFS 不需要 Attach)，Node Server 就需要实现根据给定的信息将卷 Mount 到 Pod 或者从 Pod Umount 掉卷；同样的 Node Server 也许要返回一些信息来告诉 Kubernetes 自己的详细情况，这部份由两个方法完成 <code>NodeGetInfo</code> 和 <code>NodeGetCapabilities</code></p>
-<p><img src="https://cdn.oss.link/markdown/ts3l9.png" srcset="/img/loading.gif" alt="NodeGetInfo_NodeGetCapabilities"></p>
-<p><code>NodeGetInfo</code> 中返回节点的常规信息，比如 Node ID、最大允许的 Volume 数量、集群拓扑信息等；<code>NodeGetCapabilities</code> 返回这个 Node 的 cap，由于我们的 NFS 是真的啥也不支持，所以只好返回 <code>NodeServiceCapability_RPC_UNKNOWN</code>，至于其他的 cap 如下(含义自己看注释):</p>
-<div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">const</span> (
+)</code></pre></div><p>当声明了 <code>ControllerServiceCapability_RPC_CREATE_DELETE_VOLUME</code> 以后针对创建删除卷方法 <code>CreateVolume</code>、<code>DeleteVolume</code> 做实现即可；这两个方法实现就是常规的业务逻辑层面没什么技术含量，对于外部存储供应商是 NFS 来说无非就是接到一个 <code>CreateVolumeRequest</code> ，然后根据 request 给的 volume name 啥的信息自己执行一下在 NFS Server 上 <code>mkdir</code> ，删除卷处理就是反向的 <code>rm -rf dir</code>；在两个方法的处理中可能额外掺杂一些校验等其他的辅助实现。</p><p><img src="https://cdn.oss.link/markdown/jkhb6.png" srcset="/img/loading.gif" alt="CreateVolume"></p><p><img src="https://cdn.oss.link/markdown/96ij8.png" srcset="/img/loading.gif" alt="DeleteVolume"></p><p><strong>最后有几点需要注意的地方:</strong></p><ul><li><strong>幂等性: Kubernetes 可能由于一些其他原因会重复发出请求(比如超时重试)，此时一定要保证创建/删除卷实现的幂等性，简单地说 Kubernetes 连续两次调用同一个卷创建 CSI 插件应当实现自动去重过滤，不能调用两次返回两个新卷。</strong></li><li><strong>数据回写: 要明白的是 Controller Server 是 Provisioning and Deleting 阶段，此时还没有真正挂载到 Pod，所以就本地使用 NFS 作为存储后端来说 <code>mkdir</code> 以后要把目录、NFS Server 地址等必要信息通过 VolumeContext 返回给 Kubernetes，Kubernetes 接下来会传递给 Node Driver(Mount/Umount)用。</strong></li><li><strong>预挂载: 当然这个问题目前只存在在 NFS 作为存储后端中，问题核心在于在创建卷进行 <code>mkdir</code> 之前，NFS 应该已经确保 mount 到了 Controller Server 容器本地，所以目前的做法就是启动 Controller Server 时就执行 NFS 挂载；如果用其他的后端存储比如阿里云存储时也要考虑在创建卷之前相关的 API Client 是否可用。</strong></li></ul><h3 id="3-7、实现-Node-Server"><a href="#3-7、实现-Node-Server" class="headerlink" title="3.7、实现 Node Server"></a>3.7、实现 Node Server</h3><p>Node Server 实际上就是 Node Driver，简单地说当 Controller Server 完成一个卷的创建，并且已经 Attach 到 Node 以后(当然这里的 NFS 不需要 Attach)，Node Server 就需要实现根据给定的信息将卷 Mount 到 Pod 或者从 Pod Umount 掉卷；同样的 Node Server 也许要返回一些信息来告诉 Kubernetes 自己的详细情况，这部份由两个方法完成 <code>NodeGetInfo</code> 和 <code>NodeGetCapabilities</code></p><p><img src="https://cdn.oss.link/markdown/ts3l9.png" srcset="/img/loading.gif" alt="NodeGetInfo_NodeGetCapabilities"></p><p><code>NodeGetInfo</code> 中返回节点的常规信息，比如 Node ID、最大允许的 Volume 数量、集群拓扑信息等；<code>NodeGetCapabilities</code> 返回这个 Node 的 cap，由于我们的 NFS 是真的啥也不支持，所以只好返回 <code>NodeServiceCapability_RPC_UNKNOWN</code>，至于其他的 cap 如下(含义自己看注释):</p><div class="hljs"><pre><code class="hljs go"><span class="hljs-keyword">const</span> (
 	NodeServiceCapability_RPC_UNKNOWN              NodeServiceCapability_RPC_Type = <span class="hljs-number">0</span>
 	NodeServiceCapability_RPC_STAGE_UNSTAGE_VOLUME NodeServiceCapability_RPC_Type = <span class="hljs-number">1</span>
 	<span class="hljs-comment">// If Plugin implements GET_VOLUME_STATS capability</span>
@@ -495,257 +155,7 @@
 	<span class="hljs-comment">// Note that, for alpha, `VolumeCondition` is intended to be</span>
 	<span class="hljs-comment">// informative for humans only, not for automation.</span>
 	NodeServiceCapability_RPC_VOLUME_CONDITION NodeServiceCapability_RPC_Type = <span class="hljs-number">4</span>
-)</code></pre></div>
-
-<p>剩下的核心方法 <code>NodePublishVolume</code> 和 <code>NodeUnpublishVolume</code> 挂载/卸载卷同 Controller Server 创建删除卷一样都是业务处理，没啥可说的，按步就班的调用一下 Mount 上就行；<strong>唯一需要注意的点就是这里也要保证幂等性，同时由于要操作 Pod 目录，所以要把宿主机的 <code>/var/lib/kubelet/pods</code> 目录挂载到 Node Server 容器里。</strong></p>
-<h3 id="3-8、部署测试-NFS-插件"><a href="#3-8、部署测试-NFS-插件" class="headerlink" title="3.8、部署测试 NFS 插件"></a>3.8、部署测试 NFS 插件</h3><p>NFS 插件写完以后就可以实体环境做测试了，测试方法不同插件可能并不相同，本 NFS 插件可以直接使用源码项目的 <code>deploy</code> 目录创建相关容器做测试(需要根据自己的 NFS Server 修改一些参数)。针对于如何部署下面做一下简单说明:</p>
-<p>三大阶段笼统的其实对应着三个 Sidecar Container:</p>
-<ul>
-<li>Provisioning and Deleting: external-provisioner</li>
-<li>Attaching and Detaching: external-attacher</li>
-<li>Mount and Umount: node-driver-registrar</li>
-</ul>
-<p><strong>我们的 NFS CSI 插件不需要 Attach，所以 external-attacher 也不需要部署；external-provisioner 只响应创建删除卷请求，所以通过 Deployment 部署足够多的复本保证 HA 就行；由于 Pod 不一定会落到那个节点上，理论上任意 Node 都可能有 Mount/Umount 行为，所以 node-driver-registrar 要以 Daemonset 方式部署保证每个节点都有一个。</strong></p>
-<h2 id="四、其他说明"><a href="#四、其他说明" class="headerlink" title="四、其他说明"></a>四、其他说明</h2><h3 id="4-1、前期调试"><a href="#4-1、前期调试" class="headerlink" title="4.1、前期调试"></a>4.1、前期调试</h3><p>在前期代码编写时一般都是 “盲狙”，就是按照自己的理解无脑实现，这时候可能离实际部署还很远，但是只是单纯的想知道某个 Request 里面到底是什么个东西，这时候你可以利用 <code>mritd/socket2tcp</code> 容器模拟监听 socket 文件，然后将请求转发到你的 IDE 监听端口上，然后再进行 Debug。</p>
-<p>可能有人会问: “我直接在 Sidecar Containers 里写个 tcp 地址不就行了，还转发毛线，这不是脱裤子放屁多此一举么？”，但是这里我友情提醒一下，Sidecar Containers 指定 CSI 地址时填写非 socket 类型的地址是不好使的，会直接启动失败。</p>
-<h3 id="4-2、后期调试"><a href="#4-2、后期调试" class="headerlink" title="4.2、后期调试"></a>4.2、后期调试</h3><p>等到代码编写到后期其实就开始 “真机” 调试了，这时候其实不必使用原始的打日志调试方法，NFS CSI 的项目源码中的 <code>Dockerfile.debug</code> 提供了使用 dlv 做远程调试的样例；具体怎么配合 IDE 做远程调试请自行 Google。</p>
-<h3 id="4-3、其他功能实现"><a href="#4-3、其他功能实现" class="headerlink" title="4.3、其他功能实现"></a>4.3、其他功能实现</h3><p>其他功能根据需要可以自己酌情实现，比如创建/删除快照功能；对于 NFS 插件来说 NFS Server 又没有 API，所以最简单最 low 的办法当然是 <code>tar -zcvf</code> 了(哈哈哈(超大声))，当然性能么就不要提了。</p>
-<h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p><strong>CSI 开发其实是针对 Kubernetes CSI Sidecar Containers 的 gRPC 开发，根据自己需求实现三大阶段中对应三大 gRPC Server 相应方法即可；相关功能要保证幂等性，cap 要看文档根据实际情况返回。</strong></p>
-<h2 id="六、参考文档"><a href="#六、参考文档" class="headerlink" title="六、参考文档"></a>六、参考文档</h2><ul>
-<li><a href="https://kubernetes-csi.github.io/docs/introduction.html" target="_blank" rel="noopener">https://kubernetes-csi.github.io/docs/introduction.html</a></li>
-<li><a href="https://github.com/container-storage-interface/spec" target="_blank" rel="noopener">https://github.com/container-storage-interface/spec</a></li>
-</ul>
-
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/csi/">CSI</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p>
-              
-              
-                <div class="post-prevnext row">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2020/08/19/use-etcdadm-to-build-etcd-cluster-in-3-minutes/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">使用 etcdadm 三分钟搭建 etcd 集群</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2020/08/19/make-a-custom-manjaro-image-for-rpi4/">
-                        <span class="hidden-mobile">树莓派4 Manjaro 系统定制</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                
-  <div class="disqus" style="width:100%">
-    <div id="disqus_thread"></div>
-    <script type="text/javascript">
-      var disqus_config = function () {
-        this.page.url = 'https://mritd.com/2020/08/19/how-to-write-a-csi-driver-for-kubernetes/';
-        this.page.identifier = '/2020/08/19/how-to-write-a-csi-driver-for-kubernetes/';
-      };
-      function loadDisqus() {
-        (function () {
-          var d = document,
-            s = d.createElement('script');
-          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
-          s.setAttribute('data-timestamp', new Date());
-          (d.head || d.body).appendChild(s);
-        })();
-      }
-      waitElementVisible('disqus_thread', loadDisqus);
-    </script>
-    <noscript>Please enable JavaScript to view the
-      <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a>
-    </noscript>
-  </div>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-  </main>
-
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
-
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
-    
-
-    
-
-    
-  </div>
-</footer>
-
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
-
-<!-- Plugins -->
-
-
-  
-    <script  src="/js/lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
-
-
-
-
-
-
-
-  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: '#post-body',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        collapseDepth: 3,
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc').css('visibility', 'visible');
-      }
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "如何编写 CSI 插件&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 80,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
+)</code></pre></div><p>剩下的核心方法 <code>NodePublishVolume</code> 和 <code>NodeUnpublishVolume</code> 挂载/卸载卷同 Controller Server 创建删除卷一样都是业务处理，没啥可说的，按步就班的调用一下 Mount 上就行；<strong>唯一需要注意的点就是这里也要保证幂等性，同时由于要操作 Pod 目录，所以要把宿主机的 <code>/var/lib/kubelet/pods</code> 目录挂载到 Node Server 容器里。</strong></p><h3 id="3-8、部署测试-NFS-插件"><a href="#3-8、部署测试-NFS-插件" class="headerlink" title="3.8、部署测试 NFS 插件"></a>3.8、部署测试 NFS 插件</h3><p>NFS 插件写完以后就可以实体环境做测试了，测试方法不同插件可能并不相同，本 NFS 插件可以直接使用源码项目的 <code>deploy</code> 目录创建相关容器做测试(需要根据自己的 NFS Server 修改一些参数)。针对于如何部署下面做一下简单说明:</p><p>三大阶段笼统的其实对应着三个 Sidecar Container:</p><ul><li>Provisioning and Deleting: external-provisioner</li><li>Attaching and Detaching: external-attacher</li><li>Mount and Umount: node-driver-registrar</li></ul><p><strong>我们的 NFS CSI 插件不需要 Attach，所以 external-attacher 也不需要部署；external-provisioner 只响应创建删除卷请求，所以通过 Deployment 部署足够多的复本保证 HA 就行；由于 Pod 不一定会落到那个节点上，理论上任意 Node 都可能有 Mount/Umount 行为，所以 node-driver-registrar 要以 Daemonset 方式部署保证每个节点都有一个。</strong></p><h2 id="四、其他说明"><a href="#四、其他说明" class="headerlink" title="四、其他说明"></a>四、其他说明</h2><h3 id="4-1、前期调试"><a href="#4-1、前期调试" class="headerlink" title="4.1、前期调试"></a>4.1、前期调试</h3><p>在前期代码编写时一般都是 “盲狙”，就是按照自己的理解无脑实现，这时候可能离实际部署还很远，但是只是单纯的想知道某个 Request 里面到底是什么个东西，这时候你可以利用 <code>mritd/socket2tcp</code> 容器模拟监听 socket 文件，然后将请求转发到你的 IDE 监听端口上，然后再进行 Debug。</p><p>可能有人会问: “我直接在 Sidecar Containers 里写个 tcp 地址不就行了，还转发毛线，这不是脱裤子放屁多此一举么？”，但是这里我友情提醒一下，Sidecar Containers 指定 CSI 地址时填写非 socket 类型的地址是不好使的，会直接启动失败。</p><h3 id="4-2、后期调试"><a href="#4-2、后期调试" class="headerlink" title="4.2、后期调试"></a>4.2、后期调试</h3><p>等到代码编写到后期其实就开始 “真机” 调试了，这时候其实不必使用原始的打日志调试方法，NFS CSI 的项目源码中的 <code>Dockerfile.debug</code> 提供了使用 dlv 做远程调试的样例；具体怎么配合 IDE 做远程调试请自行 Google。</p><h3 id="4-3、其他功能实现"><a href="#4-3、其他功能实现" class="headerlink" title="4.3、其他功能实现"></a>4.3、其他功能实现</h3><p>其他功能根据需要可以自己酌情实现，比如创建/删除快照功能；对于 NFS 插件来说 NFS Server 又没有 API，所以最简单最 low 的办法当然是 <code>tar -zcvf</code> 了(哈哈哈(超大声))，当然性能么就不要提了。</p><h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p><strong>CSI 开发其实是针对 Kubernetes CSI Sidecar Containers 的 gRPC 开发，根据自己需求实现三大阶段中对应三大 gRPC Server 相应方法即可；相关功能要保证幂等性，cap 要看文档根据实际情况返回。</strong></p><h2 id="六、参考文档"><a href="#六、参考文档" class="headerlink" title="六、参考文档"></a>六、参考文档</h2><ul><li><a href="https://kubernetes-csi.github.io/docs/introduction.html" target="_blank" rel="noopener">https://kubernetes-csi.github.io/docs/introduction.html</a></li><li><a href="https://github.com/container-storage-interface/spec" target="_blank" rel="noopener">https://github.com/container-storage-interface/spec</a></li></ul></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/csi/">CSI</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext row"><article class="post-prev col-6"><a href="/2020/08/19/use-etcdadm-to-build-etcd-cluster-in-3-minutes/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">使用 etcdadm 三分钟搭建 etcd 集群</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"> <a href="/2020/08/19/make-a-custom-manjaro-image-for-rpi4/"><span class="hidden-mobile">树莓派4 Manjaro 系统定制</span> <span class="visible-mobile">下一篇</span><i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments"><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2020/08/19/how-to-write-a-csi-driver-for-kubernetes/",this.page.identifier="/2020/08/19/how-to-write-a-csi-driver-for-kubernetes/"};function loadDisqus(){var e,t;e=document,(t=e.createElement("script")).src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}waitElementVisible("disqus_thread",loadDisqus)</script><noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a></noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4> <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"> <input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a><i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="/js/debouncer.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script defer="defer" src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js"></script><script>$(document).ready(function(){var t=$("#board-ctn").offset().top;tocbot.init({tocSelector:"#tocbot",contentSelector:"#post-body",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",collapseDepth:3,scrollSmooth:!0,headingsOffset:-t}),0<$(".toc-list-item").length&&$("#toc").css("visibility","visible")})</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","如何编写 CSI 插件&nbsp;"],cursorChar:"_",typeSpeed:80,loop:!1});typed.stop(),$(document).ready(function(){$(".typed-cursor").addClass("h2"),typed.start()})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>
     anchors.options = {
       placement: "right",
       visible: "hover",
@@ -759,54 +169,4 @@
       res.push(".markdown-body > " + item)
     }
     anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <script>
-    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
-      function () {
-        var element = document.createElement('a');
-        $(element).attr('data-fancybox', 'images');
-        $(element).attr('href', $(this).attr('src'));
-        $(this).wrap(element);
-      }
-    );
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</body>
-</html>
+  </script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){searchFunc(path,"local-search-input","local-search-result"),this.onclick=null}</script><script src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><link rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><script>$("#post img:not(.no-zoom img, img[no-zoom]), img[zoom]").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script></body></html>
