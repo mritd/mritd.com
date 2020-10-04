@@ -296,13 +296,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/yum-note/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2006/01/02/%E5%81%9A%E8%87%AA%E5%B7%B1%E5%B0%8A%E9%87%8D%E7%9A%84%E4%BA%BA-2015%E5%8C%97%E5%A4%A7%E6%9C%80%E7%9F%AD%E6%AF%95%E4%B8%9A%E8%87%B4%E8%BE%9E/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -310,14 +303,21 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/%E5%85%B6%E5%AE%9E%E6%AF%8F%E4%B8%AA%E4%BA%BA%E9%83%BD%E6%9B%BE%E9%A5%B1%E7%BB%8F%E6%B2%A7%E6%A1%91/</loc>
+    <loc>https://mritd.com/2006/01/02/%E6%88%91%E5%92%8C%E6%88%91%E7%9A%84%E5%80%94%E5%BC%BA/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/%E6%88%91%E5%92%8C%E6%88%91%E7%9A%84%E5%80%94%E5%BC%BA/</loc>
+    <loc>https://mritd.com/2006/01/02/yum-note/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/%E5%85%B6%E5%AE%9E%E6%AF%8F%E4%B8%AA%E4%BA%BA%E9%83%BD%E6%9B%BE%E9%A5%B1%E7%BB%8F%E6%B2%A7%E6%A1%91/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -387,13 +387,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/11/08/update-centos-kernel/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2017/06/03/use-ceph-storage-on-kubernetes/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -401,14 +394,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/10/18/set-up-vpn-with-strongswan/</loc>
+    <loc>https://mritd.com/2016/11/08/update-centos-kernel/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/spring3-note/</loc>
+    <loc>https://mritd.com/2016/10/18/set-up-vpn-with-strongswan/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -429,14 +422,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/set-up-nexus-on-centos/</loc>
+    <loc>https://mritd.com/2006/01/02/spring3-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/03/18/set-up-vnc-server-on-centos-7/</loc>
+    <loc>https://mritd.com/2006/01/02/set-up-nexus-on-centos/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -450,14 +443,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/03/03/set-up-kubernetes-ha-cluster-by-kargo/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2020/01/21/set-up-kubernetes-ha-cluster-by-kubeadm/</loc>
+    <loc>https://mritd.com/2017/03/18/set-up-vnc-server-on-centos-7/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -471,7 +457,21 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2017/03/03/set-up-kubernetes-ha-cluster-by-kargo/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2006/01/02/set-up-kubernetes/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2020/01/21/set-up-kubernetes-ha-cluster-by-kubeadm/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -562,13 +562,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/raspberry-pi2-build/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2006/01/02/redis-key-common-command/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -576,7 +569,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/maven-tutorial/</loc>
+    <loc>https://mritd.com/2006/01/02/raspberry-pi2-build/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -584,6 +577,13 @@
   
   <url>
     <loc>https://mritd.com/2006/01/02/minio-aws-s3-storage-open-source-implementation/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/maven-tutorial/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -611,7 +611,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/linux-note/</loc>
+    <loc>https://mritd.com/2016/12/05/lvs-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -625,7 +625,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/12/05/lvs-note/</loc>
+    <loc>https://mritd.com/2006/01/02/linux-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -653,13 +653,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/10/09/jekyll-create-a-static-blog/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2006/01/02/jvm-object-determination-and-reclaimable-algorithm/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -675,6 +668,13 @@
   
   <url>
     <loc>https://mritd.com/2016/11/21/kubeadm-other-problems/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2016/10/09/jekyll-create-a-static-blog/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -716,14 +716,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/java-exception/</loc>
+    <loc>https://mritd.com/2017/02/06/java-cas/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/02/06/java-cas/</loc>
+    <loc>https://mritd.com/2006/01/02/java-exception/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -814,14 +814,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/07/12/how-to-build-kubernetes-rpm/</loc>
+    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part3/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part3/</loc>
+    <loc>https://mritd.com/2017/07/12/how-to-build-kubernetes-rpm/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -940,13 +940,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/05/30/ceph-note-2/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2017/05/27/ceph-note-1/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -954,7 +947,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/aspectj-hello-world/</loc>
+    <loc>https://mritd.com/2017/05/30/ceph-note-2/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -968,7 +961,21 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2006/01/02/aspectj-hello-world/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2019/06/18/calico-3.6-forward-network-traffic/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -989,7 +996,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
+    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -997,13 +1004,6 @@
   
   <url>
     <loc>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -1040,13 +1040,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/java/</loc>
-    <lastmod>2020-10-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://mritd.com/tags/linux/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
@@ -1054,7 +1047,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/aspectj/</loc>
+    <loc>https://mritd.com/tags/java/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1068,6 +1061,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/tags/aspectj/</loc>
+    <lastmod>2020-10-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://mritd.com/tags/kubernetes/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
@@ -1075,14 +1075,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/calico/</loc>
+    <loc>https://mritd.com/tags/mysql/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/mysql/</loc>
+    <loc>https://mritd.com/tags/calico/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1201,14 +1201,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/raspberry-pi2/</loc>
+    <loc>https://mritd.com/tags/redis/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/redis/</loc>
+    <loc>https://mritd.com/tags/raspberry-pi2/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1243,6 +1243,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/tags/admission/</loc>
+    <lastmod>2020-10-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://mritd.com/tags/weblogic/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
@@ -1251,13 +1258,6 @@
   
   <url>
     <loc>https://mritd.com/tags/coredns/</loc>
-    <lastmod>2020-10-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/tags/admission/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1273,6 +1273,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/categories/linux/</loc>
+    <lastmod>2020-10-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://mritd.com/categories/java/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
@@ -1281,13 +1288,6 @@
   
   <url>
     <loc>https://mritd.com/categories/docker/</loc>
-    <lastmod>2020-10-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/categories/linux/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
