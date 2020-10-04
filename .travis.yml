@@ -3,4 +3,9 @@ language: go
 git:
   quiet: true
 
-script: curl -XPOST https://mritd.com/update
+script:
+- curl -X POST ${CALLBACK}
+
+after_script:
+- curl -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
+  -d chat_id=${TELEGRAM_CHAT_ID} -d "text=mritd.com deployed."

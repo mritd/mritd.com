@@ -352,14 +352,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
+    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
+    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -436,13 +436,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2020/01/20/set-up-percona-server/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2017/03/18/set-up-vnc-server-on-centos-7/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -450,7 +443,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/</loc>
+    <loc>https://mritd.com/2020/01/20/set-up-percona-server/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -465,6 +458,13 @@
   
   <url>
     <loc>https://mritd.com/2020/01/21/set-up-kubernetes-ha-cluster-by-kubeadm/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -716,14 +716,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/02/06/java-cas/</loc>
+    <loc>https://mritd.com/2006/01/02/java-exception/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/java-exception/</loc>
+    <loc>https://mritd.com/2017/02/06/java-cas/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -814,14 +814,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part3/</loc>
+    <loc>https://mritd.com/2017/07/12/how-to-build-kubernetes-rpm/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/07/12/how-to-build-kubernetes-rpm/</loc>
+    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part3/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -856,6 +856,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2006/01/02/force-delete-quartz-job/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2006/01/02/forced-change-mysql-passowrd-on-linux/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -870,7 +877,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/force-delete-quartz-job/</loc>
+    <loc>https://mritd.com/2017/01/12/git-uses-the-socks5-proxy/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -878,13 +885,6 @@
   
   <url>
     <loc>https://mritd.com/2017/09/05/git-flow-note/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/01/12/git-uses-the-socks5-proxy/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -940,14 +940,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/05/27/ceph-note-1/</loc>
+    <loc>https://mritd.com/2017/05/30/ceph-note-2/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/05/30/ceph-note-2/</loc>
+    <loc>https://mritd.com/2017/05/27/ceph-note-1/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -982,14 +982,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
+    <loc>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</loc>
+    <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -1054,14 +1054,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/docker/</loc>
+    <loc>https://mritd.com/tags/aspectj/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/aspectj/</loc>
+    <loc>https://mritd.com/tags/docker/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1110,14 +1110,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/git/</loc>
+    <loc>https://mritd.com/tags/quartz/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/quartz/</loc>
+    <loc>https://mritd.com/tags/git/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1250,14 +1250,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/admission/</loc>
+    <loc>https://mritd.com/tags/coredns/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/coredns/</loc>
+    <loc>https://mritd.com/tags/admission/</loc>
     <lastmod>2020-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
