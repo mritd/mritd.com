@@ -751,14 +751,14 @@
     
     
     
-    <category term="CI/CD" scheme="https://mritd.com/categories/ci-cd/"/>
-    
     <category term="Docker" scheme="https://mritd.com/categories/docker/"/>
     
+    <category term="CI/CD" scheme="https://mritd.com/categories/ci-cd/"/>
     
-    <category term="CI/CD" scheme="https://mritd.com/tags/ci-cd/"/>
     
     <category term="Linux" scheme="https://mritd.com/tags/linux/"/>
+    
+    <category term="CI/CD" scheme="https://mritd.com/tags/ci-cd/"/>
     
     <category term="Docker" scheme="https://mritd.com/tags/docker/"/>
     
@@ -854,9 +854,9 @@
     <category term="CI/CD" scheme="https://mritd.com/categories/ci-cd/"/>
     
     
-    <category term="CI/CD" scheme="https://mritd.com/tags/ci-cd/"/>
-    
     <category term="Linux" scheme="https://mritd.com/tags/linux/"/>
+    
+    <category term="CI/CD" scheme="https://mritd.com/tags/ci-cd/"/>
     
     <category term="Docker" scheme="https://mritd.com/tags/docker/"/>
     
