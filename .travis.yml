@@ -8,8 +8,9 @@ script:
 
 after_script: >-
   set -ex &&
+  export MESSAGE=$(echo "\`\`\`\bhttps://mritd.com deployed.\ncommit: ${TRAVIS_COMMIT}\ncommit message: ${TRAVIS_COMMIT_MESSAGE}\n\`\`\`") &&
   curl -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
-    -d chat_id=${TELEGRAM_CHAT_ID} \
-    -d text=$(echo "\`https://mritd.com deployed.\ncommit: ${TRAVIS_COMMIT}\ncommit message: ${TRAVIS_COMMIT_MESSAGE}\`") \
-    -d parse_mode=markdown \
-    -d disable_web_page_preview=true
+    -d "chat_id=${TELEGRAM_CHAT_ID}" \
+    -d "text=${MESSAGE}" \
+    -d "parse_mode=markdown" \
+    -d "disable_web_page_preview=true"
