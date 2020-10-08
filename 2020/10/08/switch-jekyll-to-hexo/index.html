@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;auto&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Upward, not Northward."><meta name="author" content="bleem"><meta name="keywords" content="漠然,bleem,mritd"><title>网站切换到 Hexo - bleem</title><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml"><link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"> <a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"> <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"> <a class="nav-link" href="javascript:">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner intro-2" id="background" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="container page-header text-center fade-in-up"><span class="h2" id="subtitle"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2020-10-08 19:04" pubdate>2020年10月8日 晚上</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 1.3k 字</span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 17 分钟</span></div></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto" id="post"><h1 style="display:none">网站切换到 Hexo</h1><div class="markdown-body" id="post-body"><h2 id="一、Hexlo-安装"><a href="#一、Hexlo-安装" class="headerlink" title="一、Hexlo 安装"></a>一、Hexlo 安装</h2><p>Hexo 安装根据官方文档直接操作即可，安装前提是需要先安装 Nodejs(这里不再阐述直接略过)</p><div class="hljs"><pre><code class="hljs sh">npm install -g hexo-cli</code></pre></div><p>Hexo 命令行工具安装完成后可以直接初始化一个样例项目，init 过程会 clone <code>https://github.com/hexojs/hexo-starter.git</code> 到本地，同时自动安装好相关依赖</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># mritd.com 为目录名，个人习惯直接使用网站域名作为目录名称</span>
+hexo init mritd.com</code></pre></div><p>进入目录启动样例站点</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 进入目录</span>
+<span class="hljs-built_in">cd</span> mritd.com
+<span class="hljs-comment"># 启动本地服务器进行预览</span>
+hexo serve</code></pre></div><p><img src="https://cdn.oss.link/markdown/1jb2q.png" srcset="/img/loading.gif" alt="hexo_demo"></p><h2 id="二、主题设置"><a href="#二、主题设置" class="headerlink" title="二、主题设置"></a>二、主题设置</h2><p>基本的样例博客启动完成后就需要选择一个主题，主题实质上才决定博客功能，这里目前使用了 <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener">Fluid</a> 主题，这个主题目前兼具了个人博客所需的所有功能，而且作者提交比较活跃，文档也比较全面。</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 下载主题</span>
+git <span class="hljs-built_in">clone</span> https://github.com/fluid-dev/hexo-theme-fluid.git themes/fluid
+<span class="hljs-comment"># 切换到最新版本</span>
+(<span class="hljs-built_in">cd</span> themes/fluid &amp;&amp; git checkout -b v1.8.3 v1.8.3)</code></pre></div><p>接下来修改 <code>_config.yml</code> 配置切换主题即可</p><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-comment"># Extensions</span>
+<span class="hljs-comment">## Plugins: https://hexo.io/plugins/</span>
+<span class="hljs-comment">## Themes: https://hexo.io/themes/</span>
+<span class="hljs-attr">theme:</span> <span class="hljs-string">fluid</span></code></pre></div><p>然后重新启动博客进行预览: <code>hexo cl &amp;&amp; hexo s</code></p><p><img src="https://cdn.oss.link/markdown/vlibl.png" srcset="/img/loading.gif" alt="fluid_demo"></p><p><strong>关于主题其他配置可自行阅读 <a href="https://hexo.fluid-dev.com/docs/guide/" target="_blank" rel="noopener">官方文档</a>，文档有时可能更新不及时，可同时参考仓库内的 <a href="https://github.com/fluid-dev/hexo-theme-fluid/blob/master/_config.yml" target="_blank" rel="noopener"><code>_config.yml</code></a> 配置。</strong></p><h2 id="三、文章导入"><a href="#三、文章导入" class="headerlink" title="三、文章导入"></a>三、文章导入</h2><p>关于 jekyll 博客的文章如何导入到 Hexo 中网上有很多脚本；但是实际上两个静态博客框架都是支持标准的 Markdown 语法书写的文章进行渲染，唯一区别就是每篇文章上的 “头”。</p><div class="hljs"><pre><code class="hljs markdown">---
+catalog: true
+categories:
+<span class="hljs-bullet">  - </span>[Kubernetes]
+<span class="hljs-bullet">  - </span>[Golang]
+date: 2018-11-25 11:11:28
+excerpt: 最近在看 kubeadm 的源码，不过有些东西光看代码还是没法太清楚，还是需要实际运行才能看到具体代码怎么跑的，还得打断点 debug；无奈的是本机是 mac，debug 得在 Linux 下，so 研究了一下 remote debug
+keywords: kubeadm,debug
+multilingual: false
+tags:
+<span class="hljs-bullet">  - </span>Golang
+<span class="hljs-bullet">  - </span>Kubernetes
+title: 远程 Debug kubeadm
+index<span class="hljs-emphasis">_img: img/remote_</span>debug.jpg
+---
+
+具体文章内容......</code></pre></div><p>所以直接复制 jekyll 的 md 文件到 <code>source/_posts</code> 目录，并修改文档头部即可。</p><h2 id="四、自动更新"><a href="#四、自动更新" class="headerlink" title="四、自动更新"></a>四、自动更新</h2><p>目前博客部署在自己的 VPS 上，以前都是将博客生成的静态直接使用 nginx 发布出去的；但是面临的问题就是每次博客更新都要手动去 VPS 更新，虽然可以写一些 CI 脚本但是并不算智能；得益于 Golang 官方完善的标准库支持，这次直接几行代码写一个静态服务器，同时拦截特定 URL 来更新博客:</p><div class="hljs"><pre><code class="hljs golang"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">"fmt"</span>
+	<span class="hljs-string">"net/http"</span>
+	<span class="hljs-string">"os"</span>
+	<span class="hljs-string">"os/exec"</span>
+	<span class="hljs-string">"path"</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+	http.Handle(<span class="hljs-string">"/"</span>, fileServerWithCustom404(http.Dir(<span class="hljs-string">"/data"</span>)))
+	http.HandleFunc(<span class="hljs-string">"/update"</span>, update)
+
+	fmt.Println(<span class="hljs-string">"Updating WebSite..."</span>)
+	_, err := gitPull()
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		fmt.Printf(<span class="hljs-string">"WebSite update failed: %s"</span>, err)
+	&#125;
+
+	fmt.Println(<span class="hljs-string">"HTTP Server Listen at [:8080]..."</span>)
+	_ = http.ListenAndServe(<span class="hljs-string">":8080"</span>, <span class="hljs-literal">nil</span>)
+&#125;
+
+<span class="hljs-comment">// POST 请求 /update 触发 git pull 更新博客</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">update</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
+	<span class="hljs-keyword">if</span> r.Method != http.MethodPost &#123;
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]<span class="hljs-keyword">byte</span>(<span class="hljs-string">"only support POST method.\n"</span>))
+		<span class="hljs-keyword">return</span>
+	&#125;
+	bs, err := gitPull()
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]<span class="hljs-keyword">byte</span>(err.Error()))
+		<span class="hljs-keyword">return</span>
+	&#125;
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(bs)
+&#125;
+
+<span class="hljs-comment">// 包装一下 404 状态码，返回自定义的 404 页面</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fileServerWithCustom404</span><span class="hljs-params">(fs http.FileSystem)</span> <span class="hljs-title">http</span>.<span class="hljs-title">Handler</span></span> &#123;
+	fsh := http.FileServer(fs)
+	<span class="hljs-keyword">return</span> http.HandlerFunc(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
+		_, err := fs.Open(path.Clean(r.URL.Path))
+		<span class="hljs-keyword">if</span> os.IsNotExist(err) &#123;
+			r.URL.Path = <span class="hljs-string">"/404.html"</span>
+		&#125;
+		fsh.ServeHTTP(w, r)
+	&#125;)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">gitPull</span><span class="hljs-params">()</span> <span class="hljs-params">(msg []<span class="hljs-keyword">byte</span>, err error)</span></span> &#123;
+	cmd := exec.Command(<span class="hljs-string">"git"</span>, <span class="hljs-string">"pull"</span>)
+	cmd.Dir = <span class="hljs-string">"/data"</span>
+	<span class="hljs-keyword">return</span> cmd.CombinedOutput()
+&#125;</code></pre></div><h2 id="五、Docker-化"><a href="#五、Docker-化" class="headerlink" title="五、Docker 化"></a>五、Docker 化</h2><p>有了上面的静态服务器，写个 Dockerfile 将 Hexo 生成的静态文件打包即可:</p><div class="hljs"><pre><code class="hljs Dockerfile"><span class="hljs-keyword">FROM</span> golang:<span class="hljs-number">1.15</span>-alpine3.<span class="hljs-number">12</span> AS builder
+
+<span class="hljs-keyword">ENV</span> GO111MODULE on
+
+<span class="hljs-keyword">COPY</span><span class="bash"> goserver /go/src/github.com/mritd/hexo/goserver</span>
+
+<span class="hljs-keyword">WORKDIR</span><span class="bash"> /go/src/github.com/mritd/hexo/goserver</span>
+
+<span class="hljs-keyword">RUN</span><span class="bash"> <span class="hljs-built_in">set</span> -e \</span>
+<span class="bash">    &amp;&amp; go install</span>
+
+<span class="hljs-keyword">FROM</span> alpine:<span class="hljs-number">3.12</span> AS dist
+
+<span class="hljs-keyword">LABEL</span><span class="bash"> maintainer=<span class="hljs-string">"mritd &lt;mritd@linux.com&gt;"</span></span>
+
+<span class="hljs-keyword">ENV</span> TZ Asia/Shanghai
+<span class="hljs-keyword">ENV</span> REPO https://github.com/mritd/mritd.com.git
+
+<span class="hljs-keyword">COPY</span><span class="bash"> --from=builder /go/bin/goserver /usr/<span class="hljs-built_in">local</span>/bin/goserver</span>
+
+<span class="hljs-keyword">RUN</span><span class="bash"> <span class="hljs-built_in">set</span> -e \</span>
+<span class="bash">    &amp;&amp; apk upgrade \</span>
+<span class="bash">    &amp;&amp; apk add bash tzdata git \</span>
+<span class="bash">    &amp;&amp; git <span class="hljs-built_in">clone</span> <span class="hljs-variable">$&#123;REPO&#125;</span> /data \</span>
+<span class="bash">    &amp;&amp; ln -sf /usr/share/zoneinfo/<span class="hljs-variable">$&#123;TZ&#125;</span> /etc/localtime \</span>
+<span class="bash">    &amp;&amp; <span class="hljs-built_in">echo</span> <span class="hljs-variable">$&#123;TZ&#125;</span> &gt; /etc/timezone \</span>
+<span class="bash">    &amp;&amp; rm -rf /var/cache/apk/*</span>
+
+<span class="hljs-keyword">WORKDIR</span><span class="bash"> /data</span>
+
+<span class="hljs-keyword">CMD</span><span class="bash"> [<span class="hljs-string">"goserver"</span>]</span></code></pre></div><p>镜像运行后将使用 <code>/data</code> 目录最为静态文件目录进行发布，Hexo 生成的静态文件(public 目录)也会完整的 clone 到当前目录，此后使用 POST 请求访问 <code>/update</code> 即可触发从 Github 更新博客内容。</p><h2 id="六、Travis-CI-集成"><a href="#六、Travis-CI-集成" class="headerlink" title="六、Travis CI 集成"></a>六、Travis CI 集成</h2><p>所有就绪以后在主仓库增加 <code>.travis.yml</code> 配置来联动 travis ci；由于每次 push 到 Github 的内容实际上已经是本地生成的 public 目录，所以 CI 只需要通知服务器更新即可；强迫症又加了一个 Telegram 通知，每次触发更新完成后 Telegram 再给自己推送一下:</p><div class="hljs"><pre><code class="hljs yml"><span class="hljs-attr">language:</span> <span class="hljs-string">go</span>
+
+<span class="hljs-attr">git:</span>
+  <span class="hljs-attr">quiet:</span> <span class="hljs-literal">true</span>
+
+<span class="hljs-attr">script:</span>
+<span class="hljs-bullet">-</span> <span class="hljs-string">curl</span> <span class="hljs-string">-X</span> <span class="hljs-string">POST</span> <span class="hljs-string">$&#123;CALLBACK&#125;</span>
+
+<span class="hljs-attr">after_script:</span>
+<span class="hljs-bullet">-</span> <span class="hljs-string">curl</span> <span class="hljs-string">-X</span> <span class="hljs-string">POST</span> <span class="hljs-string">https://api.telegram.org/bot$&#123;TELEGRAM_TOKEN&#125;/sendMessage</span> <span class="hljs-string">-d</span> <span class="hljs-string">chat_id=$&#123;TELEGRAM_CHAT_ID&#125;</span> <span class="hljs-string">-d</span> <span class="hljs-string">"text=mritd.com deployed."</span></code></pre></div></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/linux/">Linux</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/hexo/">Hexo</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext row"><article class="post-prev col-6"></article><article class="post-next col-6"> <a href="/2020/08/19/write-a-dynamic-admission-control-webhook/"><span class="hidden-mobile">编写一个动态准入控制来实现自动化</span> <span class="visible-mobile">下一篇</span><i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments"><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2020/10/08/switch-jekyll-to-hexo/",this.page.identifier="/2020/10/08/switch-jekyll-to-hexo/"};function loadDisqus(){var e,t;e=document,(t=e.createElement("script")).src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}waitElementVisible("disqus_thread",loadDisqus)</script><noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a></noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4> <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"> <input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a><i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="/js/debouncer.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script defer="defer" src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js"></script><script>$(document).ready(function(){var t=$("#board-ctn").offset().top;tocbot.init({tocSelector:"#tocbot",contentSelector:"#post-body",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",collapseDepth:3,scrollSmooth:!0,headingsOffset:-t}),0<$(".toc-list-item").length&&$("#toc").css("visibility","visible")})</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","网站切换到 Hexo&nbsp;"],cursorChar:"_",typeSpeed:80,loop:!1});typed.stop(),$(document).ready(function(){$(".typed-cursor").addClass("h2"),typed.start()})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){searchFunc(path,"local-search-input","local-search-result"),this.onclick=null}</script><script src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><link rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><script>$("#post img:not(.no-zoom img, img[no-zoom]), img[zoom]").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script><script defer="defer">window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-179552593-1","auto"),ga("send","pageview")</script><script async src="https://www.google-analytics.com/analytics.js"></script></body></html>
