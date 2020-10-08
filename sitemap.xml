@@ -303,13 +303,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/yum-note/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2006/01/02/%E5%81%9A%E8%87%AA%E5%B7%B1%E5%B0%8A%E9%87%8D%E7%9A%84%E4%BA%BA-2015%E5%8C%97%E5%A4%A7%E6%9C%80%E7%9F%AD%E6%AF%95%E4%B8%9A%E8%87%B4%E8%BE%9E/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -325,6 +318,13 @@
   
   <url>
     <loc>https://mritd.com/2006/01/02/%E6%88%91%E5%92%8C%E6%88%91%E7%9A%84%E5%80%94%E5%BC%BA/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/yum-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -359,14 +359,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
+    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
+    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -471,14 +471,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2020/01/21/set-up-kubernetes-ha-cluster-by-kubeadm/</loc>
+    <loc>https://mritd.com/2006/01/02/set-up-kubernetes/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/set-up-kubernetes/</loc>
+    <loc>https://mritd.com/2020/01/21/set-up-kubernetes-ha-cluster-by-kubeadm/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -541,14 +541,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/redis3-compile-and-install/</loc>
+    <loc>https://mritd.com/2006/01/02/redundent-array-of-inexpensive-disks/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/redundent-array-of-inexpensive-disks/</loc>
+    <loc>https://mritd.com/2006/01/02/redis3-compile-and-install/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -569,14 +569,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/raspberry-pi2-build/</loc>
+    <loc>https://mritd.com/2006/01/02/redis-key-common-command/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/redis-key-common-command/</loc>
+    <loc>https://mritd.com/2006/01/02/raspberry-pi2-build/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -597,14 +597,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/mysql-common-command/</loc>
+    <loc>https://mritd.com/2019/06/26/podman-history-of-container/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2019/06/26/podman-history-of-container/</loc>
+    <loc>https://mritd.com/2006/01/02/mysql-common-command/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -926,14 +926,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/12/30/configure-nginx-https-under-centos-to-support-ios-ats/</loc>
+    <loc>https://mritd.com/2006/01/02/compile-and-install-git-on-centos/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/compile-and-install-git-on-centos/</loc>
+    <loc>https://mritd.com/2016/12/30/configure-nginx-https-under-centos-to-support-ios-ats/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -968,14 +968,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2019/06/18/calico-3.6-forward-network-traffic/</loc>
+    <loc>https://mritd.com/2017/03/20/btrfs-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/03/20/btrfs-note/</loc>
+    <loc>https://mritd.com/2019/06/18/calico-3.6-forward-network-traffic/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -1208,14 +1208,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/raspberry-pi2/</loc>
+    <loc>https://mritd.com/tags/redis/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/redis/</loc>
+    <loc>https://mritd.com/tags/raspberry-pi2/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
