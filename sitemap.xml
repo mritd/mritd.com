@@ -359,14 +359,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
+    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
+    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -457,13 +457,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2017/03/03/set-up-kubernetes-ha-cluster-by-kargo/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -471,7 +464,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/set-up-kubernetes/</loc>
+    <loc>https://mritd.com/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -479,6 +472,13 @@
   
   <url>
     <loc>https://mritd.com/2020/01/21/set-up-kubernetes-ha-cluster-by-kubeadm/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/set-up-kubernetes/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -534,14 +534,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/redis-note/</loc>
+    <loc>https://mritd.com/2006/01/02/redis3-compile-and-install/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/redis3-compile-and-install/</loc>
+    <loc>https://mritd.com/2006/01/02/redis-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -793,14 +793,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/03/04/how-to-use-nginx-ingress/</loc>
+    <loc>https://mritd.com/2006/01/02/how-to-use-nexus/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/how-to-use-nexus/</loc>
+    <loc>https://mritd.com/2017/03/04/how-to-use-nginx-ingress/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -877,14 +877,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/09/05/git-flow-note/</loc>
+    <loc>https://mritd.com/2006/01/02/git-chinese-garbled-solution/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/git-chinese-garbled-solution/</loc>
+    <loc>https://mritd.com/2017/09/05/git-flow-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -947,14 +947,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/05/30/ceph-note-2/</loc>
+    <loc>https://mritd.com/2017/05/27/ceph-note-1/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/05/27/ceph-note-1/</loc>
+    <loc>https://mritd.com/2017/05/30/ceph-note-2/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
