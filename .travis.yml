@@ -7,7 +7,7 @@ script:
 - curl -X POST ${CALLBACK}
 
 after_script: >-
-  MESSAGE=$(echo "\`https://mritd.com deployed.\ncommit: ${TRAVIS_COMMIT}\ncommit message: ${TRAVIS_COMMIT_MESSAGE}\`")
+  export MESSAGE=$(echo "\`https://mritd.com deployed.\ncommit: ${TRAVIS_COMMIT}\ncommit message: ${TRAVIS_COMMIT_MESSAGE}\`") &&
   curl -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
     -d chat_id=${TELEGRAM_CHAT_ID} \
     -d text=${MESSAGE} \
