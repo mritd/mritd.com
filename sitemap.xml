@@ -366,14 +366,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/10/25/waved-goodbye/</loc>
+    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
+    <loc>https://mritd.com/2016/10/25/waved-goodbye/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -443,6 +443,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2020/01/20/set-up-percona-server/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2017/03/18/set-up-vnc-server-on-centos-7/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -450,7 +457,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2020/01/20/set-up-percona-server/</loc>
+    <loc>https://mritd.com/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -472,13 +479,6 @@
   
   <url>
     <loc>https://mritd.com/2020/01/21/set-up-kubernetes-ha-cluster-by-kubeadm/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -569,14 +569,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/redis-key-common-command/</loc>
+    <loc>https://mritd.com/2006/01/02/raspberry-pi2-build/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/raspberry-pi2-build/</loc>
+    <loc>https://mritd.com/2006/01/02/redis-key-common-command/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -660,14 +660,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/10/09/jekyll-create-a-static-blog/</loc>
+    <loc>https://mritd.com/2006/01/02/jvm-object-determination-and-reclaimable-algorithm/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/jvm-object-determination-and-reclaimable-algorithm/</loc>
+    <loc>https://mritd.com/2016/10/09/jekyll-create-a-static-blog/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -863,14 +863,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/force-delete-quartz-job/</loc>
+    <loc>https://mritd.com/2006/01/02/forced-change-mysql-passowrd-on-linux/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/forced-change-mysql-passowrd-on-linux/</loc>
+    <loc>https://mritd.com/2006/01/02/force-delete-quartz-job/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -989,14 +989,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
+    <loc>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</loc>
+    <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -1040,13 +1040,6 @@
 
   
   <url>
-    <loc>https://mritd.com/tags/ci-cd/</loc>
-    <lastmod>2020-10-08</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://mritd.com/tags/java/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
@@ -1061,7 +1054,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/docker/</loc>
+    <loc>https://mritd.com/tags/ci-cd/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1076,6 +1069,13 @@
   
   <url>
     <loc>https://mritd.com/tags/kubernetes/</loc>
+    <lastmod>2020-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/tags/docker/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1180,20 +1180,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/mac/</loc>
-    <lastmod>2020-10-08</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/tags/rime/</loc>
-    <lastmod>2020-10-08</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://mritd.com/tags/podman/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
@@ -1208,7 +1194,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/redis/</loc>
+    <loc>https://mritd.com/tags/mac/</loc>
+    <lastmod>2020-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/tags/rime/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1216,6 +1209,13 @@
   
   <url>
     <loc>https://mritd.com/tags/raspberry-pi2/</loc>
+    <lastmod>2020-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/tags/redis/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1280,13 +1280,6 @@
 
   
   <url>
-    <loc>https://mritd.com/categories/ci-cd/</loc>
-    <lastmod>2020-10-08</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://mritd.com/categories/java/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
@@ -1302,6 +1295,13 @@
   
   <url>
     <loc>https://mritd.com/categories/linux/</loc>
+    <lastmod>2020-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/categories/ci-cd/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1329,14 +1329,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/mac/</loc>
+    <loc>https://mritd.com/categories/%E9%9A%8F%E7%AC%94/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/%E9%9A%8F%E7%AC%94/</loc>
+    <loc>https://mritd.com/categories/mac/</loc>
     <lastmod>2020-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
