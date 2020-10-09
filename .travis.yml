@@ -1,16 +1,14 @@
 language: go
 
+go:
+- master
+
 git:
   quiet: true
 
 script:
 - curl -X POST ${CALLBACK}
+- go get github.com/mritd/tgsend
 
-after_script: >-
-  set -ex &&
-  export MESSAGE=$(echo "\`\`\`\bhttps://mritd.com deployed.\ncommit: ${TRAVIS_COMMIT}\ncommit message: ${TRAVIS_COMMIT_MESSAGE}\n\`\`\`") &&
-  curl -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
-    -d "chat_id=${TELEGRAM_CHAT_ID}" \
-    -d "text=${MESSAGE}" \
-    -d "parse_mode=markdown" \
-    -d "disable_web_page_preview=true"
+after_script:
+- tgsend -m $(sed "s@{{COMMIT}}@${TRAVIS_COMMIT}@g" .noti.tpl | sed "s@{{COMMIT_MESSAGE}}@${TRAVIS_COMMIT_MESSAGE}@g")
