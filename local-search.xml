@@ -2408,31 +2408,6 @@
   
   
   <entry>
-    <title>CentOS 6.7_x64 minimal 网络初始化配置</title>
-    <link href="/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/"/>
-    <url>/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</url>
-    
-    <content type="html"><![CDATA[<p><img src="https://cdn.oss.link/markdown/centos6.png" srcset="/img/loading.gif" alt="centos6"></p><h3 id="CentOS-6-7-x64-网络初始化配置"><a href="#CentOS-6-7-x64-网络初始化配置" class="headerlink" title="CentOS 6.7_x64 网络初始化配置"></a>CentOS 6.7_x64 网络初始化配置</h3><blockquote><p>最近准备折腾折腾Maven，想在本地CentOS下搭个Nexus私服，无奈CentOS LiveCD 版太大，很多功能也没啥用；so 搞了个minimal版本…..结果安装上无法联网，现记录一下初始化的网络配置。</p></blockquote><ul><li>/etc/sysconfig/network-scripts/ifcfg-eth0</li></ul><blockquote><p>这个文件主要是基本的配置文件，详细信息如下</p></blockquote><div class="hljs"><pre><code class="hljs bash">DEVICE=<span class="hljs-string">"eth0"</span>             <span class="hljs-comment">#启动的网卡</span>MM_Controlled=<span class="hljs-string">"no"</span>        <span class="hljs-comment">#没搞太明白，好像修改是实时生效的意思</span>ONBOOT=<span class="hljs-string">"yes"</span>              <span class="hljs-comment">#启动自动联网</span>BOOTPROTO=<span class="hljs-string">"static"</span>        <span class="hljs-comment">#ip获取方式 三个值 static、dhcp、none</span>IPADDR=<span class="hljs-string">"192.168.1.60"</span>     <span class="hljs-comment">#ip地址</span>IPV6INIT=no               <span class="hljs-comment">#ipv6支持</span>IPV6_AUTOCONF=no          <span class="hljs-comment">#ipv6自动配置</span>NETMASK=255.255.255.0     <span class="hljs-comment">#子网掩码</span>GATEWAY=192.168.1.1       <span class="hljs-comment">#网关 一般指向路由</span>BROADCAST=192.168.1.255   <span class="hljs-comment">#没太懂</span></code></pre></div><ul><li>/etc/sysconfig/network</li></ul><div class="hljs"><pre><code class="hljs bash">NETWORKING=yes                        <span class="hljs-comment">#网络是否可用</span>NETWORKING_IPV6=yesHOSTNAME=localhost.localdomain        <span class="hljs-comment">#主机名，主机名在/etc/hosts里面配置</span></code></pre></div><ul><li>/etc/resolv.conf</li></ul><div class="hljs"><pre><code class="hljs bash">nameserver 192.168.10.1              <span class="hljs-comment">#DNS服务器对应的IP</span>search localdomain                   <span class="hljs-comment">#搜索要找的域名，在/etc/hosts里面设定的有</span></code></pre></div><ul><li>最后重启网络</li></ul><div class="hljs"><pre><code class="hljs bash">service network restart</code></pre></div>]]></content>
-    
-    
-    <categories>
-      
-      <category>Linux</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>Linux</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>Can&#39;t connect to MySQL server on &#39;xxxx&#39; (61)</title>
     <link href="/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/"/>
     <url>/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</url>
@@ -2450,6 +2425,31 @@
     <tags>
       
       <tag>MySQL</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>CentOS 6.7_x64 minimal 网络初始化配置</title>
+    <link href="/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/"/>
+    <url>/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</url>
+    
+    <content type="html"><![CDATA[<p><img src="https://cdn.oss.link/markdown/centos6.png" srcset="/img/loading.gif" alt="centos6"></p><h3 id="CentOS-6-7-x64-网络初始化配置"><a href="#CentOS-6-7-x64-网络初始化配置" class="headerlink" title="CentOS 6.7_x64 网络初始化配置"></a>CentOS 6.7_x64 网络初始化配置</h3><blockquote><p>最近准备折腾折腾Maven，想在本地CentOS下搭个Nexus私服，无奈CentOS LiveCD 版太大，很多功能也没啥用；so 搞了个minimal版本…..结果安装上无法联网，现记录一下初始化的网络配置。</p></blockquote><ul><li>/etc/sysconfig/network-scripts/ifcfg-eth0</li></ul><blockquote><p>这个文件主要是基本的配置文件，详细信息如下</p></blockquote><div class="hljs"><pre><code class="hljs bash">DEVICE=<span class="hljs-string">"eth0"</span>             <span class="hljs-comment">#启动的网卡</span>MM_Controlled=<span class="hljs-string">"no"</span>        <span class="hljs-comment">#没搞太明白，好像修改是实时生效的意思</span>ONBOOT=<span class="hljs-string">"yes"</span>              <span class="hljs-comment">#启动自动联网</span>BOOTPROTO=<span class="hljs-string">"static"</span>        <span class="hljs-comment">#ip获取方式 三个值 static、dhcp、none</span>IPADDR=<span class="hljs-string">"192.168.1.60"</span>     <span class="hljs-comment">#ip地址</span>IPV6INIT=no               <span class="hljs-comment">#ipv6支持</span>IPV6_AUTOCONF=no          <span class="hljs-comment">#ipv6自动配置</span>NETMASK=255.255.255.0     <span class="hljs-comment">#子网掩码</span>GATEWAY=192.168.1.1       <span class="hljs-comment">#网关 一般指向路由</span>BROADCAST=192.168.1.255   <span class="hljs-comment">#没太懂</span></code></pre></div><ul><li>/etc/sysconfig/network</li></ul><div class="hljs"><pre><code class="hljs bash">NETWORKING=yes                        <span class="hljs-comment">#网络是否可用</span>NETWORKING_IPV6=yesHOSTNAME=localhost.localdomain        <span class="hljs-comment">#主机名，主机名在/etc/hosts里面配置</span></code></pre></div><ul><li>/etc/resolv.conf</li></ul><div class="hljs"><pre><code class="hljs bash">nameserver 192.168.10.1              <span class="hljs-comment">#DNS服务器对应的IP</span>search localdomain                   <span class="hljs-comment">#搜索要找的域名，在/etc/hosts里面设定的有</span></code></pre></div><ul><li>最后重启网络</li></ul><div class="hljs"><pre><code class="hljs bash">service network restart</code></pre></div>]]></content>
+    
+    
+    <categories>
+      
+      <category>Linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Linux</tag>
       
     </tags>
     
@@ -3512,35 +3512,6 @@
   
   
   <entry>
-    <title>Nexus 2.11 CentOS搭建教程</title>
-    <link href="/2006/01/02/set-up-nexus-on-centos/"/>
-    <url>/2006/01/02/set-up-nexus-on-centos/</url>
-    
-    <content type="html"><![CDATA[<p><img src="https://cdn.oss.link/markdown/Maven-Nexus-logo.png" srcset="/img/loading.gif" alt="Nexus Logo"></p><h3 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h3><blockquote><p>Nexus是一个高效的Maven私有服务器，用过Maven的都知道，一般公司开发都会搭建一个私服；然后项目中通过POM文件或者Maven的setting.xml指向私服地址，这样我们便可以通过私服管理jar包；可自定义jar包坐标，高效的构建项目。</p></blockquote><h3 id="二、前期准备"><a href="#二、前期准备" class="headerlink" title="二、前期准备"></a>二、前期准备</h3><ol><li>首先，你得有台能连接公网的CentOS系统服务器(可使用虚拟机，但网络必须桥接，保证内网独立IP)。</li><li>然后下载jdk和 nexus   <a href="http://apache.fayea.com/maven/maven-3/" target="_blank" rel="noopener">Nexus下载地址</a></li><li><strong>注意事项：</strong>Nexus 有其对应的 jdk版本，请参考官网，截至目前最高版本2.11.4-01 需要jdk7</li></ol><h3 id="三、搭建Nexus私服"><a href="#三、搭建Nexus私服" class="headerlink" title="三、搭建Nexus私服"></a>三、搭建Nexus私服</h3><blockquote><p>啰嗦一句，由于也是刚刚开始搞，以前虽然搞过，但版本比较低，配置已经变了；还有刚刚被一篇博客坑了；算了，不说了，都是眼泪，喝瓶养乐多压压惊……</p></blockquote><ol><li>配置jdk和nexus环境变量</li></ol><ul><li><p>首先上传jdk到Linux服务器(nexus顺带也传上去)，推荐xshell工具，先执行 <code>yum install lrzsz</code> ，然后把jdk往命令行一拖就上传成功，当然你有其他办法我也不阻止，反正搞上去就行。<br><img src="https://cdn.oss.link/markdown/Maven-Nexus-uploadfileo.png" srcset="/img/loading.gif" alt="Maven-Nexus-uploadfileo"></p></li><li><p>解压 jdk 和 nexus 执行以下命令</p></li></ul><div class="hljs"><pre><code class="hljs bash"><span class="hljs-comment">#解压 jdk</span>tar -zxvf jdk-7u79-linux-x64.tar.gz<span class="hljs-comment">#解压 nexus</span>tar -zxvf nexus-latest-bundle.tar.gz</code></pre></div><ul><li><p>解压后如下<br><img src="https://cdn.oss.link/markdown/Maven-Nexus-unzipfile1.png" srcset="/img/loading.gif" alt="Maven-Nexus-unzipfile1"></p></li><li><p>创建 并移动 解压后的目录到 /usr/local/java</p><div class="hljs"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /usr/<span class="hljs-built_in">local</span>mkdir java<span class="hljs-built_in">cd</span> ~mv jdk1.7.0_79 /usr/<span class="hljs-built_in">local</span>/javamv nexus-2.11.4-01 /usr/loca/javamv sonatype-work /usr/<span class="hljs-built_in">local</span>/java</code></pre></div></li><li><p>最终效果如下<br><img src="https://cdn.oss.link/markdown/Maven-Nexus-mvfile.png" srcset="/img/loading.gif" alt="Maven-Nexus-mvfile"></p></li><li><p>编辑 /etc/profile，配置环境变量，在末尾添加以下 变量(vim不会用的下面不用看了)<br><img src="https://cdn.oss.link/markdown/Maven-Nexus-path.png" srcset="/img/loading.gif" alt="Maven-Nexus-path"></p></li><li><p>执行以下命令重新初始化环境变量，并测试是否成功</p></li></ul><div class="hljs"><pre><code class="hljs bash"><span class="hljs-built_in">source</span> /etc/profilejavac -version</code></pre></div><ul><li>返回 javac 版本未成功，若出现 “command not found” 说明配置不成功，检查环境变量位置。</li></ul><ol start="2"><li>配置nexus</li></ol><blockquote><p>上面的估计玩过Linux的基本都能轻松搞定，说白了Nexus主要是下面的配置</p></blockquote><ul><li>配置nexus启动文件</li></ul><blockquote><p>编辑 /usr/local/java/nexus-2.11.4-01/bin 下的 nexus 可执行文件，主要配置部分样例如下</p></blockquote><div class="hljs"><pre><code class="hljs bash"><span class="hljs-comment">#-----------------------------------------------------------------------------</span><span class="hljs-comment"># These settings can be modified to fit the needs of your application</span><span class="hljs-comment"># Set this to the root of the Nexus installation</span><span class="hljs-comment"># 设置 nexus 主目录，就是解压后的那个 nexus目录绝对路径</span>NEXUS_HOME=<span class="hljs-string">"/usr/local/java/nexus-2.11.4-01"</span><span class="hljs-comment"># If specified, the Wrapper will be run as the specified user.</span><span class="hljs-comment"># IMPORTANT - Make sure that the user has the required privileges to write into the Nexus installation directory.</span><span class="hljs-comment"># NOTE - This will set the user which is used to run the Wrapper as well as</span><span class="hljs-comment">#  the JVM and is not useful in situations where a privileged resource or</span><span class="hljs-comment">#  port needs to be allocated prior to the user being changed.</span><span class="hljs-comment"># nexus官方不推荐以root 用户运行，如果你非要这么做，下面注释去掉 后面填写root</span><span class="hljs-comment">#RUN_AS_USER=</span><span class="hljs-comment"># Application</span>APP_NAME=<span class="hljs-string">"nexus"</span>APP_LONG_NAME=<span class="hljs-string">"Nexus OSS"</span><span class="hljs-comment"># Priority at which to run the wrapper.  See "man nice" for valid priorities.</span><span class="hljs-comment">#  nice is only used if a priority is specified.</span><span class="hljs-comment"># 这块我查了一下 好像是设置运行优先级，默认10，没太搞懂，可不填</span>PRIORITY=<span class="hljs-comment">#Location of the pid file.</span><span class="hljs-comment"># nexus pid 文件存放位置 不用改</span>PIDDIR=<span class="hljs-string">"."</span><span class="hljs-comment"># If uncommented, causes the Wrapper to be shutdown using an anchor file.</span><span class="hljs-comment">#  When launched with the 'start' command, it will also ignore all INT and</span><span class="hljs-comment">#  TERM signals.</span><span class="hljs-comment">#IGNORE_SIGNALS=true</span><span class="hljs-comment"># The following two lines are used by the chkconfig command. Change as is</span><span class="hljs-comment">#  appropriate for your application.  They should remain commented.</span><span class="hljs-comment"># chkconfig: 2345 20 80</span><span class="hljs-comment"># description: Test Wrapper Sample Application</span></code></pre></div><ul><li>配置 /usr/local/java/nexus-2.11.4-01/bin/jsw/conf 下的 wrapper.conf 文件</li></ul><blockquote><p>妈蛋，最坑的就是这货，配置样例如下</p></blockquote><div class="hljs"><pre><code class="hljs bash"><span class="hljs-comment"># JSW Configuration file</span><span class="hljs-comment">#</span><span class="hljs-comment"># For complete coverage of available configuration, please go here:</span><span class="hljs-comment"># http://wrapper.tanukisoftware.org/doc/english/properties.html</span><span class="hljs-comment">#</span><span class="hljs-comment"># Some "most often used" keywords are added to end of this file</span><span class="hljs-comment"># to be used as a "guideline". They are NOT the complete list of</span><span class="hljs-comment"># keywords.</span><span class="hljs-comment"># Set the JSW working directory (used as base for resolving relative paths)</span><span class="hljs-comment"># 设置wrapper的工作目录 其实也是指向 nexus 主目录即可</span><span class="hljs-comment"># 妈蛋的地址我就不说了，刚刚一个博主告诉我把他指向 /usr/local/java/nexus-2.11.4-01/bin/jsw/linux-x86-64</span><span class="hljs-comment"># 我进去一看 里面确实有个wrapper 可执行文件，就特么信了，结果各种报错</span><span class="hljs-comment"># 不凑巧，我特么居然还看懂了，就是找不到java类，然后我就根据错误各种改底下配置的绝对路径</span><span class="hljs-comment"># 改了半天我特么感觉不对啊...怎么其实都是基于默认值往上 跳了几层，妈的瞬间领悟...</span>wrapper.working.dir=/usr/<span class="hljs-built_in">local</span>/java/nexus-2.11.4-01<span class="hljs-comment"># Set the JVM executable</span><span class="hljs-comment"># (modify this to absolute path if you need a Java that is not on the OS path)</span><span class="hljs-comment"># 配置 jdk中 java 可执行文件的位置(其实我感觉jre就可以，没测试，有兴趣的测试一下)</span>wrapper.java.command=/usr/<span class="hljs-built_in">local</span>/java/jdk1.7.0_79/bin/java<span class="hljs-comment"># The main class that JSW will execute within JVM</span><span class="hljs-comment"># 这货不要动，目测这个玩意应该在下面的 wrapper-3.2.3.jar 里面</span>wrapper.java.mainclass=org.sonatype.nexus.bootstrap.jsw.JswLauncher<span class="hljs-comment"># The JVM classpath</span><span class="hljs-comment"># 如果你上面的 wrapper.working.dir 没问题这块就没问题...再次吐槽，坑爹博主，害得我第一次把这都改成绝对路径了</span>wrapper.java.classpath.1=bin/jsw/lib/wrapper-3.2.3.jarwrapper.java.classpath.2=./lib/*.jarwrapper.java.classpath.3=./conf/<span class="hljs-comment"># The library path</span><span class="hljs-comment"># 不需要动，一些依赖jar包 下面有路径配置的，默认值其实都是基于 wrapper.working.dir 的</span><span class="hljs-comment"># 也就是说一但你 wrapper.working.dir 错了，其他的就都得改</span>wrapper.java.library.path.1=bin/jsw/lib<span class="hljs-comment"># Additional JVM parameters (tune if needed, but match the sequence of numbers!)</span><span class="hljs-comment"># 一些 jvm 参数，默认即可，能玩明白的 可以自己调优啥的，下面的有能力可以设置一下，</span><span class="hljs-comment"># 搞不定的 就不用往下看了......</span>wrapper.java.additional.1=-XX:MaxPermSize=192mwrapper.java.additional.2=-Djava.io.tmpdir=./tmpwrapper.java.additional.3=-Djava.net.preferIPv4Stack=<span class="hljs-literal">true</span>wrapper.java.additional.4=-Dcom.sun.jndi.ldap.connect.pool.protocol=<span class="hljs-string">"plain ssl"</span>wrapper.java.additional.4.stripquotes=TRUE<span class="hljs-comment">#wrapper.java.additional.5=-Xdebug</span><span class="hljs-comment">#wrapper.java.additional.6=-Xnoagent</span><span class="hljs-comment">#wrapper.java.additional.7=-Djava.compiler=NONE</span><span class="hljs-comment">#wrapper.java.additional.8=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000</span><span class="hljs-comment">#wrapper.java.additional.9=-XX:+HeapDumpOnOutOfMemoryError</span>wrapper.app.parameter.1=./conf/jetty.xmlwrapper.app.parameter.2=./conf/jetty-requestlog.xml<span class="hljs-comment">#下面的都无需更改，暂且省略......</span></code></pre></div><ul><li>创建 nexus 用户</li></ul><blockquote><p>nexus 不推荐以root用户运行，所以我们创建一个 nexus 用户，安全性要求高的可以控制其是否可登录什么的，我这里只是自己玩玩，so 允许登录。</p></blockquote><div class="hljs"><pre><code class="hljs bash">useradd nexuspasswd nexus<span class="hljs-comment">#输入2次密码</span></code></pre></div><ol start="3"><li>启动nexus</li></ol><blockquote><p>首先切换到 nexus 用户，然后启动nexus</p></blockquote><div class="hljs"><pre><code class="hljs bash">su - nexus<span class="hljs-comment"># 由于配置了PATH变量，所以可在任意位置执行 nexus命令</span>nexus start</code></pre></div><ul><li>查看是否启动成功&amp;监测日志</li></ul><blockquote><p>访问 ip:8081/nexus ；启动成功的话会进入如下界面</p></blockquote><p><img src="https://cdn.oss.link/markdown/Maven-Nexus-home-1024x436.png" srcset="/img/loading.gif" alt="Maven-Nexus-home-1024x436"></p><blockquote><p>默认登陆账户密码为  admin/admin123 ；如启动不成功可查看日志</p></blockquote><div class="hljs"><pre><code class="hljs bash">less /usr/<span class="hljs-built_in">local</span>/java/nexus-2.11.4-01/logs/wrapper.log</code></pre></div><blockquote><p>到此结束，关于仓库使用啥的不管了…</p></blockquote>]]></content>
-    
-    
-    <categories>
-      
-      <category>Java</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>Java</tag>
-      
-      <tag>Maven</tag>
-      
-      <tag>Nexus</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>Kubernetes 集群搭建</title>
     <link href="/2006/01/02/set-up-kubernetes/"/>
     <url>/2006/01/02/set-up-kubernetes/</url>
@@ -3562,6 +3533,35 @@
       <tag>Docker</tag>
       
       <tag>Kubernetes</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Nexus 2.11 CentOS搭建教程</title>
+    <link href="/2006/01/02/set-up-nexus-on-centos/"/>
+    <url>/2006/01/02/set-up-nexus-on-centos/</url>
+    
+    <content type="html"><![CDATA[<p><img src="https://cdn.oss.link/markdown/Maven-Nexus-logo.png" srcset="/img/loading.gif" alt="Nexus Logo"></p><h3 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h3><blockquote><p>Nexus是一个高效的Maven私有服务器，用过Maven的都知道，一般公司开发都会搭建一个私服；然后项目中通过POM文件或者Maven的setting.xml指向私服地址，这样我们便可以通过私服管理jar包；可自定义jar包坐标，高效的构建项目。</p></blockquote><h3 id="二、前期准备"><a href="#二、前期准备" class="headerlink" title="二、前期准备"></a>二、前期准备</h3><ol><li>首先，你得有台能连接公网的CentOS系统服务器(可使用虚拟机，但网络必须桥接，保证内网独立IP)。</li><li>然后下载jdk和 nexus   <a href="http://apache.fayea.com/maven/maven-3/" target="_blank" rel="noopener">Nexus下载地址</a></li><li><strong>注意事项：</strong>Nexus 有其对应的 jdk版本，请参考官网，截至目前最高版本2.11.4-01 需要jdk7</li></ol><h3 id="三、搭建Nexus私服"><a href="#三、搭建Nexus私服" class="headerlink" title="三、搭建Nexus私服"></a>三、搭建Nexus私服</h3><blockquote><p>啰嗦一句，由于也是刚刚开始搞，以前虽然搞过，但版本比较低，配置已经变了；还有刚刚被一篇博客坑了；算了，不说了，都是眼泪，喝瓶养乐多压压惊……</p></blockquote><ol><li>配置jdk和nexus环境变量</li></ol><ul><li><p>首先上传jdk到Linux服务器(nexus顺带也传上去)，推荐xshell工具，先执行 <code>yum install lrzsz</code> ，然后把jdk往命令行一拖就上传成功，当然你有其他办法我也不阻止，反正搞上去就行。<br><img src="https://cdn.oss.link/markdown/Maven-Nexus-uploadfileo.png" srcset="/img/loading.gif" alt="Maven-Nexus-uploadfileo"></p></li><li><p>解压 jdk 和 nexus 执行以下命令</p></li></ul><div class="hljs"><pre><code class="hljs bash"><span class="hljs-comment">#解压 jdk</span>tar -zxvf jdk-7u79-linux-x64.tar.gz<span class="hljs-comment">#解压 nexus</span>tar -zxvf nexus-latest-bundle.tar.gz</code></pre></div><ul><li><p>解压后如下<br><img src="https://cdn.oss.link/markdown/Maven-Nexus-unzipfile1.png" srcset="/img/loading.gif" alt="Maven-Nexus-unzipfile1"></p></li><li><p>创建 并移动 解压后的目录到 /usr/local/java</p><div class="hljs"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /usr/<span class="hljs-built_in">local</span>mkdir java<span class="hljs-built_in">cd</span> ~mv jdk1.7.0_79 /usr/<span class="hljs-built_in">local</span>/javamv nexus-2.11.4-01 /usr/loca/javamv sonatype-work /usr/<span class="hljs-built_in">local</span>/java</code></pre></div></li><li><p>最终效果如下<br><img src="https://cdn.oss.link/markdown/Maven-Nexus-mvfile.png" srcset="/img/loading.gif" alt="Maven-Nexus-mvfile"></p></li><li><p>编辑 /etc/profile，配置环境变量，在末尾添加以下 变量(vim不会用的下面不用看了)<br><img src="https://cdn.oss.link/markdown/Maven-Nexus-path.png" srcset="/img/loading.gif" alt="Maven-Nexus-path"></p></li><li><p>执行以下命令重新初始化环境变量，并测试是否成功</p></li></ul><div class="hljs"><pre><code class="hljs bash"><span class="hljs-built_in">source</span> /etc/profilejavac -version</code></pre></div><ul><li>返回 javac 版本未成功，若出现 “command not found” 说明配置不成功，检查环境变量位置。</li></ul><ol start="2"><li>配置nexus</li></ol><blockquote><p>上面的估计玩过Linux的基本都能轻松搞定，说白了Nexus主要是下面的配置</p></blockquote><ul><li>配置nexus启动文件</li></ul><blockquote><p>编辑 /usr/local/java/nexus-2.11.4-01/bin 下的 nexus 可执行文件，主要配置部分样例如下</p></blockquote><div class="hljs"><pre><code class="hljs bash"><span class="hljs-comment">#-----------------------------------------------------------------------------</span><span class="hljs-comment"># These settings can be modified to fit the needs of your application</span><span class="hljs-comment"># Set this to the root of the Nexus installation</span><span class="hljs-comment"># 设置 nexus 主目录，就是解压后的那个 nexus目录绝对路径</span>NEXUS_HOME=<span class="hljs-string">"/usr/local/java/nexus-2.11.4-01"</span><span class="hljs-comment"># If specified, the Wrapper will be run as the specified user.</span><span class="hljs-comment"># IMPORTANT - Make sure that the user has the required privileges to write into the Nexus installation directory.</span><span class="hljs-comment"># NOTE - This will set the user which is used to run the Wrapper as well as</span><span class="hljs-comment">#  the JVM and is not useful in situations where a privileged resource or</span><span class="hljs-comment">#  port needs to be allocated prior to the user being changed.</span><span class="hljs-comment"># nexus官方不推荐以root 用户运行，如果你非要这么做，下面注释去掉 后面填写root</span><span class="hljs-comment">#RUN_AS_USER=</span><span class="hljs-comment"># Application</span>APP_NAME=<span class="hljs-string">"nexus"</span>APP_LONG_NAME=<span class="hljs-string">"Nexus OSS"</span><span class="hljs-comment"># Priority at which to run the wrapper.  See "man nice" for valid priorities.</span><span class="hljs-comment">#  nice is only used if a priority is specified.</span><span class="hljs-comment"># 这块我查了一下 好像是设置运行优先级，默认10，没太搞懂，可不填</span>PRIORITY=<span class="hljs-comment">#Location of the pid file.</span><span class="hljs-comment"># nexus pid 文件存放位置 不用改</span>PIDDIR=<span class="hljs-string">"."</span><span class="hljs-comment"># If uncommented, causes the Wrapper to be shutdown using an anchor file.</span><span class="hljs-comment">#  When launched with the 'start' command, it will also ignore all INT and</span><span class="hljs-comment">#  TERM signals.</span><span class="hljs-comment">#IGNORE_SIGNALS=true</span><span class="hljs-comment"># The following two lines are used by the chkconfig command. Change as is</span><span class="hljs-comment">#  appropriate for your application.  They should remain commented.</span><span class="hljs-comment"># chkconfig: 2345 20 80</span><span class="hljs-comment"># description: Test Wrapper Sample Application</span></code></pre></div><ul><li>配置 /usr/local/java/nexus-2.11.4-01/bin/jsw/conf 下的 wrapper.conf 文件</li></ul><blockquote><p>妈蛋，最坑的就是这货，配置样例如下</p></blockquote><div class="hljs"><pre><code class="hljs bash"><span class="hljs-comment"># JSW Configuration file</span><span class="hljs-comment">#</span><span class="hljs-comment"># For complete coverage of available configuration, please go here:</span><span class="hljs-comment"># http://wrapper.tanukisoftware.org/doc/english/properties.html</span><span class="hljs-comment">#</span><span class="hljs-comment"># Some "most often used" keywords are added to end of this file</span><span class="hljs-comment"># to be used as a "guideline". They are NOT the complete list of</span><span class="hljs-comment"># keywords.</span><span class="hljs-comment"># Set the JSW working directory (used as base for resolving relative paths)</span><span class="hljs-comment"># 设置wrapper的工作目录 其实也是指向 nexus 主目录即可</span><span class="hljs-comment"># 妈蛋的地址我就不说了，刚刚一个博主告诉我把他指向 /usr/local/java/nexus-2.11.4-01/bin/jsw/linux-x86-64</span><span class="hljs-comment"># 我进去一看 里面确实有个wrapper 可执行文件，就特么信了，结果各种报错</span><span class="hljs-comment"># 不凑巧，我特么居然还看懂了，就是找不到java类，然后我就根据错误各种改底下配置的绝对路径</span><span class="hljs-comment"># 改了半天我特么感觉不对啊...怎么其实都是基于默认值往上 跳了几层，妈的瞬间领悟...</span>wrapper.working.dir=/usr/<span class="hljs-built_in">local</span>/java/nexus-2.11.4-01<span class="hljs-comment"># Set the JVM executable</span><span class="hljs-comment"># (modify this to absolute path if you need a Java that is not on the OS path)</span><span class="hljs-comment"># 配置 jdk中 java 可执行文件的位置(其实我感觉jre就可以，没测试，有兴趣的测试一下)</span>wrapper.java.command=/usr/<span class="hljs-built_in">local</span>/java/jdk1.7.0_79/bin/java<span class="hljs-comment"># The main class that JSW will execute within JVM</span><span class="hljs-comment"># 这货不要动，目测这个玩意应该在下面的 wrapper-3.2.3.jar 里面</span>wrapper.java.mainclass=org.sonatype.nexus.bootstrap.jsw.JswLauncher<span class="hljs-comment"># The JVM classpath</span><span class="hljs-comment"># 如果你上面的 wrapper.working.dir 没问题这块就没问题...再次吐槽，坑爹博主，害得我第一次把这都改成绝对路径了</span>wrapper.java.classpath.1=bin/jsw/lib/wrapper-3.2.3.jarwrapper.java.classpath.2=./lib/*.jarwrapper.java.classpath.3=./conf/<span class="hljs-comment"># The library path</span><span class="hljs-comment"># 不需要动，一些依赖jar包 下面有路径配置的，默认值其实都是基于 wrapper.working.dir 的</span><span class="hljs-comment"># 也就是说一但你 wrapper.working.dir 错了，其他的就都得改</span>wrapper.java.library.path.1=bin/jsw/lib<span class="hljs-comment"># Additional JVM parameters (tune if needed, but match the sequence of numbers!)</span><span class="hljs-comment"># 一些 jvm 参数，默认即可，能玩明白的 可以自己调优啥的，下面的有能力可以设置一下，</span><span class="hljs-comment"># 搞不定的 就不用往下看了......</span>wrapper.java.additional.1=-XX:MaxPermSize=192mwrapper.java.additional.2=-Djava.io.tmpdir=./tmpwrapper.java.additional.3=-Djava.net.preferIPv4Stack=<span class="hljs-literal">true</span>wrapper.java.additional.4=-Dcom.sun.jndi.ldap.connect.pool.protocol=<span class="hljs-string">"plain ssl"</span>wrapper.java.additional.4.stripquotes=TRUE<span class="hljs-comment">#wrapper.java.additional.5=-Xdebug</span><span class="hljs-comment">#wrapper.java.additional.6=-Xnoagent</span><span class="hljs-comment">#wrapper.java.additional.7=-Djava.compiler=NONE</span><span class="hljs-comment">#wrapper.java.additional.8=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000</span><span class="hljs-comment">#wrapper.java.additional.9=-XX:+HeapDumpOnOutOfMemoryError</span>wrapper.app.parameter.1=./conf/jetty.xmlwrapper.app.parameter.2=./conf/jetty-requestlog.xml<span class="hljs-comment">#下面的都无需更改，暂且省略......</span></code></pre></div><ul><li>创建 nexus 用户</li></ul><blockquote><p>nexus 不推荐以root用户运行，所以我们创建一个 nexus 用户，安全性要求高的可以控制其是否可登录什么的，我这里只是自己玩玩，so 允许登录。</p></blockquote><div class="hljs"><pre><code class="hljs bash">useradd nexuspasswd nexus<span class="hljs-comment">#输入2次密码</span></code></pre></div><ol start="3"><li>启动nexus</li></ol><blockquote><p>首先切换到 nexus 用户，然后启动nexus</p></blockquote><div class="hljs"><pre><code class="hljs bash">su - nexus<span class="hljs-comment"># 由于配置了PATH变量，所以可在任意位置执行 nexus命令</span>nexus start</code></pre></div><ul><li>查看是否启动成功&amp;监测日志</li></ul><blockquote><p>访问 ip:8081/nexus ；启动成功的话会进入如下界面</p></blockquote><p><img src="https://cdn.oss.link/markdown/Maven-Nexus-home-1024x436.png" srcset="/img/loading.gif" alt="Maven-Nexus-home-1024x436"></p><blockquote><p>默认登陆账户密码为  admin/admin123 ；如启动不成功可查看日志</p></blockquote><div class="hljs"><pre><code class="hljs bash">less /usr/<span class="hljs-built_in">local</span>/java/nexus-2.11.4-01/logs/wrapper.log</code></pre></div><blockquote><p>到此结束，关于仓库使用啥的不管了…</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>Java</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Java</tag>
+      
+      <tag>Maven</tag>
+      
+      <tag>Nexus</tag>
       
     </tags>
     
