@@ -296,13 +296,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/yum-note/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2019/11/05/writing-plugin-for-coredns/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -310,7 +303,21 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2006/01/02/yum-note/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2006/01/02/%E5%81%9A%E8%87%AA%E5%B7%B1%E5%B0%8A%E9%87%8D%E7%9A%84%E4%BA%BA-2015%E5%8C%97%E5%A4%A7%E6%9C%80%E7%9F%AD%E6%AF%95%E4%B8%9A%E8%87%B4%E8%BE%9E/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/%E5%85%B6%E5%AE%9E%E6%AF%8F%E4%B8%AA%E4%BA%BA%E9%83%BD%E6%9B%BE%E9%A5%B1%E7%BB%8F%E6%B2%A7%E6%A1%91/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -325,13 +332,6 @@
   
   <url>
     <loc>https://mritd.com/2006/01/02/%E6%9C%AA%E6%9D%A5%E7%A7%91%E6%8A%80%E6%B8%B2%E6%9F%93%E8%A7%86%E9%A2%91/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/%E5%85%B6%E5%AE%9E%E6%AF%8F%E4%B8%AA%E4%BA%BA%E9%83%BD%E6%9B%BE%E9%A5%B1%E7%BB%8F%E6%B2%A7%E6%A1%91/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -359,14 +359,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
+    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
+    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -436,13 +436,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/03/18/set-up-vnc-server-on-centos-7/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2006/01/02/set-up-nexus-on-centos/</loc>
     
     <lastmod>2020-05-14</lastmod>
@@ -451,6 +444,13 @@
   
   <url>
     <loc>https://mritd.com/2020/01/20/set-up-percona-server/</loc>
+    
+    <lastmod>2020-05-14</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/03/18/set-up-vnc-server-on-centos-7/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -541,14 +541,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/redis3-compile-and-install/</loc>
+    <loc>https://mritd.com/2006/01/02/redundent-array-of-inexpensive-disks/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/redundent-array-of-inexpensive-disks/</loc>
+    <loc>https://mritd.com/2006/01/02/redis3-compile-and-install/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -618,14 +618,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/01/27/logical-volume-manager-note/</loc>
+    <loc>https://mritd.com/2006/01/02/linux-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/linux-note/</loc>
+    <loc>https://mritd.com/2017/01/27/logical-volume-manager-note/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -660,14 +660,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/10/09/jekyll-create-a-static-blog/</loc>
+    <loc>https://mritd.com/2006/01/02/jvm-object-determination-and-reclaimable-algorithm/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/jvm-object-determination-and-reclaimable-algorithm/</loc>
+    <loc>https://mritd.com/2016/10/09/jekyll-create-a-static-blog/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -695,14 +695,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/java-memory-overview-of-vm-memory-auto-management-and-memory-regions/</loc>
+    <loc>https://mritd.com/2006/01/02/java-multithreading-variable-visibility/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/java-multithreading-variable-visibility/</loc>
+    <loc>https://mritd.com/2006/01/02/java-memory-overview-of-vm-memory-auto-management-and-memory-regions/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -737,14 +737,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/java-list-unsupportedoperation-exception/</loc>
+    <loc>https://mritd.com/2006/01/02/java-memory-direct-memory/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/java-memory-direct-memory/</loc>
+    <loc>https://mritd.com/2006/01/02/java-list-unsupportedoperation-exception/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -786,14 +786,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/how-to-use-nexus/</loc>
+    <loc>https://mritd.com/2020/01/21/how-to-upgrade-kubeadm-cluster/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2020/01/21/how-to-upgrade-kubeadm-cluster/</loc>
+    <loc>https://mritd.com/2006/01/02/how-to-use-nexus/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -814,14 +814,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part2/</loc>
+    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part3/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part3/</loc>
+    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part2/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -863,14 +863,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/force-delete-quartz-job/</loc>
+    <loc>https://mritd.com/2006/01/02/forced-change-mysql-passowrd-on-linux/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/forced-change-mysql-passowrd-on-linux/</loc>
+    <loc>https://mritd.com/2006/01/02/force-delete-quartz-job/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
@@ -905,14 +905,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/docker-mirror-registry/</loc>
+    <loc>https://mritd.com/2017/05/12/docker-uses-the-host-network-segment-ip/</loc>
     
     <lastmod>2020-05-14</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/05/12/docker-uses-the-host-network-segment-ip/</loc>
+    <loc>https://mritd.com/2006/01/02/docker-mirror-registry/</loc>
     
     <lastmod>2020-05-14</lastmod>
     

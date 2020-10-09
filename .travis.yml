@@ -11,6 +11,5 @@ script:
 - go get github.com/mritd/tgsend
 
 after_script:
-- set -ex
 - export MESSAGE=$(sed "s@{{COMMIT}}@${TRAVIS_COMMIT}@g" .noti.tpl | sed "s@{{COMMIT_MESSAGE}}@${TRAVIS_COMMIT_MESSAGE}@g")
-- tgsend -m <<EOF ${MESSAGE} EOF
+- echo ${MESSAGE} | tgsend -m "@-"
