@@ -12,4 +12,4 @@ script:
 
 after_script:
 - export MESSAGE=$(sed "s@{{COMMIT}}@${TRAVIS_COMMIT}@g" .noti.tpl | sed "s@{{COMMIT_MESSAGE}}@${TRAVIS_COMMIT_MESSAGE}@g")
-- echo ${MESSAGE} | tgsend -m "@-"
+- echo ${MESSAGE} | tgsend -m @-
