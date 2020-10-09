@@ -1,14 +1,14 @@
 language: go
 
-go:
-- 1.15.x
-
 git:
   quiet: true
 
 script:
 - curl -X POST ${CALLBACK}
-- go get github.com/mritd/tgsend
 
-after_script:
-- tgsend -m "https://mritd.com updated(${TRAVIS_COMMIT})."
+after_script: |
+  curl -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
+    -d "chat_id=${TELEGRAM_SEND_ID}" \
+    -d "text=\`https://mritd.com updated.\`" \
+    -d "parse_mode=markdown" \
+    -d "disable_web_page_preview=true"
