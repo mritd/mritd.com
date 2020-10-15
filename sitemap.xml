@@ -2,1038 +2,1045 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://mritd.com/2020/10/08/switch-jekyll-to-hexo/</loc>
+    <loc>https://mritd.com/2020/10/16/gigabyte-z370-aorus-gaming-5-disable-cfg-lock/</loc>
     
-    <lastmod>2020-10-08</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2020/01/21/how-to-extend-the-validity-of-your-kubeadm-certificate/</loc>
-    
-    <lastmod>2020-10-04</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/about/index.html</loc>
-    
-    <lastmod>2020-08-31</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2020/08/19/write-a-dynamic-admission-control-webhook/</loc>
-    
-    <lastmod>2020-08-19</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2020/08/19/use-etcdadm-to-build-etcd-cluster-in-3-minutes/</loc>
-    
-    <lastmod>2020-08-19</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2019/10/15/golang-etcd-client-example/</loc>
-    
-    <lastmod>2020-08-19</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2020/08/19/make-a-custom-manjaro-image-for-rpi4/</loc>
-    
-    <lastmod>2020-08-19</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2020/08/19/how-to-write-a-csi-driver-for-kubernetes/</loc>
-    
-    <lastmod>2020-08-19</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2020/08/19/how-to-modify-filebeat-source-code-to-processing-logs/</loc>
-    
-    <lastmod>2020-08-19</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/09/21/set-up-ha-consul-cluster/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/09/27/alpine-3.6-openjdk-8-bug/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/10/09/set-up-kubernetes-1.8-ha-cluster/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/10/10/kube-proxy-use-ipvs-on-kubernetes-1.8/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/11/03/deep-learning-on-kubernetes/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/11/09/set-up-teleport/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/11/12/ci-cd-dockerfile/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/11/28/ci-cd-gitlab-ci/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/03/20/use-rbac-to-control-kubectl-permissions/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/07/17/kubernetes-rbac-chinese-translation/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/01/07/kubernetes-tls-bootstrapping-note/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/08/28/kubernetes-tls-bootstrapping-with-bootstrap-token/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/03/28/unix-proxy-setting/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/03/30/set-up-drone-ci/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/04/19/set-up-kubernetes-1.10.1-cluster-by-hyperkube/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/05/11/add-commit-message-style-check-to-your-gitlab/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/05/24/kubernetes-traefik-service-exposure/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/08/09/create-a-plugin-for-kubectl/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/08/26/kubernetes-certificate-configuration/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/09/17/google-container-registry-sync/</loc>
-    
-    <lastmod>2020-05-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/10/23/golang-code-plugin/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/11/09/go-interactive-shell/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/11/23/extract-jdk-to-folder-on-mac/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/11/25/kubeadm-remote-debug/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/11/27/simple-tool-written-in-golang/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2018/11/30/kubectl-plugin-new-solution-on-kubernetes-1.12/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2019/01/16/understand-kubernetes-sample-cli-plugin-source-code/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2019/03/16/set-up-kubernetes-1.13.4-cluster/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2019/03/19/how-to-set-multiple-apt-mirrors-for-ubuntu/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2019/03/23/oh-my-rime/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2019/05/13/dockerfile-extended-syntax/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/%E6%B5%85%E8%B0%88-java%E4%B8%AD%E7%9A%84-equals-%E5%92%8C-hashcode/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/friends/index.html</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2019/11/05/writing-plugin-for-coredns/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/yum-note/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/%E5%81%9A%E8%87%AA%E5%B7%B1%E5%B0%8A%E9%87%8D%E7%9A%84%E4%BA%BA-2015%E5%8C%97%E5%A4%A7%E6%9C%80%E7%9F%AD%E6%AF%95%E4%B8%9A%E8%87%B4%E8%BE%9E/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/%E5%85%B6%E5%AE%9E%E6%AF%8F%E4%B8%AA%E4%BA%BA%E9%83%BD%E6%9B%BE%E9%A5%B1%E7%BB%8F%E6%B2%A7%E6%A1%91/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/%E6%88%91%E5%92%8C%E6%88%91%E7%9A%84%E5%80%94%E5%BC%BA/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/%E6%9C%AA%E6%9D%A5%E7%A7%91%E6%8A%80%E6%B8%B2%E6%9F%93%E8%A7%86%E9%A2%91/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/%E6%A1%83%E8%8A%B1%E4%BE%9D%E6%97%A7%E7%AC%91/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/01/21/use-frp-for-internal-network-wear/</loc>
+    <loc>https://mritd.com/2006/01/02/%E6%B5%85%E8%B0%88-java%E4%B8%AD%E7%9A%84-equals-%E5%92%8C-hashcode/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/03/21/vim-e492-not-an-editor-command-plugin-xxxx/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
+    <loc>https://mritd.com/about/index.html</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
+    <loc>https://mritd.com/2020/08/19/write-a-dynamic-admission-control-webhook/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2019/11/05/writing-plugin-for-coredns/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/%E5%81%9A%E8%87%AA%E5%B7%B1%E5%B0%8A%E9%87%8D%E7%9A%84%E4%BA%BA-2015%E5%8C%97%E5%A4%A7%E6%9C%80%E7%9F%AD%E6%AF%95%E4%B8%9A%E8%87%B4%E8%BE%9E/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/yum-note/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2016/10/25/waved-goodbye/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/weblogic-request-getcontextpath-null/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/10/25/twenty-love-so-hard/</loc>
+    <loc>https://mritd.com/2018/03/20/use-rbac-to-control-kubectl-permissions/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/03/21/vim-e492-not-an-editor-command-plugin-xxxx/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2016/11/02/wanyue/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2018/03/28/unix-proxy-setting/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2016/11/08/update-centos-kernel/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2017/06/03/use-ceph-storage-on-kubernetes/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/10/18/set-up-vpn-with-strongswan/</loc>
+    <loc>https://mritd.com/2020/08/19/use-etcdadm-to-build-etcd-cluster-in-3-minutes/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/spring3-note/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/sql-or-keyword-priority/</loc>
+    <loc>https://mritd.com/2017/01/21/use-frp-for-internal-network-wear/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2020/10/08/switch-jekyll-to-hexo/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2016/12/06/try-traefik-on-kubernetes/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/set-up-nexus-on-centos/</loc>
+    <loc>https://mritd.com/2016/10/25/twenty-love-so-hard/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2020/01/20/set-up-percona-server/</loc>
+    <loc>https://mritd.com/2019/01/16/understand-kubernetes-sample-cli-plugin-source-code/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2017/03/18/set-up-vnc-server-on-centos-7/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/</loc>
+    <loc>https://mritd.com/2016/10/18/set-up-vpn-with-strongswan/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/03/03/set-up-kubernetes-ha-cluster-by-kargo/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2020/01/21/set-up-kubernetes-ha-cluster-by-kubeadm/</loc>
+    <loc>https://mritd.com/2018/11/27/simple-tool-written-in-golang/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/spring3-note/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/sql-or-keyword-priority/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/set-up-nexus-on-centos/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/set-up-kubernetes/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/11/09/set-up-teleport/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2020/01/20/set-up-percona-server/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/03/03/set-up-kubernetes-ha-cluster-by-kargo/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2020/01/21/set-up-kubernetes-ha-cluster-by-kubeadm/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/10/09/set-up-kubernetes-1.8-ha-cluster/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2016/12/01/set-up-kubernetes-cluster-by-calico/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2016/11/30/set-up-kubernetes-cluster-by-flannel/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2016/10/29/set-up-kubernetes-cluster-by-kubeadm/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2019/03/16/set-up-kubernetes-1.13.4-cluster/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/set-up-glusterfs-cluster/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/09/21/set-up-ha-consul-cluster/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2017/09/20/set-up-ha-kubernetes-cluster-on-aliyun-ecs/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/01/08/set-up-docker-registry-by-nexus/</loc>
+    <loc>https://mritd.com/2018/04/19/set-up-kubernetes-1.10.1-cluster-by-hyperkube/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/set-up-etcd-ha-cluster/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/redis3-compile-and-install/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/redis-note/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/set-up-dnsmasq-for-10-minutes/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/redundent-array-of-inexpensive-disks/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/quickly-create-custom-rpms-based-on-official-rpm/</loc>
+    <loc>https://mritd.com/2006/01/02/set-up-dnsmasq-for-10-minutes/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/01/08/set-up-docker-registry-by-nexus/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2018/03/30/set-up-drone-ci/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/set-up-etcd-ha-cluster/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/raspberry-pi2-build/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/redis-key-common-command/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/maven-tutorial/</loc>
+    <loc>https://mritd.com/2006/01/02/redis3-compile-and-install/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/minio-aws-s3-storage-open-source-implementation/</loc>
+    <loc>https://mritd.com/2006/01/02/redis-note/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/mysql-common-command/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/programmer's-self-cultivation/</loc>
+    <loc>https://mritd.com/2019/03/23/oh-my-rime/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2019/06/26/podman-history-of-container/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/linux-note/</loc>
+    <loc>https://mritd.com/2006/01/02/quickly-create-custom-rpms-based-on-official-rpm/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/programmer's-self-cultivation/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2017/01/27/logical-volume-manager-note/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2016/12/05/lvs-note/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2020/08/19/make-a-custom-manjaro-image-for-rpi4/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/minio-aws-s3-storage-open-source-implementation/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/maven-tutorial/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/kubernetes-tls-config/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2016/10/09/kubernetes-1.4-create-cluster/</loc>
+    <loc>https://mritd.com/2018/05/24/kubernetes-traefik-service-exposure/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2016/10/09/jekyll-create-a-static-blog/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/02/25/jekyll-blog-+-travis-ci-auto-deploy/</loc>
+    <loc>https://mritd.com/2006/01/02/linux-note/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/jvm-object-determination-and-reclaimable-algorithm/</loc>
+    <loc>https://mritd.com/2018/08/26/kubernetes-certificate-configuration/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/07/17/kubernetes-rbac-chinese-translation/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2018/08/28/kubernetes-tls-bootstrapping-with-bootstrap-token/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2018/01/07/kubernetes-tls-bootstrapping-note/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2017/03/10/kargo-cluster-expansion-and-fine-grained-configuration/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/10/10/kube-proxy-use-ipvs-on-kubernetes-1.8/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2016/11/21/kubeadm-other-problems/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/java-memory-method-area-and-runtime-constant-pool/</loc>
+    <loc>https://mritd.com/2018/11/25/kubeadm-remote-debug/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-multithreading-variable-visibility/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/java-memory-overview-of-vm-memory-auto-management-and-memory-regions/</loc>
+    <loc>https://mritd.com/2018/11/30/kubectl-plugin-new-solution-on-kubernetes-1.12/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2016/10/09/kubernetes-1.4-create-cluster/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/jaxb-note/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/jdk8-new-features/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/02/06/java-cas/</loc>
+    <loc>https://mritd.com/2017/02/25/jekyll-blog-+-travis-ci-auto-deploy/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2016/10/09/jekyll-create-a-static-blog/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/jvm-object-determination-and-reclaimable-algorithm/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/java-exception/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-memory-direct-memory/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/java-list-unsupportedoperation-exception/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/java-memory-direct-memory/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/java-memory-method-area-and-runtime-constant-pool/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/java-memory-java-heap/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/03/01/how-to-use-vagrant/</loc>
+    <loc>https://mritd.com/2006/01/02/java-memory-overview-of-vm-memory-auto-management-and-memory-regions/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-builtin-command-jps/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/03/25/java-capturing-https-packets-use-mitmproxy/</loc>
+    <loc>https://mritd.com/2006/01/02/java-multithreading-variable-visibility/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2020/01/21/how-to-modify-dns-on-ubuntu18-server/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/how-to-use-nexus/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2020/01/21/how-to-upgrade-kubeadm-cluster/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2017/03/04/how-to-use-nginx-ingress/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part1/</loc>
+    <loc>https://mritd.com/2020/08/19/how-to-write-a-csi-driver-for-kubernetes/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part2/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/07/12/how-to-build-kubernetes-rpm/</loc>
+    <loc>https://mritd.com/2017/03/01/how-to-use-vagrant/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part3/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2020/03/31/how-to-download-docker-image-without-docker/</loc>
+    <loc>https://mritd.com/2006/01/02/java-builtin-command-jps/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/02/27/how-to-download-kubernetes-images-and-rpm/</loc>
+    <loc>https://mritd.com/2017/03/25/java-capturing-https-packets-use-mitmproxy/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/02/06/java-cas/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2020/01/21/how-to-modify-dns-on-ubuntu18-server/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2020/08/19/how-to-modify-filebeat-source-code-to-processing-logs/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2019/03/19/how-to-set-multiple-apt-mirrors-for-ubuntu/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2020/01/21/how-to-upgrade-kubeadm-cluster/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/how-to-use-nexus/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2018/09/17/google-container-registry-sync/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/gradle-note/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/encryption-and-introduction-to-openssl/</loc>
+    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part1/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/force-delete-quartz-job/</loc>
+    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part2/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part3/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/07/12/how-to-build-kubernetes-rpm/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2020/03/31/how-to-download-docker-image-without-docker/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/02/27/how-to-download-kubernetes-images-and-rpm/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2020/01/21/how-to-extend-the-validity-of-your-kubeadm-certificate/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/forced-change-mysql-passowrd-on-linux/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/git-chinese-garbled-solution/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2017/09/05/git-flow-note/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2017/01/12/git-uses-the-socks5-proxy/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/docker-contianer-%E6%8C%82%E6%8E%89%E5%BC%BA%E5%88%B6%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6/</loc>
+    <loc>https://mritd.com/2018/11/09/go-interactive-shell/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/docker-mirror-registry/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/05/12/docker-uses-the-host-network-segment-ip/</loc>
+    <loc>https://mritd.com/2018/10/23/golang-code-plugin/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2019/10/15/golang-etcd-client-example/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2019/05/13/dockerfile-extended-syntax/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/dokcer-%E4%BD%BF%E7%94%A8-flannel-%E8%B7%A8%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%AE%AF/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/05/12/docker-uses-the-host-network-segment-ip/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/encryption-and-introduction-to-openssl/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2018/11/23/extract-jdk-to-folder-on-mac/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/force-delete-quartz-job/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/11/28/ci-cd-gitlab-ci/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/compile-and-install-git-on-centos/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2016/12/30/configure-nginx-https-under-centos-to-support-ios-ats/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2018/08/09/create-a-plugin-for-kubectl/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/dba%E8%A7%86%E9%A2%91%E7%AC%94%E8%AE%B0/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2017/05/27/ceph-note-1/</loc>
+    <loc>https://mritd.com/2017/11/03/deep-learning-on-kubernetes/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/05/30/ceph-note-2/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/aspectj-hello-world/</loc>
+    <loc>https://mritd.com/2006/01/02/docker-contianer-%E6%8C%82%E6%8E%89%E5%BC%BA%E5%88%B6%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/docker-mirror-registry/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2019/06/18/calico-3.6-forward-network-traffic/</loc>
     
-    <lastmod>2020-05-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2017/03/20/btrfs-note/</loc>
-    
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2017/07/31/calico-yml-bug/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/05/27/ceph-note-1/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/05/30/ceph-note-2/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/11/12/ci-cd-dockerfile/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2018/05/11/add-commit-message-style-check-to-your-gitlab/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
+    <loc>https://mritd.com/2017/09/27/alpine-3.6-openjdk-8-bug/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2006/01/02/apt-get%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://mritd.com/2016/10/14/arukas-docker-fq/</loc>
     
-    <lastmod>2020-05-14</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/aspectj-hello-world/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2017/03/20/btrfs-note/</loc>
+    
+    <lastmod>2020-10-15</lastmod>
     
   </url>
   
 
   <url>
     <loc>https://mritd.com/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -1041,238 +1048,245 @@
   
   <url>
     <loc>https://mritd.com/tags/ci-cd/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/java/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/linux/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/docker/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/aspectj/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/kubernetes/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/calico/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/mysql/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/ceph/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/sql/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/oracle/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/quartz/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/git/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/tags/cfg-lock/</loc>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/golang/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/etcd/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/gradle/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/maven/</loc>
-    <lastmod>2020-10-09</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/tags/jmm/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/csi/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/tags/jmm/</loc>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/manjaro/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/mac/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/rime/</loc>
-    <lastmod>2020-10-09</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/tags/%E9%9A%8F%E7%AC%94/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/podman/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/raspberry-pi2/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/tags/%E9%9A%8F%E7%AC%94/</loc>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/redis/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/nexus/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/drone/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/percona/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/spring/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/hexo/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/weblogic/</loc>
-    <lastmod>2020-10-09</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/tags/coredns/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/tags/admission/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/tags/coredns/</loc>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -1281,63 +1295,70 @@
   
   <url>
     <loc>https://mritd.com/categories/ci-cd/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/categories/java/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/categories/docker/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/categories/linux/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/categories/kubernetes/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/categories/database/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/categories/hackintosh/</loc>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/categories/golang/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/categories/mac/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://mritd.com/categories/%E9%9A%8F%E7%AC%94/</loc>
-    <lastmod>2020-10-09</lastmod>
+    <lastmod>2020-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
