@@ -1,72 +1,72 @@
-<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;auto&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Upward, not Northward."><meta name="author" content="bleem"><meta name="keywords" content="漠然,bleem,mritd"><title>Kubernetes 1.13.4 搭建 - bleem</title><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/atom-one-dark.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 4.2.1"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml"><link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"> <a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"> <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"> <a class="nav-link" href="javascript:">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner intro-2" id="background" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="container page-header text-center fade-in-up"><span class="h2" id="subtitle"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2019-03-16 17:36" pubdate>2019年3月16日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 8.5k 字</span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 149 分钟</span></div></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto" id="post"><h1 style="display:none">Kubernetes 1.13.4 搭建</h1><div class="markdown-body" id="post-body"><blockquote><p>年后回来有点懒，也有点忙；1.13 出来好久了，周末还是决定折腾一下吧</p></blockquote><h2 id="一、环境准备"><a href="#一、环境准备" class="headerlink" title="一、环境准备"></a>一、环境准备</h2><p>老样子，安装环境为 5 台 Ubuntu 18.04.2 LTS 虚拟机，其他详细信息如下</p><table><thead><tr><th>System OS</th><th>IP Address</th><th>Docker</th><th>Kernel</th><th>Application</th></tr></thead><tbody><tr><td>Ubuntu 18.04.2 LTS</td><td>192.168.1.51</td><td>18.09.2</td><td>4.15.0-46-generic</td><td>k8s-master、etcd</td></tr><tr><td>Ubuntu 18.04.2 LTS</td><td>192.168.1.52</td><td>18.09.2</td><td>4.15.0-46-generic</td><td>k8s-master、etcd</td></tr><tr><td>Ubuntu 18.04.2 LTS</td><td>192.168.1.53</td><td>18.09.2</td><td>4.15.0-46-generic</td><td>k8s-master、etcd</td></tr><tr><td>Ubuntu 18.04.2 LTS</td><td>192.168.1.54</td><td>18.09.2</td><td>4.15.0-46-generic</td><td>k8s-node</td></tr><tr><td>Ubuntu 18.04.2 LTS</td><td>192.168.1.55</td><td>18.09.2</td><td>4.15.0-46-generic</td><td>k8s-node</td></tr></tbody></table><p><strong>所有配置生成将在第一个节点上完成，第一个节点与其他节点 root 用户免密码登录，用于分发文件；为了方便搭建弄了一点小脚本，仓库地址 <a href="https://github.com/mritd/ktool" target="_blank" rel="noopener">ktool</a>，本文后续所有脚本、配置都可以在此仓库找到；关于 <a href="https://github.com/cloudflare/cfssl" target="_blank" rel="noopener">cfssl</a> 等基本工具使用，本文不再阐述</strong></p><h2 id="二、安装-Etcd"><a href="#二、安装-Etcd" class="headerlink" title="二、安装 Etcd"></a>二、安装 Etcd</h2><h3 id="2-1、生成证书"><a href="#2-1、生成证书" class="headerlink" title="2.1、生成证书"></a>2.1、生成证书</h3><p>Etcd 仍然开启 TLS 认证，所以先使用 cfssl 生成相关证书</p><ul><li>etcd-root-ca-csr.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-    <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"etcd-root-ca"</span>,
-    <span class="hljs-attr">"key"</span>: &#123;
-        <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
-        <span class="hljs-attr">"size"</span>: <span class="hljs-number">4096</span>
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;auto&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Upward, not Northward."><meta name="author" content="bleem"><meta name="keywords" content="漠然,bleem,mritd"><title>Kubernetes 1.13.4 搭建 - bleem</title><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/atom-one-dark.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script id="fluid-configs">var Fluid=window.Fluid||{},CONFIG={hostname:"mritd.com",root:"/",version:"1.8.5",typing:{enable:!0,typeSpeed:80,cursorChar:"_",loop:!1},toc:{enable:!0,headingSelector:"h1,h2,h3,h4,h5,h6",collapseDepth:3},anchorjs:{enable:!0,element:"h1,h2,h3,h4,h5,h6",placement:"right",visible:"hover",icon:"❡"},copy_btn:!0,image_zoom:{enable:!0},lazyload:{enable:!0,onlypost:!1},web_analytics:{enable:!0,baidu:null,google:"UA-179552593-1",gtag:null,tencent:{sid:null,cid:null},woyaola:null,cnzz:null,leancloud:{app_id:null,app_key:null,server_url:null}}}</script><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 5.2.0"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"> <a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"> <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"> <a class="nav-link" href="javascript:">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner intro-2" id="background" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="page-header text-center fade-in-up"><span class="h2" id="subtitle" title="Kubernetes 1.13.4 搭建"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2019-03-16 17:36" pubdate>2019年3月16日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 9.3k 字</span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 165 分钟</span></div></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto"><h1 style="display:none">Kubernetes 1.13.4 搭建</h1><div class="markdown-body"><blockquote><p>年后回来有点懒，也有点忙；1.13 出来好久了，周末还是决定折腾一下吧</p></blockquote><h2 id="一、环境准备"><a href="#一、环境准备" class="headerlink" title="一、环境准备"></a>一、环境准备</h2><p>老样子，安装环境为 5 台 Ubuntu 18.04.2 LTS 虚拟机，其他详细信息如下</p><table><thead><tr><th>System OS</th><th>IP Address</th><th>Docker</th><th>Kernel</th><th>Application</th></tr></thead><tbody><tr><td>Ubuntu 18.04.2 LTS</td><td>192.168.1.51</td><td>18.09.2</td><td>4.15.0-46-generic</td><td>k8s-master、etcd</td></tr><tr><td>Ubuntu 18.04.2 LTS</td><td>192.168.1.52</td><td>18.09.2</td><td>4.15.0-46-generic</td><td>k8s-master、etcd</td></tr><tr><td>Ubuntu 18.04.2 LTS</td><td>192.168.1.53</td><td>18.09.2</td><td>4.15.0-46-generic</td><td>k8s-master、etcd</td></tr><tr><td>Ubuntu 18.04.2 LTS</td><td>192.168.1.54</td><td>18.09.2</td><td>4.15.0-46-generic</td><td>k8s-node</td></tr><tr><td>Ubuntu 18.04.2 LTS</td><td>192.168.1.55</td><td>18.09.2</td><td>4.15.0-46-generic</td><td>k8s-node</td></tr></tbody></table><p><strong>所有配置生成将在第一个节点上完成，第一个节点与其他节点 root 用户免密码登录，用于分发文件；为了方便搭建弄了一点小脚本，仓库地址 <a target="_blank" rel="noopener" href="https://github.com/mritd/ktool">ktool</a>，本文后续所有脚本、配置都可以在此仓库找到；关于 <a target="_blank" rel="noopener" href="https://github.com/cloudflare/cfssl">cfssl</a> 等基本工具使用，本文不再阐述</strong></p><h2 id="二、安装-Etcd"><a href="#二、安装-Etcd" class="headerlink" title="二、安装 Etcd"></a>二、安装 Etcd</h2><h3 id="2-1、生成证书"><a href="#2-1、生成证书" class="headerlink" title="2.1、生成证书"></a>2.1、生成证书</h3><p>Etcd 仍然开启 TLS 认证，所以先使用 cfssl 生成相关证书</p><ul><li>etcd-root-ca-csr.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
+    <span class="hljs-attr">&quot;CN&quot;</span>: <span class="hljs-string">&quot;etcd-root-ca&quot;</span>,
+    <span class="hljs-attr">&quot;key&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;algo&quot;</span>: <span class="hljs-string">&quot;rsa&quot;</span>,
+        <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">4096</span>
     &#125;,
-    <span class="hljs-attr">"names"</span>: [
+    <span class="hljs-attr">&quot;names&quot;</span>: [
         &#123;
-            <span class="hljs-attr">"O"</span>: <span class="hljs-string">"etcd"</span>,
-            <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"etcd Security"</span>,
-            <span class="hljs-attr">"L"</span>: <span class="hljs-string">"Beijing"</span>,
-            <span class="hljs-attr">"ST"</span>: <span class="hljs-string">"Beijing"</span>,
-            <span class="hljs-attr">"C"</span>: <span class="hljs-string">"CN"</span>
+            <span class="hljs-attr">&quot;O&quot;</span>: <span class="hljs-string">&quot;etcd&quot;</span>,
+            <span class="hljs-attr">&quot;OU&quot;</span>: <span class="hljs-string">&quot;etcd Security&quot;</span>,
+            <span class="hljs-attr">&quot;L&quot;</span>: <span class="hljs-string">&quot;Beijing&quot;</span>,
+            <span class="hljs-attr">&quot;ST&quot;</span>: <span class="hljs-string">&quot;Beijing&quot;</span>,
+            <span class="hljs-attr">&quot;C&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span>
         &#125;
     ],
-    <span class="hljs-attr">"ca"</span>: &#123;
-        <span class="hljs-attr">"expiry"</span>: <span class="hljs-string">"87600h"</span>
+    <span class="hljs-attr">&quot;ca&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;expiry&quot;</span>: <span class="hljs-string">&quot;87600h&quot;</span>
     &#125;
 &#125;</code></pre></div><ul><li>etcd-gencert.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-  <span class="hljs-attr">"signing"</span>: &#123;
-    <span class="hljs-attr">"default"</span>: &#123;
-        <span class="hljs-attr">"usages"</span>: [
-          <span class="hljs-string">"signing"</span>,
-          <span class="hljs-string">"key encipherment"</span>,
-          <span class="hljs-string">"server auth"</span>,
-          <span class="hljs-string">"client auth"</span>
+  <span class="hljs-attr">&quot;signing&quot;</span>: &#123;
+    <span class="hljs-attr">&quot;default&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;usages&quot;</span>: [
+          <span class="hljs-string">&quot;signing&quot;</span>,
+          <span class="hljs-string">&quot;key encipherment&quot;</span>,
+          <span class="hljs-string">&quot;server auth&quot;</span>,
+          <span class="hljs-string">&quot;client auth&quot;</span>
         ],
-        <span class="hljs-attr">"expiry"</span>: <span class="hljs-string">"87600h"</span>
+        <span class="hljs-attr">&quot;expiry&quot;</span>: <span class="hljs-string">&quot;87600h&quot;</span>
     &#125;
   &#125;
 &#125;</code></pre></div><ul><li>etcd-csr.json</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-    <span class="hljs-attr">"key"</span>: &#123;
-        <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
-        <span class="hljs-attr">"size"</span>: <span class="hljs-number">2048</span>
+    <span class="hljs-attr">&quot;key&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;algo&quot;</span>: <span class="hljs-string">&quot;rsa&quot;</span>,
+        <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">2048</span>
     &#125;,
-    <span class="hljs-attr">"names"</span>: [
+    <span class="hljs-attr">&quot;names&quot;</span>: [
         &#123;
-            <span class="hljs-attr">"O"</span>: <span class="hljs-string">"etcd"</span>,
-            <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"etcd Security"</span>,
-            <span class="hljs-attr">"L"</span>: <span class="hljs-string">"Beijing"</span>,
-            <span class="hljs-attr">"ST"</span>: <span class="hljs-string">"Beijing"</span>,
-            <span class="hljs-attr">"C"</span>: <span class="hljs-string">"CN"</span>
+            <span class="hljs-attr">&quot;O&quot;</span>: <span class="hljs-string">&quot;etcd&quot;</span>,
+            <span class="hljs-attr">&quot;OU&quot;</span>: <span class="hljs-string">&quot;etcd Security&quot;</span>,
+            <span class="hljs-attr">&quot;L&quot;</span>: <span class="hljs-string">&quot;Beijing&quot;</span>,
+            <span class="hljs-attr">&quot;ST&quot;</span>: <span class="hljs-string">&quot;Beijing&quot;</span>,
+            <span class="hljs-attr">&quot;C&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span>
         &#125;
     ],
-    <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"etcd"</span>,
-    <span class="hljs-attr">"hosts"</span>: [
-        <span class="hljs-string">"127.0.0.1"</span>,
-        <span class="hljs-string">"localhost"</span>,
-        <span class="hljs-string">"192.168.1.51"</span>,
-        <span class="hljs-string">"192.168.1.52"</span>,
-        <span class="hljs-string">"192.168.1.53"</span>
+    <span class="hljs-attr">&quot;CN&quot;</span>: <span class="hljs-string">&quot;etcd&quot;</span>,
+    <span class="hljs-attr">&quot;hosts&quot;</span>: [
+        <span class="hljs-string">&quot;127.0.0.1&quot;</span>,
+        <span class="hljs-string">&quot;localhost&quot;</span>,
+        <span class="hljs-string">&quot;192.168.1.51&quot;</span>,
+        <span class="hljs-string">&quot;192.168.1.52&quot;</span>,
+        <span class="hljs-string">&quot;192.168.1.53&quot;</span>
     ]
 &#125;</code></pre></div><p>接下来执行生成即可；<strong>我建议在生产环境在证书内预留几个 IP，已防止意外故障迁移时还需要重新生成证书；证书默认期限为 10 年(包括 CA 证书)，有需要加强安全性的可以适当减小</strong></p><div class="hljs"><pre><code class="hljs sh">cfssl gencert --initca=<span class="hljs-literal">true</span> etcd-root-ca-csr.json | cfssljson --bare etcd-root-ca
 cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-gencert.json etcd-csr.json | cfssljson --bare etcd</code></pre></div><h3 id="2-2、安装-Etcd"><a href="#2-2、安装-Etcd" class="headerlink" title="2.2、安装 Etcd"></a>2.2、安装 Etcd</h3><h4 id="2-2-1、安装脚本"><a href="#2-2-1、安装脚本" class="headerlink" title="2.2.1、安装脚本"></a>2.2.1、安装脚本</h4><p>安装 Etcd 只需要将二进制文件放在可执行目录下，然后修改配置增加 systemd service 配置文件即可；为了安全性起见最好使用单独的用户启动 Etcd</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-meta">#!/bin/bash</span>
 
 <span class="hljs-built_in">set</span> -e
 
-ETCD_DEFAULT_VERSION=<span class="hljs-string">"3.3.12"</span>
+ETCD_DEFAULT_VERSION=<span class="hljs-string">&quot;3.3.12&quot;</span>
 
-<span class="hljs-keyword">if</span> [ <span class="hljs-string">"<span class="hljs-variable">$1</span>"</span> != <span class="hljs-string">""</span> ]; <span class="hljs-keyword">then</span>
+<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> != <span class="hljs-string">&quot;&quot;</span> ]; <span class="hljs-keyword">then</span>
   ETCD_VERSION=<span class="hljs-variable">$1</span>
 <span class="hljs-keyword">else</span>
-  <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[33mWARNING: ETCD_VERSION is blank,use default version: <span class="hljs-variable">$&#123;ETCD_DEFAULT_VERSION&#125;</span>\033[0m"</span>
+  <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;\033[33mWARNING: ETCD_VERSION is blank,use default version: <span class="hljs-variable">$&#123;ETCD_DEFAULT_VERSION&#125;</span>\033[0m&quot;</span>
   ETCD_VERSION=<span class="hljs-variable">$&#123;ETCD_DEFAULT_VERSION&#125;</span>
 <span class="hljs-keyword">fi</span>
 
 <span class="hljs-comment"># 下载 Etcd 二进制文件</span>
 <span class="hljs-keyword">function</span> <span class="hljs-function"><span class="hljs-title">download</span></span>()&#123;
-    <span class="hljs-keyword">if</span> [ ! -f <span class="hljs-string">"etcd-v<span class="hljs-variable">$&#123;ETCD_VERSION&#125;</span>-linux-amd64.tar.gz"</span> ]; <span class="hljs-keyword">then</span>
+    <span class="hljs-keyword">if</span> [ ! -f <span class="hljs-string">&quot;etcd-v<span class="hljs-variable">$&#123;ETCD_VERSION&#125;</span>-linux-amd64.tar.gz&quot;</span> ]; <span class="hljs-keyword">then</span>
         wget https://github.com/coreos/etcd/releases/download/v<span class="hljs-variable">$&#123;ETCD_VERSION&#125;</span>/etcd-v<span class="hljs-variable">$&#123;ETCD_VERSION&#125;</span>-linux-amd64.tar.gz
         tar -zxvf etcd-v<span class="hljs-variable">$&#123;ETCD_VERSION&#125;</span>-linux-amd64.tar.gz
     <span class="hljs-keyword">fi</span>
@@ -75,33 +75,33 @@ ETCD_DEFAULT_VERSION=<span class="hljs-string">"3.3.12"</span>
 <span class="hljs-comment"># 为 Etcd 创建单独的用户</span>
 <span class="hljs-keyword">function</span> <span class="hljs-function"><span class="hljs-title">preinstall</span></span>()&#123;
 	getent group etcd &gt;/dev/null || groupadd -r etcd
-	getent passwd etcd &gt;/dev/null || useradd -r -g etcd -d /var/lib/etcd -s /sbin/nologin -c <span class="hljs-string">"etcd user"</span> etcd
+	getent passwd etcd &gt;/dev/null || useradd -r -g etcd -d /var/lib/etcd -s /sbin/nologin -c <span class="hljs-string">&quot;etcd user&quot;</span> etcd
 &#125;
 
 <span class="hljs-comment"># 安装(复制文件)</span>
 <span class="hljs-keyword">function</span> <span class="hljs-function"><span class="hljs-title">install</span></span>()&#123;
 
     <span class="hljs-comment"># 释放 Etcd 二进制文件</span>
-    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[32mINFO: Copy etcd...\033[0m"</span>
+    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;\033[32mINFO: Copy etcd...\033[0m&quot;</span>
     tar -zxvf etcd-v<span class="hljs-variable">$&#123;ETCD_VERSION&#125;</span>-linux-amd64.tar.gz
     cp etcd-v<span class="hljs-variable">$&#123;ETCD_VERSION&#125;</span>-linux-amd64/etcd* /usr/<span class="hljs-built_in">local</span>/bin
     rm -rf etcd-v<span class="hljs-variable">$&#123;ETCD_VERSION&#125;</span>-linux-amd64
 
     <span class="hljs-comment"># 复制 配置文件 到 /etc/etcd(目录内文件结构在下面)</span>
-    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[32mINFO: Copy etcd config...\033[0m"</span>
+    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;\033[32mINFO: Copy etcd config...\033[0m&quot;</span>
     cp -r conf /etc/etcd
     chown -R etcd:etcd /etc/etcd
     chmod -R 755 /etc/etcd/ssl
 
     <span class="hljs-comment"># 复制 systemd service 配置</span>
-    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[32mINFO: Copy etcd systemd config...\033[0m"</span>
+    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;\033[32mINFO: Copy etcd systemd config...\033[0m&quot;</span>
     cp systemd/*.service /lib/systemd/system
     systemctl daemon-reload
 &#125;
 
 <span class="hljs-comment"># 创建 Etcd 存储目录(如需要更改，请求改 /etc/etcd/etcd.conf 配置文件)</span>
 <span class="hljs-keyword">function</span> <span class="hljs-function"><span class="hljs-title">postinstall</span></span>()&#123;
-    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">"/var/lib/etcd"</span> ]; <span class="hljs-keyword">then</span>
+    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">&quot;/var/lib/etcd&quot;</span> ]; <span class="hljs-keyword">then</span>
         mkdir /var/lib/etcd
         chown -R etcd:etcd /var/lib/etcd
     <span class="hljs-keyword">fi</span>
@@ -124,55 +124,55 @@ postinstall</code></pre></div><h4 id="2-2-2、配置文件"><a href="#2-2-2、�
 
 1 directory, 7 files</code></pre></div><ul><li>etcd.conf</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># [member]</span>
 ETCD_NAME=etcd1
-ETCD_DATA_DIR=<span class="hljs-string">"/var/lib/etcd/data"</span>
-ETCD_WAL_DIR=<span class="hljs-string">"/var/lib/etcd/wal"</span>
-ETCD_SNAPSHOT_COUNT=<span class="hljs-string">"100"</span>
-ETCD_HEARTBEAT_INTERVAL=<span class="hljs-string">"100"</span>
-ETCD_ELECTION_TIMEOUT=<span class="hljs-string">"1000"</span>
-ETCD_LISTEN_PEER_URLS=<span class="hljs-string">"https://192.168.1.51:2380"</span>
-ETCD_LISTEN_CLIENT_URLS=<span class="hljs-string">"https://192.168.1.51:2379,http://127.0.0.1:2379"</span>
-ETCD_MAX_SNAPSHOTS=<span class="hljs-string">"5"</span>
-ETCD_MAX_WALS=<span class="hljs-string">"5"</span>
-<span class="hljs-comment">#ETCD_CORS=""</span>
+ETCD_DATA_DIR=<span class="hljs-string">&quot;/var/lib/etcd/data&quot;</span>
+ETCD_WAL_DIR=<span class="hljs-string">&quot;/var/lib/etcd/wal&quot;</span>
+ETCD_SNAPSHOT_COUNT=<span class="hljs-string">&quot;100&quot;</span>
+ETCD_HEARTBEAT_INTERVAL=<span class="hljs-string">&quot;100&quot;</span>
+ETCD_ELECTION_TIMEOUT=<span class="hljs-string">&quot;1000&quot;</span>
+ETCD_LISTEN_PEER_URLS=<span class="hljs-string">&quot;https://192.168.1.51:2380&quot;</span>
+ETCD_LISTEN_CLIENT_URLS=<span class="hljs-string">&quot;https://192.168.1.51:2379,http://127.0.0.1:2379&quot;</span>
+ETCD_MAX_SNAPSHOTS=<span class="hljs-string">&quot;5&quot;</span>
+ETCD_MAX_WALS=<span class="hljs-string">&quot;5&quot;</span>
+<span class="hljs-comment">#ETCD_CORS=&quot;&quot;</span>
 
 <span class="hljs-comment"># [cluster]</span>
-ETCD_INITIAL_ADVERTISE_PEER_URLS=<span class="hljs-string">"https://192.168.1.51:2380"</span>
-<span class="hljs-comment"># if you use different ETCD_NAME (e.g. test), set ETCD_INITIAL_CLUSTER value for this name, i.e. "test=http://..."</span>
-ETCD_INITIAL_CLUSTER=<span class="hljs-string">"etcd1=https://192.168.1.51:2380,etcd2=https://192.168.1.52:2380,etcd3=https://192.168.1.53:2380"</span>
-ETCD_INITIAL_CLUSTER_STATE=<span class="hljs-string">"new"</span>
-ETCD_INITIAL_CLUSTER_TOKEN=<span class="hljs-string">"etcd-cluster"</span>
-ETCD_ADVERTISE_CLIENT_URLS=<span class="hljs-string">"https://192.168.1.51:2379"</span>
-<span class="hljs-comment">#ETCD_DISCOVERY=""</span>
-<span class="hljs-comment">#ETCD_DISCOVERY_SRV=""</span>
-<span class="hljs-comment">#ETCD_DISCOVERY_FALLBACK="proxy"</span>
-<span class="hljs-comment">#ETCD_DISCOVERY_PROXY=""</span>
-<span class="hljs-comment">#ETCD_STRICT_RECONFIG_CHECK="false"</span>
-<span class="hljs-comment">#ETCD_AUTO_COMPACTION_RETENTION="0"</span>
+ETCD_INITIAL_ADVERTISE_PEER_URLS=<span class="hljs-string">&quot;https://192.168.1.51:2380&quot;</span>
+<span class="hljs-comment"># if you use different ETCD_NAME (e.g. test), set ETCD_INITIAL_CLUSTER value for this name, i.e. &quot;test=http://...&quot;</span>
+ETCD_INITIAL_CLUSTER=<span class="hljs-string">&quot;etcd1=https://192.168.1.51:2380,etcd2=https://192.168.1.52:2380,etcd3=https://192.168.1.53:2380&quot;</span>
+ETCD_INITIAL_CLUSTER_STATE=<span class="hljs-string">&quot;new&quot;</span>
+ETCD_INITIAL_CLUSTER_TOKEN=<span class="hljs-string">&quot;etcd-cluster&quot;</span>
+ETCD_ADVERTISE_CLIENT_URLS=<span class="hljs-string">&quot;https://192.168.1.51:2379&quot;</span>
+<span class="hljs-comment">#ETCD_DISCOVERY=&quot;&quot;</span>
+<span class="hljs-comment">#ETCD_DISCOVERY_SRV=&quot;&quot;</span>
+<span class="hljs-comment">#ETCD_DISCOVERY_FALLBACK=&quot;proxy&quot;</span>
+<span class="hljs-comment">#ETCD_DISCOVERY_PROXY=&quot;&quot;</span>
+<span class="hljs-comment">#ETCD_STRICT_RECONFIG_CHECK=&quot;false&quot;</span>
+<span class="hljs-comment">#ETCD_AUTO_COMPACTION_RETENTION=&quot;0&quot;</span>
 
 <span class="hljs-comment"># [proxy]</span>
-<span class="hljs-comment">#ETCD_PROXY="off"</span>
-<span class="hljs-comment">#ETCD_PROXY_FAILURE_WAIT="5000"</span>
-<span class="hljs-comment">#ETCD_PROXY_REFRESH_INTERVAL="30000"</span>
-<span class="hljs-comment">#ETCD_PROXY_DIAL_TIMEOUT="1000"</span>
-<span class="hljs-comment">#ETCD_PROXY_WRITE_TIMEOUT="5000"</span>
-<span class="hljs-comment">#ETCD_PROXY_READ_TIMEOUT="0"</span>
+<span class="hljs-comment">#ETCD_PROXY=&quot;off&quot;</span>
+<span class="hljs-comment">#ETCD_PROXY_FAILURE_WAIT=&quot;5000&quot;</span>
+<span class="hljs-comment">#ETCD_PROXY_REFRESH_INTERVAL=&quot;30000&quot;</span>
+<span class="hljs-comment">#ETCD_PROXY_DIAL_TIMEOUT=&quot;1000&quot;</span>
+<span class="hljs-comment">#ETCD_PROXY_WRITE_TIMEOUT=&quot;5000&quot;</span>
+<span class="hljs-comment">#ETCD_PROXY_READ_TIMEOUT=&quot;0&quot;</span>
 
 <span class="hljs-comment"># [security]</span>
-ETCD_CERT_FILE=<span class="hljs-string">"/etc/etcd/ssl/etcd.pem"</span>
-ETCD_KEY_FILE=<span class="hljs-string">"/etc/etcd/ssl/etcd-key.pem"</span>
-ETCD_CLIENT_CERT_AUTH=<span class="hljs-string">"true"</span>
-ETCD_TRUSTED_CA_FILE=<span class="hljs-string">"/etc/etcd/ssl/etcd-root-ca.pem"</span>
-ETCD_AUTO_TLS=<span class="hljs-string">"true"</span>
-ETCD_PEER_CERT_FILE=<span class="hljs-string">"/etc/etcd/ssl/etcd.pem"</span>
-ETCD_PEER_KEY_FILE=<span class="hljs-string">"/etc/etcd/ssl/etcd-key.pem"</span>
-ETCD_PEER_CLIENT_CERT_AUTH=<span class="hljs-string">"true"</span>
-ETCD_PEER_TRUSTED_CA_FILE=<span class="hljs-string">"/etc/etcd/ssl/etcd-root-ca.pem"</span>
-ETCD_PEER_AUTO_TLS=<span class="hljs-string">"true"</span>
+ETCD_CERT_FILE=<span class="hljs-string">&quot;/etc/etcd/ssl/etcd.pem&quot;</span>
+ETCD_KEY_FILE=<span class="hljs-string">&quot;/etc/etcd/ssl/etcd-key.pem&quot;</span>
+ETCD_CLIENT_CERT_AUTH=<span class="hljs-string">&quot;true&quot;</span>
+ETCD_TRUSTED_CA_FILE=<span class="hljs-string">&quot;/etc/etcd/ssl/etcd-root-ca.pem&quot;</span>
+ETCD_AUTO_TLS=<span class="hljs-string">&quot;true&quot;</span>
+ETCD_PEER_CERT_FILE=<span class="hljs-string">&quot;/etc/etcd/ssl/etcd.pem&quot;</span>
+ETCD_PEER_KEY_FILE=<span class="hljs-string">&quot;/etc/etcd/ssl/etcd-key.pem&quot;</span>
+ETCD_PEER_CLIENT_CERT_AUTH=<span class="hljs-string">&quot;true&quot;</span>
+ETCD_PEER_TRUSTED_CA_FILE=<span class="hljs-string">&quot;/etc/etcd/ssl/etcd-root-ca.pem&quot;</span>
+ETCD_PEER_AUTO_TLS=<span class="hljs-string">&quot;true&quot;</span>
 
 <span class="hljs-comment"># [logging]</span>
-<span class="hljs-comment">#ETCD_DEBUG="false"</span>
+<span class="hljs-comment">#ETCD_DEBUG=&quot;false&quot;</span>
 <span class="hljs-comment"># examples for -log-package-levels etcdserver=WARNING,security=DEBUG</span>
-<span class="hljs-comment">#ETCD_LOG_PACKAGE_LEVELS=""</span></code></pre></div><ul><li>etcd.service</li></ul><div class="hljs"><pre><code class="hljs sh">[Unit]
+<span class="hljs-comment">#ETCD_LOG_PACKAGE_LEVELS=&quot;&quot;</span></code></pre></div><ul><li>etcd.service</li></ul><div class="hljs"><pre><code class="hljs sh">[Unit]
 Description=Etcd Server
 After=network.target
 After=network-online.target
@@ -184,316 +184,316 @@ WorkingDirectory=/var/lib/etcd/
 EnvironmentFile=-/etc/etcd/etcd.conf
 User=etcd
 <span class="hljs-comment"># set GOMAXPROCS to number of processors</span>
-ExecStart=/bin/bash -c <span class="hljs-string">"GOMAXPROCS=<span class="hljs-variable">$(nproc)</span> /usr/local/bin/etcd --name=\"<span class="hljs-variable">$&#123;ETCD_NAME&#125;</span>\" --data-dir=\"<span class="hljs-variable">$&#123;ETCD_DATA_DIR&#125;</span>\" --listen-client-urls=\"<span class="hljs-variable">$&#123;ETCD_LISTEN_CLIENT_URLS&#125;</span>\""</span>
+ExecStart=/bin/bash -c <span class="hljs-string">&quot;GOMAXPROCS=<span class="hljs-subst">$(nproc)</span> /usr/local/bin/etcd --name=\&quot;<span class="hljs-variable">$&#123;ETCD_NAME&#125;</span>\&quot; --data-dir=\&quot;<span class="hljs-variable">$&#123;ETCD_DATA_DIR&#125;</span>\&quot; --listen-client-urls=\&quot;<span class="hljs-variable">$&#123;ETCD_LISTEN_CLIENT_URLS&#125;</span>\&quot;&quot;</span>
 Restart=on-failure
 LimitNOFILE=65536
 
 [Install]
-WantedBy=multi-user.target</code></pre></div><p>最后三台机器依次修改 <code>IP</code>、<code>ETCD_NAME</code> 然后启动即可，<strong>生产环境请不要忘记修改集群 Token 为真实随机字符串 (<code>ETCD_INITIAL_CLUSTER_TOKEN</code> 变量)</strong>启动后可以通过以下命令测试集群联通性</p><div class="hljs"><pre><code class="hljs sh">docker1.node ➜  ~ <span class="hljs-built_in">export</span> ETCDCTL_API=3
+WantedBy=multi-user.target</code></pre></div><p>最后三台机器依次修改 <code>IP</code>、<code>ETCD_NAME</code> 然后启动即可，**生产环境请不要忘记修改集群 Token 为真实随机字符串 (<code>ETCD_INITIAL_CLUSTER_TOKEN</code> 变量)**启动后可以通过以下命令测试集群联通性</p><div class="hljs"><pre><code class="hljs sh">docker1.node ➜  ~ <span class="hljs-built_in">export</span> ETCDCTL_API=3
 docker1.node ➜  ~ etcdctl member list
 238b72cdd26e304f, started, etcd2, https://192.168.1.52:2380, https://192.168.1.52:2379
 8034142cf01c5d1c, started, etcd3, https://192.168.1.53:2380, https://192.168.1.53:2379
 8da171dbef9ded69, started, etcd1, https://192.168.1.51:2380, https://192.168.1.51:2379</code></pre></div><h2 id="三、安装-Kubernetes"><a href="#三、安装-Kubernetes" class="headerlink" title="三、安装 Kubernetes"></a>三、安装 Kubernetes</h2><h3 id="3-1、生成证书及配置"><a href="#3-1、生成证书及配置" class="headerlink" title="3.1、生成证书及配置"></a>3.1、生成证书及配置</h3><h4 id="3-1-1、生成证书"><a href="#3-1-1、生成证书" class="headerlink" title="3.1.1、生成证书"></a>3.1.1、生成证书</h4><p>新版本已经越来越趋近全面 TLS + RBAC 配置，<strong>所以本次安装将会启动大部分 TLS + RBAC 配置，包括 <code>kube-controler-manager</code>、<code>kube-scheduler</code> 组件不再连接本地 <code>kube-apiserver</code> 的 8080 非认证端口，<code>kubelet</code> 等组件 API 端点关闭匿名访问，启动 RBAC 认证等</strong>；为了满足这些认证，需要签署以下证书</p><ul><li>k8s-root-ca-csr.json 集群 CA 根证书</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-    <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"kubernetes"</span>,
-    <span class="hljs-attr">"key"</span>: &#123;
-        <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
-        <span class="hljs-attr">"size"</span>: <span class="hljs-number">4096</span>
+    <span class="hljs-attr">&quot;CN&quot;</span>: <span class="hljs-string">&quot;kubernetes&quot;</span>,
+    <span class="hljs-attr">&quot;key&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;algo&quot;</span>: <span class="hljs-string">&quot;rsa&quot;</span>,
+        <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">4096</span>
     &#125;,
-    <span class="hljs-attr">"names"</span>: [
+    <span class="hljs-attr">&quot;names&quot;</span>: [
         &#123;
-            <span class="hljs-attr">"C"</span>: <span class="hljs-string">"CN"</span>,
-            <span class="hljs-attr">"ST"</span>: <span class="hljs-string">"BeiJing"</span>,
-            <span class="hljs-attr">"L"</span>: <span class="hljs-string">"BeiJing"</span>,
-            <span class="hljs-attr">"O"</span>: <span class="hljs-string">"kubernetes"</span>,
-            <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
+            <span class="hljs-attr">&quot;C&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span>,
+            <span class="hljs-attr">&quot;ST&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+            <span class="hljs-attr">&quot;L&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+            <span class="hljs-attr">&quot;O&quot;</span>: <span class="hljs-string">&quot;kubernetes&quot;</span>,
+            <span class="hljs-attr">&quot;OU&quot;</span>: <span class="hljs-string">&quot;System&quot;</span>
         &#125;
     ],
-    <span class="hljs-attr">"ca"</span>: &#123;
-        <span class="hljs-attr">"expiry"</span>: <span class="hljs-string">"87600h"</span>
+    <span class="hljs-attr">&quot;ca&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;expiry&quot;</span>: <span class="hljs-string">&quot;87600h&quot;</span>
     &#125;
 &#125;</code></pre></div><ul><li>k8s-gencert.json 用于生成其他证书的标准配置</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-    <span class="hljs-attr">"signing"</span>: &#123;
-        <span class="hljs-attr">"default"</span>: &#123;
-            <span class="hljs-attr">"expiry"</span>: <span class="hljs-string">"87600h"</span>
+    <span class="hljs-attr">&quot;signing&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;default&quot;</span>: &#123;
+            <span class="hljs-attr">&quot;expiry&quot;</span>: <span class="hljs-string">&quot;87600h&quot;</span>
         &#125;,
-        <span class="hljs-attr">"profiles"</span>: &#123;
-            <span class="hljs-attr">"kubernetes"</span>: &#123;
-                <span class="hljs-attr">"usages"</span>: [
-                    <span class="hljs-string">"signing"</span>,
-                    <span class="hljs-string">"key encipherment"</span>,
-                    <span class="hljs-string">"server auth"</span>,
-                    <span class="hljs-string">"client auth"</span>
+        <span class="hljs-attr">&quot;profiles&quot;</span>: &#123;
+            <span class="hljs-attr">&quot;kubernetes&quot;</span>: &#123;
+                <span class="hljs-attr">&quot;usages&quot;</span>: [
+                    <span class="hljs-string">&quot;signing&quot;</span>,
+                    <span class="hljs-string">&quot;key encipherment&quot;</span>,
+                    <span class="hljs-string">&quot;server auth&quot;</span>,
+                    <span class="hljs-string">&quot;client auth&quot;</span>
                 ],
-                <span class="hljs-attr">"expiry"</span>: <span class="hljs-string">"87600h"</span>
+                <span class="hljs-attr">&quot;expiry&quot;</span>: <span class="hljs-string">&quot;87600h&quot;</span>
             &#125;
         &#125;
     &#125;
 &#125;</code></pre></div><ul><li>kube-apiserver-csr.json apiserver TLS 认证端口需要的证书</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-    <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"kubernetes"</span>,
-    <span class="hljs-attr">"hosts"</span>: [
-        <span class="hljs-string">"127.0.0.1"</span>,
-        <span class="hljs-string">"10.254.0.1"</span>,
-        <span class="hljs-string">"localhost"</span>,
-        <span class="hljs-string">"*.master.kubernetes.node"</span>,
-        <span class="hljs-string">"kubernetes"</span>,
-        <span class="hljs-string">"kubernetes.default"</span>,
-        <span class="hljs-string">"kubernetes.default.svc"</span>,
-        <span class="hljs-string">"kubernetes.default.svc.cluster"</span>,
-        <span class="hljs-string">"kubernetes.default.svc.cluster.local"</span>
+    <span class="hljs-attr">&quot;CN&quot;</span>: <span class="hljs-string">&quot;kubernetes&quot;</span>,
+    <span class="hljs-attr">&quot;hosts&quot;</span>: [
+        <span class="hljs-string">&quot;127.0.0.1&quot;</span>,
+        <span class="hljs-string">&quot;10.254.0.1&quot;</span>,
+        <span class="hljs-string">&quot;localhost&quot;</span>,
+        <span class="hljs-string">&quot;*.master.kubernetes.node&quot;</span>,
+        <span class="hljs-string">&quot;kubernetes&quot;</span>,
+        <span class="hljs-string">&quot;kubernetes.default&quot;</span>,
+        <span class="hljs-string">&quot;kubernetes.default.svc&quot;</span>,
+        <span class="hljs-string">&quot;kubernetes.default.svc.cluster&quot;</span>,
+        <span class="hljs-string">&quot;kubernetes.default.svc.cluster.local&quot;</span>
     ],
-    <span class="hljs-attr">"key"</span>: &#123;
-        <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
-        <span class="hljs-attr">"size"</span>: <span class="hljs-number">2048</span>
+    <span class="hljs-attr">&quot;key&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;algo&quot;</span>: <span class="hljs-string">&quot;rsa&quot;</span>,
+        <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">2048</span>
     &#125;,
-    <span class="hljs-attr">"names"</span>: [
+    <span class="hljs-attr">&quot;names&quot;</span>: [
         &#123;
-            <span class="hljs-attr">"C"</span>: <span class="hljs-string">"CN"</span>,
-            <span class="hljs-attr">"ST"</span>: <span class="hljs-string">"BeiJing"</span>,
-            <span class="hljs-attr">"L"</span>: <span class="hljs-string">"BeiJing"</span>,
-            <span class="hljs-attr">"O"</span>: <span class="hljs-string">"kubernetes"</span>,
-            <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
+            <span class="hljs-attr">&quot;C&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span>,
+            <span class="hljs-attr">&quot;ST&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+            <span class="hljs-attr">&quot;L&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+            <span class="hljs-attr">&quot;O&quot;</span>: <span class="hljs-string">&quot;kubernetes&quot;</span>,
+            <span class="hljs-attr">&quot;OU&quot;</span>: <span class="hljs-string">&quot;System&quot;</span>
         &#125;
     ]
 &#125;</code></pre></div><ul><li>kube-controller-manager-csr.json controller manager 连接 apiserver 需要使用的证书，同时本身 <code>10257</code> 端口也会使用此证书</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-  <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"system:kube-controller-manager"</span>,
-  <span class="hljs-attr">"hosts"</span>: [
-    <span class="hljs-string">"127.0.0.1"</span>,
-    <span class="hljs-string">"localhost"</span>,
-    <span class="hljs-string">"*.master.kubernetes.node"</span>
+  <span class="hljs-attr">&quot;CN&quot;</span>: <span class="hljs-string">&quot;system:kube-controller-manager&quot;</span>,
+  <span class="hljs-attr">&quot;hosts&quot;</span>: [
+    <span class="hljs-string">&quot;127.0.0.1&quot;</span>,
+    <span class="hljs-string">&quot;localhost&quot;</span>,
+    <span class="hljs-string">&quot;*.master.kubernetes.node&quot;</span>
   ],
-  <span class="hljs-attr">"key"</span>: &#123;
-    <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
-    <span class="hljs-attr">"size"</span>: <span class="hljs-number">2048</span>
+  <span class="hljs-attr">&quot;key&quot;</span>: &#123;
+    <span class="hljs-attr">&quot;algo&quot;</span>: <span class="hljs-string">&quot;rsa&quot;</span>,
+    <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">2048</span>
   &#125;,
-  <span class="hljs-attr">"names"</span>: [
+  <span class="hljs-attr">&quot;names&quot;</span>: [
     &#123;
-      <span class="hljs-attr">"C"</span>: <span class="hljs-string">"CN"</span>,
-      <span class="hljs-attr">"ST"</span>: <span class="hljs-string">"BeiJing"</span>,
-      <span class="hljs-attr">"L"</span>: <span class="hljs-string">"BeiJing"</span>,
-      <span class="hljs-attr">"O"</span>: <span class="hljs-string">"system:kube-controller-manager"</span>,
-      <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
+      <span class="hljs-attr">&quot;C&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span>,
+      <span class="hljs-attr">&quot;ST&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+      <span class="hljs-attr">&quot;L&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+      <span class="hljs-attr">&quot;O&quot;</span>: <span class="hljs-string">&quot;system:kube-controller-manager&quot;</span>,
+      <span class="hljs-attr">&quot;OU&quot;</span>: <span class="hljs-string">&quot;System&quot;</span>
     &#125;
   ]
 &#125;</code></pre></div><ul><li>kube-scheduler-csr.json scheduler 连接 apiserver 需要使用的证书，同时本身 <code>10259</code> 端口也会使用此证书</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-  <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"system:kube-scheduler"</span>,
-  <span class="hljs-attr">"hosts"</span>: [
-    <span class="hljs-string">"127.0.0.1"</span>,
-    <span class="hljs-string">"localhost"</span>,
-    <span class="hljs-string">"*.master.kubernetes.node"</span>
+  <span class="hljs-attr">&quot;CN&quot;</span>: <span class="hljs-string">&quot;system:kube-scheduler&quot;</span>,
+  <span class="hljs-attr">&quot;hosts&quot;</span>: [
+    <span class="hljs-string">&quot;127.0.0.1&quot;</span>,
+    <span class="hljs-string">&quot;localhost&quot;</span>,
+    <span class="hljs-string">&quot;*.master.kubernetes.node&quot;</span>
   ],
-  <span class="hljs-attr">"key"</span>: &#123;
-    <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
-    <span class="hljs-attr">"size"</span>: <span class="hljs-number">2048</span>
+  <span class="hljs-attr">&quot;key&quot;</span>: &#123;
+    <span class="hljs-attr">&quot;algo&quot;</span>: <span class="hljs-string">&quot;rsa&quot;</span>,
+    <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">2048</span>
   &#125;,
-  <span class="hljs-attr">"names"</span>: [
+  <span class="hljs-attr">&quot;names&quot;</span>: [
     &#123;
-      <span class="hljs-attr">"C"</span>: <span class="hljs-string">"CN"</span>,
-      <span class="hljs-attr">"ST"</span>: <span class="hljs-string">"BeiJing"</span>,
-      <span class="hljs-attr">"L"</span>: <span class="hljs-string">"BeiJing"</span>,
-      <span class="hljs-attr">"O"</span>: <span class="hljs-string">"system:kube-scheduler"</span>,
-      <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
+      <span class="hljs-attr">&quot;C&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span>,
+      <span class="hljs-attr">&quot;ST&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+      <span class="hljs-attr">&quot;L&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+      <span class="hljs-attr">&quot;O&quot;</span>: <span class="hljs-string">&quot;system:kube-scheduler&quot;</span>,
+      <span class="hljs-attr">&quot;OU&quot;</span>: <span class="hljs-string">&quot;System&quot;</span>
     &#125;
   ]
 &#125;</code></pre></div><ul><li>kube-proxy-csr.json proxy 组件连接 apiserver 需要使用的证书</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-    <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"system:kube-proxy"</span>,
-    <span class="hljs-attr">"hosts"</span>: [],
-    <span class="hljs-attr">"key"</span>: &#123;
-        <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
-        <span class="hljs-attr">"size"</span>: <span class="hljs-number">2048</span>
+    <span class="hljs-attr">&quot;CN&quot;</span>: <span class="hljs-string">&quot;system:kube-proxy&quot;</span>,
+    <span class="hljs-attr">&quot;hosts&quot;</span>: [],
+    <span class="hljs-attr">&quot;key&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;algo&quot;</span>: <span class="hljs-string">&quot;rsa&quot;</span>,
+        <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">2048</span>
     &#125;,
-    <span class="hljs-attr">"names"</span>: [
+    <span class="hljs-attr">&quot;names&quot;</span>: [
         &#123;
-            <span class="hljs-attr">"C"</span>: <span class="hljs-string">"CN"</span>,
-            <span class="hljs-attr">"ST"</span>: <span class="hljs-string">"BeiJing"</span>,
-            <span class="hljs-attr">"L"</span>: <span class="hljs-string">"BeiJing"</span>,
-            <span class="hljs-attr">"O"</span>: <span class="hljs-string">"system:kube-proxy"</span>,
-            <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
+            <span class="hljs-attr">&quot;C&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span>,
+            <span class="hljs-attr">&quot;ST&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+            <span class="hljs-attr">&quot;L&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+            <span class="hljs-attr">&quot;O&quot;</span>: <span class="hljs-string">&quot;system:kube-proxy&quot;</span>,
+            <span class="hljs-attr">&quot;OU&quot;</span>: <span class="hljs-string">&quot;System&quot;</span>
         &#125;
     ]
 &#125;</code></pre></div><ul><li>kubelet-api-admin-csr.json apiserver 反向连接 kubelet 组件 <code>10250</code> 端口需要使用的证书(例如执行 <code>kubectl logs</code>)</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-    <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"system:kubelet-api-admin"</span>,
-    <span class="hljs-attr">"hosts"</span>: [],
-    <span class="hljs-attr">"key"</span>: &#123;
-        <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
-        <span class="hljs-attr">"size"</span>: <span class="hljs-number">2048</span>
+    <span class="hljs-attr">&quot;CN&quot;</span>: <span class="hljs-string">&quot;system:kubelet-api-admin&quot;</span>,
+    <span class="hljs-attr">&quot;hosts&quot;</span>: [],
+    <span class="hljs-attr">&quot;key&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;algo&quot;</span>: <span class="hljs-string">&quot;rsa&quot;</span>,
+        <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">2048</span>
     &#125;,
-    <span class="hljs-attr">"names"</span>: [
+    <span class="hljs-attr">&quot;names&quot;</span>: [
         &#123;
-            <span class="hljs-attr">"C"</span>: <span class="hljs-string">"CN"</span>,
-            <span class="hljs-attr">"ST"</span>: <span class="hljs-string">"BeiJing"</span>,
-            <span class="hljs-attr">"L"</span>: <span class="hljs-string">"BeiJing"</span>,
-            <span class="hljs-attr">"O"</span>: <span class="hljs-string">"system:kubelet-api-admin"</span>,
-            <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
+            <span class="hljs-attr">&quot;C&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span>,
+            <span class="hljs-attr">&quot;ST&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+            <span class="hljs-attr">&quot;L&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+            <span class="hljs-attr">&quot;O&quot;</span>: <span class="hljs-string">&quot;system:kubelet-api-admin&quot;</span>,
+            <span class="hljs-attr">&quot;OU&quot;</span>: <span class="hljs-string">&quot;System&quot;</span>
         &#125;
     ]
 &#125;</code></pre></div><ul><li>admin-csr.json 集群管理员(kubectl)连接 apiserver 需要使用的证书</li></ul><div class="hljs"><pre><code class="hljs json">&#123;
-    <span class="hljs-attr">"CN"</span>: <span class="hljs-string">"system:masters"</span>,
-    <span class="hljs-attr">"hosts"</span>: [],
-    <span class="hljs-attr">"key"</span>: &#123;
-        <span class="hljs-attr">"algo"</span>: <span class="hljs-string">"rsa"</span>,
-        <span class="hljs-attr">"size"</span>: <span class="hljs-number">2048</span>
+    <span class="hljs-attr">&quot;CN&quot;</span>: <span class="hljs-string">&quot;system:masters&quot;</span>,
+    <span class="hljs-attr">&quot;hosts&quot;</span>: [],
+    <span class="hljs-attr">&quot;key&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;algo&quot;</span>: <span class="hljs-string">&quot;rsa&quot;</span>,
+        <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">2048</span>
     &#125;,
-    <span class="hljs-attr">"names"</span>: [
+    <span class="hljs-attr">&quot;names&quot;</span>: [
         &#123;
-            <span class="hljs-attr">"C"</span>: <span class="hljs-string">"CN"</span>,
-            <span class="hljs-attr">"ST"</span>: <span class="hljs-string">"BeiJing"</span>,
-            <span class="hljs-attr">"L"</span>: <span class="hljs-string">"BeiJing"</span>,
-            <span class="hljs-attr">"O"</span>: <span class="hljs-string">"system:masters"</span>,
-            <span class="hljs-attr">"OU"</span>: <span class="hljs-string">"System"</span>
+            <span class="hljs-attr">&quot;C&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span>,
+            <span class="hljs-attr">&quot;ST&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+            <span class="hljs-attr">&quot;L&quot;</span>: <span class="hljs-string">&quot;BeiJing&quot;</span>,
+            <span class="hljs-attr">&quot;O&quot;</span>: <span class="hljs-string">&quot;system:masters&quot;</span>,
+            <span class="hljs-attr">&quot;OU&quot;</span>: <span class="hljs-string">&quot;System&quot;</span>
         &#125;
     ]
-&#125;</code></pre></div><p><strong>注意: 请不要修改证书配置的 <code>CN</code>、<code>O</code> 字段，这两个字段名称比较特殊，大多数为 <code>system:</code> 开头，实际上是为了匹配 RBAC 规则，具体请参考 <a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/#default-roles-and-role-bindings" target="_blank" rel="noopener">Default Roles and Role Bindings</a></strong></p><p>最后使用如下命令生成即可:</p><div class="hljs"><pre><code class="hljs sh">cfssl gencert --initca=<span class="hljs-literal">true</span> k8s-root-ca-csr.json | cfssljson --bare k8s-root-ca
+&#125;</code></pre></div><p><strong>注意: 请不要修改证书配置的 <code>CN</code>、<code>O</code> 字段，这两个字段名称比较特殊，大多数为 <code>system:</code> 开头，实际上是为了匹配 RBAC 规则，具体请参考 <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/#default-roles-and-role-bindings">Default Roles and Role Bindings</a></strong></p><p>最后使用如下命令生成即可:</p><div class="hljs"><pre><code class="hljs sh">cfssl gencert --initca=<span class="hljs-literal">true</span> k8s-root-ca-csr.json | cfssljson --bare k8s-root-ca
 
 <span class="hljs-keyword">for</span> targetName <span class="hljs-keyword">in</span> kube-apiserver kube-controller-manager kube-scheduler kube-proxy kubelet-api-admin admin; <span class="hljs-keyword">do</span>
     cfssl gencert --ca k8s-root-ca.pem --ca-key k8s-root-ca-key.pem --config k8s-gencert.json --profile kubernetes <span class="hljs-variable">$targetName</span>-csr.json | cfssljson --
 bare <span class="hljs-variable">$targetName</span>
-<span class="hljs-keyword">done</span></code></pre></div><h4 id="3-1-2、生成配置文件"><a href="#3-1-2、生成配置文件" class="headerlink" title="3.1.2、生成配置文件"></a>3.1.2、生成配置文件</h4><p>集群搭建需要预先生成一系列配置文件，生成配置需要预先安装 <code>kubectl</code> 命令，请自行根据文档安装 <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-using-curl" target="_blank" rel="noopener">Install kubectl binary using curl</a>；其中配置文件及其作用如下:</p><ul><li><code>bootstrap.kubeconfig</code> kubelet TLS Bootstarp 引导阶段需要使用的配置文件</li><li><code>kube-controller-manager.kubeconfig</code> controller manager 组件开启安全端口及 RBAC 认证所需配置</li><li><code>kube-scheduler.kubeconfig</code> scheduler 组件开启安全端口及 RBAC 认证所需配置</li><li><code>kube-proxy.kubeconfig</code> proxy 组件连接 apiserver 所需配置文件</li><li><code>audit-policy.yaml</code> apiserver RBAC 审计日志配置文件</li><li><code>bootstrap.secret.yaml</code> kubelet TLS Bootstarp 引导阶段使用 Bootstrap Token 方式引导，需要预先创建此 Token</li></ul><p>生成这些配置文件的脚本如下</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 指定 apiserver 地址</span>
-KUBE_APISERVER=<span class="hljs-string">"https://127.0.0.1:6443"</span>
+<span class="hljs-keyword">done</span></code></pre></div><h4 id="3-1-2、生成配置文件"><a href="#3-1-2、生成配置文件" class="headerlink" title="3.1.2、生成配置文件"></a>3.1.2、生成配置文件</h4><p>集群搭建需要预先生成一系列配置文件，生成配置需要预先安装 <code>kubectl</code> 命令，请自行根据文档安装 <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-using-curl">Install kubectl binary using curl</a>；其中配置文件及其作用如下:</p><ul><li><code>bootstrap.kubeconfig</code> kubelet TLS Bootstarp 引导阶段需要使用的配置文件</li><li><code>kube-controller-manager.kubeconfig</code> controller manager 组件开启安全端口及 RBAC 认证所需配置</li><li><code>kube-scheduler.kubeconfig</code> scheduler 组件开启安全端口及 RBAC 认证所需配置</li><li><code>kube-proxy.kubeconfig</code> proxy 组件连接 apiserver 所需配置文件</li><li><code>audit-policy.yaml</code> apiserver RBAC 审计日志配置文件</li><li><code>bootstrap.secret.yaml</code> kubelet TLS Bootstarp 引导阶段使用 Bootstrap Token 方式引导，需要预先创建此 Token</li></ul><p>生成这些配置文件的脚本如下</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 指定 apiserver 地址</span>
+KUBE_APISERVER=<span class="hljs-string">&quot;https://127.0.0.1:6443&quot;</span>
 
 <span class="hljs-comment"># 生成 Bootstrap Token</span>
 BOOTSTRAP_TOKEN_ID=$(head -c 6 /dev/urandom | md5sum | head -c 6)
 BOOTSTRAP_TOKEN_SECRET=$(head -c 16 /dev/urandom | md5sum | head -c 16)
-BOOTSTRAP_TOKEN=<span class="hljs-string">"<span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_ID&#125;</span>.<span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_SECRET&#125;</span>"</span>
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"Bootstrap Tokne: <span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN&#125;</span>"</span>
+BOOTSTRAP_TOKEN=<span class="hljs-string">&quot;<span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_ID&#125;</span>.<span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_SECRET&#125;</span>&quot;</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Bootstrap Tokne: <span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN&#125;</span>&quot;</span>
 
 <span class="hljs-comment"># 生成 kubelet tls bootstrap 配置</span>
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"Create kubelet bootstrapping kubeconfig..."</span>
-kubectl config <span class="hljs-built_in">set</span>-cluster kubernetes \
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Create kubelet bootstrapping kubeconfig...&quot;</span>
+kubectl config set-cluster kubernetes \
   --certificate-authority=k8s-root-ca.pem \
   --embed-certs=<span class="hljs-literal">true</span> \
   --server=<span class="hljs-variable">$&#123;KUBE_APISERVER&#125;</span> \
   --kubeconfig=bootstrap.kubeconfig
-kubectl config <span class="hljs-built_in">set</span>-credentials <span class="hljs-string">"system:bootstrap:<span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_ID&#125;</span>"</span> \
+kubectl config set-credentials <span class="hljs-string">&quot;system:bootstrap:<span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_ID&#125;</span>&quot;</span> \
   --token=<span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN&#125;</span> \
   --kubeconfig=bootstrap.kubeconfig
-kubectl config <span class="hljs-built_in">set</span>-context default \
+kubectl config set-context default \
   --cluster=kubernetes \
-  --user=<span class="hljs-string">"system:bootstrap:<span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_ID&#125;</span>"</span> \
+  --user=<span class="hljs-string">&quot;system:bootstrap:<span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_ID&#125;</span>&quot;</span> \
   --kubeconfig=bootstrap.kubeconfig
 kubectl config use-context default --kubeconfig=bootstrap.kubeconfig
 
 <span class="hljs-comment"># 生成 kube-controller-manager 配置文件</span>
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"Create kube-controller-manager kubeconfig..."</span>
-kubectl config <span class="hljs-built_in">set</span>-cluster kubernetes \
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Create kube-controller-manager kubeconfig...&quot;</span>
+kubectl config set-cluster kubernetes \
   --certificate-authority=k8s-root-ca.pem \
   --embed-certs=<span class="hljs-literal">true</span> \
   --server=<span class="hljs-variable">$&#123;KUBE_APISERVER&#125;</span> \
   --kubeconfig=kube-controller-manager.kubeconfig
-kubectl config <span class="hljs-built_in">set</span>-credentials <span class="hljs-string">"system:kube-controller-manager"</span> \
+kubectl config set-credentials <span class="hljs-string">&quot;system:kube-controller-manager&quot;</span> \
   --client-certificate=kube-controller-manager.pem \
   --client-key=kube-controller-manager-key.pem \
   --embed-certs=<span class="hljs-literal">true</span> \
   --kubeconfig=kube-controller-manager.kubeconfig
-kubectl config <span class="hljs-built_in">set</span>-context default \
+kubectl config set-context default \
   --cluster=kubernetes \
   --user=system:kube-controller-manager \
   --kubeconfig=kube-controller-manager.kubeconfig
 kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig 
 
 <span class="hljs-comment"># 生成 kube-scheduler 配置文件</span>
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"Create kube-scheduler kubeconfig..."</span>
-kubectl config <span class="hljs-built_in">set</span>-cluster kubernetes \
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Create kube-scheduler kubeconfig...&quot;</span>
+kubectl config set-cluster kubernetes \
   --certificate-authority=k8s-root-ca.pem \
   --embed-certs=<span class="hljs-literal">true</span> \
   --server=<span class="hljs-variable">$&#123;KUBE_APISERVER&#125;</span> \
   --kubeconfig=kube-scheduler.kubeconfig
-kubectl config <span class="hljs-built_in">set</span>-credentials <span class="hljs-string">"system:kube-scheduler"</span> \
+kubectl config set-credentials <span class="hljs-string">&quot;system:kube-scheduler&quot;</span> \
   --client-certificate=kube-scheduler.pem \
   --client-key=kube-scheduler-key.pem \
   --embed-certs=<span class="hljs-literal">true</span> \
   --kubeconfig=kube-scheduler.kubeconfig
-kubectl config <span class="hljs-built_in">set</span>-context default \
+kubectl config set-context default \
   --cluster=kubernetes \
   --user=system:kube-scheduler \
   --kubeconfig=kube-scheduler.kubeconfig
 kubectl config use-context default --kubeconfig=kube-scheduler.kubeconfig 
 
 <span class="hljs-comment"># 生成 kube-proxy 配置文件</span>
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"Create kube-proxy kubeconfig..."</span>
-kubectl config <span class="hljs-built_in">set</span>-cluster kubernetes \
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Create kube-proxy kubeconfig...&quot;</span>
+kubectl config set-cluster kubernetes \
   --certificate-authority=k8s-root-ca.pem \
   --embed-certs=<span class="hljs-literal">true</span> \
   --server=<span class="hljs-variable">$&#123;KUBE_APISERVER&#125;</span> \
   --kubeconfig=kube-proxy.kubeconfig
-kubectl config <span class="hljs-built_in">set</span>-credentials <span class="hljs-string">"system:kube-proxy"</span> \
+kubectl config set-credentials <span class="hljs-string">&quot;system:kube-proxy&quot;</span> \
   --client-certificate=kube-proxy.pem \
   --client-key=kube-proxy-key.pem \
   --embed-certs=<span class="hljs-literal">true</span> \
   --kubeconfig=kube-proxy.kubeconfig
-kubectl config <span class="hljs-built_in">set</span>-context default \
+kubectl config set-context default \
   --cluster=kubernetes \
   --user=system:kube-proxy \
   --kubeconfig=kube-proxy.kubeconfig
 kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig 
 
 <span class="hljs-comment"># 生成 apiserver RBAC 审计配置文件 </span>
-cat &gt;&gt; audit-policy.yaml &lt;&lt;EOF
-<span class="hljs-comment"># Log all requests at the Metadata level.</span>
-apiVersion: audit.k8s.io/v1
-kind: Policy
-rules:
-- level: Metadata
-EOF
+cat &gt;&gt; audit-policy.yaml &lt;&lt;<span class="hljs-string">EOF</span>
+<span class="hljs-string"># Log all requests at the Metadata level.</span>
+<span class="hljs-string">apiVersion: audit.k8s.io/v1</span>
+<span class="hljs-string">kind: Policy</span>
+<span class="hljs-string">rules:</span>
+<span class="hljs-string">- level: Metadata</span>
+<span class="hljs-string">EOF</span>
 
 <span class="hljs-comment"># 生成 tls bootstrap token secret 配置文件</span>
-cat &gt;&gt; bootstrap.secret.yaml &lt;&lt;EOF
-apiVersion: v1
-kind: Secret
-metadata:
-  <span class="hljs-comment"># Name MUST be of form "bootstrap-token-&lt;token id&gt;"</span>
-  name: bootstrap-token-<span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_ID&#125;</span>
-  namespace: kube-system
-<span class="hljs-comment"># Type MUST be 'bootstrap.kubernetes.io/token'</span>
-<span class="hljs-built_in">type</span>: bootstrap.kubernetes.io/token
-stringData:
-  <span class="hljs-comment"># Human readable description. Optional.</span>
-  description: <span class="hljs-string">"The default bootstrap token."</span>
-  <span class="hljs-comment"># Token ID and secret. Required.</span>
-  token-id: <span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_ID&#125;</span>
-  token-secret: <span class="hljs-variable">$&#123;BOOTSTRAP_TOKEN_SECRET&#125;</span>
-  <span class="hljs-comment"># Expiration. Optional.</span>
-  expiration: $(date -d<span class="hljs-string">'+2 day'</span> -u +<span class="hljs-string">"%Y-%m-%dT%H:%M:%SZ"</span>)
-  <span class="hljs-comment"># Allowed usages.</span>
-  usage-bootstrap-authentication: <span class="hljs-string">"true"</span>
-  usage-bootstrap-signing: <span class="hljs-string">"true"</span>
-  <span class="hljs-comment"># Extra groups to authenticate the token as. Must start with "system:bootstrappers:"</span>
-<span class="hljs-comment">#  auth-extra-groups: system:bootstrappers:worker,system:bootstrappers:ingress</span>
-EOF</code></pre></div><h3 id="3-2、处理-ipvs-及依赖"><a href="#3-2、处理-ipvs-及依赖" class="headerlink" title="3.2、处理 ipvs 及依赖"></a>3.2、处理 ipvs 及依赖</h3><p>新版本目前 <code>kube-proxy</code> 组件全部采用 ipvs 方式负载，所以为了 <code>kube-proxy</code> 能正常工作需要预先处理一下 ipvs 配置以及相关依赖(每台 node 都要处理)</p><div class="hljs"><pre><code class="hljs sh">cat &gt;&gt; /etc/sysctl.conf &lt;&lt;EOF
-net.ipv4.ip_forward=1
-net.bridge.bridge-nf-call-iptables=1
-net.bridge.bridge-nf-call-ip6tables=1
-EOF
+cat &gt;&gt; bootstrap.secret.yaml &lt;&lt;<span class="hljs-string">EOF</span>
+<span class="hljs-string">apiVersion: v1</span>
+<span class="hljs-string">kind: Secret</span>
+<span class="hljs-string">metadata:</span>
+<span class="hljs-string">  # Name MUST be of form &quot;bootstrap-token-&lt;token id&gt;&quot;</span>
+<span class="hljs-string">  name: bootstrap-token-$&#123;BOOTSTRAP_TOKEN_ID&#125;</span>
+<span class="hljs-string">  namespace: kube-system</span>
+<span class="hljs-string"># Type MUST be &#x27;bootstrap.kubernetes.io/token&#x27;</span>
+<span class="hljs-string">type: bootstrap.kubernetes.io/token</span>
+<span class="hljs-string">stringData:</span>
+<span class="hljs-string">  # Human readable description. Optional.</span>
+<span class="hljs-string">  description: &quot;The default bootstrap token.&quot;</span>
+<span class="hljs-string">  # Token ID and secret. Required.</span>
+<span class="hljs-string">  token-id: $&#123;BOOTSTRAP_TOKEN_ID&#125;</span>
+<span class="hljs-string">  token-secret: $&#123;BOOTSTRAP_TOKEN_SECRET&#125;</span>
+<span class="hljs-string">  # Expiration. Optional.</span>
+<span class="hljs-string">  expiration: $(date -d&#x27;+2 day&#x27; -u +&quot;%Y-%m-%dT%H:%M:%SZ&quot;)</span>
+<span class="hljs-string">  # Allowed usages.</span>
+<span class="hljs-string">  usage-bootstrap-authentication: &quot;true&quot;</span>
+<span class="hljs-string">  usage-bootstrap-signing: &quot;true&quot;</span>
+<span class="hljs-string">  # Extra groups to authenticate the token as. Must start with &quot;system:bootstrappers:&quot;</span>
+<span class="hljs-string">#  auth-extra-groups: system:bootstrappers:worker,system:bootstrappers:ingress</span>
+<span class="hljs-string">EOF</span></code></pre></div><h3 id="3-2、处理-ipvs-及依赖"><a href="#3-2、处理-ipvs-及依赖" class="headerlink" title="3.2、处理 ipvs 及依赖"></a>3.2、处理 ipvs 及依赖</h3><p>新版本目前 <code>kube-proxy</code> 组件全部采用 ipvs 方式负载，所以为了 <code>kube-proxy</code> 能正常工作需要预先处理一下 ipvs 配置以及相关依赖(每台 node 都要处理)</p><div class="hljs"><pre><code class="hljs sh">cat &gt;&gt; /etc/sysctl.conf &lt;&lt;<span class="hljs-string">EOF</span>
+<span class="hljs-string">net.ipv4.ip_forward=1</span>
+<span class="hljs-string">net.bridge.bridge-nf-call-iptables=1</span>
+<span class="hljs-string">net.bridge.bridge-nf-call-ip6tables=1</span>
+<span class="hljs-string">EOF</span>
 
 sysctl -p
 
-cat &gt;&gt; /etc/modules &lt;&lt;EOF
-ip_vs
-ip_vs_lc
-ip_vs_wlc
-ip_vs_rr
-ip_vs_wrr
-ip_vs_lblc
-ip_vs_lblcr
-ip_vs_dh
-ip_vs_sh
-ip_vs_fo
-ip_vs_nq
-ip_vs_sed
-ip_vs_ftp
-EOF
+cat &gt;&gt; /etc/modules &lt;&lt;<span class="hljs-string">EOF</span>
+<span class="hljs-string">ip_vs</span>
+<span class="hljs-string">ip_vs_lc</span>
+<span class="hljs-string">ip_vs_wlc</span>
+<span class="hljs-string">ip_vs_rr</span>
+<span class="hljs-string">ip_vs_wrr</span>
+<span class="hljs-string">ip_vs_lblc</span>
+<span class="hljs-string">ip_vs_lblcr</span>
+<span class="hljs-string">ip_vs_dh</span>
+<span class="hljs-string">ip_vs_sh</span>
+<span class="hljs-string">ip_vs_fo</span>
+<span class="hljs-string">ip_vs_nq</span>
+<span class="hljs-string">ip_vs_sed</span>
+<span class="hljs-string">ip_vs_ftp</span>
+<span class="hljs-string">EOF</span>
 
-apt install -y conntrack ipvsadm</code></pre></div><h3 id="3-3、部署-Master"><a href="#3-3、部署-Master" class="headerlink" title="3.3、部署 Master"></a>3.3、部署 Master</h3><h4 id="3-3-1、安装脚本"><a href="#3-3-1、安装脚本" class="headerlink" title="3.3.1、安装脚本"></a>3.3.1、安装脚本</h4><p>master 节点上需要三个组件: <code>kube-apiserver</code>、<code>kube-controller-manager</code>、<code>kube-scheduler</code></p><p><strong>安装流程整体为以下几步</strong></p><ul><li><strong>创建单独的 <code>kube</code> 用户</strong></li><li><strong>复制相关二进制文件到 <code>/usr/bin</code>，可以采用 <code>all in one</code> 的 <code>hyperkube</code></strong></li><li><strong>复制配置文件到 <code>/etc/kubernetes</code></strong></li><li><strong>复制证书文件到 <code>/etc/kubernetes/ssl</code></strong></li><li><strong>修改配置并启动</strong></li></ul><p>安装脚本如下所示:</p><div class="hljs"><pre><code class="hljs sh">KUBE_DEFAULT_VERSION=<span class="hljs-string">"1.13.4"</span>
+apt install -y conntrack ipvsadm</code></pre></div><h3 id="3-3、部署-Master"><a href="#3-3、部署-Master" class="headerlink" title="3.3、部署 Master"></a>3.3、部署 Master</h3><h4 id="3-3-1、安装脚本"><a href="#3-3-1、安装脚本" class="headerlink" title="3.3.1、安装脚本"></a>3.3.1、安装脚本</h4><p>master 节点上需要三个组件: <code>kube-apiserver</code>、<code>kube-controller-manager</code>、<code>kube-scheduler</code></p><p><strong>安装流程整体为以下几步</strong></p><ul><li><strong>创建单独的 <code>kube</code> 用户</strong></li><li><strong>复制相关二进制文件到 <code>/usr/bin</code>，可以采用 <code>all in one</code> 的 <code>hyperkube</code></strong></li><li><strong>复制配置文件到 <code>/etc/kubernetes</code></strong></li><li><strong>复制证书文件到 <code>/etc/kubernetes/ssl</code></strong></li><li><strong>修改配置并启动</strong></li></ul><p>安装脚本如下所示:</p><div class="hljs"><pre><code class="hljs sh">KUBE_DEFAULT_VERSION=<span class="hljs-string">&quot;1.13.4&quot;</span>
 
-<span class="hljs-keyword">if</span> [ <span class="hljs-string">"<span class="hljs-variable">$1</span>"</span> != <span class="hljs-string">""</span> ]; <span class="hljs-keyword">then</span>
+<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> != <span class="hljs-string">&quot;&quot;</span> ]; <span class="hljs-keyword">then</span>
   KUBE_VERSION=<span class="hljs-variable">$1</span>
 <span class="hljs-keyword">else</span>
-  <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[33mWARNING: KUBE_VERSION is blank,use default version: <span class="hljs-variable">$&#123;KUBE_DEFAULT_VERSION&#125;</span>\033[0m"</span>
+  <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;\033[33mWARNING: KUBE_VERSION is blank,use default version: <span class="hljs-variable">$&#123;KUBE_DEFAULT_VERSION&#125;</span>\033[0m&quot;</span>
   KUBE_VERSION=<span class="hljs-variable">$&#123;KUBE_DEFAULT_VERSION&#125;</span>
 <span class="hljs-keyword">fi</span>
 
 <span class="hljs-comment"># 下载 hyperkube</span>
 <span class="hljs-keyword">function</span> <span class="hljs-function"><span class="hljs-title">download_k8s</span></span>()&#123;
-    <span class="hljs-keyword">if</span> [ ! -f <span class="hljs-string">"hyperkube_v<span class="hljs-variable">$&#123;KUBE_VERSION&#125;</span>"</span> ]; <span class="hljs-keyword">then</span>
+    <span class="hljs-keyword">if</span> [ ! -f <span class="hljs-string">&quot;hyperkube_v<span class="hljs-variable">$&#123;KUBE_VERSION&#125;</span>&quot;</span> ]; <span class="hljs-keyword">then</span>
         wget https://storage.googleapis.com/kubernetes-release/release/v<span class="hljs-variable">$&#123;KUBE_VERSION&#125;</span>/bin/linux/amd64/hyperkube -O hyperkube_v<span class="hljs-variable">$&#123;KUBE_VERSION&#125;</span>
         chmod +x hyperkube_v<span class="hljs-variable">$&#123;KUBE_VERSION&#125;</span>
     <span class="hljs-keyword">fi</span>
@@ -502,38 +502,38 @@ apt install -y conntrack ipvsadm</code></pre></div><h3 id="3-3、部署-Master">
 <span class="hljs-comment"># 创建专用用户 kube</span>
 <span class="hljs-keyword">function</span> <span class="hljs-function"><span class="hljs-title">preinstall</span></span>()&#123;
     getent group kube &gt;/dev/null || groupadd -r kube
-    getent passwd kube &gt;/dev/null || useradd -r -g kube -d / -s /sbin/nologin -c <span class="hljs-string">"Kubernetes user"</span> kube
+    getent passwd kube &gt;/dev/null || useradd -r -g kube -d / -s /sbin/nologin -c <span class="hljs-string">&quot;Kubernetes user&quot;</span> kube
 &#125;
 
 <span class="hljs-comment"># 复制可执行文件和配置以及证书</span>
 <span class="hljs-keyword">function</span> <span class="hljs-function"><span class="hljs-title">install_k8s</span></span>()&#123;
-    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[32mINFO: Copy hyperkube...\033[0m"</span>
+    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;\033[32mINFO: Copy hyperkube...\033[0m&quot;</span>
     cp hyperkube_v<span class="hljs-variable">$&#123;KUBE_VERSION&#125;</span> /usr/bin/hyperkube
 
-    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[32mINFO: Create symbolic link...\033[0m"</span>
+    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;\033[32mINFO: Create symbolic link...\033[0m&quot;</span>
     (<span class="hljs-built_in">cd</span> /usr/bin &amp;&amp; hyperkube --make-symlinks)
 
-    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[32mINFO: Copy kubernetes config...\033[0m"</span>
+    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;\033[32mINFO: Copy kubernetes config...\033[0m&quot;</span>
     cp -r conf /etc/kubernetes
-    <span class="hljs-keyword">if</span> [ -d <span class="hljs-string">"/etc/kubernetes/ssl"</span> ]; <span class="hljs-keyword">then</span>
+    <span class="hljs-keyword">if</span> [ -d <span class="hljs-string">&quot;/etc/kubernetes/ssl&quot;</span> ]; <span class="hljs-keyword">then</span>
         chown -R kube:kube /etc/kubernetes/ssl
     <span class="hljs-keyword">fi</span>
 
-    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[32mINFO: Copy kubernetes systemd config...\033[0m"</span>
+    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;\033[32mINFO: Copy kubernetes systemd config...\033[0m&quot;</span>
     cp systemd/*.service /lib/systemd/system
     systemctl daemon-reload
 &#125;
 
 <span class="hljs-comment"># 创建必要的目录并修改权限</span>
 <span class="hljs-keyword">function</span> <span class="hljs-function"><span class="hljs-title">postinstall</span></span>()&#123;
-    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">"/var/log/kube-audit"</span> ]; <span class="hljs-keyword">then</span>
+    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">&quot;/var/log/kube-audit&quot;</span> ]; <span class="hljs-keyword">then</span>
         mkdir /var/<span class="hljs-built_in">log</span>/kube-audit
     <span class="hljs-keyword">fi</span>
     
-    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">"/var/lib/kubelet"</span> ]; <span class="hljs-keyword">then</span>
+    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">&quot;/var/lib/kubelet&quot;</span> ]; <span class="hljs-keyword">then</span>
         mkdir /var/lib/kubelet
     <span class="hljs-keyword">fi</span>
-    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">"/usr/libexec"</span> ]; <span class="hljs-keyword">then</span>
+    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">&quot;/usr/libexec&quot;</span> ]; <span class="hljs-keyword">then</span>
         mkdir /usr/libexec
     <span class="hljs-keyword">fi</span>
     chown -R kube:kube /etc/kubernetes /var/<span class="hljs-built_in">log</span>/kube-audit /var/lib/kubelet /usr/libexec
@@ -635,25 +635,25 @@ WantedBy=multi-user.target</code></pre></div><p><strong>核心配置文件</stro
 <span class="hljs-comment">#</span>
 
 <span class="hljs-comment"># The address on the local server to listen to.</span>
-KUBE_API_ADDRESS=<span class="hljs-string">"--advertise-address=192.168.1.51 --bind-address=0.0.0.0"</span>
+KUBE_API_ADDRESS=<span class="hljs-string">&quot;--advertise-address=192.168.1.51 --bind-address=0.0.0.0&quot;</span>
 
 <span class="hljs-comment"># The port on the local server to listen on.</span>
-KUBE_API_PORT=<span class="hljs-string">"--secure-port=6443"</span>
+KUBE_API_PORT=<span class="hljs-string">&quot;--secure-port=6443&quot;</span>
 
 <span class="hljs-comment"># Port minions listen on</span>
-<span class="hljs-comment"># KUBELET_PORT="--kubelet-port=10250"</span>
+<span class="hljs-comment"># KUBELET_PORT=&quot;--kubelet-port=10250&quot;</span>
 
 <span class="hljs-comment"># Comma separated list of nodes in the etcd cluster</span>
-KUBE_ETCD_SERVERS=<span class="hljs-string">"--etcd-servers=https://192.168.1.51:2379,https://192.168.1.52:2379,https://192.168.1.53:2379"</span>
+KUBE_ETCD_SERVERS=<span class="hljs-string">&quot;--etcd-servers=https://192.168.1.51:2379,https://192.168.1.52:2379,https://192.168.1.53:2379&quot;</span>
 
 <span class="hljs-comment"># Address range to use for services</span>
-KUBE_SERVICE_ADDRESSES=<span class="hljs-string">"--service-cluster-ip-range=10.254.0.0/16"</span>
+KUBE_SERVICE_ADDRESSES=<span class="hljs-string">&quot;--service-cluster-ip-range=10.254.0.0/16&quot;</span>
 
 <span class="hljs-comment"># default admission control policies</span>
-KUBE_ADMISSION_CONTROL=<span class="hljs-string">"--enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,Priority,ResourceQuota"</span>
+KUBE_ADMISSION_CONTROL=<span class="hljs-string">&quot;--enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,Priority,ResourceQuota&quot;</span>
 
 <span class="hljs-comment"># Add your own!</span>
-KUBE_API_ARGS=<span class="hljs-string">" --allow-privileged=true \</span>
+KUBE_API_ARGS=<span class="hljs-string">&quot; --allow-privileged=true \</span>
 <span class="hljs-string">                --anonymous-auth=false \</span>
 <span class="hljs-string">                --alsologtostderr \</span>
 <span class="hljs-string">                --apiserver-count=3 \</span>
@@ -683,13 +683,13 @@ KUBE_API_ARGS=<span class="hljs-string">" --allow-privileged=true \</span>
 <span class="hljs-string">                --service-account-key-file=/etc/kubernetes/ssl/k8s-root-ca.pem \</span>
 <span class="hljs-string">                --tls-cert-file=/etc/kubernetes/ssl/kube-apiserver.pem \</span>
 <span class="hljs-string">                --tls-private-key-file=/etc/kubernetes/ssl/kube-apiserver-key.pem \</span>
-<span class="hljs-string">                --v=2"</span></code></pre></div><p>配置解释:</p><table><thead><tr><th>选项</th><th>作用</th></tr></thead><tbody><tr><td><code>--client-ca-file</code></td><td>定义客户端 CA</td></tr><tr><td><code>--endpoint-reconciler-type</code></td><td>master endpoint 策略</td></tr><tr><td><code>--kubelet-client-certificate</code>、<code>--kubelet-client-key</code></td><td>master 反向连接 kubelet 使用的证书</td></tr><tr><td><code>--service-account-key-file</code></td><td>service account 签名 key(用于有效性验证)</td></tr><tr><td><code>--tls-cert-file</code>、<code>--tls-private-key-file</code></td><td>master apiserver <code>6443</code> 端口证书</td></tr></tbody></table><ul><li>controller-manager</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
+<span class="hljs-string">                --v=2&quot;</span></code></pre></div><p>配置解释:</p><table><thead><tr><th>选项</th><th>作用</th></tr></thead><tbody><tr><td><code>--client-ca-file</code></td><td>定义客户端 CA</td></tr><tr><td><code>--endpoint-reconciler-type</code></td><td>master endpoint 策略</td></tr><tr><td><code>--kubelet-client-certificate</code>、<code>--kubelet-client-key</code></td><td>master 反向连接 kubelet 使用的证书</td></tr><tr><td><code>--service-account-key-file</code></td><td>service account 签名 key(用于有效性验证)</td></tr><tr><td><code>--tls-cert-file</code>、<code>--tls-private-key-file</code></td><td>master apiserver <code>6443</code> 端口证书</td></tr></tbody></table><ul><li>controller-manager</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># The following values are used to configure the kubernetes controller-manager</span>
 
 <span class="hljs-comment"># defaults from config and apiserver should be adequate</span>
 
 <span class="hljs-comment"># Add your own!</span>
-KUBE_CONTROLLER_MANAGER_ARGS=<span class="hljs-string">"  --address=127.0.0.1 \</span>
+KUBE_CONTROLLER_MANAGER_ARGS=<span class="hljs-string">&quot;  --address=127.0.0.1 \</span>
 <span class="hljs-string">                                --authentication-kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \</span>
 <span class="hljs-string">                                --authorization-kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \</span>
 <span class="hljs-string">                                --bind-address=0.0.0.0 \</span>
@@ -716,13 +716,13 @@ KUBE_CONTROLLER_MANAGER_ARGS=<span class="hljs-string">"  --address=127.0.0.1 \<
 <span class="hljs-string">                                --service-cluster-ip-range=10.254.0.0/16 \</span>
 <span class="hljs-string">                                --service-account-private-key-file=/etc/kubernetes/ssl/k8s-root-ca-key.pem \</span>
 <span class="hljs-string">                                --use-service-account-credentials=true \</span>
-<span class="hljs-string">                                --v=2"</span></code></pre></div><p>controller manager 将不安全端口 <code>10252</code> 绑定到 127.0.0.1 确保 <code>kuebctl get cs</code> 有正确返回；将安全端口 <code>10257</code> 绑定到 0.0.0.0 公开，提供服务调用；<strong>由于 controller manager 开始连接 apiserver 的 <code>6443</code> 认证端口，所以需要 <code>--use-service-account-credentials</code> 选项来让 controller manager 创建单独的 service account(默认 <code>system:kube-controller-manager</code> 用户没有那么高权限)</strong></p><ul><li>scheduler</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
+<span class="hljs-string">                                --v=2&quot;</span></code></pre></div><p>controller manager 将不安全端口 <code>10252</code> 绑定到 127.0.0.1 确保 <code>kuebctl get cs</code> 有正确返回；将安全端口 <code>10257</code> 绑定到 0.0.0.0 公开，提供服务调用；<strong>由于 controller manager 开始连接 apiserver 的 <code>6443</code> 认证端口，所以需要 <code>--use-service-account-credentials</code> 选项来让 controller manager 创建单独的 service account(默认 <code>system:kube-controller-manager</code> 用户没有那么高权限)</strong></p><ul><li>scheduler</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># kubernetes scheduler config</span>
 
 <span class="hljs-comment"># default config should be adequate</span>
 
 <span class="hljs-comment"># Add your own!</span>
-KUBE_SCHEDULER_ARGS=<span class="hljs-string">"   --address=127.0.0.1 \</span>
+KUBE_SCHEDULER_ARGS=<span class="hljs-string">&quot;   --address=127.0.0.1 \</span>
 <span class="hljs-string">                        --authentication-kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig \</span>
 <span class="hljs-string">                        --authorization-kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig \</span>
 <span class="hljs-string">                        --bind-address=0.0.0.0 \</span>
@@ -734,7 +734,7 @@ KUBE_SCHEDULER_ARGS=<span class="hljs-string">"   --address=127.0.0.1 \</span>
 <span class="hljs-string">                        --port=10251 \</span>
 <span class="hljs-string">                        --tls-cert-file=/etc/kubernetes/ssl/kube-scheduler.pem \</span>
 <span class="hljs-string">                        --tls-private-key-file=/etc/kubernetes/ssl/kube-scheduler-key.pem \</span>
-<span class="hljs-string">                        --v=2"</span></code></pre></div><p>shceduler 同 controller manager 一样将不安全端口绑定在本地，安全端口对外公开</p><p><strong>最后在三台节点上调整一下 IP 配置，启动即可</strong></p><h3 id="3-4、部署-Node"><a href="#3-4、部署-Node" class="headerlink" title="3.4、部署 Node"></a>3.4、部署 Node</h3><h4 id="3-4-1、安装脚本"><a href="#3-4-1、安装脚本" class="headerlink" title="3.4.1、安装脚本"></a>3.4.1、安装脚本</h4><p>node 安装与 master 安装过程一致，这里不再阐述</p><h4 id="3-4-2、配置文件"><a href="#3-4-2、配置文件" class="headerlink" title="3.4.2、配置文件"></a>3.4.2、配置文件</h4><p><strong>systemd 配置文件</strong></p><ul><li>kubelet.service</li></ul><div class="hljs"><pre><code class="hljs sh">[Unit]
+<span class="hljs-string">                        --v=2&quot;</span></code></pre></div><p>shceduler 同 controller manager 一样将不安全端口绑定在本地，安全端口对外公开</p><p><strong>最后在三台节点上调整一下 IP 配置，启动即可</strong></p><h3 id="3-4、部署-Node"><a href="#3-4、部署-Node" class="headerlink" title="3.4、部署 Node"></a>3.4、部署 Node</h3><h4 id="3-4-1、安装脚本"><a href="#3-4-1、安装脚本" class="headerlink" title="3.4.1、安装脚本"></a>3.4.1、安装脚本</h4><p>node 安装与 master 安装过程一致，这里不再阐述</p><h4 id="3-4-2、配置文件"><a href="#3-4-2、配置文件" class="headerlink" title="3.4.2、配置文件"></a>3.4.2、配置文件</h4><p><strong>systemd 配置文件</strong></p><ul><li>kubelet.service</li></ul><div class="hljs"><pre><code class="hljs sh">[Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 After=docker.service
@@ -775,20 +775,20 @@ LimitNOFILE=65536
 WantedBy=multi-user.target</code></pre></div><p><strong>核心配置文件</strong></p><ul><li>kubelet</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># kubernetes kubelet (minion) config</span>
 
-<span class="hljs-comment"># The address for the info server to serve on (set to 0.0.0.0 or "" for all interfaces)</span>
-KUBELET_ADDRESS=<span class="hljs-string">"--node-ip=192.168.1.54"</span>
+<span class="hljs-comment"># The address for the info server to serve on (set to 0.0.0.0 or &quot;&quot; for all interfaces)</span>
+KUBELET_ADDRESS=<span class="hljs-string">&quot;--node-ip=192.168.1.54&quot;</span>
 
 <span class="hljs-comment"># The port for the info server to serve on</span>
-<span class="hljs-comment"># KUBELET_PORT="--port=10250"</span>
+<span class="hljs-comment"># KUBELET_PORT=&quot;--port=10250&quot;</span>
 
 <span class="hljs-comment"># You may leave this blank to use the actual hostname</span>
-KUBELET_HOSTNAME=<span class="hljs-string">"--hostname-override=docker4.node"</span>
+KUBELET_HOSTNAME=<span class="hljs-string">&quot;--hostname-override=docker4.node&quot;</span>
 
 <span class="hljs-comment"># location of the api-server</span>
-<span class="hljs-comment"># KUBELET_API_SERVER=""</span>
+<span class="hljs-comment"># KUBELET_API_SERVER=&quot;&quot;</span>
 
 <span class="hljs-comment"># Add your own!</span>
-KUBELET_ARGS=<span class="hljs-string">"  --address=0.0.0.0 \</span>
+KUBELET_ARGS=<span class="hljs-string">&quot;  --address=0.0.0.0 \</span>
 <span class="hljs-string">                --allow-privileged \</span>
 <span class="hljs-string">                --anonymous-auth=false \</span>
 <span class="hljs-string">                --authorization-mode=Webhook \</span>
@@ -820,11 +820,11 @@ KUBELET_ARGS=<span class="hljs-string">"  --address=0.0.0.0 \</span>
 <span class="hljs-string">                --resolv-conf=/run/systemd/resolve/resolv.conf \</span>
 <span class="hljs-string">                --system-reserved=cpu=500m,memory=512Mi,ephemeral-storage=1Gi \</span>
 <span class="hljs-string">                --fail-swap-on=false \</span>
-<span class="hljs-string">                --v=2"</span></code></pre></div><p><strong>当 kubelet 组件设置了 <code>--rotate-certificates</code>，<code>--rotate-server-certificates</code> 后会自动更新其使用的相关证书，同时指定 <code>--authorization-mode=Webhook</code> 后 <code>10250</code> 端口 RBAC 授权将会委托给 apiserver</strong></p><ul><li>proxy</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
+<span class="hljs-string">                --v=2&quot;</span></code></pre></div><p><strong>当 kubelet 组件设置了 <code>--rotate-certificates</code>，<code>--rotate-server-certificates</code> 后会自动更新其使用的相关证书，同时指定 <code>--authorization-mode=Webhook</code> 后 <code>10250</code> 端口 RBAC 授权将会委托给 apiserver</strong></p><ul><li>proxy</li></ul><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment">###</span>
 <span class="hljs-comment"># kubernetes proxy config</span>
 <span class="hljs-comment"># default config should be adequate</span>
 <span class="hljs-comment"># Add your own!</span>
-KUBE_PROXY_ARGS=<span class="hljs-string">"   --bind-address=0.0.0.0 \</span>
+KUBE_PROXY_ARGS=<span class="hljs-string">&quot;   --bind-address=0.0.0.0 \</span>
 <span class="hljs-string">                    --cleanup-ipvs=true \</span>
 <span class="hljs-string">                    --cluster-cidr=10.254.0.0/16 \</span>
 <span class="hljs-string">                    --hostname-override=docker4.node \</span>
@@ -837,7 +837,7 @@ KUBE_PROXY_ARGS=<span class="hljs-string">"   --bind-address=0.0.0.0 \</span>
 <span class="hljs-string">                    --ipvs-scheduler=wrr \</span>
 <span class="hljs-string">                    --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig \</span>
 <span class="hljs-string">                    --logtostderr=true \</span>
-<span class="hljs-string">                    --v=2"</span></code></pre></div><p>由于 <code>kubelet</code> 组件是采用 TLS Bootstrap 启动，所以需要预先创建相关配置</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建用于 tls bootstrap 的 token secret</span>
+<span class="hljs-string">                    --v=2&quot;</span></code></pre></div><p>由于 <code>kubelet</code> 组件是采用 TLS Bootstrap 启动，所以需要预先创建相关配置</p><div class="hljs"><pre><code class="hljs sh"><span class="hljs-comment"># 创建用于 tls bootstrap 的 token secret</span>
 kubectl create -f bootstrap.secret.yaml
 
 <span class="hljs-comment"># 为了能让 kubelet 实现自动更新证书，需要配置相关 clusterrolebinding</span>
@@ -910,7 +910,7 @@ NAME                                                   AGE   REQUESTOR          
 csr-99l77                                              10s   system:node:docker4.node   Pending
 node-csr-aGwaNKorMc0MZBYOuJsJGCB8Bg8ds97rmE3oKBTV-_E   11s   system:bootstrap:5d820b    Approved,Issued
 docker1.node ➜  ~ kubectl certificate approve csr-99l77
-certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></div><h3 id="3-5、部署-Calico"><a href="#3-5、部署-Calico" class="headerlink" title="3.5、部署 Calico"></a>3.5、部署 Calico</h3><p>当 node 全部启动后，由于网络组件(CNI)未安装会显示为 NotReady 状态；下面将部署 Calico 作为网络组件，完成跨节点网络通讯；具体安装文档可以参考 <a href="https://docs.projectcalico.org/v3.6/getting-started/kubernetes/installation/calico#installing-with-the-etcd-datastore" target="_blank" rel="noopener">Installing with the etcd datastore</a></p><p>以下为 calico 的配置文件</p><ul><li>calico.yaml</li></ul><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-meta">---</span>
+certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></div><h3 id="3-5、部署-Calico"><a href="#3-5、部署-Calico" class="headerlink" title="3.5、部署 Calico"></a>3.5、部署 Calico</h3><p>当 node 全部启动后，由于网络组件(CNI)未安装会显示为 NotReady 状态；下面将部署 Calico 作为网络组件，完成跨节点网络通讯；具体安装文档可以参考 <a target="_blank" rel="noopener" href="https://docs.projectcalico.org/v3.6/getting-started/kubernetes/installation/calico#installing-with-the-etcd-datastore">Installing with the etcd datastore</a></p><p>以下为 calico 的配置文件</p><ul><li>calico.yaml</li></ul><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-meta">---</span>
 <span class="hljs-comment"># Source: calico/templates/calico-etcd-secrets.yaml</span>
 <span class="hljs-comment"># The following contains k8s Secrets for use with a TLS enabled etcd cluster.</span>
 <span class="hljs-comment"># For information on populating Secrets, see http://kubernetes.io/docs/user-guide/secrets/</span>
@@ -939,53 +939,53 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
   <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span>
 <span class="hljs-attr">data:</span>
   <span class="hljs-comment"># Configure this with the location of your etcd cluster.</span>
-  <span class="hljs-attr">etcd_endpoints:</span> <span class="hljs-string">"https://192.168.1.51:2379,https://192.168.1.52:2379,https://192.168.1.53:2379"</span>
+  <span class="hljs-attr">etcd_endpoints:</span> <span class="hljs-string">&quot;https://192.168.1.51:2379,https://192.168.1.52:2379,https://192.168.1.53:2379&quot;</span>
 
-  <span class="hljs-comment"># If you're using TLS enabled etcd uncomment the following.</span>
+  <span class="hljs-comment"># If you&#x27;re using TLS enabled etcd uncomment the following.</span>
   <span class="hljs-comment"># You must also populate the Secret below with these files.</span>
-  <span class="hljs-attr">etcd_ca:</span> <span class="hljs-string">"/calico-secrets/etcd-ca"</span>
-  <span class="hljs-attr">etcd_cert:</span> <span class="hljs-string">"/calico-secrets/etcd-cert"</span>
-  <span class="hljs-attr">etcd_key:</span> <span class="hljs-string">"/calico-secrets/etcd-key"</span>
+  <span class="hljs-attr">etcd_ca:</span> <span class="hljs-string">&quot;/calico-secrets/etcd-ca&quot;</span>
+  <span class="hljs-attr">etcd_cert:</span> <span class="hljs-string">&quot;/calico-secrets/etcd-cert&quot;</span>
+  <span class="hljs-attr">etcd_key:</span> <span class="hljs-string">&quot;/calico-secrets/etcd-key&quot;</span>
   <span class="hljs-comment"># Typha is disabled.</span>
-  <span class="hljs-attr">typha_service_name:</span> <span class="hljs-string">"none"</span>
+  <span class="hljs-attr">typha_service_name:</span> <span class="hljs-string">&quot;none&quot;</span>
   <span class="hljs-comment"># Configure the Calico backend to use.</span>
-  <span class="hljs-attr">calico_backend:</span> <span class="hljs-string">"bird"</span>
+  <span class="hljs-attr">calico_backend:</span> <span class="hljs-string">&quot;bird&quot;</span>
 
   <span class="hljs-comment"># Configure the MTU to use</span>
-  <span class="hljs-attr">veth_mtu:</span> <span class="hljs-string">"1440"</span>
+  <span class="hljs-attr">veth_mtu:</span> <span class="hljs-string">&quot;1440&quot;</span>
 
   <span class="hljs-comment"># The CNI network configuration to install on each node.  The special</span>
   <span class="hljs-comment"># values in this config will be automatically populated.</span>
   <span class="hljs-attr">cni_network_config:</span> <span class="hljs-string">|-</span>
-    <span class="hljs-string">&#123;</span>
-      <span class="hljs-attr">"name":</span> <span class="hljs-string">"k8s-pod-network"</span><span class="hljs-string">,</span>
-      <span class="hljs-attr">"cniVersion":</span> <span class="hljs-string">"0.3.0"</span><span class="hljs-string">,</span>
-      <span class="hljs-attr">"plugins":</span> <span class="hljs-string">[</span>
-        <span class="hljs-string">&#123;</span>
-          <span class="hljs-attr">"type":</span> <span class="hljs-string">"calico"</span><span class="hljs-string">,</span>
-          <span class="hljs-attr">"log_level":</span> <span class="hljs-string">"info"</span><span class="hljs-string">,</span>
-          <span class="hljs-attr">"etcd_endpoints":</span> <span class="hljs-string">"__ETCD_ENDPOINTS__"</span><span class="hljs-string">,</span>
-          <span class="hljs-attr">"etcd_key_file":</span> <span class="hljs-string">"__ETCD_KEY_FILE__"</span><span class="hljs-string">,</span>
-          <span class="hljs-attr">"etcd_cert_file":</span> <span class="hljs-string">"__ETCD_CERT_FILE__"</span><span class="hljs-string">,</span>
-          <span class="hljs-attr">"etcd_ca_cert_file":</span> <span class="hljs-string">"__ETCD_CA_CERT_FILE__"</span><span class="hljs-string">,</span>
-          <span class="hljs-attr">"mtu":</span> <span class="hljs-string">__CNI_MTU__,</span>
-          <span class="hljs-attr">"ipam":</span> <span class="hljs-string">&#123;</span>
-              <span class="hljs-attr">"type":</span> <span class="hljs-string">"calico-ipam"</span>
-          <span class="hljs-string">&#125;,</span>
-          <span class="hljs-attr">"policy":</span> <span class="hljs-string">&#123;</span>
-              <span class="hljs-attr">"type":</span> <span class="hljs-string">"k8s"</span>
-          <span class="hljs-string">&#125;,</span>
-          <span class="hljs-attr">"kubernetes":</span> <span class="hljs-string">&#123;</span>
-              <span class="hljs-attr">"kubeconfig":</span> <span class="hljs-string">"__KUBECONFIG_FILEPATH__"</span>
-          <span class="hljs-string">&#125;</span>
-        <span class="hljs-string">&#125;,</span>
-        <span class="hljs-string">&#123;</span>
-          <span class="hljs-attr">"type":</span> <span class="hljs-string">"portmap"</span><span class="hljs-string">,</span>
-          <span class="hljs-attr">"snat":</span> <span class="hljs-literal">true</span><span class="hljs-string">,</span>
-          <span class="hljs-attr">"capabilities":</span> <span class="hljs-string">&#123;"portMappings":</span> <span class="hljs-literal">true</span><span class="hljs-string">&#125;</span>
-        <span class="hljs-string">&#125;</span>
-      <span class="hljs-string">]</span>
-    <span class="hljs-string">&#125;</span>
+    &#123;
+      <span class="hljs-attr">&quot;name&quot;:</span> <span class="hljs-string">&quot;k8s-pod-network&quot;</span>,
+      <span class="hljs-attr">&quot;cniVersion&quot;:</span> <span class="hljs-string">&quot;0.3.0&quot;</span>,
+      <span class="hljs-attr">&quot;plugins&quot;:</span> [
+        &#123;
+          <span class="hljs-attr">&quot;type&quot;:</span> <span class="hljs-string">&quot;calico&quot;</span>,
+          <span class="hljs-attr">&quot;log_level&quot;:</span> <span class="hljs-string">&quot;info&quot;</span>,
+          <span class="hljs-attr">&quot;etcd_endpoints&quot;:</span> <span class="hljs-string">&quot;__ETCD_ENDPOINTS__&quot;</span>,
+          <span class="hljs-attr">&quot;etcd_key_file&quot;:</span> <span class="hljs-string">&quot;__ETCD_KEY_FILE__&quot;</span>,
+          <span class="hljs-attr">&quot;etcd_cert_file&quot;:</span> <span class="hljs-string">&quot;__ETCD_CERT_FILE__&quot;</span>,
+          <span class="hljs-attr">&quot;etcd_ca_cert_file&quot;:</span> <span class="hljs-string">&quot;__ETCD_CA_CERT_FILE__&quot;</span>,
+          <span class="hljs-attr">&quot;mtu&quot;:</span> <span class="hljs-string">__CNI_MTU__</span>,
+          <span class="hljs-attr">&quot;ipam&quot;:</span> &#123;
+              <span class="hljs-attr">&quot;type&quot;:</span> <span class="hljs-string">&quot;calico-ipam&quot;</span>
+          &#125;,
+          <span class="hljs-attr">&quot;policy&quot;:</span> &#123;
+              <span class="hljs-attr">&quot;type&quot;:</span> <span class="hljs-string">&quot;k8s&quot;</span>
+          &#125;,
+          <span class="hljs-attr">&quot;kubernetes&quot;:</span> &#123;
+              <span class="hljs-attr">&quot;kubeconfig&quot;:</span> <span class="hljs-string">&quot;__KUBECONFIG_FILEPATH__&quot;</span>
+          &#125;
+        &#125;,
+        &#123;
+          <span class="hljs-attr">&quot;type&quot;:</span> <span class="hljs-string">&quot;portmap&quot;</span>,
+          <span class="hljs-attr">&quot;snat&quot;:</span> <span class="hljs-literal">true</span>,
+          <span class="hljs-attr">&quot;capabilities&quot;:</span> &#123;<span class="hljs-attr">&quot;portMappings&quot;:</span> <span class="hljs-literal">true</span>&#125;
+        &#125;
+      ]
+    &#125;
 
 <span class="hljs-meta">---</span>
 <span class="hljs-comment"># Source: calico/templates/rbac.yaml</span>
@@ -1000,7 +1000,7 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
   <span class="hljs-comment"># Pods are monitored for changing labels.</span>
   <span class="hljs-comment"># The node controller monitors Kubernetes nodes.</span>
   <span class="hljs-comment"># Namespace and serviceaccount labels are used for policy.</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> <span class="hljs-string">[""]</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;&quot;</span>]
     <span class="hljs-attr">resources:</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">pods</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">nodes</span>
@@ -1010,7 +1010,7 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
       <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">list</span>
   <span class="hljs-comment"># Watch for changes to Kubernetes NetworkPolicies.</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> <span class="hljs-string">["networking.k8s.io"]</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;networking.k8s.io&quot;</span>]
     <span class="hljs-attr">resources:</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">networkpolicies</span>
     <span class="hljs-attr">verbs:</span>
@@ -1038,14 +1038,14 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
   <span class="hljs-attr">name:</span> <span class="hljs-string">calico-node</span>
 <span class="hljs-attr">rules:</span>
   <span class="hljs-comment"># The CNI plugin needs to get pods, nodes, and namespaces.</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> <span class="hljs-string">[""]</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;&quot;</span>]
     <span class="hljs-attr">resources:</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">pods</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">nodes</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">namespaces</span>
     <span class="hljs-attr">verbs:</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">get</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> <span class="hljs-string">[""]</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;&quot;</span>]
     <span class="hljs-attr">resources:</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">endpoints</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">services</span>
@@ -1053,7 +1053,7 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
       <span class="hljs-comment"># Used to discover service IPs for advertisement.</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">list</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> <span class="hljs-string">[""]</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;&quot;</span>]
     <span class="hljs-attr">resources:</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">nodes/status</span>
     <span class="hljs-attr">verbs:</span>
@@ -1103,7 +1103,7 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
         <span class="hljs-comment"># marks the pod as a critical add-on, ensuring it gets</span>
         <span class="hljs-comment"># priority scheduling and that its resources are reserved</span>
         <span class="hljs-comment"># if it ever gets evicted.</span>
-        <span class="hljs-attr">scheduler.alpha.kubernetes.io/critical-pod:</span> <span class="hljs-string">''</span>
+        <span class="hljs-attr">scheduler.alpha.kubernetes.io/critical-pod:</span> <span class="hljs-string">&#x27;&#x27;</span>
     <span class="hljs-attr">spec:</span>
       <span class="hljs-attr">nodeSelector:</span>
         <span class="hljs-attr">beta.kubernetes.io/os:</span> <span class="hljs-string">linux</span>
@@ -1118,19 +1118,19 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
         <span class="hljs-bullet">-</span> <span class="hljs-attr">effect:</span> <span class="hljs-string">NoExecute</span>
           <span class="hljs-attr">operator:</span> <span class="hljs-string">Exists</span>
       <span class="hljs-attr">serviceAccountName:</span> <span class="hljs-string">calico-node</span>
-      <span class="hljs-comment"># Minimize downtime during a rolling upgrade or deletion; tell Kubernetes to do a "force</span>
-      <span class="hljs-comment"># deletion": https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods.</span>
+      <span class="hljs-comment"># Minimize downtime during a rolling upgrade or deletion; tell Kubernetes to do a &quot;force</span>
+      <span class="hljs-comment"># deletion&quot;: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods.</span>
       <span class="hljs-attr">terminationGracePeriodSeconds:</span> <span class="hljs-number">0</span>
       <span class="hljs-attr">initContainers:</span>
         <span class="hljs-comment"># This container installs the Calico CNI binaries</span>
         <span class="hljs-comment"># and CNI network config file on each node.</span>
         <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">install-cni</span>
           <span class="hljs-attr">image:</span> <span class="hljs-string">calico/cni:v3.6.0</span>
-          <span class="hljs-attr">command:</span> <span class="hljs-string">["/install-cni.sh"]</span>
+          <span class="hljs-attr">command:</span> [<span class="hljs-string">&quot;/install-cni.sh&quot;</span>]
           <span class="hljs-attr">env:</span>
             <span class="hljs-comment"># Name of the CNI config file to create.</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">CNI_CONF_NAME</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"10-calico.conflist"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;10-calico.conflist&quot;</span>
             <span class="hljs-comment"># The CNI network config to install on each node.</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">CNI_NETWORK_CONFIG</span>
               <span class="hljs-attr">valueFrom:</span>
@@ -1151,7 +1151,7 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
                   <span class="hljs-attr">key:</span> <span class="hljs-string">veth_mtu</span>
             <span class="hljs-comment"># Prevents the container from sleeping forever.</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">SLEEP</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"false"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;false&quot;</span>
           <span class="hljs-attr">volumeMounts:</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">mountPath:</span> <span class="hljs-string">/host/opt/cni/bin</span>
               <span class="hljs-attr">name:</span> <span class="hljs-string">cni-bin-dir</span>
@@ -1203,13 +1203,13 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
                   <span class="hljs-attr">key:</span> <span class="hljs-string">calico_backend</span>
             <span class="hljs-comment"># Cluster type to identify the deployment type</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">CLUSTER_TYPE</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"k8s,bgp"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;k8s,bgp&quot;</span>
             <span class="hljs-comment"># Auto-detect the BGP IP address.</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">IP</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"autodetect"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;autodetect&quot;</span>
             <span class="hljs-comment"># Enable IPIP</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">CALICO_IPV4POOL_IPIP</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"Always"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;Always&quot;</span>
             <span class="hljs-comment"># Set MTU for tunnel device used if ipip is enabled</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">FELIX_IPINIPMTU</span>
               <span class="hljs-attr">valueFrom:</span>
@@ -1220,21 +1220,21 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
             <span class="hljs-comment"># chosen from this range. Changing this value after installation will have</span>
             <span class="hljs-comment"># no effect. This should fall within `--cluster-cidr`.</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">CALICO_IPV4POOL_CIDR</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"10.20.0.0/16"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;10.20.0.0/16&quot;</span>
             <span class="hljs-comment"># Disable file logging so `kubectl logs` works.</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">CALICO_DISABLE_FILE_LOGGING</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"true"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;true&quot;</span>
             <span class="hljs-comment"># Set Felix endpoint to host default action to ACCEPT.</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">FELIX_DEFAULTENDPOINTTOHOSTACTION</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"ACCEPT"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;ACCEPT&quot;</span>
             <span class="hljs-comment"># Disable IPv6 on Kubernetes.</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">FELIX_IPV6SUPPORT</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"false"</span>
-            <span class="hljs-comment"># Set Felix logging to "info"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;false&quot;</span>
+            <span class="hljs-comment"># Set Felix logging to &quot;info&quot;</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">FELIX_LOGSEVERITYSCREEN</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"info"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;info&quot;</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">FELIX_HEALTHENABLED</span>
-              <span class="hljs-attr">value:</span> <span class="hljs-string">"true"</span>
+              <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;true&quot;</span>
             <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">IP_AUTODETECTION_METHOD</span>
               <span class="hljs-attr">value:</span> <span class="hljs-string">can-reach=192.168.1.51</span>
           <span class="hljs-attr">securityContext:</span>
@@ -1320,7 +1320,7 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
   <span class="hljs-attr">labels:</span>
     <span class="hljs-attr">k8s-app:</span> <span class="hljs-string">calico-kube-controllers</span>
   <span class="hljs-attr">annotations:</span>
-    <span class="hljs-attr">scheduler.alpha.kubernetes.io/critical-pod:</span> <span class="hljs-string">''</span>
+    <span class="hljs-attr">scheduler.alpha.kubernetes.io/critical-pod:</span> <span class="hljs-string">&#x27;&#x27;</span>
 <span class="hljs-attr">spec:</span>
   <span class="hljs-comment"># The controllers can only have a single active instance.</span>
   <span class="hljs-attr">replicas:</span> <span class="hljs-number">1</span>
@@ -1336,7 +1336,7 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
       <span class="hljs-attr">nodeSelector:</span>
         <span class="hljs-attr">beta.kubernetes.io/os:</span> <span class="hljs-string">linux</span>
       <span class="hljs-comment"># The controllers must run in the host network namespace so that</span>
-      <span class="hljs-comment"># it isn't governed by policy that would prevent it from working.</span>
+      <span class="hljs-comment"># it isn&#x27;t governed by policy that would prevent it from working.</span>
       <span class="hljs-attr">hostNetwork:</span> <span class="hljs-literal">true</span>
       <span class="hljs-attr">tolerations:</span>
         <span class="hljs-comment"># Mark the pod as a critical add-on for rescheduling.</span>
@@ -1399,14 +1399,14 @@ certificatesigningrequest.certificates.k8s.io/csr-99l77 approved</code></pre></d
 <span class="hljs-attr">kind:</span> <span class="hljs-string">ServiceAccount</span>
 <span class="hljs-attr">metadata:</span>
   <span class="hljs-attr">name:</span> <span class="hljs-string">calico-kube-controllers</span>
-  <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span></code></pre></div><p><strong>需要注意的是我们添加了 <code>IP_AUTODETECTION_METHOD</code> 变量，这个变量会设置 calcio 获取 node ip 的方式；默认情况下采用 <a href="https://docs.projectcalico.org/v3.6/reference/node/configuration#ip-autodetection-methods" target="_blank" rel="noopener">first-found</a> 方式获取，即获取第一个有效网卡的 IP 作为 node ip；在某些多网卡机器上可能会出现问题；这里将值设置为 <code>can-reach=192.168.1.51</code>，即使用第一个能够访问 master <code>192.168.1.51</code> 的网卡地址作为 node ip</strong></p><p>最后执行创建即可，创建成功后如下所示</p><div class="hljs"><pre><code class="hljs sh">docker1.node ➜  ~ kubectl get pod -o wide -n kube-system
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span></code></pre></div><p><strong>需要注意的是我们添加了 <code>IP_AUTODETECTION_METHOD</code> 变量，这个变量会设置 calcio 获取 node ip 的方式；默认情况下采用 <a target="_blank" rel="noopener" href="https://docs.projectcalico.org/v3.6/reference/node/configuration#ip-autodetection-methods">first-found</a> 方式获取，即获取第一个有效网卡的 IP 作为 node ip；在某些多网卡机器上可能会出现问题；这里将值设置为 <code>can-reach=192.168.1.51</code>，即使用第一个能够访问 master <code>192.168.1.51</code> 的网卡地址作为 node ip</strong></p><p>最后执行创建即可，创建成功后如下所示</p><div class="hljs"><pre><code class="hljs sh">docker1.node ➜  ~ kubectl get pod -o wide -n kube-system
 NAME                                      READY   STATUS    RESTARTS   AGE   IP             NODE           NOMINATED NODE   READINESS GATES
 calico-kube-controllers-65bc6b9f9-cn27f   1/1     Running   0          85s   192.168.1.53   docker3.node   &lt;none&gt;           &lt;none&gt;
 calico-node-c5nl8                         1/1     Running   0          85s   192.168.1.53   docker3.node   &lt;none&gt;           &lt;none&gt;
 calico-node-fqknv                         1/1     Running   0          85s   192.168.1.51   docker1.node   &lt;none&gt;           &lt;none&gt;
 calico-node-ldfzs                         1/1     Running   0          85s   192.168.1.55   docker5.node   &lt;none&gt;           &lt;none&gt;
 calico-node-ngjxc                         1/1     Running   0          85s   192.168.1.52   docker2.node   &lt;none&gt;           &lt;none&gt;
-calico-node-vj8np                         1/1     Running   0          85s   192.168.1.54   docker4.node   &lt;none&gt;           &lt;none&gt;</code></pre></div><p>此时所有 node 应当变为 Ready 状态</p><h3 id="3-5、部署-DNS"><a href="#3-5、部署-DNS" class="headerlink" title="3.5、部署 DNS"></a>3.5、部署 DNS</h3><p>其他组件全部完成后我们应当部署集群 DNS 使 service 等能够正常解析；集群 DNS 这里采用 coredns，具体安装文档参考 <a href="https://github.com/coredns/deployment/tree/master/kubernetes" target="_blank" rel="noopener">coredns/deployment</a>；coredns 完整配置如下</p><ul><li>coredns.yaml</li></ul><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+calico-node-vj8np                         1/1     Running   0          85s   192.168.1.54   docker4.node   &lt;none&gt;           &lt;none&gt;</code></pre></div><p>此时所有 node 应当变为 Ready 状态</p><h3 id="3-5、部署-DNS"><a href="#3-5、部署-DNS" class="headerlink" title="3.5、部署 DNS"></a>3.5、部署 DNS</h3><p>其他组件全部完成后我们应当部署集群 DNS 使 service 等能够正常解析；集群 DNS 这里采用 coredns，具体安装文档参考 <a target="_blank" rel="noopener" href="https://github.com/coredns/deployment/tree/master/kubernetes">coredns/deployment</a>；coredns 完整配置如下</p><ul><li>coredns.yaml</li></ul><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
 <span class="hljs-attr">kind:</span> <span class="hljs-string">ServiceAccount</span>
 <span class="hljs-attr">metadata:</span>
   <span class="hljs-attr">name:</span> <span class="hljs-string">coredns</span>
@@ -1420,7 +1420,7 @@ calico-node-vj8np                         1/1     Running   0          85s   192
   <span class="hljs-attr">name:</span> <span class="hljs-string">system:coredns</span>
 <span class="hljs-attr">rules:</span>
 <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-string">""</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;&quot;</span>
   <span class="hljs-attr">resources:</span>
   <span class="hljs-bullet">-</span> <span class="hljs-string">endpoints</span>
   <span class="hljs-bullet">-</span> <span class="hljs-string">services</span>
@@ -1430,7 +1430,7 @@ calico-node-vj8np                         1/1     Running   0          85s   192
   <span class="hljs-bullet">-</span> <span class="hljs-string">list</span>
   <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span>
 <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-string">""</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;&quot;</span>
   <span class="hljs-attr">resources:</span>
   <span class="hljs-bullet">-</span> <span class="hljs-string">nodes</span>
   <span class="hljs-attr">verbs:</span>
@@ -1440,7 +1440,7 @@ calico-node-vj8np                         1/1     Running   0          85s   192
 <span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRoleBinding</span>
 <span class="hljs-attr">metadata:</span>
   <span class="hljs-attr">annotations:</span>
-    <span class="hljs-attr">rbac.authorization.kubernetes.io/autoupdate:</span> <span class="hljs-string">"true"</span>
+    <span class="hljs-attr">rbac.authorization.kubernetes.io/autoupdate:</span> <span class="hljs-string">&quot;true&quot;</span>
   <span class="hljs-attr">labels:</span>
     <span class="hljs-attr">kubernetes.io/bootstrapping:</span> <span class="hljs-string">rbac-defaults</span>
   <span class="hljs-attr">name:</span> <span class="hljs-string">system:coredns</span>
@@ -1460,21 +1460,21 @@ calico-node-vj8np                         1/1     Running   0          85s   192
   <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span>
 <span class="hljs-attr">data:</span>
   <span class="hljs-attr">Corefile:</span> <span class="hljs-string">|</span>
-    <span class="hljs-string">.:53</span> <span class="hljs-string">&#123;</span>
+    <span class="hljs-string">.:53</span> &#123;
         <span class="hljs-string">errors</span>
         <span class="hljs-string">health</span>
-        <span class="hljs-string">kubernetes</span> <span class="hljs-string">cluster.local</span> <span class="hljs-string">in-addr.arpa</span> <span class="hljs-string">ip6.arpa</span> <span class="hljs-string">&#123;</span>
+        <span class="hljs-string">kubernetes</span> <span class="hljs-string">cluster.local</span> <span class="hljs-string">in-addr.arpa</span> <span class="hljs-string">ip6.arpa</span> &#123;
           <span class="hljs-string">pods</span> <span class="hljs-string">insecure</span>
           <span class="hljs-string">upstream</span>
           <span class="hljs-string">fallthrough</span> <span class="hljs-string">in-addr.arpa</span> <span class="hljs-string">ip6.arpa</span>
-        <span class="hljs-string">&#125;</span>
+        &#125;
         <span class="hljs-string">prometheus</span> <span class="hljs-string">:9153</span>
         <span class="hljs-string">forward</span> <span class="hljs-string">.</span> <span class="hljs-string">/etc/resolv.conf</span>
         <span class="hljs-string">cache</span> <span class="hljs-number">30</span>
         <span class="hljs-string">loop</span>
         <span class="hljs-string">reload</span>
         <span class="hljs-string">loadbalance</span>
-    <span class="hljs-string">&#125;</span>
+    &#125;
 <span class="hljs-meta">---</span>
 <span class="hljs-attr">apiVersion:</span> <span class="hljs-string">apps/v1</span>
 <span class="hljs-attr">kind:</span> <span class="hljs-string">Deployment</span>
@@ -1483,7 +1483,7 @@ calico-node-vj8np                         1/1     Running   0          85s   192
   <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span>
   <span class="hljs-attr">labels:</span>
     <span class="hljs-attr">k8s-app:</span> <span class="hljs-string">kube-dns</span>
-    <span class="hljs-attr">kubernetes.io/name:</span> <span class="hljs-string">"CoreDNS"</span>
+    <span class="hljs-attr">kubernetes.io/name:</span> <span class="hljs-string">&quot;CoreDNS&quot;</span>
 <span class="hljs-attr">spec:</span>
   <span class="hljs-attr">replicas:</span> <span class="hljs-number">2</span>
   <span class="hljs-attr">strategy:</span>
@@ -1501,8 +1501,8 @@ calico-node-vj8np                         1/1     Running   0          85s   192
       <span class="hljs-attr">priorityClassName:</span> <span class="hljs-string">system-cluster-critical</span>
       <span class="hljs-attr">serviceAccountName:</span> <span class="hljs-string">coredns</span>
       <span class="hljs-attr">tolerations:</span>
-        <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">"CriticalAddonsOnly"</span>
-          <span class="hljs-attr">operator:</span> <span class="hljs-string">"Exists"</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">&quot;CriticalAddonsOnly&quot;</span>
+          <span class="hljs-attr">operator:</span> <span class="hljs-string">&quot;Exists&quot;</span>
       <span class="hljs-attr">nodeSelector:</span>
         <span class="hljs-attr">beta.kubernetes.io/os:</span> <span class="hljs-string">linux</span>
       <span class="hljs-attr">containers:</span>
@@ -1515,7 +1515,7 @@ calico-node-vj8np                         1/1     Running   0          85s   192
           <span class="hljs-attr">requests:</span>
             <span class="hljs-attr">cpu:</span> <span class="hljs-string">100m</span>
             <span class="hljs-attr">memory:</span> <span class="hljs-string">70Mi</span>
-        <span class="hljs-attr">args:</span> <span class="hljs-string">[</span> <span class="hljs-string">"-conf"</span><span class="hljs-string">,</span> <span class="hljs-string">"/etc/coredns/Corefile"</span> <span class="hljs-string">]</span>
+        <span class="hljs-attr">args:</span> [ <span class="hljs-string">&quot;-conf&quot;</span>, <span class="hljs-string">&quot;/etc/coredns/Corefile&quot;</span> ]
         <span class="hljs-attr">volumeMounts:</span>
         <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">config-volume</span>
           <span class="hljs-attr">mountPath:</span> <span class="hljs-string">/etc/coredns</span>
@@ -1567,12 +1567,12 @@ calico-node-vj8np                         1/1     Running   0          85s   192
   <span class="hljs-attr">name:</span> <span class="hljs-string">kube-dns</span>
   <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span>
   <span class="hljs-attr">annotations:</span>
-    <span class="hljs-attr">prometheus.io/port:</span> <span class="hljs-string">"9153"</span>
-    <span class="hljs-attr">prometheus.io/scrape:</span> <span class="hljs-string">"true"</span>
+    <span class="hljs-attr">prometheus.io/port:</span> <span class="hljs-string">&quot;9153&quot;</span>
+    <span class="hljs-attr">prometheus.io/scrape:</span> <span class="hljs-string">&quot;true&quot;</span>
   <span class="hljs-attr">labels:</span>
     <span class="hljs-attr">k8s-app:</span> <span class="hljs-string">kube-dns</span>
-    <span class="hljs-attr">kubernetes.io/cluster-service:</span> <span class="hljs-string">"true"</span>
-    <span class="hljs-attr">kubernetes.io/name:</span> <span class="hljs-string">"CoreDNS"</span>
+    <span class="hljs-attr">kubernetes.io/cluster-service:</span> <span class="hljs-string">&quot;true&quot;</span>
+    <span class="hljs-attr">kubernetes.io/name:</span> <span class="hljs-string">&quot;CoreDNS&quot;</span>
 <span class="hljs-attr">spec:</span>
   <span class="hljs-attr">selector:</span>
     <span class="hljs-attr">k8s-app:</span> <span class="hljs-string">kube-dns</span>
@@ -1586,16 +1586,16 @@ calico-node-vj8np                         1/1     Running   0          85s   192
     <span class="hljs-attr">protocol:</span> <span class="hljs-string">TCP</span>
   <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">metrics</span>
     <span class="hljs-attr">port:</span> <span class="hljs-number">9153</span>
-    <span class="hljs-attr">protocol:</span> <span class="hljs-string">TCP</span></code></pre></div><h3 id="3-5、部署-DNS-自动扩容"><a href="#3-5、部署-DNS-自动扩容" class="headerlink" title="3.5、部署 DNS 自动扩容"></a>3.5、部署 DNS 自动扩容</h3><p>在大规模集群的情况下，可能需要集群 DNS 自动扩容，具体文档请参考 <a href="https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns-horizontal-autoscaler" target="_blank" rel="noopener">DNS Horizontal Autoscaler</a>，DNS 扩容算法可参考 <a href="https://github.com/kubernetes-incubator/cluster-proportional-autoscaler/" target="_blank" rel="noopener">Github</a>，如有需要请自行修改；以下为具体配置</p><ul><li>dns-horizontal-autoscaler.yaml</li></ul><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-comment"># Copyright 2016 The Kubernetes Authors.</span>
+    <span class="hljs-attr">protocol:</span> <span class="hljs-string">TCP</span></code></pre></div><h3 id="3-5、部署-DNS-自动扩容"><a href="#3-5、部署-DNS-自动扩容" class="headerlink" title="3.5、部署 DNS 自动扩容"></a>3.5、部署 DNS 自动扩容</h3><p>在大规模集群的情况下，可能需要集群 DNS 自动扩容，具体文档请参考 <a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns-horizontal-autoscaler">DNS Horizontal Autoscaler</a>，DNS 扩容算法可参考 <a target="_blank" rel="noopener" href="https://github.com/kubernetes-incubator/cluster-proportional-autoscaler/">Github</a>，如有需要请自行修改；以下为具体配置</p><ul><li>dns-horizontal-autoscaler.yaml</li></ul><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-comment"># Copyright 2016 The Kubernetes Authors.</span>
 <span class="hljs-comment">#</span>
-<span class="hljs-comment"># Licensed under the Apache License, Version 2.0 (the "License");</span>
+<span class="hljs-comment"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="hljs-comment"># you may not use this file except in compliance with the License.</span>
 <span class="hljs-comment"># You may obtain a copy of the License at</span>
 <span class="hljs-comment">#</span>
 <span class="hljs-comment">#     http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="hljs-comment">#</span>
 <span class="hljs-comment"># Unless required by applicable law or agreed to in writing, software</span>
-<span class="hljs-comment"># distributed under the License is distributed on an "AS IS" BASIS,</span>
+<span class="hljs-comment"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
 <span class="hljs-comment"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="hljs-comment"># See the License for the specific language governing permissions and</span>
 <span class="hljs-comment"># limitations under the License.</span>
@@ -1615,20 +1615,20 @@ calico-node-vj8np                         1/1     Running   0          85s   192
   <span class="hljs-attr">labels:</span>
     <span class="hljs-attr">addonmanager.kubernetes.io/mode:</span> <span class="hljs-string">Reconcile</span>
 <span class="hljs-attr">rules:</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> <span class="hljs-string">[""]</span>
-    <span class="hljs-attr">resources:</span> <span class="hljs-string">["nodes"]</span>
-    <span class="hljs-attr">verbs:</span> <span class="hljs-string">["list"]</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> <span class="hljs-string">[""]</span>
-    <span class="hljs-attr">resources:</span> <span class="hljs-string">["replicationcontrollers/scale"]</span>
-    <span class="hljs-attr">verbs:</span> <span class="hljs-string">["get",</span> <span class="hljs-string">"update"</span><span class="hljs-string">]</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> <span class="hljs-string">["extensions"]</span>
-    <span class="hljs-attr">resources:</span> <span class="hljs-string">["deployments/scale",</span> <span class="hljs-string">"replicasets/scale"</span><span class="hljs-string">]</span>
-    <span class="hljs-attr">verbs:</span> <span class="hljs-string">["get",</span> <span class="hljs-string">"update"</span><span class="hljs-string">]</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;&quot;</span>]
+    <span class="hljs-attr">resources:</span> [<span class="hljs-string">&quot;nodes&quot;</span>]
+    <span class="hljs-attr">verbs:</span> [<span class="hljs-string">&quot;list&quot;</span>]
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;&quot;</span>]
+    <span class="hljs-attr">resources:</span> [<span class="hljs-string">&quot;replicationcontrollers/scale&quot;</span>]
+    <span class="hljs-attr">verbs:</span> [<span class="hljs-string">&quot;get&quot;</span>, <span class="hljs-string">&quot;update&quot;</span>]
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;extensions&quot;</span>]
+    <span class="hljs-attr">resources:</span> [<span class="hljs-string">&quot;deployments/scale&quot;</span>, <span class="hljs-string">&quot;replicasets/scale&quot;</span>]
+    <span class="hljs-attr">verbs:</span> [<span class="hljs-string">&quot;get&quot;</span>, <span class="hljs-string">&quot;update&quot;</span>]
 <span class="hljs-comment"># Remove the configmaps rule once below issue is fixed:</span>
 <span class="hljs-comment"># kubernetes-incubator/cluster-proportional-autoscaler#16</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> <span class="hljs-string">[""]</span>
-    <span class="hljs-attr">resources:</span> <span class="hljs-string">["configmaps"]</span>
-    <span class="hljs-attr">verbs:</span> <span class="hljs-string">["get",</span> <span class="hljs-string">"create"</span><span class="hljs-string">]</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;&quot;</span>]
+    <span class="hljs-attr">resources:</span> [<span class="hljs-string">&quot;configmaps&quot;</span>]
+    <span class="hljs-attr">verbs:</span> [<span class="hljs-string">&quot;get&quot;</span>, <span class="hljs-string">&quot;create&quot;</span>]
 <span class="hljs-meta">---</span>
 <span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRoleBinding</span>
 <span class="hljs-attr">apiVersion:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1</span>
@@ -1653,7 +1653,7 @@ calico-node-vj8np                         1/1     Running   0          85s   192
   <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span>
   <span class="hljs-attr">labels:</span>
     <span class="hljs-attr">k8s-app:</span> <span class="hljs-string">kube-dns-autoscaler</span>
-    <span class="hljs-attr">kubernetes.io/cluster-service:</span> <span class="hljs-string">"true"</span>
+    <span class="hljs-attr">kubernetes.io/cluster-service:</span> <span class="hljs-string">&quot;true&quot;</span>
     <span class="hljs-attr">addonmanager.kubernetes.io/mode:</span> <span class="hljs-string">Reconcile</span>
 <span class="hljs-attr">spec:</span>
   <span class="hljs-attr">selector:</span>
@@ -1664,7 +1664,7 @@ calico-node-vj8np                         1/1     Running   0          85s   192
       <span class="hljs-attr">labels:</span>
         <span class="hljs-attr">k8s-app:</span> <span class="hljs-string">kube-dns-autoscaler</span>
       <span class="hljs-attr">annotations:</span>
-        <span class="hljs-attr">scheduler.alpha.kubernetes.io/critical-pod:</span> <span class="hljs-string">''</span>
+        <span class="hljs-attr">scheduler.alpha.kubernetes.io/critical-pod:</span> <span class="hljs-string">&#x27;&#x27;</span>
     <span class="hljs-attr">spec:</span>
       <span class="hljs-attr">priorityClassName:</span> <span class="hljs-string">system-cluster-critical</span>
       <span class="hljs-attr">containers:</span>
@@ -1672,22 +1672,22 @@ calico-node-vj8np                         1/1     Running   0          85s   192
         <span class="hljs-attr">image:</span> <span class="hljs-string">gcr.azk8s.cn/google_containers/cluster-proportional-autoscaler-amd64:1.1.2-r2</span>
         <span class="hljs-attr">resources:</span>
             <span class="hljs-attr">requests:</span>
-                <span class="hljs-attr">cpu:</span> <span class="hljs-string">"20m"</span>
-                <span class="hljs-attr">memory:</span> <span class="hljs-string">"10Mi"</span>
+                <span class="hljs-attr">cpu:</span> <span class="hljs-string">&quot;20m&quot;</span>
+                <span class="hljs-attr">memory:</span> <span class="hljs-string">&quot;10Mi&quot;</span>
         <span class="hljs-attr">command:</span>
           <span class="hljs-bullet">-</span> <span class="hljs-string">/cluster-proportional-autoscaler</span>
           <span class="hljs-bullet">-</span> <span class="hljs-string">--namespace=kube-system</span>
           <span class="hljs-bullet">-</span> <span class="hljs-string">--configmap=kube-dns-autoscaler</span>
           <span class="hljs-comment"># Should keep target in sync with cluster/addons/dns/kube-dns.yaml.base</span>
           <span class="hljs-bullet">-</span> <span class="hljs-string">--target=Deployment/coredns</span>
-          <span class="hljs-comment"># When cluster is using large nodes(with more cores), "coresPerReplica" should dominate.</span>
-          <span class="hljs-comment"># If using small nodes, "nodesPerReplica" should dominate.</span>
-          <span class="hljs-bullet">-</span> <span class="hljs-string">--default-params=&#123;"linear":&#123;"coresPerReplica":256,"nodesPerReplica":16,"preventSinglePointFailure":true&#125;&#125;</span>
+          <span class="hljs-comment"># When cluster is using large nodes(with more cores), &quot;coresPerReplica&quot; should dominate.</span>
+          <span class="hljs-comment"># If using small nodes, &quot;nodesPerReplica&quot; should dominate.</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-string">--default-params=&#123;&quot;linear&quot;:&#123;&quot;coresPerReplica&quot;:256,&quot;nodesPerReplica&quot;:16,&quot;preventSinglePointFailure&quot;:true&#125;&#125;</span>
           <span class="hljs-bullet">-</span> <span class="hljs-string">--logtostderr=true</span>
           <span class="hljs-bullet">-</span> <span class="hljs-string">--v=2</span>
       <span class="hljs-attr">tolerations:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">"CriticalAddonsOnly"</span>
-        <span class="hljs-attr">operator:</span> <span class="hljs-string">"Exists"</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">&quot;CriticalAddonsOnly&quot;</span>
+        <span class="hljs-attr">operator:</span> <span class="hljs-string">&quot;Exists&quot;</span>
       <span class="hljs-attr">serviceAccountName:</span> <span class="hljs-string">kube-dns-autoscaler</span></code></pre></div><h2 id="四、其他"><a href="#四、其他" class="headerlink" title="四、其他"></a>四、其他</h2><h3 id="4-1、集群测试"><a href="#4-1、集群测试" class="headerlink" title="4.1、集群测试"></a>4.1、集群测试</h3><p>为测试集群工作正常，我们创建一个 deployment 和一个 service，用于测试联通性和 DNS 工作是否正常；测试配置如下</p><ul><li>test.yaml</li></ul><div class="hljs"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">apps/v1</span>
 <span class="hljs-attr">kind:</span> <span class="hljs-string">Deployment</span>
 <span class="hljs-attr">metadata:</span>
@@ -1723,18 +1723,4 @@ calico-node-vj8np                         1/1     Running   0          85s   192
     <span class="hljs-attr">nodePort:</span> <span class="hljs-number">30001</span>
     <span class="hljs-attr">targetPort:</span> <span class="hljs-number">80</span>
     <span class="hljs-attr">protocol:</span> <span class="hljs-string">TCP</span>
-  <span class="hljs-attr">type:</span> <span class="hljs-string">NodePort</span></code></pre></div><p>测试方式很简单，进入某一个 pod ping 其他 pod ip 确认网络是否正常，直接访问 service 名称测试 DNS 是否工作正常，这里不再演示</p><h3 id="4-2、其他说明"><a href="#4-2、其他说明" class="headerlink" title="4.2、其他说明"></a>4.2、其他说明</h3><p>此次搭建开启了大部分认证，限于篇幅原因没有将每个选项作用做完整解释，推荐搭建完成后仔细阅读以下 <code>--help</code> 中的描述(官方文档页面有时候更新不完整)；目前 apiserver 仍然保留了 8080 端口(因为直接使用 kubectl 方便)，但是在高安全性环境请关闭 8080 端口，因为即使绑定在 127.0.0.1 上，对于任何能够登录 master 机器的用户仍然能够不经验证操作整个集群</p></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext row"><article class="post-prev col-6"><a href="/2019/03/19/how-to-set-multiple-apt-mirrors-for-ubuntu/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">Ubuntu 设置多个源</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"> <a href="/2019/01/16/understand-kubernetes-sample-cli-plugin-source-code/"><span class="hidden-mobile">Kubernetes sample-cli-plugin 源码分析</span> <span class="visible-mobile">下一篇</span><i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments"><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2019/03/16/set-up-kubernetes-1.13.4-cluster/",this.page.identifier="/2019/03/16/set-up-kubernetes-1.13.4-cluster/"};function loadDisqus(){var e,t;e=document,(t=e.createElement("script")).src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}waitElementVisible("disqus_thread",loadDisqus)</script><noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" target="_blank" rel="nofollow noopener noopener">comments powered by Disqus.</a></noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4> <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"> <input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a><i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="/js/debouncer.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script defer="defer" src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js"></script><script>$(document).ready(function(){var t=$("#board-ctn").offset().top;tocbot.init({tocSelector:"#tocbot",contentSelector:"#post-body",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",collapseDepth:3,scrollSmooth:!0,headingsOffset:-t}),0<$(".toc-list-item").length&&$("#toc").css("visibility","visible")})</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","Kubernetes 1.13.4 搭建&nbsp;"],cursorChar:"_",typeSpeed:80,loop:!1});typed.stop(),$(document).ready(function(){$(".typed-cursor").addClass("h2"),typed.start()})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>
-    anchors.options = {
-      placement: "right",
-      visible: "hover",
-      
-      icon: "❡"
-      
-    };
-    var el = "h1,h2,h3,h4,h5,h6".split(",");
-    var res = [];
-    for (item of el) {
-      res.push(".markdown-body > " + item)
-    }
-    anchors.add(res.join(", "))
-  </script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){searchFunc(path,"local-search-input","local-search-result"),this.onclick=null}</script><script src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><link rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><script>$("#post img:not(.no-zoom img, img[no-zoom]), img[zoom]").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script><script defer="defer">window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-179552593-1","auto"),ga("send","pageview")</script><script async src="https://www.google-analytics.com/analytics.js"></script></body></html>
+  <span class="hljs-attr">type:</span> <span class="hljs-string">NodePort</span></code></pre></div><p>测试方式很简单，进入某一个 pod ping 其他 pod ip 确认网络是否正常，直接访问 service 名称测试 DNS 是否工作正常，这里不再演示</p><h3 id="4-2、其他说明"><a href="#4-2、其他说明" class="headerlink" title="4.2、其他说明"></a>4.2、其他说明</h3><p>此次搭建开启了大部分认证，限于篇幅原因没有将每个选项作用做完整解释，推荐搭建完成后仔细阅读以下 <code>--help</code> 中的描述(官方文档页面有时候更新不完整)；目前 apiserver 仍然保留了 8080 端口(因为直接使用 kubectl 方便)，但是在高安全性环境请关闭 8080 端口，因为即使绑定在 127.0.0.1 上，对于任何能够登录 master 机器的用户仍然能够不经验证操作整个集群</p></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext row"><article class="post-prev col-6"><a href="/2019/03/19/how-to-set-multiple-apt-mirrors-for-ubuntu/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">Ubuntu 设置多个源</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"> <a href="/2019/01/16/understand-kubernetes-sample-cli-plugin-source-code/"><span class="hidden-mobile">Kubernetes sample-cli-plugin 源码分析</span> <span class="visible-mobile">下一篇</span><i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments"><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2019/03/16/set-up-kubernetes-1.13.4-cluster/",this.page.identifier="/2019/03/16/set-up-kubernetes-1.13.4-cluster/"};Fluid.utils.waitElementVisible("disqus_thread",function(){var e=document,t=e.createElement("script");t.src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)})</script><noscript>Please enable JavaScript to view the <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a></noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div class="toc-body" id="toc-body"></div></div></div></div></div><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4> <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"> <input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div></main><footer class="text-center mt-5 py-3"><div class="footer-content"> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a><i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></footer><script src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js"></script><link rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css"><script>NProgress.configure({showSpinner:!1,trickleSpeed:200}),NProgress.start(),document.addEventListener("DOMContentLoaded",function(){window.NProgress&&window.NProgress.inc()}),window.addEventListener("load",function(){NProgress.done()})</script><script src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js"></script><script src="/js/debouncer.js"></script><script src="/js/events.js"></script><script src="/js/plugins.js"></script><script src="/js/lazyload.js"></script><script src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js"></script><script src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><script src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js"></script><script defer="defer" src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>!function(t,i){(0,Fluid.plugins.typing)(i.getElementById("subtitle").title)}(window,document)</script><script src="/js/local-search.js"></script><script>document.querySelector("#local-search-input").onclick=function(){searchFunc("/local-search.xml","local-search-input","local-search-result"),this.onclick=null}</script><script defer="defer">window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-179552593-1","auto"),ga("send","pageview")</script><script async src="https://www.google-analytics.com/analytics.js"></script><script src="/js/boot.js"></script></body></html>
