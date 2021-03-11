@@ -786,13 +786,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/java-list-unsupportedoperation-exception/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2006/01/02/java-equals-and-hashcode/</loc>
     
     <lastmod>2006-01-02</lastmod>
@@ -801,6 +794,13 @@
   
   <url>
     <loc>https://mritd.com/2006/01/02/java-exception/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/java-list-unsupportedoperation-exception/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -828,6 +828,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2006/01/02/jaxb-note/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2006/01/02/java-memory-overview-of-vm-memory-auto-management-and-memory-regions/</loc>
     
     <lastmod>2006-01-02</lastmod>
@@ -836,13 +843,6 @@
   
   <url>
     <loc>https://mritd.com/2006/01/02/java-multithreading-variable-visibility/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/jaxb-note/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -1399,14 +1399,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/linux/database/</loc>
+    <loc>https://mritd.com/categories/hackintosh/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/hackintosh/</loc>
+    <loc>https://mritd.com/categories/linux/database/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
