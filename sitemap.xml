@@ -653,14 +653,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</loc>
+    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
+    <loc>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -1082,13 +1082,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/java/</loc>
-    <lastmod>2021-03-11</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://mritd.com/tags/linux/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
@@ -1096,7 +1089,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/docker/</loc>
+    <loc>https://mritd.com/tags/java/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1104,6 +1097,13 @@
   
   <url>
     <loc>https://mritd.com/tags/aspectj/</loc>
+    <lastmod>2021-03-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/tags/docker/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1357,6 +1357,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/categories/linux/</loc>
+    <lastmod>2021-03-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://mritd.com/categories/java/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
@@ -1365,13 +1372,6 @@
   
   <url>
     <loc>https://mritd.com/categories/docker/</loc>
-    <lastmod>2021-03-11</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/categories/linux/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
