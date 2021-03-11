@@ -380,7 +380,7 @@
     
     <category term="Linux" scheme="https://mritd.com/categories/linux/"/>
     
-    <category term="Database" scheme="https://mritd.com/categories/database/"/>
+    <category term="Database" scheme="https://mritd.com/categories/linux/database/"/>
     
     
     <category term="Linux" scheme="https://mritd.com/tags/linux/"/>
@@ -648,7 +648,7 @@
     
     <category term="Kubernetes" scheme="https://mritd.com/categories/kubernetes/"/>
     
-    <category term="Golang" scheme="https://mritd.com/categories/golang/"/>
+    <category term="Golang" scheme="https://mritd.com/categories/kubernetes/golang/"/>
     
     
     <category term="Kubernetes" scheme="https://mritd.com/tags/kubernetes/"/>
@@ -883,9 +883,9 @@
     
     
     
-    <category term="CI/CD" scheme="https://mritd.com/categories/ci-cd/"/>
-    
     <category term="Docker" scheme="https://mritd.com/categories/docker/"/>
+    
+    <category term="CI/CD" scheme="https://mritd.com/categories/docker/ci-cd/"/>
     
     
     <category term="CI/CD" scheme="https://mritd.com/tags/ci-cd/"/>
@@ -1054,9 +1054,9 @@
     
     
     
-    <category term="Docker" scheme="https://mritd.com/categories/docker/"/>
-    
     <category term="Kubernetes" scheme="https://mritd.com/categories/kubernetes/"/>
+    
+    <category term="Docker" scheme="https://mritd.com/categories/kubernetes/docker/"/>
     
     
     <category term="Linux" scheme="https://mritd.com/tags/linux/"/>
@@ -1154,9 +1154,9 @@
     
     
     
-    <category term="Docker" scheme="https://mritd.com/categories/docker/"/>
-    
     <category term="Kubernetes" scheme="https://mritd.com/categories/kubernetes/"/>
+    
+    <category term="Docker" scheme="https://mritd.com/categories/kubernetes/docker/"/>
     
     
     <category term="Linux" scheme="https://mritd.com/tags/linux/"/>
@@ -1421,9 +1421,9 @@
     
     
     
-    <category term="Java" scheme="https://mritd.com/categories/java/"/>
-    
     <category term="Linux" scheme="https://mritd.com/categories/linux/"/>
+    
+    <category term="Java" scheme="https://mritd.com/categories/linux/java/"/>
     
     
     <category term="Java" scheme="https://mritd.com/tags/java/"/>
