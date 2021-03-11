@@ -786,13 +786,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/java-builtin-command-jps/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2006/01/02/java-exception/</loc>
     
     <lastmod>2006-01-02</lastmod>
@@ -801,6 +794,13 @@
   
   <url>
     <loc>https://mritd.com/2006/01/02/java-list-unsupportedoperation-exception/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/java-builtin-command-jps/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -1082,14 +1082,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/java/</loc>
+    <loc>https://mritd.com/tags/linux/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/linux/</loc>
+    <loc>https://mritd.com/tags/java/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1357,14 +1357,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/java/</loc>
+    <loc>https://mritd.com/categories/docker/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/docker/</loc>
+    <loc>https://mritd.com/categories/java/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
