@@ -653,21 +653,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/apt-get-common-cmds/</loc>
+    <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -681,7 +667,21 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
+    <loc>https://mritd.com/2006/01/02/apt-get-common-cmds/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -1075,14 +1075,14 @@
 
   
   <url>
-    <loc>https://mritd.com/tags/ci-cd/</loc>
+    <loc>https://mritd.com/tags/java/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/java/</loc>
+    <loc>https://mritd.com/tags/ci-cd/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1152,14 +1152,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/git/</loc>
+    <loc>https://mritd.com/tags/cfg-lock/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/cfg-lock/</loc>
+    <loc>https://mritd.com/tags/git/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1350,13 +1350,6 @@
 
   
   <url>
-    <loc>https://mritd.com/categories/ci-cd/</loc>
-    <lastmod>2021-03-11</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://mritd.com/categories/java/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
@@ -1364,7 +1357,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/docker/</loc>
+    <loc>https://mritd.com/categories/ci-cd/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1372,6 +1365,13 @@
   
   <url>
     <loc>https://mritd.com/categories/linux/</loc>
+    <lastmod>2021-03-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/categories/docker/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
