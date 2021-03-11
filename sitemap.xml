@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://mritd.com/2021/03/11/java-memory-direct-memory/</loc>
+    
+    <lastmod>2021-03-11</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2021/03/06/longhorn-storage-test/</loc>
     
     <lastmod>2021-03-06</lastmod>
@@ -653,6 +660,391 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2012/01/02/zuo-zi-ji-zun-zhong-de-ren-2015-bei-da-zui-duan-bi-ye-zhi-ci/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/yum-note/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/wo-he-wo-de-jue-jiang/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/wei-lai-ke-ji-xuan-ran-shi-pin/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/weblogic-request-getcontextpath-null/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/vim-note/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/use-flannel-with-docker/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/tao-hua-yi-jiu-xiao/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/sql-or-keyword-priority/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/spring3-note/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/set-up-nexus-on-centos/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/set-up-kubernetes/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/set-up-glusterfs-cluster/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/set-up-etcd-ha-cluster/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/set-up-dnsmasq-for-10-minutes/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/redundent-array-of-inexpensive-disks/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/redis3-compile-and-install/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/redis-note/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/redis-key-common-command/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/raspberry-pi2-build/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/quickly-create-custom-rpms-based-on-official-rpm/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/programmer's-self-cultivation/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/qi-shi-mei-ge-ren-dou-ceng-bao-jing-cang-sang/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/mysql-common-command/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/minio-aws-s3-storage-open-source-implementation/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/linux-note/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/maven-tutorial/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/kubernetes-tls-config/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/jvm-object-determination-and-reclaimable-algorithm/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/jdk8-new-features/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/jaxb-note/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/java-multithreading-variable-visibility/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/java-memory-overview-of-vm-memory-auto-management-and-memory-regions/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/java-memory-method-area-and-runtime-constant-pool/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/java-memory-java-heap/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/java-list-unsupportedoperation-exception/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/java-equals-and-hashcode/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/java-exception/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/java-builtin-command-jps/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/how-to-use-nexus/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/harbor-enterprise-docker-registry-part3/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/harbor-enterprise-docker-registry-part2/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/harbor-enterprise-docker-registry-part1/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/forced-change-mysql-passowrd-on-linux/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/gradle-note/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/docker-contianer-force-modify-file/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/encryption-and-introduction-to-openssl/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/compile-and-install-git-on-centos/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/git-chinese-garbled-solution/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/force-delete-quartz-job/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/docker-mirror-registry/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/dba-video-node/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2012/01/02/apply-for-a-startssl-certificate-for-free/</loc>
+    
+    <lastmod>2012-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-network-init/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
     
     <lastmod>2006-01-02</lastmod>
@@ -668,398 +1060,6 @@
   
   <url>
     <loc>https://mritd.com/2006/01/02/apt-get-common-cmds/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-network-init/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/compile-and-install-git-on-centos/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/dba-video-node/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/docker-contianer-force-modify-file/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/docker-mirror-registry/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/force-delete-quartz-job/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/forced-change-mysql-passowrd-on-linux/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/git-chinese-garbled-solution/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/gradle-note/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part1/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part2/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/harbor-enterprise-docker-registry-part3/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/how-to-use-nexus/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-builtin-command-jps/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-equals-and-hashcode/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-exception/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-list-unsupportedoperation-exception/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-memory-direct-memory/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-memory-java-heap/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-memory-method-area-and-runtime-constant-pool/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-memory-overview-of-vm-memory-auto-management-and-memory-regions/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/java-multithreading-variable-visibility/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/jaxb-note/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/jvm-object-determination-and-reclaimable-algorithm/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/kubernetes-tls-config/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/maven-tutorial/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/minio-aws-s3-storage-open-source-implementation/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/mysql-common-command/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/programmer's-self-cultivation/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/qi-shi-mei-ge-ren-dou-ceng-bao-jing-cang-sang/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/quickly-create-custom-rpms-based-on-official-rpm/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/redis-key-common-command/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/redis3-compile-and-install/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/redundent-array-of-inexpensive-disks/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/set-up-dnsmasq-for-10-minutes/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/set-up-etcd-ha-cluster/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/set-up-glusterfs-cluster/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/set-up-kubernetes/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/set-up-nexus-on-centos/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/spring3-note/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/sql-or-keyword-priority/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/tao-hua-yi-jiu-xiao/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/use-flannel-with-docker/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/vim-note/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/weblogic-request-getcontextpath-null/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/wei-lai-ke-ji-xuan-ran-shi-pin/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/wo-he-wo-de-jue-jiang/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/yum-note/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/zuo-zi-ji-zun-zhong-de-ren-2015-bei-da-zui-duan-bi-ye-zhi-ci/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/encryption-and-introduction-to-openssl/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/jdk8-new-features/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/raspberry-pi2-build/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/linux-note/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/redis-note/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
