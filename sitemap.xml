@@ -653,13 +653,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</loc>
     
     <lastmod>2006-01-02</lastmod>
@@ -667,7 +660,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/apt-get%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</loc>
+    <loc>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -681,6 +674,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2006/01/02/apt-get-common-cmds/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</loc>
     
     <lastmod>2006-01-02</lastmod>
@@ -688,7 +688,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</loc>
+    <loc>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-network-init/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -702,14 +702,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/dba%E8%A7%86%E9%A2%91%E7%AC%94%E8%AE%B0/</loc>
+    <loc>https://mritd.com/2006/01/02/dba-video-node/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/docker-contianer-%E6%8C%82%E6%8E%89%E5%BC%BA%E5%88%B6%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6/</loc>
+    <loc>https://mritd.com/2006/01/02/docker-contianer-force-modify-file/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -717,13 +717,6 @@
   
   <url>
     <loc>https://mritd.com/2006/01/02/docker-mirror-registry/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/dokcer-%E4%BD%BF%E7%94%A8-flannel-%E8%B7%A8%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%AE%AF/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -787,6 +780,13 @@
   
   <url>
     <loc>https://mritd.com/2006/01/02/java-builtin-command-jps/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/java-equals-and-hashcode/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -891,6 +891,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2006/01/02/qi-shi-mei-ge-ren-dou-ceng-bao-jing-cang-sang/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2006/01/02/quickly-create-custom-rpms-based-on-official-rpm/</loc>
     
     <lastmod>2006-01-02</lastmod>
@@ -968,6 +975,20 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2006/01/02/tao-hua-yi-jiu-xiao/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/use-flannel-with-docker/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2006/01/02/vim-note/</loc>
     
     <lastmod>2006-01-02</lastmod>
@@ -982,6 +1003,20 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2006/01/02/wei-lai-ke-ji-xuan-ran-shi-pin/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/2006/01/02/wo-he-wo-de-jue-jiang/</loc>
+    
+    <lastmod>2006-01-02</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2006/01/02/yum-note/</loc>
     
     <lastmod>2006-01-02</lastmod>
@@ -989,42 +1024,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/2006/01/02/%E5%81%9A%E8%87%AA%E5%B7%B1%E5%B0%8A%E9%87%8D%E7%9A%84%E4%BA%BA-2015%E5%8C%97%E5%A4%A7%E6%9C%80%E7%9F%AD%E6%AF%95%E4%B8%9A%E8%87%B4%E8%BE%9E/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/%E5%85%B6%E5%AE%9E%E6%AF%8F%E4%B8%AA%E4%BA%BA%E9%83%BD%E6%9B%BE%E9%A5%B1%E7%BB%8F%E6%B2%A7%E6%A1%91/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/%E6%88%91%E5%92%8C%E6%88%91%E7%9A%84%E5%80%94%E5%BC%BA/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/%E6%9C%AA%E6%9D%A5%E7%A7%91%E6%8A%80%E6%B8%B2%E6%9F%93%E8%A7%86%E9%A2%91/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/%E6%A1%83%E8%8A%B1%E4%BE%9D%E6%97%A7%E7%AC%91/</loc>
-    
-    <lastmod>2006-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2006/01/02/%E6%B5%85%E8%B0%88-java%E4%B8%AD%E7%9A%84-equals-%E5%92%8C-hashcode/</loc>
+    <loc>https://mritd.com/2006/01/02/zuo-zi-ji-zun-zhong-de-ren-2015-bei-da-zui-duan-bi-ye-zhi-ci/</loc>
     
     <lastmod>2006-01-02</lastmod>
     
@@ -1082,14 +1082,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/linux/</loc>
+    <loc>https://mritd.com/tags/java/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/java/</loc>
+    <loc>https://mritd.com/tags/linux/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1357,13 +1357,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/linux/</loc>
-    <lastmod>2021-03-11</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://mritd.com/categories/java/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
@@ -1372,6 +1365,13 @@
   
   <url>
     <loc>https://mritd.com/categories/docker/</loc>
+    <lastmod>2021-03-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/categories/linux/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>

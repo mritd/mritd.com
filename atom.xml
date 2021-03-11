@@ -1134,9 +1134,9 @@
     <category term="Docker" scheme="https://mritd.com/categories/docker/"/>
     
     
-    <category term="Linux" scheme="https://mritd.com/tags/linux/"/>
-    
     <category term="Java" scheme="https://mritd.com/tags/java/"/>
+    
+    <category term="Linux" scheme="https://mritd.com/tags/linux/"/>
     
   </entry>
   
@@ -1421,9 +1421,9 @@
     
     
     
-    <category term="Linux" scheme="https://mritd.com/categories/linux/"/>
-    
     <category term="Java" scheme="https://mritd.com/categories/java/"/>
+    
+    <category term="Linux" scheme="https://mritd.com/categories/linux/"/>
     
     
     <category term="Java" scheme="https://mritd.com/tags/java/"/>
@@ -2088,27 +2088,6 @@
   </entry>
   
   <entry>
-    <title>免费申请 StartSSL 证书</title>
-    <link href="https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/"/>
-    <id>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</id>
-    <published>2006-01-02T07:04:05.000Z</published>
-    <updated>2006-01-02T07:04:05.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><blockquote><p>一直想给博客搞个 SSL 证书装装逼，发现 StartSSL 可以申请免费的一年个人证书，所以决定搞来一个，以下为申请过程。</p></blockquote><h2 id="二、申请过程"><a href="#二、申请过程" class="headerlink" title="二、申请过程"></a>二、申请过程</h2><h3 id="2-1、注册账号"><a href="#2-1、注册账号" class="headerlink" title="2.1、注册账号"></a>2.1、注册账号</h3><p>既然要申请，首先需要注册一个 StartSSL 的账号，注册地址 <a href="https://www.startssl.com/SignUp">https://www.startssl.com/SignUp</a>，按照提示一步一步往下搞就行。</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_register_account.png" alt="hexo_startssl_register_account"></p><h3 id="2-2、登录"><a href="#2-2、登录" class="headerlink" title="2.2、登录"></a>2.2、登录</h3><p>注册完成后默认会下载一个 key，导入浏览器后可免密码登录；同时支持动态密码登录，不导入 key 每次登录都会向邮箱发送一个动态密码。</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_register_login.png" alt="hexo_startssl_register_login"></p><p>接下来发送一个动态密码即可</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_login_sendpasswd.png" alt="hexo_startssl_login_sendpasswd"></p><h3 id="2-3、创建-SSL"><a href="#2-3、创建-SSL" class="headerlink" title="2.3、创建 SSL"></a>2.3、创建 SSL</h3><p>首先点击 <code>Validations Wizard</code>，并选择第一项 <code>Domain Validation (for SSL certificate)</code>，创建一个域名的 SSL 证书</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_createssltype.png" alt="hexo_startssl_createssltype"></p><p>然后输入你的域名地址</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_createssl_domain.png" alt="hexo_startssl_createssl_domain"></p><h3 id="2-4、验证域名"><a href="#2-4、验证域名" class="headerlink" title="2.4、验证域名"></a>2.4、验证域名</h3><p>接下来 StartSSL 会要求验证域名的所有权，验证方法就是向域名注册邮箱发送动态验证码；<strong>注意 : 如果域名开启了隐私保护，那么 whois 查询得到的域名注册邮箱将是注册商的，所以验证时最好取消域名隐私保护，当然像 GoDaddy 等大型注册商会提供邮件转发，目前测试 GoDaddy 会转发邮件。</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_domain_email.png" alt="hexo_startssl_domain_email"></p><h3 id="2-5、生成-HTTPS-证书"><a href="#2-5、生成-HTTPS-证书" class="headerlink" title="2.5、生成 HTTPS 证书"></a>2.5、生成 HTTPS 证书</h3><p>验证好域名以后便可以选择 <code>Certificates Wizard</code> 来创建 SSL 证书</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_create_ssl1.png" alt="hexo_startssl_create_ssl1"></p><p>随后输入证书使用的域名，包括二级域名，<strong>免费版最多可一次性输入5个</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_input_domainname.png" alt="hexo_startssl_input_domainname"></p><p>最后需要创建 CSR 来生成 SSL 证书，StartSSL支持在线生成以及离线(本地)生成并上传，以下为本地生成，并复制到 StartSSL</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_create_csr.png" alt="hexo_startssl_create_csr"></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_mac_createcsr.png" alt="hexo_startssl_mac_createcsr"></p><p><strong>生成好以后将 csr 文件内容复制到文本框即可</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_copycsr.png" alt="hexo_startssl_copycsr"></p><h3 id="2-6、下载证书"><a href="#2-6、下载证书" class="headerlink" title="2.6、下载证书"></a>2.6、下载证书</h3><p>输入完成后，待 StartSSL 签名完成便可下载证书</p><p><img src="https://cdn.oss.link/markdown/hexo_download_ssl.png" alt="hexo_download_ssl"></p><p>文件内包含主流服务器的证书，如下</p><p><img src="https://cdn.oss.link/markdown/hexo_download_ssl_value.png" alt="hexo_download_ssl"></p><p>到此申请结束，关于其实用教程请自行 Google</p>]]></content>
-    
-    
-    <summary type="html">一直想给博客搞个 SSL 证书装装逼，发现 StartSSL 可以申请免费的一年个人证书，所以决定搞来一个，以下为申请过程。</summary>
-    
-    
-    
-    <category term="Linux" scheme="https://mritd.com/categories/linux/"/>
-    
-    
-    <category term="Linux" scheme="https://mritd.com/tags/linux/"/>
-    
-  </entry>
-  
-  <entry>
     <title>HotSpot 虚拟机的算法实现</title>
     <link href="https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/"/>
     <id>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</id>
@@ -2130,16 +2109,16 @@
   </entry>
   
   <entry>
-    <title>apt-get 常用命令</title>
-    <link href="https://mritd.com/2006/01/02/apt-get%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/"/>
-    <id>https://mritd.com/2006/01/02/apt-get%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</id>
+    <title>免费申请 StartSSL 证书</title>
+    <link href="https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/"/>
+    <id>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</id>
     <published>2006-01-02T07:04:05.000Z</published>
     <updated>2006-01-02T07:04:05.000Z</updated>
     
-    <content type="html"><![CDATA[<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">apt-cache search package    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg）</span><br>apt-cache show package      <span class="hljs-comment">#显示包的相关信息，如说明、大小、版本等</span><br>apt-cache showpg package    <span class="hljs-comment">#显示包的相关信息，如Reverse Depends（反向依赖）、依赖等</span><br>apt-get install package       <span class="hljs-comment">#安装包</span><br>apt-get reinstall package     <span class="hljs-comment">#重新安装包</span><br>apt-get -f install package    <span class="hljs-comment">#强制安装</span><br></code></pre></div></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">apt-get remove package        <span class="hljs-comment">#删除包（只是删掉数据和可执行文件，不删除配置文件）</span><br>apt-get remove --purge package       <span class="hljs-comment">#删除包，包括删除配置文件等</span><br>apt-get autoremove --purge package   <span class="hljs-comment">#删除包及其依赖的软件包+配置文件等</span><br>apt-get update          <span class="hljs-comment">#更新源</span><br>apt-get upgrade         <span class="hljs-comment">#更新已安装的包</span><br>apt-get dist-upgrade    <span class="hljs-comment">#升级系统</span><br>apt-get dselect-upgrade        <span class="hljs-comment">#使用 dselect 升级</span><br>apt-cache depends package      <span class="hljs-comment">#了解使用依赖</span><br>apt-cache rdepends package     <span class="hljs-comment">#查看该包被哪些包依赖</span><br>apt-get build-dep package   <span class="hljs-comment">#安装相关的编译环境</span><br>apt-get <span class="hljs-built_in">source</span> package      <span class="hljs-comment">#下载该包的源代码</span><br>apt-get clean &amp;&amp; apt-get autoclean  <span class="hljs-comment">#清理下载文件的存档 &amp;&amp; 只清理过时的包</span><br>apt-get check             <span class="hljs-comment">#检查是否有损坏的依赖</span><br>dpkg -S filename          <span class="hljs-comment">#查找filename属于哪个软件包</span><br>apt-file search filename  <span class="hljs-comment">#查找filename属于哪个软件包</span><br>apt-file list packagename <span class="hljs-comment">#列出软件包的内容</span><br>apt-file update           <span class="hljs-comment">#更新apt-file的数据库</span><br><br>dpkg -l      <span class="hljs-comment">#列出当前系统中所有的包.可以和参数less一起使用在分屏查看（类似于rpm -qa）</span><br>dpkg -l |grep -i <span class="hljs-string">&quot;pkg&quot;</span>   <span class="hljs-comment">#查看系统中与&quot;pkg&quot;相关联的包（类似于rpm -qa | grep pkg）</span><br>dpkg -s pkg  <span class="hljs-comment">#查询一个已安装的包的详细信息（类似于rpm -qi）</span><br>dpkg -L pkg  <span class="hljs-comment">#查询一个已安装的软件包释放了哪些文件（类似于rpm -ql）</span><br>dpkg -S file     <span class="hljs-comment">#查询系统中某个文件属于哪个软件包（类似于rpm -qf）</span><br>dpkg -c pkg.deb  <span class="hljs-comment">#查询一个未安装的deb包将会释放哪些文件（类似于rpm -qpl）</span><br>dpkg -I pkg.deb  <span class="hljs-comment">#查看一个未安装的deb包的详细信息（类似于rpm -qpi）</span><br>dpkg -i pkg.deb  <span class="hljs-comment">#手动安装软件包（不能解决软依赖性问题，可以用apt-get -f install解决）</span><br>dpkg -r pkg      <span class="hljs-comment">#卸载软件包（不是完全的卸载，它的配置文件还存在）</span><br>dpkg -P pkg      <span class="hljs-comment">#全部卸载（不能解决依赖性的问题）</span><br>dpkg-reconfigure pkg     <span class="hljs-comment">#重新配置</span><br>dpkg -x pkg.deb dir      <span class="hljs-comment">#将一个deb包解开至dir目录</span><br>dpkg --pending --remove  <span class="hljs-comment">#移除多余的软件</span><br><br><span class="hljs-comment"># 强制安装一个包(忽略依赖及其它问题)</span><br>dpkg --force-all -i pkg.deb    <span class="hljs-comment">#可以参考dpkg --force-help</span><br><br><span class="hljs-comment"># 强制卸载一个包</span><br>dpkg --force-all -P pkg.deb<br><br>aptitude update   <span class="hljs-comment">#更新可用的包列表</span><br>aptitude upgrade  <span class="hljs-comment">#升级可用的包</span><br>aptitude dist-upgrade     <span class="hljs-comment">#将系统升级到新的发行版</span><br>aptitude install pkgname  <span class="hljs-comment">#安装包</span><br>aptitude remove pkgname   <span class="hljs-comment">#删除包</span><br>aptitude purge pkgname    <span class="hljs-comment">#删除包及其配置文件</span><br>aptitude search string    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg，重要）</span><br>aptitude show pkgname     <span class="hljs-comment">#显示包的详细信息 （相当于yum info pkg，重要）</span><br>aptitude clean            <span class="hljs-comment">#删除下载的包文件</span><br>aptitude autoclean        <span class="hljs-comment">#仅删除过期的包文件</span><br><br>apt-get install xrdp      <span class="hljs-comment">#安装图形化</span><br></code></pre></div></td></tr></table></figure>]]></content>
+    <content type="html"><![CDATA[<h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><blockquote><p>一直想给博客搞个 SSL 证书装装逼，发现 StartSSL 可以申请免费的一年个人证书，所以决定搞来一个，以下为申请过程。</p></blockquote><h2 id="二、申请过程"><a href="#二、申请过程" class="headerlink" title="二、申请过程"></a>二、申请过程</h2><h3 id="2-1、注册账号"><a href="#2-1、注册账号" class="headerlink" title="2.1、注册账号"></a>2.1、注册账号</h3><p>既然要申请，首先需要注册一个 StartSSL 的账号，注册地址 <a href="https://www.startssl.com/SignUp">https://www.startssl.com/SignUp</a>，按照提示一步一步往下搞就行。</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_register_account.png" alt="hexo_startssl_register_account"></p><h3 id="2-2、登录"><a href="#2-2、登录" class="headerlink" title="2.2、登录"></a>2.2、登录</h3><p>注册完成后默认会下载一个 key，导入浏览器后可免密码登录；同时支持动态密码登录，不导入 key 每次登录都会向邮箱发送一个动态密码。</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_register_login.png" alt="hexo_startssl_register_login"></p><p>接下来发送一个动态密码即可</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_login_sendpasswd.png" alt="hexo_startssl_login_sendpasswd"></p><h3 id="2-3、创建-SSL"><a href="#2-3、创建-SSL" class="headerlink" title="2.3、创建 SSL"></a>2.3、创建 SSL</h3><p>首先点击 <code>Validations Wizard</code>，并选择第一项 <code>Domain Validation (for SSL certificate)</code>，创建一个域名的 SSL 证书</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_createssltype.png" alt="hexo_startssl_createssltype"></p><p>然后输入你的域名地址</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_createssl_domain.png" alt="hexo_startssl_createssl_domain"></p><h3 id="2-4、验证域名"><a href="#2-4、验证域名" class="headerlink" title="2.4、验证域名"></a>2.4、验证域名</h3><p>接下来 StartSSL 会要求验证域名的所有权，验证方法就是向域名注册邮箱发送动态验证码；<strong>注意 : 如果域名开启了隐私保护，那么 whois 查询得到的域名注册邮箱将是注册商的，所以验证时最好取消域名隐私保护，当然像 GoDaddy 等大型注册商会提供邮件转发，目前测试 GoDaddy 会转发邮件。</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_domain_email.png" alt="hexo_startssl_domain_email"></p><h3 id="2-5、生成-HTTPS-证书"><a href="#2-5、生成-HTTPS-证书" class="headerlink" title="2.5、生成 HTTPS 证书"></a>2.5、生成 HTTPS 证书</h3><p>验证好域名以后便可以选择 <code>Certificates Wizard</code> 来创建 SSL 证书</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_create_ssl1.png" alt="hexo_startssl_create_ssl1"></p><p>随后输入证书使用的域名，包括二级域名，<strong>免费版最多可一次性输入5个</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_input_domainname.png" alt="hexo_startssl_input_domainname"></p><p>最后需要创建 CSR 来生成 SSL 证书，StartSSL支持在线生成以及离线(本地)生成并上传，以下为本地生成，并复制到 StartSSL</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_create_csr.png" alt="hexo_startssl_create_csr"></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_mac_createcsr.png" alt="hexo_startssl_mac_createcsr"></p><p><strong>生成好以后将 csr 文件内容复制到文本框即可</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_copycsr.png" alt="hexo_startssl_copycsr"></p><h3 id="2-6、下载证书"><a href="#2-6、下载证书" class="headerlink" title="2.6、下载证书"></a>2.6、下载证书</h3><p>输入完成后，待 StartSSL 签名完成便可下载证书</p><p><img src="https://cdn.oss.link/markdown/hexo_download_ssl.png" alt="hexo_download_ssl"></p><p>文件内包含主流服务器的证书，如下</p><p><img src="https://cdn.oss.link/markdown/hexo_download_ssl_value.png" alt="hexo_download_ssl"></p><p>到此申请结束，关于其实用教程请自行 Google</p>]]></content>
     
     
-    <summary type="html">apt-get 常用命令</summary>
+    <summary type="html">一直想给博客搞个 SSL 证书装装逼，发现 StartSSL 可以申请免费的一年个人证书，所以决定搞来一个，以下为申请过程。</summary>
     
     
     
@@ -2172,6 +2151,27 @@
   </entry>
   
   <entry>
+    <title>apt-get 常用命令</title>
+    <link href="https://mritd.com/2006/01/02/apt-get-common-cmds/"/>
+    <id>https://mritd.com/2006/01/02/apt-get-common-cmds/</id>
+    <published>2006-01-02T07:04:05.000Z</published>
+    <updated>2006-01-02T07:04:05.000Z</updated>
+    
+    <content type="html"><![CDATA[<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">apt-cache search package    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg）</span><br>apt-cache show package      <span class="hljs-comment">#显示包的相关信息，如说明、大小、版本等</span><br>apt-cache showpg package    <span class="hljs-comment">#显示包的相关信息，如Reverse Depends（反向依赖）、依赖等</span><br>apt-get install package       <span class="hljs-comment">#安装包</span><br>apt-get reinstall package     <span class="hljs-comment">#重新安装包</span><br>apt-get -f install package    <span class="hljs-comment">#强制安装</span><br></code></pre></div></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">apt-get remove package        <span class="hljs-comment">#删除包（只是删掉数据和可执行文件，不删除配置文件）</span><br>apt-get remove --purge package       <span class="hljs-comment">#删除包，包括删除配置文件等</span><br>apt-get autoremove --purge package   <span class="hljs-comment">#删除包及其依赖的软件包+配置文件等</span><br>apt-get update          <span class="hljs-comment">#更新源</span><br>apt-get upgrade         <span class="hljs-comment">#更新已安装的包</span><br>apt-get dist-upgrade    <span class="hljs-comment">#升级系统</span><br>apt-get dselect-upgrade        <span class="hljs-comment">#使用 dselect 升级</span><br>apt-cache depends package      <span class="hljs-comment">#了解使用依赖</span><br>apt-cache rdepends package     <span class="hljs-comment">#查看该包被哪些包依赖</span><br>apt-get build-dep package   <span class="hljs-comment">#安装相关的编译环境</span><br>apt-get <span class="hljs-built_in">source</span> package      <span class="hljs-comment">#下载该包的源代码</span><br>apt-get clean &amp;&amp; apt-get autoclean  <span class="hljs-comment">#清理下载文件的存档 &amp;&amp; 只清理过时的包</span><br>apt-get check             <span class="hljs-comment">#检查是否有损坏的依赖</span><br>dpkg -S filename          <span class="hljs-comment">#查找filename属于哪个软件包</span><br>apt-file search filename  <span class="hljs-comment">#查找filename属于哪个软件包</span><br>apt-file list packagename <span class="hljs-comment">#列出软件包的内容</span><br>apt-file update           <span class="hljs-comment">#更新apt-file的数据库</span><br><br>dpkg -l      <span class="hljs-comment">#列出当前系统中所有的包.可以和参数less一起使用在分屏查看（类似于rpm -qa）</span><br>dpkg -l |grep -i <span class="hljs-string">&quot;pkg&quot;</span>   <span class="hljs-comment">#查看系统中与&quot;pkg&quot;相关联的包（类似于rpm -qa | grep pkg）</span><br>dpkg -s pkg  <span class="hljs-comment">#查询一个已安装的包的详细信息（类似于rpm -qi）</span><br>dpkg -L pkg  <span class="hljs-comment">#查询一个已安装的软件包释放了哪些文件（类似于rpm -ql）</span><br>dpkg -S file     <span class="hljs-comment">#查询系统中某个文件属于哪个软件包（类似于rpm -qf）</span><br>dpkg -c pkg.deb  <span class="hljs-comment">#查询一个未安装的deb包将会释放哪些文件（类似于rpm -qpl）</span><br>dpkg -I pkg.deb  <span class="hljs-comment">#查看一个未安装的deb包的详细信息（类似于rpm -qpi）</span><br>dpkg -i pkg.deb  <span class="hljs-comment">#手动安装软件包（不能解决软依赖性问题，可以用apt-get -f install解决）</span><br>dpkg -r pkg      <span class="hljs-comment">#卸载软件包（不是完全的卸载，它的配置文件还存在）</span><br>dpkg -P pkg      <span class="hljs-comment">#全部卸载（不能解决依赖性的问题）</span><br>dpkg-reconfigure pkg     <span class="hljs-comment">#重新配置</span><br>dpkg -x pkg.deb dir      <span class="hljs-comment">#将一个deb包解开至dir目录</span><br>dpkg --pending --remove  <span class="hljs-comment">#移除多余的软件</span><br><br><span class="hljs-comment"># 强制安装一个包(忽略依赖及其它问题)</span><br>dpkg --force-all -i pkg.deb    <span class="hljs-comment">#可以参考dpkg --force-help</span><br><br><span class="hljs-comment"># 强制卸载一个包</span><br>dpkg --force-all -P pkg.deb<br><br>aptitude update   <span class="hljs-comment">#更新可用的包列表</span><br>aptitude upgrade  <span class="hljs-comment">#升级可用的包</span><br>aptitude dist-upgrade     <span class="hljs-comment">#将系统升级到新的发行版</span><br>aptitude install pkgname  <span class="hljs-comment">#安装包</span><br>aptitude remove pkgname   <span class="hljs-comment">#删除包</span><br>aptitude purge pkgname    <span class="hljs-comment">#删除包及其配置文件</span><br>aptitude search string    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg，重要）</span><br>aptitude show pkgname     <span class="hljs-comment">#显示包的详细信息 （相当于yum info pkg，重要）</span><br>aptitude clean            <span class="hljs-comment">#删除下载的包文件</span><br>aptitude autoclean        <span class="hljs-comment">#仅删除过期的包文件</span><br><br>apt-get install xrdp      <span class="hljs-comment">#安装图形化</span><br></code></pre></div></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">apt-get 常用命令</summary>
+    
+    
+    
+    <category term="Linux" scheme="https://mritd.com/categories/linux/"/>
+    
+    
+    <category term="Linux" scheme="https://mritd.com/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Can&#39;t connect to MySQL server on &#39;xxxx&#39; (61)</title>
     <link href="https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/"/>
     <id>https://mritd.com/2006/01/02/can-t-connect-to-mysql-server-on-xxxx-61/</id>
@@ -2194,8 +2194,8 @@
   
   <entry>
     <title>CentOS 6.7_x64 minimal 网络初始化配置</title>
-    <link href="https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/"/>
-    <id>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</id>
+    <link href="https://mritd.com/2006/01/02/centos-6-7-x64-minimal-network-init/"/>
+    <id>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-network-init/</id>
     <published>2006-01-02T07:04:05.000Z</published>
     <updated>2006-01-02T07:04:05.000Z</updated>
     
@@ -2236,8 +2236,8 @@
   
   <entry>
     <title>DBA视频笔记</title>
-    <link href="https://mritd.com/2006/01/02/dba%E8%A7%86%E9%A2%91%E7%AC%94%E8%AE%B0/"/>
-    <id>https://mritd.com/2006/01/02/dba%E8%A7%86%E9%A2%91%E7%AC%94%E8%AE%B0/</id>
+    <link href="https://mritd.com/2006/01/02/dba-video-node/"/>
+    <id>https://mritd.com/2006/01/02/dba-video-node/</id>
     <published>2006-01-02T07:04:05.000Z</published>
     <updated>2006-01-02T07:04:05.000Z</updated>
     
@@ -2259,8 +2259,8 @@
   
   <entry>
     <title>Docker Contianer 挂掉强制修改文件</title>
-    <link href="https://mritd.com/2006/01/02/docker-contianer-%E6%8C%82%E6%8E%89%E5%BC%BA%E5%88%B6%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6/"/>
-    <id>https://mritd.com/2006/01/02/docker-contianer-%E6%8C%82%E6%8E%89%E5%BC%BA%E5%88%B6%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6/</id>
+    <link href="https://mritd.com/2006/01/02/docker-contianer-force-modify-file/"/>
+    <id>https://mritd.com/2006/01/02/docker-contianer-force-modify-file/</id>
     <published>2006-01-02T07:04:05.000Z</published>
     <updated>2006-01-02T07:04:05.000Z</updated>
     

@@ -1227,9 +1227,9 @@
       <category domain="https://mritd.com/categories/docker/">Docker</category>
       
       
-      <category domain="https://mritd.com/tags/linux/">Linux</category>
-      
       <category domain="https://mritd.com/tags/java/">Java</category>
+      
+      <category domain="https://mritd.com/tags/linux/">Linux</category>
       
       
       <comments>https://mritd.com/2017/09/27/alpine-3.6-openjdk-8-bug/#disqus_thread</comments>
@@ -1538,9 +1538,9 @@
       <content:encoded><![CDATA[<blockquote><p>今天对接接口，对方给的 Demo 和已有项目用的 HTTP 工具不是一个；后来出现人家的好使，我的死活不通的情况；无奈之下开始研究 Java 抓包，所以怕忘了记录一下……</p></blockquote><h3 id="一、mitmproxy-简介"><a href="#一、mitmproxy-简介" class="headerlink" title="一、mitmproxy 简介"></a>一、mitmproxy 简介</h3><p>mitmproxy 是一个命令行下的强大抓包工具，可以在命令行下抓取 HTTP(S) 数据包并加以分析；对于 HTTPS 抓包，首先要在本地添加 mitmproxy 的根证书，然后 mitmproxy 通过以下方式进行抓包：</p><p><img src="https://cdn.oss.link/markdown/x7lir.jpg" alt="mitmproxy1"></p><ul><li>1、客户端发起一个到 mitmproxy 的连接，并且发出HTTP CONNECT 请求</li><li>2、mitmproxy作出响应(200)，模拟已经建立了CONNECT通信管道</li><li>3、客户端确信它正在和远端服务器会话，然后启动SSL连接。在SSL连接中指明了它正在连接的主机名(SNI)</li><li>4、mitmproxy连接服务器，然后使用客户端发出的SNI指示的主机名建立SSL连接</li><li>5、服务器以匹配的SSL证书作出响应，这个SSL证书里包含生成的拦截证书所必须的通用名(CN)和服务器备用名(SAN)</li><li>6、mitmproxy生成拦截证书，然后继续进行与第３步暂停的客户端SSL握手</li><li>7、客户端通过已经建立的SSL连接发送请求，</li><li>8、mitmproxy通过第４步建立的SSL连接传递这个请求给服务器</li></ul><h3 id="二、抓包配置"><a href="#二、抓包配置" class="headerlink" title="二、抓包配置"></a>二、抓包配置</h3><h4 id="2-1、安装-mitmproxy"><a href="#2-1、安装-mitmproxy" class="headerlink" title="2.1、安装 mitmproxy"></a>2.1、安装 mitmproxy</h4><p>mitmproxy 是由  python 编写的，所以直接通过 pip 即可安装，mac 下也可使用 brew 工具安装</p><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># mac</span><br>brew install mitmproxy<br><span class="hljs-comment"># Linux</span><br>pip install mitmproxy<br><span class="hljs-comment"># CentOS 安装时可能会出现 &quot;致命错误：libxml/xmlversion.h：没有那个文件或目录&quot;</span><br><span class="hljs-comment"># 需要安装如下软件包即可解决</span><br>yum install libxml2 libxml2-devel libxslt libxslt-devel -y<br></code></pre></div></td></tr></table></figure><h4 id="2-2、HTTPS-证书配置"><a href="#2-2、HTTPS-证书配置" class="headerlink" title="2.2、HTTPS 证书配置"></a>2.2、HTTPS 证书配置</h4><p>首先由于 HTTPS 的安全性，直接抓包是什么也看不到的；所以需要先在本地配置 mitmproxy 的根证书，使其能够解密 HTTPS 流量完成一个中间人的角色；证书下载方式需要先在本地启动 mitmproxy，然后通过设置本地连接代理到 mitmproxy 端口，访问 <code>mitm.it</code> 即可，具体可查看 <a href="https://mitmproxy.org/doc/certinstall.html">官方文档</a></p><p><strong>首先启动 mitmproxy</strong></p><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">mitmproxy -p 4000 --no-mouse<br></code></pre></div></td></tr></table></figure><p><strong>浏览器通过设置代理访问 mitm.it</strong></p><p><img src="https://cdn.oss.link/markdown/unrnc.jpg" alt="access"></p><p>选择对应平台并将其证书加入到系统信任根证书列表即可；对于 Java 程序来说可能有时候并不会生效，所以必须 <strong>修改 keystore</strong>，修改如下</p><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># Linux 一般在 JAVA_HOME/jre/lib/security/cacerts 下</span><br><span class="hljs-comment"># Mac 在 /Library/Java/JavaVirtualMachines/JAVA_HOME/Contents/Home/jre/lib/security/cacerts</span><br>sudo keytool -importcert -<span class="hljs-built_in">alias</span> mitmproxy -keystore /Library/Java/JavaVirtualMachines/jdk1.8.0_77.jdk/Contents/Home/jre/lib/security/cacerts -storepass changeit -trustcacerts -file ~/.mitmproxy/mitmproxy-ca-cert.pem<br></code></pre></div></td></tr></table></figure><h4 id="2-4、Java-抓包调试"><a href="#2-4、Java-抓包调试" class="headerlink" title="2.4、Java 抓包调试"></a>2.4、Java 抓包调试</h4><p>JVM 本身在启动时就可以设置代理参数，也可以通过代码层设置；以下为代码层设置代理方式</p><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">public void <span class="hljs-function"><span class="hljs-title">beforeTest</span></span>()&#123;<br>    logger.info(<span class="hljs-string">&quot;设置抓包代理......&quot;</span>);<br>    System.setProperty(<span class="hljs-string">&quot;https.proxyHost&quot;</span>, <span class="hljs-string">&quot;127.0.0.1&quot;</span>);<br>    System.setProperty(<span class="hljs-string">&quot;https.proxyPort&quot;</span>, <span class="hljs-string">&quot;4000&quot;</span>);<br>&#125;<br></code></pre></div></td></tr></table></figure><p><strong>然后保证在发送 HTTPS 请求之前此代码执行即可，以下为抓包示例</strong></p><p><img src="https://cdn.oss.link/markdown/kuzhd.jpg" alt="zhuabao"></p><p>通过方向键+回车即可选择某个请求查看报文信息</p><p><img src="https://cdn.oss.link/markdown/vfifu.jpg" alt="detail"></p><h3 id="三、Java-其他代理设置"><a href="#三、Java-其他代理设置" class="headerlink" title="三、Java 其他代理设置"></a>三、Java 其他代理设置</h3><p>Java 代理一般可以通过 2 种方式设置，一种是通过代码层，如下</p><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">// HTTP 代理，只能代理 HTTP 请求<br>System.setProperty(<span class="hljs-string">&quot;http.proxyHost&quot;</span>, <span class="hljs-string">&quot;127.0.0.1&quot;</span>);<br>System.setProperty(<span class="hljs-string">&quot;http.proxyPort&quot;</span>, <span class="hljs-string">&quot;9876&quot;</span>);<br> <br>// HTTPS 代理，只能代理 HTTPS 请求<br>System.setProperty(<span class="hljs-string">&quot;https.proxyHost&quot;</span>, <span class="hljs-string">&quot;127.0.0.1&quot;</span>);<br>System.setProperty(<span class="hljs-string">&quot;https.proxyPort&quot;</span>, <span class="hljs-string">&quot;9876&quot;</span>);<br><br>// 同时支持代理 HTTP/HTTPS 请求<br>System.setProperty(<span class="hljs-string">&quot;proxyHost&quot;</span>, <span class="hljs-string">&quot;127.0.0.1&quot;</span>);<br>System.setProperty(<span class="hljs-string">&quot;proxyPort&quot;</span>, <span class="hljs-string">&quot;9876&quot;</span>);<br> <br>// SOCKS 代理，支持 HTTP 和 HTTPS 请求<br>// 注意：如果设置了 SOCKS 代理就不要设 HTTP/HTTPS 代理<br>System.setProperty(<span class="hljs-string">&quot;socksProxyHost&quot;</span>, <span class="hljs-string">&quot;127.0.0.1&quot;</span>);<br>System.setProperty(<span class="hljs-string">&quot;socksProxyPort&quot;</span>, <span class="hljs-string">&quot;1080&quot;</span>);<br></code></pre></div></td></tr></table></figure><p>另一种还可以通过 JVM 启动参数设置</p><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">-DproxyHost=127.0.0.1 -DproxyPort=9876<br></code></pre></div></td></tr></table></figure><p>本文参考：</p><ul><li><a href="http://www.aneasystone.com/archives/2015/12/java-and-http-using-proxy.html">Java 和 HTTP 的那些事</a></li><li><a href="http://blog.csdn.net/qq_30513483/article/details/53258637">一步一步教你https抓包</a></li></ul>]]></content:encoded>
       
       
-      <category domain="https://mritd.com/categories/linux/">Linux</category>
-      
       <category domain="https://mritd.com/categories/java/">Java</category>
+      
+      <category domain="https://mritd.com/categories/linux/">Linux</category>
       
       
       <category domain="https://mritd.com/tags/java/">Java</category>
@@ -2266,29 +2266,6 @@
     </item>
     
     <item>
-      <title>免费申请 StartSSL 证书</title>
-      <link>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</link>
-      <guid>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</guid>
-      <pubDate>Mon, 02 Jan 2006 07:04:05 GMT</pubDate>
-      
-      <description>一直想给博客搞个 SSL 证书装装逼，发现 StartSSL 可以申请免费的一年个人证书，所以决定搞来一个，以下为申请过程。</description>
-      
-      
-      
-      <content:encoded><![CDATA[<h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><blockquote><p>一直想给博客搞个 SSL 证书装装逼，发现 StartSSL 可以申请免费的一年个人证书，所以决定搞来一个，以下为申请过程。</p></blockquote><h2 id="二、申请过程"><a href="#二、申请过程" class="headerlink" title="二、申请过程"></a>二、申请过程</h2><h3 id="2-1、注册账号"><a href="#2-1、注册账号" class="headerlink" title="2.1、注册账号"></a>2.1、注册账号</h3><p>既然要申请，首先需要注册一个 StartSSL 的账号，注册地址 <a href="https://www.startssl.com/SignUp">https://www.startssl.com/SignUp</a>，按照提示一步一步往下搞就行。</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_register_account.png" alt="hexo_startssl_register_account"></p><h3 id="2-2、登录"><a href="#2-2、登录" class="headerlink" title="2.2、登录"></a>2.2、登录</h3><p>注册完成后默认会下载一个 key，导入浏览器后可免密码登录；同时支持动态密码登录，不导入 key 每次登录都会向邮箱发送一个动态密码。</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_register_login.png" alt="hexo_startssl_register_login"></p><p>接下来发送一个动态密码即可</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_login_sendpasswd.png" alt="hexo_startssl_login_sendpasswd"></p><h3 id="2-3、创建-SSL"><a href="#2-3、创建-SSL" class="headerlink" title="2.3、创建 SSL"></a>2.3、创建 SSL</h3><p>首先点击 <code>Validations Wizard</code>，并选择第一项 <code>Domain Validation (for SSL certificate)</code>，创建一个域名的 SSL 证书</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_createssltype.png" alt="hexo_startssl_createssltype"></p><p>然后输入你的域名地址</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_createssl_domain.png" alt="hexo_startssl_createssl_domain"></p><h3 id="2-4、验证域名"><a href="#2-4、验证域名" class="headerlink" title="2.4、验证域名"></a>2.4、验证域名</h3><p>接下来 StartSSL 会要求验证域名的所有权，验证方法就是向域名注册邮箱发送动态验证码；<strong>注意 : 如果域名开启了隐私保护，那么 whois 查询得到的域名注册邮箱将是注册商的，所以验证时最好取消域名隐私保护，当然像 GoDaddy 等大型注册商会提供邮件转发，目前测试 GoDaddy 会转发邮件。</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_domain_email.png" alt="hexo_startssl_domain_email"></p><h3 id="2-5、生成-HTTPS-证书"><a href="#2-5、生成-HTTPS-证书" class="headerlink" title="2.5、生成 HTTPS 证书"></a>2.5、生成 HTTPS 证书</h3><p>验证好域名以后便可以选择 <code>Certificates Wizard</code> 来创建 SSL 证书</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_create_ssl1.png" alt="hexo_startssl_create_ssl1"></p><p>随后输入证书使用的域名，包括二级域名，<strong>免费版最多可一次性输入5个</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_input_domainname.png" alt="hexo_startssl_input_domainname"></p><p>最后需要创建 CSR 来生成 SSL 证书，StartSSL支持在线生成以及离线(本地)生成并上传，以下为本地生成，并复制到 StartSSL</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_create_csr.png" alt="hexo_startssl_create_csr"></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_mac_createcsr.png" alt="hexo_startssl_mac_createcsr"></p><p><strong>生成好以后将 csr 文件内容复制到文本框即可</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_copycsr.png" alt="hexo_startssl_copycsr"></p><h3 id="2-6、下载证书"><a href="#2-6、下载证书" class="headerlink" title="2.6、下载证书"></a>2.6、下载证书</h3><p>输入完成后，待 StartSSL 签名完成便可下载证书</p><p><img src="https://cdn.oss.link/markdown/hexo_download_ssl.png" alt="hexo_download_ssl"></p><p>文件内包含主流服务器的证书，如下</p><p><img src="https://cdn.oss.link/markdown/hexo_download_ssl_value.png" alt="hexo_download_ssl"></p><p>到此申请结束，关于其实用教程请自行 Google</p>]]></content:encoded>
-      
-      
-      <category domain="https://mritd.com/categories/linux/">Linux</category>
-      
-      
-      <category domain="https://mritd.com/tags/linux/">Linux</category>
-      
-      
-      <comments>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/#disqus_thread</comments>
-      
-    </item>
-    
-    <item>
       <title>HotSpot 虚拟机的算法实现</title>
       <link>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</link>
       <guid>https://mritd.com/2006/01/02/algorithm-implementation-of-hotspot-vm/</guid>
@@ -2312,16 +2289,16 @@
     </item>
     
     <item>
-      <title>apt-get 常用命令</title>
-      <link>https://mritd.com/2006/01/02/apt-get%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link>
-      <guid>https://mritd.com/2006/01/02/apt-get%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid>
+      <title>免费申请 StartSSL 证书</title>
+      <link>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</link>
+      <guid>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/</guid>
       <pubDate>Mon, 02 Jan 2006 07:04:05 GMT</pubDate>
       
-      <description>apt-get 常用命令</description>
+      <description>一直想给博客搞个 SSL 证书装装逼，发现 StartSSL 可以申请免费的一年个人证书，所以决定搞来一个，以下为申请过程。</description>
       
       
       
-      <content:encoded><![CDATA[<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">apt-cache search package    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg）</span><br>apt-cache show package      <span class="hljs-comment">#显示包的相关信息，如说明、大小、版本等</span><br>apt-cache showpg package    <span class="hljs-comment">#显示包的相关信息，如Reverse Depends（反向依赖）、依赖等</span><br>apt-get install package       <span class="hljs-comment">#安装包</span><br>apt-get reinstall package     <span class="hljs-comment">#重新安装包</span><br>apt-get -f install package    <span class="hljs-comment">#强制安装</span><br></code></pre></div></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">apt-get remove package        <span class="hljs-comment">#删除包（只是删掉数据和可执行文件，不删除配置文件）</span><br>apt-get remove --purge package       <span class="hljs-comment">#删除包，包括删除配置文件等</span><br>apt-get autoremove --purge package   <span class="hljs-comment">#删除包及其依赖的软件包+配置文件等</span><br>apt-get update          <span class="hljs-comment">#更新源</span><br>apt-get upgrade         <span class="hljs-comment">#更新已安装的包</span><br>apt-get dist-upgrade    <span class="hljs-comment">#升级系统</span><br>apt-get dselect-upgrade        <span class="hljs-comment">#使用 dselect 升级</span><br>apt-cache depends package      <span class="hljs-comment">#了解使用依赖</span><br>apt-cache rdepends package     <span class="hljs-comment">#查看该包被哪些包依赖</span><br>apt-get build-dep package   <span class="hljs-comment">#安装相关的编译环境</span><br>apt-get <span class="hljs-built_in">source</span> package      <span class="hljs-comment">#下载该包的源代码</span><br>apt-get clean &amp;&amp; apt-get autoclean  <span class="hljs-comment">#清理下载文件的存档 &amp;&amp; 只清理过时的包</span><br>apt-get check             <span class="hljs-comment">#检查是否有损坏的依赖</span><br>dpkg -S filename          <span class="hljs-comment">#查找filename属于哪个软件包</span><br>apt-file search filename  <span class="hljs-comment">#查找filename属于哪个软件包</span><br>apt-file list packagename <span class="hljs-comment">#列出软件包的内容</span><br>apt-file update           <span class="hljs-comment">#更新apt-file的数据库</span><br><br>dpkg -l      <span class="hljs-comment">#列出当前系统中所有的包.可以和参数less一起使用在分屏查看（类似于rpm -qa）</span><br>dpkg -l |grep -i <span class="hljs-string">&quot;pkg&quot;</span>   <span class="hljs-comment">#查看系统中与&quot;pkg&quot;相关联的包（类似于rpm -qa | grep pkg）</span><br>dpkg -s pkg  <span class="hljs-comment">#查询一个已安装的包的详细信息（类似于rpm -qi）</span><br>dpkg -L pkg  <span class="hljs-comment">#查询一个已安装的软件包释放了哪些文件（类似于rpm -ql）</span><br>dpkg -S file     <span class="hljs-comment">#查询系统中某个文件属于哪个软件包（类似于rpm -qf）</span><br>dpkg -c pkg.deb  <span class="hljs-comment">#查询一个未安装的deb包将会释放哪些文件（类似于rpm -qpl）</span><br>dpkg -I pkg.deb  <span class="hljs-comment">#查看一个未安装的deb包的详细信息（类似于rpm -qpi）</span><br>dpkg -i pkg.deb  <span class="hljs-comment">#手动安装软件包（不能解决软依赖性问题，可以用apt-get -f install解决）</span><br>dpkg -r pkg      <span class="hljs-comment">#卸载软件包（不是完全的卸载，它的配置文件还存在）</span><br>dpkg -P pkg      <span class="hljs-comment">#全部卸载（不能解决依赖性的问题）</span><br>dpkg-reconfigure pkg     <span class="hljs-comment">#重新配置</span><br>dpkg -x pkg.deb dir      <span class="hljs-comment">#将一个deb包解开至dir目录</span><br>dpkg --pending --remove  <span class="hljs-comment">#移除多余的软件</span><br><br><span class="hljs-comment"># 强制安装一个包(忽略依赖及其它问题)</span><br>dpkg --force-all -i pkg.deb    <span class="hljs-comment">#可以参考dpkg --force-help</span><br><br><span class="hljs-comment"># 强制卸载一个包</span><br>dpkg --force-all -P pkg.deb<br><br>aptitude update   <span class="hljs-comment">#更新可用的包列表</span><br>aptitude upgrade  <span class="hljs-comment">#升级可用的包</span><br>aptitude dist-upgrade     <span class="hljs-comment">#将系统升级到新的发行版</span><br>aptitude install pkgname  <span class="hljs-comment">#安装包</span><br>aptitude remove pkgname   <span class="hljs-comment">#删除包</span><br>aptitude purge pkgname    <span class="hljs-comment">#删除包及其配置文件</span><br>aptitude search string    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg，重要）</span><br>aptitude show pkgname     <span class="hljs-comment">#显示包的详细信息 （相当于yum info pkg，重要）</span><br>aptitude clean            <span class="hljs-comment">#删除下载的包文件</span><br>aptitude autoclean        <span class="hljs-comment">#仅删除过期的包文件</span><br><br>apt-get install xrdp      <span class="hljs-comment">#安装图形化</span><br></code></pre></div></td></tr></table></figure>]]></content:encoded>
+      <content:encoded><![CDATA[<h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><blockquote><p>一直想给博客搞个 SSL 证书装装逼，发现 StartSSL 可以申请免费的一年个人证书，所以决定搞来一个，以下为申请过程。</p></blockquote><h2 id="二、申请过程"><a href="#二、申请过程" class="headerlink" title="二、申请过程"></a>二、申请过程</h2><h3 id="2-1、注册账号"><a href="#2-1、注册账号" class="headerlink" title="2.1、注册账号"></a>2.1、注册账号</h3><p>既然要申请，首先需要注册一个 StartSSL 的账号，注册地址 <a href="https://www.startssl.com/SignUp">https://www.startssl.com/SignUp</a>，按照提示一步一步往下搞就行。</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_register_account.png" alt="hexo_startssl_register_account"></p><h3 id="2-2、登录"><a href="#2-2、登录" class="headerlink" title="2.2、登录"></a>2.2、登录</h3><p>注册完成后默认会下载一个 key，导入浏览器后可免密码登录；同时支持动态密码登录，不导入 key 每次登录都会向邮箱发送一个动态密码。</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_register_login.png" alt="hexo_startssl_register_login"></p><p>接下来发送一个动态密码即可</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_login_sendpasswd.png" alt="hexo_startssl_login_sendpasswd"></p><h3 id="2-3、创建-SSL"><a href="#2-3、创建-SSL" class="headerlink" title="2.3、创建 SSL"></a>2.3、创建 SSL</h3><p>首先点击 <code>Validations Wizard</code>，并选择第一项 <code>Domain Validation (for SSL certificate)</code>，创建一个域名的 SSL 证书</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_createssltype.png" alt="hexo_startssl_createssltype"></p><p>然后输入你的域名地址</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_createssl_domain.png" alt="hexo_startssl_createssl_domain"></p><h3 id="2-4、验证域名"><a href="#2-4、验证域名" class="headerlink" title="2.4、验证域名"></a>2.4、验证域名</h3><p>接下来 StartSSL 会要求验证域名的所有权，验证方法就是向域名注册邮箱发送动态验证码；<strong>注意 : 如果域名开启了隐私保护，那么 whois 查询得到的域名注册邮箱将是注册商的，所以验证时最好取消域名隐私保护，当然像 GoDaddy 等大型注册商会提供邮件转发，目前测试 GoDaddy 会转发邮件。</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_domain_email.png" alt="hexo_startssl_domain_email"></p><h3 id="2-5、生成-HTTPS-证书"><a href="#2-5、生成-HTTPS-证书" class="headerlink" title="2.5、生成 HTTPS 证书"></a>2.5、生成 HTTPS 证书</h3><p>验证好域名以后便可以选择 <code>Certificates Wizard</code> 来创建 SSL 证书</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_create_ssl1.png" alt="hexo_startssl_create_ssl1"></p><p>随后输入证书使用的域名，包括二级域名，<strong>免费版最多可一次性输入5个</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_input_domainname.png" alt="hexo_startssl_input_domainname"></p><p>最后需要创建 CSR 来生成 SSL 证书，StartSSL支持在线生成以及离线(本地)生成并上传，以下为本地生成，并复制到 StartSSL</p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_create_csr.png" alt="hexo_startssl_create_csr"></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_mac_createcsr.png" alt="hexo_startssl_mac_createcsr"></p><p><strong>生成好以后将 csr 文件内容复制到文本框即可</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_startssl_copycsr.png" alt="hexo_startssl_copycsr"></p><h3 id="2-6、下载证书"><a href="#2-6、下载证书" class="headerlink" title="2.6、下载证书"></a>2.6、下载证书</h3><p>输入完成后，待 StartSSL 签名完成便可下载证书</p><p><img src="https://cdn.oss.link/markdown/hexo_download_ssl.png" alt="hexo_download_ssl"></p><p>文件内包含主流服务器的证书，如下</p><p><img src="https://cdn.oss.link/markdown/hexo_download_ssl_value.png" alt="hexo_download_ssl"></p><p>到此申请结束，关于其实用教程请自行 Google</p>]]></content:encoded>
       
       
       <category domain="https://mritd.com/categories/linux/">Linux</category>
@@ -2330,7 +2307,7 @@
       <category domain="https://mritd.com/tags/linux/">Linux</category>
       
       
-      <comments>https://mritd.com/2006/01/02/apt-get%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/#disqus_thread</comments>
+      <comments>https://mritd.com/2006/01/02/apply-for-a-startssl-certificate-for-free/#disqus_thread</comments>
       
     </item>
     
@@ -2354,6 +2331,29 @@
       
       
       <comments>https://mritd.com/2006/01/02/aspectj-hello-world/#disqus_thread</comments>
+      
+    </item>
+    
+    <item>
+      <title>apt-get 常用命令</title>
+      <link>https://mritd.com/2006/01/02/apt-get-common-cmds/</link>
+      <guid>https://mritd.com/2006/01/02/apt-get-common-cmds/</guid>
+      <pubDate>Mon, 02 Jan 2006 07:04:05 GMT</pubDate>
+      
+      <description>apt-get 常用命令</description>
+      
+      
+      
+      <content:encoded><![CDATA[<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">apt-cache search package    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg）</span><br>apt-cache show package      <span class="hljs-comment">#显示包的相关信息，如说明、大小、版本等</span><br>apt-cache showpg package    <span class="hljs-comment">#显示包的相关信息，如Reverse Depends（反向依赖）、依赖等</span><br>apt-get install package       <span class="hljs-comment">#安装包</span><br>apt-get reinstall package     <span class="hljs-comment">#重新安装包</span><br>apt-get -f install package    <span class="hljs-comment">#强制安装</span><br></code></pre></div></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">apt-get remove package        <span class="hljs-comment">#删除包（只是删掉数据和可执行文件，不删除配置文件）</span><br>apt-get remove --purge package       <span class="hljs-comment">#删除包，包括删除配置文件等</span><br>apt-get autoremove --purge package   <span class="hljs-comment">#删除包及其依赖的软件包+配置文件等</span><br>apt-get update          <span class="hljs-comment">#更新源</span><br>apt-get upgrade         <span class="hljs-comment">#更新已安装的包</span><br>apt-get dist-upgrade    <span class="hljs-comment">#升级系统</span><br>apt-get dselect-upgrade        <span class="hljs-comment">#使用 dselect 升级</span><br>apt-cache depends package      <span class="hljs-comment">#了解使用依赖</span><br>apt-cache rdepends package     <span class="hljs-comment">#查看该包被哪些包依赖</span><br>apt-get build-dep package   <span class="hljs-comment">#安装相关的编译环境</span><br>apt-get <span class="hljs-built_in">source</span> package      <span class="hljs-comment">#下载该包的源代码</span><br>apt-get clean &amp;&amp; apt-get autoclean  <span class="hljs-comment">#清理下载文件的存档 &amp;&amp; 只清理过时的包</span><br>apt-get check             <span class="hljs-comment">#检查是否有损坏的依赖</span><br>dpkg -S filename          <span class="hljs-comment">#查找filename属于哪个软件包</span><br>apt-file search filename  <span class="hljs-comment">#查找filename属于哪个软件包</span><br>apt-file list packagename <span class="hljs-comment">#列出软件包的内容</span><br>apt-file update           <span class="hljs-comment">#更新apt-file的数据库</span><br><br>dpkg -l      <span class="hljs-comment">#列出当前系统中所有的包.可以和参数less一起使用在分屏查看（类似于rpm -qa）</span><br>dpkg -l |grep -i <span class="hljs-string">&quot;pkg&quot;</span>   <span class="hljs-comment">#查看系统中与&quot;pkg&quot;相关联的包（类似于rpm -qa | grep pkg）</span><br>dpkg -s pkg  <span class="hljs-comment">#查询一个已安装的包的详细信息（类似于rpm -qi）</span><br>dpkg -L pkg  <span class="hljs-comment">#查询一个已安装的软件包释放了哪些文件（类似于rpm -ql）</span><br>dpkg -S file     <span class="hljs-comment">#查询系统中某个文件属于哪个软件包（类似于rpm -qf）</span><br>dpkg -c pkg.deb  <span class="hljs-comment">#查询一个未安装的deb包将会释放哪些文件（类似于rpm -qpl）</span><br>dpkg -I pkg.deb  <span class="hljs-comment">#查看一个未安装的deb包的详细信息（类似于rpm -qpi）</span><br>dpkg -i pkg.deb  <span class="hljs-comment">#手动安装软件包（不能解决软依赖性问题，可以用apt-get -f install解决）</span><br>dpkg -r pkg      <span class="hljs-comment">#卸载软件包（不是完全的卸载，它的配置文件还存在）</span><br>dpkg -P pkg      <span class="hljs-comment">#全部卸载（不能解决依赖性的问题）</span><br>dpkg-reconfigure pkg     <span class="hljs-comment">#重新配置</span><br>dpkg -x pkg.deb dir      <span class="hljs-comment">#将一个deb包解开至dir目录</span><br>dpkg --pending --remove  <span class="hljs-comment">#移除多余的软件</span><br><br><span class="hljs-comment"># 强制安装一个包(忽略依赖及其它问题)</span><br>dpkg --force-all -i pkg.deb    <span class="hljs-comment">#可以参考dpkg --force-help</span><br><br><span class="hljs-comment"># 强制卸载一个包</span><br>dpkg --force-all -P pkg.deb<br><br>aptitude update   <span class="hljs-comment">#更新可用的包列表</span><br>aptitude upgrade  <span class="hljs-comment">#升级可用的包</span><br>aptitude dist-upgrade     <span class="hljs-comment">#将系统升级到新的发行版</span><br>aptitude install pkgname  <span class="hljs-comment">#安装包</span><br>aptitude remove pkgname   <span class="hljs-comment">#删除包</span><br>aptitude purge pkgname    <span class="hljs-comment">#删除包及其配置文件</span><br>aptitude search string    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg，重要）</span><br>aptitude show pkgname     <span class="hljs-comment">#显示包的详细信息 （相当于yum info pkg，重要）</span><br>aptitude clean            <span class="hljs-comment">#删除下载的包文件</span><br>aptitude autoclean        <span class="hljs-comment">#仅删除过期的包文件</span><br><br>apt-get install xrdp      <span class="hljs-comment">#安装图形化</span><br></code></pre></div></td></tr></table></figure>]]></content:encoded>
+      
+      
+      <category domain="https://mritd.com/categories/linux/">Linux</category>
+      
+      
+      <category domain="https://mritd.com/tags/linux/">Linux</category>
+      
+      
+      <comments>https://mritd.com/2006/01/02/apt-get-common-cmds/#disqus_thread</comments>
       
     </item>
     
@@ -2382,8 +2382,8 @@
     
     <item>
       <title>CentOS 6.7_x64 minimal 网络初始化配置</title>
-      <link>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</link>
-      <guid>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/</guid>
+      <link>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-network-init/</link>
+      <guid>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-network-init/</guid>
       <pubDate>Mon, 02 Jan 2006 07:04:05 GMT</pubDate>
       
       <description>最近准备折腾折腾Maven，想在本地CentOS下搭个Nexus私服，无奈CentOS LiveCD 版太大，很多功能也没啥用；so 搞了个minimal版本…..结果安装上无法联网，现记录一下初始化的网络配置。</description>
@@ -2399,7 +2399,7 @@
       <category domain="https://mritd.com/tags/linux/">Linux</category>
       
       
-      <comments>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-%E7%BD%91%E7%BB%9C%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE/#disqus_thread</comments>
+      <comments>https://mritd.com/2006/01/02/centos-6-7-x64-minimal-network-init/#disqus_thread</comments>
       
     </item>
     
@@ -2428,8 +2428,8 @@
     
     <item>
       <title>DBA视频笔记</title>
-      <link>https://mritd.com/2006/01/02/dba%E8%A7%86%E9%A2%91%E7%AC%94%E8%AE%B0/</link>
-      <guid>https://mritd.com/2006/01/02/dba%E8%A7%86%E9%A2%91%E7%AC%94%E8%AE%B0/</guid>
+      <link>https://mritd.com/2006/01/02/dba-video-node/</link>
+      <guid>https://mritd.com/2006/01/02/dba-video-node/</guid>
       <pubDate>Mon, 02 Jan 2006 07:04:05 GMT</pubDate>
       
       <description>DBA视频笔记</description>
@@ -2447,14 +2447,14 @@
       <category domain="https://mritd.com/tags/oracle/">Oracle</category>
       
       
-      <comments>https://mritd.com/2006/01/02/dba%E8%A7%86%E9%A2%91%E7%AC%94%E8%AE%B0/#disqus_thread</comments>
+      <comments>https://mritd.com/2006/01/02/dba-video-node/#disqus_thread</comments>
       
     </item>
     
     <item>
       <title>Docker Contianer 挂掉强制修改文件</title>
-      <link>https://mritd.com/2006/01/02/docker-contianer-%E6%8C%82%E6%8E%89%E5%BC%BA%E5%88%B6%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6/</link>
-      <guid>https://mritd.com/2006/01/02/docker-contianer-%E6%8C%82%E6%8E%89%E5%BC%BA%E5%88%B6%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6/</guid>
+      <link>https://mritd.com/2006/01/02/docker-contianer-force-modify-file/</link>
+      <guid>https://mritd.com/2006/01/02/docker-contianer-force-modify-file/</guid>
       <pubDate>Mon, 02 Jan 2006 07:04:05 GMT</pubDate>
       
       <description>起因是为了装逼，想申请一个 StartSSL 证书给博客装下逼...... 目前博客全部采用 Dokcer 部署，前端一个 Nginx 的 Contianer 做反代，后端起了静态博客、WP老博客什么的一些东西；手残党开始肆无忌惮的改前端 Nginx Contianer 中的配置；发现 `service nginx reload` 没效果，这特么哪行，果断 `docker restart nginx`.....后面你懂的，`docker logs nginx` 发现配置报错了......所以就有了下文......</description>
@@ -2472,7 +2472,7 @@
       <category domain="https://mritd.com/tags/docker/">Docker</category>
       
       
-      <comments>https://mritd.com/2006/01/02/docker-contianer-%E6%8C%82%E6%8E%89%E5%BC%BA%E5%88%B6%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6/#disqus_thread</comments>
+      <comments>https://mritd.com/2006/01/02/docker-contianer-force-modify-file/#disqus_thread</comments>
       
     </item>
     
