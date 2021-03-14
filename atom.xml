@@ -6,7 +6,7 @@
   <link href="https://mritd.com/atom.xml" rel="self"/>
   
   <link href="https://mritd.com/"/>
-  <updated>2021-03-11T05:41:46.818Z</updated>
+  <updated>2021-03-06T05:40:22.000Z</updated>
   <id>https://mritd.com/</id>
   
   <author>
@@ -15,29 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title></title>
-    <link href="https://mritd.com/2021/03/11/java-memory-direct-memory/"/>
-    <id>https://mritd.com/2021/03/11/java-memory-direct-memory/</id>
-    <published>2021-03-11T05:41:46.818Z</published>
-    <updated>2021-03-11T05:41:46.818Z</updated>
-    
-    <content type="html"><![CDATA[<hr><p>catalog: true<br>categories:</p><ul><li>Java<br>excerpt: Java 内存之直接内存<br>keywords: Java,内存,直接内存,Native<br>multilingual: false<br>tags:</li><li>Java</li><li>JMM<br>title: Java 内存之直接内存<br>date: 2012-01-02 15:04:28</li></ul><h2 id="一、概念和特征"><a href="#一、概念和特征" class="headerlink" title="一、概念和特征"></a>一、概念和特征</h2><ul><li>直接内存并非 JVMS 定义的标准 Java 运行时内存。</li><li>JDK1.4 加入了新的 NIO 机制，目的是防止 Java 堆 和 Native 堆之间往复的数据复制带来的性能损耗，此后 NIO 可以使用 Native 的方式直接在 Native 堆分配内存。</li><li>直接内存区域是全局共享的内存区域。</li></ul><ul><li>直接内存区域可以进行自动内存管理(GC)，但机制并不完善。</li><li>本机的 Native 堆(直接内存) 不受 JVM 堆内存大小限制。</li><li>可能出现 OutOfMemoryError 异常。</li></ul><h2 id="二、异常演示"><a href="#二、异常演示" class="headerlink" title="二、异常演示"></a>二、异常演示</h2><p>测试代码：</p><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestNativeHeap</span> </span>&#123;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * VM Args: -XX:MaxDirectMemorySize=10M</span><br><span class="hljs-comment"> */</span><br><br><span class="hljs-comment">// 每次内存分配大小</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> _1M =<span class="hljs-number">1024</span>*<span class="hljs-number">1024</span>;<br><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IllegalArgumentException, IllegalAccessException </span>&#123;<br>Field unsafeFiled = Unsafe.class.getFields()[<span class="hljs-number">0</span>];<br>unsafeFiled.setAccessible(<span class="hljs-keyword">true</span>);<br>Unsafe unsafe = (Unsafe) unsafeFiled.get(<span class="hljs-keyword">null</span>);<br><span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>unsafe.allocateMemory(_1M);<br>&#125;<br>&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure><p>以上代码运行会出现 OutOfMemoryError 异常，原因是不断申请内存将超出 Native 堆限制。</p><p><strong>直接内存导致的 OutOfMemoryError 异常，在异常信息中不会有明显的堆栈区错误提示；同时另一大特点就是内存转储文件(dump)出来会非常小，如果项目中出现这种情况，并且直接或者间接地使用了 NIO 技术，那么应该考虑是否为直接内存导致的内存溢出。</strong></p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;hr&gt;
-&lt;p&gt;catalog: true&lt;br&gt;categories:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Java&lt;br&gt;excerpt: Java 内存之直接内存&lt;br&gt;keywords: Java,内存,直接内存,Native&lt;br&gt;multilingual: false&lt;br&gt;t</summary>
-      
-    
-    
-    
-    
-  </entry>
   
   <entry>
     <title>Longhorn 微服务化存储初试</title>
@@ -2279,6 +2256,29 @@
     
     
     <category term="随笔" scheme="https://mritd.com/tags/%E9%9A%8F%E7%AC%94/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>SQL中 OR 关键字优先级问题</title>
+    <link href="https://mritd.com/2012/01/02/sql-or-keyword-priority/"/>
+    <id>https://mritd.com/2012/01/02/sql-or-keyword-priority/</id>
+    <published>2012-01-02T07:11:21.000Z</published>
+    <updated>2012-01-02T07:11:21.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>今天群里哥们偶尔问道一个问题，顺便查查找到了答案，记录一下。</p></blockquote><h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>问题大致如下:</p><p>SQL1</p><figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-keyword">WHERE</span> NAME<span class="hljs-operator">=</span><span class="hljs-string">&#x27;ZHANGSAN&#x27;</span> <span class="hljs-keyword">OR</span> <span class="hljs-number">1</span><span class="hljs-operator">=</span><span class="hljs-number">1</span> <span class="hljs-keyword">OR</span> <span class="hljs-string">&#x27;1&#x27;</span><span class="hljs-operator">=</span><span class="hljs-string">&#x27;1&#x27;</span> <span class="hljs-keyword">AND</span> AGE<span class="hljs-operator">=</span><span class="hljs-number">10</span>;<br></code></pre></div></td></tr></table></figure><p>SQL2</p><figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-keyword">WHERE</span> NAME<span class="hljs-operator">=</span><span class="hljs-string">&#x27;ZAHNGSAN&#x27;</span> <span class="hljs-keyword">OR</span> <span class="hljs-number">1</span><span class="hljs-operator">=</span><span class="hljs-number">1</span> <span class="hljs-keyword">AND</span> AGE<span class="hljs-operator">=</span><span class="hljs-number">10</span>;<br></code></pre></div></td></tr></table></figure><p><strong>两条SQL，第一条返回全表结果集，第二条返回 <code>NAME=&#39;ZHANGSAN&#39;</code> 或者 <code>AGE=10</code> 的结果集；问两条SQL为何会这样。</strong></p><h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>以前一直没留意过，搜了下资料，大致原因如下:</p><p><strong>在 SQL 中，<code>OR</code> 关键字的优先级会比 <code>AND</code> 关键字优先级要高，<code>OR</code>关键字会将条件切分成前后两部分，大致表现如下：</strong></p><p>SQL1</p><figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-keyword">WHERE</span> (NAME<span class="hljs-operator">=</span><span class="hljs-string">&#x27;ZHANGSAN&#x27;</span>) <span class="hljs-keyword">OR</span> ((<span class="hljs-number">1</span><span class="hljs-operator">=</span><span class="hljs-number">1</span>) <span class="hljs-keyword">OR</span> (<span class="hljs-string">&#x27;1&#x27;</span><span class="hljs-operator">=</span><span class="hljs-string">&#x27;1&#x27;</span> <span class="hljs-keyword">AND</span> AGE<span class="hljs-operator">=</span><span class="hljs-number">10</span>));<br></code></pre></div></td></tr></table></figure><p><strong>所以在第一个 <code>OR</code> 分割后，后面又进行了二次分割；此时后面由于 <code>(&#39;1&#39;=&#39;1&#39;)</code> 始终为真，则后半部分一直返回为真，此时第一个 <code>OR</code> 分割整体也会返回为真，造成查出整个表的结果集；SQL2同理一样。</strong></p>]]></content>
+    
+    
+    <summary type="html">今天群里哥们偶尔问道一个问题，顺便查查找到了答案，记录一下</summary>
+    
+    
+    
+    <category term="Database" scheme="https://mritd.com/categories/database/"/>
+    
+    
+    <category term="SQL" scheme="https://mritd.com/tags/sql/"/>
+    
+    <category term="Oracle" scheme="https://mritd.com/tags/oracle/"/>
     
   </entry>
   
