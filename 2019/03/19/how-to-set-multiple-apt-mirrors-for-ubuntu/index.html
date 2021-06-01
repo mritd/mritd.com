@@ -1,3 +1,510 @@
-<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;dark&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="介绍通过 mirror 方式来设置 Ubuntu 源，从而实现自动切换 apt 源下载"><meta name="author" content="bleem"><meta name="keywords" content="ubuntu,apt,mirror"><title>Ubuntu 设置多个源 - bleem</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/atom-one-dark-reasonable.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script id="fluid-configs">var Fluid=window.Fluid||{},CONFIG={hostname:"mritd.com",root:"/",version:"1.8.11",typing:{enable:!0,typeSpeed:80,cursorChar:"_",loop:!1},anchorjs:{enable:!0,element:"h1,h2,h3,h4,h5,h6",placement:"right",visible:"hover",icon:"❡"},progressbar:{enable:!0,height_px:3,color:"#29d",options:{showSpinner:!1,trickleSpeed:200}},copy_btn:!0,image_zoom:{enable:!0,img_url_replace:["",""]},toc:{enable:!0,headingSelector:"h1,h2,h3,h4,h5,h6",collapseDepth:3},lazyload:{enable:!0,loading_img:"/img/loading.gif",onlypost:!1,offset_factor:2},web_analytics:{enable:!0,baidu:null,google:"UA-179552593-1",gtag:null,tencent:{sid:null,cid:null},woyaola:null,cnzz:null,leancloud:{app_id:null,app_key:null,server_url:null}},search_path:"/local-search.xml"}</script><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;dark&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="介绍通过 mirror 方式来设置 Ubuntu 源，从而实现自动切换 apt 源下载">
+  <meta name="author" content="bleem">
+  <meta name="keywords" content="ubuntu,apt,mirror">
+  
+  <title>Ubuntu 设置多个源 - bleem</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/atom-one-dark-reasonable.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":200}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-179552593-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
 <link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
-</head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"><a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"><a class="nav-link" target="_self">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner" id="banner" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="page-header text-center fade-in-up"><span class="h2" id="subtitle" title="Ubuntu 设置多个源"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2019-03-19 21:43" pubdate>2019年3月19日 晚上</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 778 字 </span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 10 分钟</span></div></div></div></div></div></header><main><div class="container-fluid nopadding-x"><div class="row nomargin-x"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-x-md"><div class="container nopadding-x-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto"><h1 style="display:none">Ubuntu 设置多个源</h1><div class="markdown-body"><h2 id="一、源起"><a href="#一、源起" class="headerlink" title="一、源起"></a>一、源起</h2><p>使用 Ubuntu 作为生产容器系统好久了，但是 apt 源问题一致有点困扰: **由于众所周知的原因，官方源执行 <code>apt update</code> 等命令会非常慢；而国内有很多镜像服务，但是某些偶尔也会抽风(比如清华大源)，最后的结果就是日常修改 apt 源…**Google 查了了好久发现事实上 apt 源是支持 <code>mirror</code> 协议的，从而自动选择可用的一个</p><h2 id="二、使用-mirror-协议"><a href="#二、使用-mirror-协议" class="headerlink" title="二、使用 mirror 协议"></a>二、使用 mirror 协议</h2><p>废话不说多直接上代码，编辑 <code>/etc/apt/sources.list</code>，替换为如下内容</p><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment">#------------------------------------------------------------------------------#</span><br><span class="hljs-comment">#                            OFFICIAL UBUNTU REPOS                             #</span><br><span class="hljs-comment">#------------------------------------------------------------------------------#</span><br><br><br><span class="hljs-comment">###### Ubuntu Main Repos</span><br>deb mirror://mirrors.ubuntu.com/mirrors.txt bionic main restricted universe multiverse<br>deb-src mirror://mirrors.ubuntu.com/mirrors.txt bionic main restricted universe multiverse<br><br><span class="hljs-comment">###### Ubuntu Update Repos</span><br>deb mirror://mirrors.ubuntu.com/mirrors.txt bionic-security main restricted universe multiverse<br>deb mirror://mirrors.ubuntu.com/mirrors.txt bionic-updates main restricted universe multiverse<br>deb mirror://mirrors.ubuntu.com/mirrors.txt bionic-backports main restricted universe multiverse<br>deb-src mirror://mirrors.ubuntu.com/mirrors.txt bionic-security main restricted universe multiverse<br>deb-src mirror://mirrors.ubuntu.com/mirrors.txt bionic-updates main restricted universe multiverse<br>deb-src mirror://mirrors.ubuntu.com/mirrors.txt bionic-backports main restricted universe multiverse<br></code></pre></div></td></tr></table></figure><p>当使用 <code>mirror</code> 协议后，执行 <code>apt update</code> 时会首先<strong>通过 http 访问</strong> <code>mirrors.ubuntu.com/mirrors.txt</code> 文本；文本内容实际上就是当前可用的镜像源列表，如下所示</p><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">http://ftp.sjtu.edu.cn/ubuntu/<br>http://mirrors.nju.edu.cn/ubuntu/<br>http://mirrors.nwafu.edu.cn/ubuntu/<br>http://mirrors.sohu.com/ubuntu/<br>http://mirrors.aliyun.com/ubuntu/<br>http://mirrors.shu.edu.cn/ubuntu/<br>http://mirrors.cqu.edu.cn/ubuntu/<br>http://mirrors.huaweicloud.com/repository/ubuntu/<br>http://mirrors.cn99.com/ubuntu/<br>http://mirrors.yun-idc.com/ubuntu/<br>http://mirrors.tuna.tsinghua.edu.cn/ubuntu/<br>http://mirrors.ustc.edu.cn/ubuntu/<br>http://mirrors.njupt.edu.cn/ubuntu/<br>http://mirror.lzu.edu.cn/ubuntu/<br>http://archive.ubuntu.com/ubuntu/<br></code></pre></div></td></tr></table></figure><p>得到列表后 apt 会自动选择一个(选择规则暂不清楚，国外有文章说是选择最快的，但是不清楚这个最快是延迟还是网速)进行下载；**同时根据地区不通，官方也提供指定国家的 <code>mirror.txt</code>**，比如中国的实际上可以设置为 <code>mirrors.ubuntu.com/CN.txt</code>(我测试跟官方一样，推测可能是使用了类似 DNS 选优的策略)</p><h2 id="三、自定义-mirror-地址"><a href="#三、自定义-mirror-地址" class="headerlink" title="三、自定义 mirror 地址"></a>三、自定义 mirror 地址</h2><p>现在已经解决了能同时使用多个源的问题，但是有些时候你会发现源的可用性检测并不是很精准，比如某个源只有 40k 的下载速度…不巧你某个下载还命中了，这就很尴尬；<strong>所以有时候我们可能需要自定义 <code>mirror.txt</code> 这个源列表</strong>，经过测试证明**只需要开启一个标准的 <code>http server</code> 能返回一个文本即可，不过需要注意只能是 <code>http</code>，而不是 <code>https</code>**；所以我们首先下载一下这个文本，把不想要的删掉；然后弄个 nginx，甚至 <code>python -m http.server</code> 把文本文件暴露出去就可以；我比较懒…扔 CDN 上了: <a target="_blank" rel="noopener" href="http://oss.link/config/apt-mirrors.txt">http://oss.link/config/apt-mirrors.txt</a></p><p>关于源的精简，我建议将一些 <code>edu</code> 的删掉，因为敏感时期他们很不稳定；优选阿里云、网易、华为这种大公司的，比较有名的清华大的什么的可以留着，其他的可以考虑都删掉</p></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/linux/">Linux</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/linux/">Linux</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext"><article class="post-prev col-6"><a href="/2019/03/23/oh-my-rime/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">Mac 下调校 Rime</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"><a href="/2019/03/16/set-up-kubernetes-1.13.4-cluster/"><span class="hidden-mobile">Kubernetes 1.13.4 搭建</span> <span class="visible-mobile">下一篇</span> <i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments" lazyload><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2019/03/19/how-to-set-multiple-apt-mirrors-for-ubuntu/",this.page.identifier="/2019/03/19/how-to-set-multiple-apt-mirrors-for-ubuntu/"};Fluid.utils.loadComments("#disqus_thread",(function(){var t=document,e=t.createElement("script");e.src="//bleem.disqus.com/embed.js",e.setAttribute("data-timestamp",new Date),(t.head||t.body).appendChild(e)}))</script><noscript>Please enable JavaScript to view the comments</noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div class="toc-body" id="toc-body"></div></div></div></div></div><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div></main><footer class="text-center mt-5 py-3"><div class="footer-content"><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></footer><script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css"><script>NProgress.configure({showSpinner:!1,trickleSpeed:200}),NProgress.start(),window.addEventListener("load",(function(){NProgress.done()}))</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script><script src="/js/events.js"></script><script src="/js/plugins.js"></script><script src="/js/img-lazyload.js"></script><script src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script><script src="/js/local-search.js"></script><script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js"></script><script>!function(t,i){(0,Fluid.plugins.typing)(i.getElementById("subtitle").title)}(window,document)</script><script defer>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-179552593-1","auto"),ga("send","pageview")</script><script async src="https://www.google-analytics.com/analytics.js"></script><script src="/js/boot.js"></script></body></html>
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>bleem</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Ubuntu 设置多个源">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-03-19 21:43" pubdate>
+        2019年3月19日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      778 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      10
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Ubuntu 设置多个源</h1>
+            
+            <div class="markdown-body">
+              <h2 id="一、源起"><a href="#一、源起" class="headerlink" title="一、源起"></a>一、源起</h2><p>使用 Ubuntu 作为生产容器系统好久了，但是 apt 源问题一致有点困扰: **由于众所周知的原因，官方源执行 <code>apt update</code> 等命令会非常慢；而国内有很多镜像服务，但是某些偶尔也会抽风(比如清华大源)，最后的结果就是日常修改 apt 源…**Google 查了了好久发现事实上 apt 源是支持 <code>mirror</code> 协议的，从而自动选择可用的一个</p>
+<h2 id="二、使用-mirror-协议"><a href="#二、使用-mirror-协议" class="headerlink" title="二、使用 mirror 协议"></a>二、使用 mirror 协议</h2><p>废话不说多直接上代码，编辑 <code>/etc/apt/sources.list</code>，替换为如下内容</p>
+<figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment">#------------------------------------------------------------------------------#</span><br><span class="hljs-comment">#                            OFFICIAL UBUNTU REPOS                             #</span><br><span class="hljs-comment">#------------------------------------------------------------------------------#</span><br><br><br><span class="hljs-comment">###### Ubuntu Main Repos</span><br>deb mirror://mirrors.ubuntu.com/mirrors.txt bionic main restricted universe multiverse<br>deb-src mirror://mirrors.ubuntu.com/mirrors.txt bionic main restricted universe multiverse<br><br><span class="hljs-comment">###### Ubuntu Update Repos</span><br>deb mirror://mirrors.ubuntu.com/mirrors.txt bionic-security main restricted universe multiverse<br>deb mirror://mirrors.ubuntu.com/mirrors.txt bionic-updates main restricted universe multiverse<br>deb mirror://mirrors.ubuntu.com/mirrors.txt bionic-backports main restricted universe multiverse<br>deb-src mirror://mirrors.ubuntu.com/mirrors.txt bionic-security main restricted universe multiverse<br>deb-src mirror://mirrors.ubuntu.com/mirrors.txt bionic-updates main restricted universe multiverse<br>deb-src mirror://mirrors.ubuntu.com/mirrors.txt bionic-backports main restricted universe multiverse<br></code></pre></div></td></tr></table></figure>
+<p>当使用 <code>mirror</code> 协议后，执行 <code>apt update</code> 时会首先<strong>通过 http 访问</strong> <code>mirrors.ubuntu.com/mirrors.txt</code> 文本；文本内容实际上就是当前可用的镜像源列表，如下所示</p>
+<figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">http://ftp.sjtu.edu.cn/ubuntu/<br>http://mirrors.nju.edu.cn/ubuntu/<br>http://mirrors.nwafu.edu.cn/ubuntu/<br>http://mirrors.sohu.com/ubuntu/<br>http://mirrors.aliyun.com/ubuntu/<br>http://mirrors.shu.edu.cn/ubuntu/<br>http://mirrors.cqu.edu.cn/ubuntu/<br>http://mirrors.huaweicloud.com/repository/ubuntu/<br>http://mirrors.cn99.com/ubuntu/<br>http://mirrors.yun-idc.com/ubuntu/<br>http://mirrors.tuna.tsinghua.edu.cn/ubuntu/<br>http://mirrors.ustc.edu.cn/ubuntu/<br>http://mirrors.njupt.edu.cn/ubuntu/<br>http://mirror.lzu.edu.cn/ubuntu/<br>http://archive.ubuntu.com/ubuntu/<br></code></pre></div></td></tr></table></figure>
+<p>得到列表后 apt 会自动选择一个(选择规则暂不清楚，国外有文章说是选择最快的，但是不清楚这个最快是延迟还是网速)进行下载；**同时根据地区不通，官方也提供指定国家的 <code>mirror.txt</code>**，比如中国的实际上可以设置为 <code>mirrors.ubuntu.com/CN.txt</code>(我测试跟官方一样，推测可能是使用了类似 DNS 选优的策略)</p>
+<h2 id="三、自定义-mirror-地址"><a href="#三、自定义-mirror-地址" class="headerlink" title="三、自定义 mirror 地址"></a>三、自定义 mirror 地址</h2><p>现在已经解决了能同时使用多个源的问题，但是有些时候你会发现源的可用性检测并不是很精准，比如某个源只有 40k 的下载速度…不巧你某个下载还命中了，这就很尴尬；<strong>所以有时候我们可能需要自定义 <code>mirror.txt</code> 这个源列表</strong>，经过测试证明**只需要开启一个标准的 <code>http server</code> 能返回一个文本即可，不过需要注意只能是 <code>http</code>，而不是 <code>https</code>**；所以我们首先下载一下这个文本，把不想要的删掉；然后弄个 nginx，甚至 <code>python -m http.server</code> 把文本文件暴露出去就可以；我比较懒…扔 CDN 上了: <a target="_blank" rel="noopener" href="http://oss.link/config/apt-mirrors.txt">http://oss.link/config/apt-mirrors.txt</a></p>
+<p>关于源的精简，我建议将一些 <code>edu</code> 的删掉，因为敏感时期他们很不稳定；优选阿里云、网易、华为这种大公司的，比较有名的清华大的什么的可以留着，其他的可以考虑都删掉</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/linux/">Linux</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/linux/">Linux</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/03/23/oh-my-rime/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Mac 下调校 Rime</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/03/16/set-up-kubernetes-1.13.4-cluster/">
+                        <span class="hidden-mobile">Kubernetes 1.13.4 搭建</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2019/03/19/how-to-set-multiple-apt-mirrors-for-ubuntu/';
+          this.page.identifier = '/2019/03/19/how-to-set-multiple-apt-mirrors-for-ubuntu/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-179552593-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
