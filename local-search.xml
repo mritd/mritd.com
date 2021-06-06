@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>JetBrains 常用插件</title>
+    <link href="/2021/06/06/jetbrains-plugins/"/>
+    <url>/2021/06/06/jetbrains-plugins/</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>所谓工欲善其事，必先利其器；这篇文章分享一些日常 Coding 中常用 JetBrains 系列 IDE 插件(本文所有插件可直接从 Marketplace 搜索并安装)。</p></blockquote><h2 id="One-Dark-theme"><a href="#One-Dark-theme" class="headerlink" title="One Dark theme"></a>One Dark theme</h2><p>上来先整点没用的吧，主题配色这个东西根据个人喜好；我比较喜欢花花绿绿的感觉，在防止眼疲劳的同时还有点 RMB 的感觉(RMB 也花花绿绿的)，毕竟 Coding 的时候要 “酷一点”，然后才能心情愉悦的写 BUG(代码和我只要有一个能跑就行)。</p><p><img src="https://cdn.oss.link/markdown/kikZwf.jpg"></p><h2 id="Gopher"><a href="#Gopher" class="headerlink" title="Gopher"></a>Gopher</h2><p>也是啥用没有的插件，唯一的效果就是在各种 Loading 的时候进度条变成了 Go 的吉祥物(Golang 天下第一，嘶吼)…当然还有个同款，Gopher 变成了彩虹猫，需要的自己搜吧。</p><p><img src="https://cdn.oss.link/markdown/uVYpSQ.jpg"></p><h2 id="Extra-Icons"><a href="#Extra-Icons" class="headerlink" title="Extra Icons"></a>Extra Icons</h2><p>这个插件为项目里一些特殊文件增加 Icon，比如 <code>.gitignore</code> 文件、CI 配置等，可以让人看着更舒服一些。</p><p><img src="https://cdn.oss.link/markdown/RQek39.jpg"></p><h2 id="GitToolBox"><a href="#GitToolBox" class="headerlink" title="GitToolBox"></a>GitToolBox</h2><p>GitToolBox 会在光标定位到某一行代码时显示其最近改动等提交信息，方便在甩锅时精确定位到背锅侠。</p><p><img src="https://cdn.oss.link/markdown/zyLD6C.png"></p><h2 id="String-Manipulation"><a href="#String-Manipulation" class="headerlink" title="String Manipulation"></a>String Manipulation</h2><p>这个就牛逼了，非常有实用价值的一个插件；当某些规范下你必须进行 “驼峰/下划线/短横线/全大写/全小写/大写加下划线/小写加下划线…” 疯狂转换时，String Manipulation 只需要选中右键即可完成。</p><p><img src="https://cdn.oss.link/markdown/GBB7KC.gif"></p><h2 id="Randomness"><a href="#Randomness" class="headerlink" title="Randomness"></a>Randomness</h2><p>Randomness 在需要测试数据时很有用，它可以快速生成一些随机性的垃圾数据填充进来；例如写示例配置时。</p><p><img src="https://cdn.oss.link/markdown/Cj9bsm.png"></p><h2 id="Translation"><a href="#Translation" class="headerlink" title="Translation"></a>Translation</h2><p>英文渣必备插件，除了能翻译一些单词之外，还能自动识别文档进行翻译，甚至还带单词本。</p><p><img src="https://cdn.oss.link/markdown/psZGNv.png"></p><h2 id="carbon-now-sh"><a href="#carbon-now-sh" class="headerlink" title="carbon-now-sh"></a>carbon-now-sh</h2><p>当你想把你的代码发到某个群里装X，或者写博客不想让别人复制只想展示时，carbon-now-sh 可以帮你把选中的代码传输到 <a href="https://carbon.now.sh/">https://carbon.now.sh/</a> 来生成漂亮的图片。</p><p><img src="https://cdn.oss.link/markdown/qXDcrg.png"></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>Golang</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>JetBrains</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>寥寥浮生，莫问前程</title>
     <link href="/2021/06/04/liao-liao-fu-sheng-mo-wen-qian-cheng/"/>
     <url>/2021/06/04/liao-liao-fu-sheng-mo-wen-qian-cheng/</url>
