@@ -14,8 +14,8 @@
     
     <item>
       <title>Caddy2 的 ListenerWrapper</title>
-      <link>https://mritd.com/2021/06/15/caddy2-listenerwapper/</link>
-      <guid>https://mritd.com/2021/06/15/caddy2-listenerwapper/</guid>
+      <link>https://mritd.com/2021/06/15/caddy2-listenerwrapper/</link>
+      <guid>https://mritd.com/2021/06/15/caddy2-listenerwrapper/</guid>
       <pubDate>Tue, 15 Jun 2021 06:04:00 GMT</pubDate>
       
       <description>最近分析了一下 Caddy2 的 ListenerWrapper，觉得很厉害索性写下来</description>
@@ -31,7 +31,7 @@
       <category domain="https://mritd.com/tags/caddy2/">Caddy2</category>
       
       
-      <comments>https://mritd.com/2021/06/15/caddy2-listenerwapper/#disqus_thread</comments>
+      <comments>https://mritd.com/2021/06/15/caddy2-listenerwrapper/#disqus_thread</comments>
       
     </item>
     
