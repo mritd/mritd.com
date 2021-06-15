@@ -1166,14 +1166,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/kubernetes/</loc>
+    <loc>https://mritd.com/tags/caddy/</loc>
     <lastmod>2021-06-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/tags/caddy2/</loc>
+    <loc>https://mritd.com/tags/kubernetes/</loc>
     <lastmod>2021-06-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1272,13 +1272,6 @@
   
   <url>
     <loc>https://mritd.com/tags/jetbrains/</loc>
-    <lastmod>2021-06-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/tags/caddy/</loc>
     <lastmod>2021-06-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1469,13 +1462,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/kubernetes/</loc>
-    <lastmod>2021-06-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://mritd.com/categories/golang/</loc>
     <lastmod>2021-06-15</lastmod>
     <changefreq>daily</changefreq>
@@ -1483,14 +1469,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/database/</loc>
+    <loc>https://mritd.com/categories/kubernetes/</loc>
     <lastmod>2021-06-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/kubernetes/docker/</loc>
+    <loc>https://mritd.com/categories/database/</loc>
     <lastmod>2021-06-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1505,6 +1491,13 @@
   
   <url>
     <loc>https://mritd.com/categories/hackintosh/</loc>
+    <lastmod>2021-06-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/categories/kubernetes/docker/</loc>
     <lastmod>2021-06-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
