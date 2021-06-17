@@ -1,0 +1,170 @@
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;dark&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Harbor 企业级 Docker Registry HTTPS 配置"><meta name="author" content="bleem"><meta name="keywords" content="Linux,Dokcer,Harbor,HTTPS,SSL,私服"><title>Harbor 企业级 Docker Registry HTTPS配置 - bleem</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/atom-one-dark-reasonable.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script id="fluid-configs">var Fluid=window.Fluid||{},CONFIG={hostname:"mritd.com",root:"/",version:"1.8.11",typing:{enable:!0,typeSpeed:80,cursorChar:"_",loop:!1},anchorjs:{enable:!0,element:"h1,h2,h3,h4,h5,h6",placement:"right",visible:"hover",icon:"❡"},progressbar:{enable:!0,height_px:3,color:"#29d",options:{showSpinner:!1,trickleSpeed:200}},copy_btn:!0,image_zoom:{enable:!0,img_url_replace:["",""]},toc:{enable:!0,headingSelector:"h1,h2,h3,h4,h5,h6",collapseDepth:3},lazyload:{enable:!0,loading_img:"/img/loading.gif",onlypost:!1,offset_factor:2},web_analytics:{enable:!0,baidu:null,google:"UA-179552593-1",gtag:null,tencent:{sid:null,cid:null},woyaola:null,cnzz:null,leancloud:{app_id:null,app_key:null,server_url:null}},search_path:"/local-search.xml"}</script><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"><a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"><a class="nav-link" target="_self">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner" id="banner" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="page-header text-center fade-in-up"><span class="h2" id="subtitle" title="Harbor 企业级 Docker Registry HTTPS配置"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2016-07-03 15:04" pubdate>2016年7月3日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 1.3k 字 </span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 19 分钟</span></div></div></div></div></div></header><main><div class="container-fluid nopadding-x"><div class="row nomargin-x"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-x-md"><div class="container nopadding-x-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto"><h1 style="display:none">Harbor 企业级 Docker Registry HTTPS配置</h1><div class="markdown-body"><blockquote><p>本文参考自 <a target="_blank" rel="noopener" href="https://github.com/vmware/harbor/blob/master/docs/configure_https.md">Harbor Github</a>、<a target="_blank" rel="noopener" href="http://liaoph.com/openssl-san/">OpenSSL 创建 SAN 证书</a></p></blockquote><h2 id="一、创建-CA-并自签证书"><a href="#一、创建-CA-并自签证书" class="headerlink" title="一、创建 CA 并自签证书"></a>一、创建 CA 并自签证书</h2><p>创建 CA 即自签名证书请看 <a target="_blank" rel="noopener" href="http://mritd.me/2016/07/02/%E4%BA%92%E8%81%94%E7%BD%91%E5%8A%A0%E5%AF%86%E5%8F%8AOpenSSL%E4%BB%8B%E7%BB%8D%E5%92%8C%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">互联网加密及OpenSSL介绍和简单使用</a>，以下简单介绍一下踩的坑，堆一下命令</p><h3 id="1-1、SAN-证书扩展域名配置"><a href="#1-1、SAN-证书扩展域名配置" class="headerlink" title="1.1、SAN 证书扩展域名配置"></a>1.1、SAN 证书扩展域名配置</h3><p><strong>默认的 OpenSSL 生成的签名请求只适用于生成时填写的域名，即 <code>Common Name</code> 填的是哪个域名，证书就只能应用于哪个域名，但是一般内网都是以 IP 方式部署，所以需要添加 SAN(Subject Alternative Name) 扩展信息，以支持多域名和IP</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 首先 cp 一份 openssl 配置</span>
+cp /etc/ssl/openssl.cnf .
+<span class="hljs-comment"># 主要修改 内容如下</span>
+[ req ]
+<span class="hljs-comment"># 上面的内容省略，主要增加这个属性(默认在最后一行被注释了，解开即可)</span>
+req_extensions = v3_req
+[ v3_req ]
+<span class="hljs-comment"># 修改 subjectAltName</span>
+subjectAltName = @alt_names
+[ alt_names ]
+<span class="hljs-comment"># 此节点[ alt_names ]为新增的，内容如下</span>
+IP.1=10.211.55.16   <span class="hljs-comment"># 扩展IP(私服所在服务器IP)</span>
+DNS.1=*.xran.me     <span class="hljs-comment"># 扩展域名(一般用于公网这里做测试)</span>
+DNS.2=*.baidu.com   <span class="hljs-comment"># 可添加多个扩展域名和IP</span></code></pre></div><p>完整的配置文件如下</p><div class="hljs code-wrapper"><pre><code class="hljs sh">[ req ]
+default_bits            = 2048
+default_keyfile         = privkey.pem
+distinguished_name      = req_distinguished_name
+attributes              = req_attributes
+x509_extensions = v3_ca <span class="hljs-comment"># The extentions to add to the self signed cert</span>
+
+<span class="hljs-comment"># Passwords for private keys if not present they will be prompted for</span>
+<span class="hljs-comment"># input_password = secret</span>
+<span class="hljs-comment"># output_password = secret</span>
+
+<span class="hljs-comment"># This sets a mask for permitted string types. There are several options.</span>
+<span class="hljs-comment"># default: PrintableString, T61String, BMPString.</span>
+<span class="hljs-comment"># pkix   : PrintableString, BMPString (PKIX recommendation before 2004)</span>
+<span class="hljs-comment"># utf8only: only UTF8Strings (PKIX recommendation after 2004).</span>
+<span class="hljs-comment"># nombstr : PrintableString, T61String (no BMPStrings or UTF8Strings).</span>
+<span class="hljs-comment"># MASK:XXXX a literal mask value.</span>
+<span class="hljs-comment"># WARNING: ancient versions of Netscape crash on BMPStrings or UTF8Strings.</span>
+string_mask = utf8only
+
+req_extensions = v3_req <span class="hljs-comment"># The extensions to add to a certificate request</span>
+[ v3_req ]
+
+<span class="hljs-comment"># Extensions to add to a certificate request</span>
+
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
+[ alt_names ]
+IP.1=10.211.55.16
+DNS.1=*.xran.me
+DNS.2=*.baidu.com</code></pre></div><h3 id="1-2、创建-CA-及自签名"><a href="#1-2、创建-CA-及自签名" class="headerlink" title="1.2、创建 CA 及自签名"></a>1.2、创建 CA 及自签名</h3><p>具体原理这里不做过多阐述，直接堆命令，详细请看 <a target="_blank" rel="noopener" href="http://mritd.me/2016/07/02/%E4%BA%92%E8%81%94%E7%BD%91%E5%8A%A0%E5%AF%86%E5%8F%8AOpenSSL%E4%BB%8B%E7%BB%8D%E5%92%8C%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">互联网加密及OpenSSL介绍和简单使用</a></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-built_in">cd</span> ~
+<span class="hljs-comment"># 创建 CA 工作目录</span>
+mkdir -p demoCA/&#123;private,certs,crl,newcerts&#125;
+<span class="hljs-comment"># 创建 CA 私钥</span>
+(<span class="hljs-built_in">umask</span> 077; openssl genrsa -out demoCA/private/cakey.pem 2048)
+<span class="hljs-comment"># 执行自签名(信息不要乱填，参考下面截图)</span>
+openssl req -new -x509 -key demoCA/private/cakey.pem -days 3655 -out demoCA/cacert.pem
+<span class="hljs-comment"># 初始化相关文件</span>
+touch demoCA/&#123;index.txt,serial,crlnumber&#125;
+<span class="hljs-comment"># 初始化序列号</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;01&quot;</span> &gt; demoCA/serial</code></pre></div><p>自签名证书截图如下</p><p><img src="https://cdn.oss.link/markdown/hexo_docker_harbor_https_createcacrt.png" srcset="/img/loading.gif" lazyload alt="hexo_harbor_https_createcacrt"></p><h3 id="1-3、创建证书并通过-CA-签名"><a href="#1-3、创建证书并通过-CA-签名" class="headerlink" title="1.3、创建证书并通过 CA 签名"></a>1.3、创建证书并通过 CA 签名</h3><p>同样，直接上命令……嘎嘣脆，奏是这个味</p><p><strong>注意: 创建签名请求(csr文件)命令和签名命令(ca)与 <a target="_blank" rel="noopener" href="http://mritd.me/2016/07/02/%E4%BA%92%E8%81%94%E7%BD%91%E5%8A%A0%E5%AF%86%E5%8F%8AOpenSSL%E4%BB%8B%E7%BB%8D%E5%92%8C%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">互联网加密及OpenSSL介绍和简单使用</a> 中稍有不同，openssl.cnf 为第一步修改后的，签名请求密码留空即可</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 证书存放目录</span>
+mkdir dockercrt
+<span class="hljs-comment"># 创建私钥</span>
+openssl genrsa -out dockercrt/docker.key 2048
+<span class="hljs-comment"># 生成带有 SAN 的证书请求</span>
+openssl req -new -key dockercrt/docker.key -out dockercrt/docker.csr -config openssl.cnf
+<span class="hljs-comment"># 签名带有 SAN 的证书</span>
+openssl ca -<span class="hljs-keyword">in</span> dockercrt/docker.csr -out dockercrt/docker.crt -config openssl.cnf -extensions v3_req</code></pre></div><p>创建签名请求信息填写截图如下</p><p><img src="https://cdn.oss.link/markdown/hexo_docker_harbor_https_createcsr.png" srcset="/img/loading.gif" lazyload alt="hexo_harbor_https_createcsr"></p><h2 id="二、配置-Harbor-HTTPS"><a href="#二、配置-Harbor-HTTPS" class="headerlink" title="二、配置 Harbor HTTPS"></a>二、配置 Harbor HTTPS</h2><h3 id="2-1、服务端配置"><a href="#2-1、服务端配置" class="headerlink" title="2.1、服务端配置"></a>2.1、服务端配置</h3><p>服务端配置相对简单，只需要修改一下 Harbor 的 Nginx 配置文件，并把签名好的证书和私钥复制过去即可</p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-built_in">cd</span> ~/harbor/Deploy
+<span class="hljs-comment"># 复制 crt、key</span>
+cp ~/dockercrt/docker.crt config/nginx/cert
+cp ~/dockercrt/docker.key config/nginx/cert
+<span class="hljs-comment"># 修改配置</span>
+vim config/nginx/nginx.conf</code></pre></div><p><strong>Nginx 样例配置如下</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">worker_processes auto;
+
+events &#123;
+  worker_connections 1024;
+  use epoll;
+  multi_accept on;
+&#125;
+
+http &#123;
+  tcp_nodelay on;
+
+  <span class="hljs-comment"># this is necessary for us to be able to disable request buffering in all cases</span>
+  proxy_http_version 1.1;
+
+
+  upstream registry &#123;
+    server registry:5000;
+  &#125;
+
+  upstream ui &#123;
+    server ui:80;
+  &#125;
+
+
+  server &#123;
+    <span class="hljs-comment"># listen 80;</span>
+    listen 443 ssl;
+
+    <span class="hljs-comment"># disable any limits to avoid HTTP 413 for large image uploads</span>
+    client_max_body_size 0;
+
+    ssl on;
+    ssl_certificate /etc/nginx/cert/docker.crt;
+    ssl_certificate_key /etc/nginx/cert/docker.key;
+
+    location / &#123;
+      proxy_pass http://ui/;
+      proxy_set_header Host <span class="hljs-variable">$host</span>;
+      proxy_set_header X-Real-IP <span class="hljs-variable">$remote_addr</span>;
+      proxy_set_header X-Forwarded-For <span class="hljs-variable">$proxy_add_x_forwarded_for</span>;
+
+      <span class="hljs-comment"># When setting up Harbor behind other proxy, such as an Nginx instance, remove the below line if the proxy already</span>
+has similar settings.
+      proxy_set_header X-Forwarded-Proto <span class="hljs-variable">$scheme</span>;
+
+      proxy_buffering off;
+      proxy_request_buffering off;
+    &#125;
+
+    location /v1/ &#123;
+      <span class="hljs-built_in">return</span> 404;
+    &#125;
+
+    location /v2/ &#123;
+      proxy_pass http://registry/v2/;
+      proxy_set_header Host <span class="hljs-variable">$http_host</span>;
+      proxy_set_header X-Real-IP <span class="hljs-variable">$remote_addr</span>;
+      proxy_set_header X-Forwarded-For <span class="hljs-variable">$proxy_add_x_forwarded_for</span>;
+
+      <span class="hljs-comment"># When setting up Harbor behind other proxy, such as an Nginx instance, remove the below line if the proxy already has similar settings.</span>
+      proxy_set_header X-Forwarded-Proto <span class="hljs-variable">$scheme</span>;
+
+      proxy_buffering off;
+      proxy_request_buffering off;
+
+    &#125;
+
+    location /service/ &#123;
+      proxy_pass http://ui/service/;
+      proxy_set_header Host <span class="hljs-variable">$host</span>;
+      proxy_set_header X-Real-IP <span class="hljs-variable">$remote_addr</span>;
+      proxy_set_header X-Forwarded-For <span class="hljs-variable">$proxy_add_x_forwarded_for</span>;
+
+      <span class="hljs-comment"># When setting up Harbor behind other proxy, such as an Nginx instance, remove the below line if the proxy already has similar settings.</span>
+      proxy_set_header X-Forwarded-Proto <span class="hljs-variable">$scheme</span>;
+
+      proxy_buffering off;
+      proxy_request_buffering off;
+    &#125;
+  &#125;
+
+  server &#123;
+    listen 80;
+    rewrite ^/(.*) https://$server_name<span class="hljs-variable">$1</span> permanent;
+  &#125;
+&#125;</code></pre></div><p><strong>最后重新创建 contianer 即可</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-built_in">cd</span> ~/harbor/Deploy
+./prepare
+<span class="hljs-comment"># 先 down 一下删除原有配置</span>
+docker-compose down
+docker-compose up -d</code></pre></div><p>此时访问 <code>https://hostname</code> 即可</p><h3 id="2-2、客户端配置"><a href="#2-2、客户端配置" class="headerlink" title="2.2、客户端配置"></a>2.2、客户端配置</h3><p><strong>客户端需要将签名 CA 的自签名根证书加入到本机的信任列表中，Ubuntu 下操作如下</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-built_in">cd</span> ~
+<span class="hljs-comment"># 本人测试用的两个 虚拟机，需要远程拷贝</span>
+scp root@10.211.55.16:~/demoCA/cacert.pem .
+<span class="hljs-comment"># 备份一下 系统原有的根证书信任列表</span>
+cp /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt.bak
+<span class="hljs-comment"># 追加 自签名的 CA 根证书到 系统信任列表</span>
+cat cacert.pem &gt;&gt; /etc/ssl/certs/ca-certificates.crt
+<span class="hljs-comment"># 重启 docker 服务</span>
+service docker restart</code></pre></div><h3 id="2-3、客户端测试"><a href="#2-3、客户端测试" class="headerlink" title="2.3、客户端测试"></a>2.3、客户端测试</h3><p>客户端直接登录，并 push 即可，<strong>如果原来修改过 <code>/etc/default/docker</code> 文件的，并加入了 <code>--insecure-registry</code> 选项的需要将其去除</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 登录 如果登录成功就代表没问题了</span>
+docker login 10.211.55.16
+<span class="hljs-comment"># push 测试</span>
+docker push 10.211.55.16/mritd/nginx:1.9</code></pre></div></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/docker/">Docker</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/linux/">Linux</a> <a class="hover-with-bg" href="/tags/docker/">Docker</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext"><article class="post-prev col-6"><a href="/2016/08/02/yum-note/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">yum 笔记</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"><a href="/2016/07/02/encryption-and-introduction-to-openssl/"><span class="hidden-mobile">互联网加密及 OpenSSL 介绍和简单使用</span> <span class="visible-mobile">下一篇</span> <i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments" lazyload><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2016/07/03/harbor-enterprise-docker-registry-part3/",this.page.identifier="/2016/07/03/harbor-enterprise-docker-registry-part3/"};Fluid.utils.loadComments("#disqus_thread",(function(){var e=document,t=e.createElement("script");t.src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}))</script><noscript>Please enable JavaScript to view the comments</noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div class="toc-body" id="toc-body"></div></div></div></div></div><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div></main><footer class="text-center mt-5 py-3"><div class="footer-content"><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></footer><script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css"><script>NProgress.configure({showSpinner:!1,trickleSpeed:200}),NProgress.start(),window.addEventListener("load",(function(){NProgress.done()}))</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script><script src="/js/events.js"></script><script src="/js/plugins.js"></script><script src="/js/img-lazyload.js"></script><script src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script><script src="/js/local-search.js"></script><script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js"></script><script>!function(t,i){(0,Fluid.plugins.typing)(i.getElementById("subtitle").title)}(window,document)</script><script defer>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-179552593-1","auto"),ga("send","pageview")</script><script async src="https://www.google-analytics.com/analytics.js"></script><script src="/js/boot.js"></script></body></html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;dark&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Gradle 构建基础笔记"><meta name="author" content="bleem"><meta name="keywords" content="Gradle"><title>Gradle 构建基础笔记 - bleem</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/atom-one-dark-reasonable.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script id="fluid-configs">var Fluid=window.Fluid||{},CONFIG={hostname:"mritd.com",root:"/",version:"1.8.11",typing:{enable:!0,typeSpeed:80,cursorChar:"_",loop:!1},anchorjs:{enable:!0,element:"h1,h2,h3,h4,h5,h6",placement:"right",visible:"hover",icon:"❡"},progressbar:{enable:!0,height_px:3,color:"#29d",options:{showSpinner:!1,trickleSpeed:200}},copy_btn:!0,image_zoom:{enable:!0,img_url_replace:["",""]},toc:{enable:!0,headingSelector:"h1,h2,h3,h4,h5,h6",collapseDepth:3},lazyload:{enable:!0,loading_img:"/img/loading.gif",onlypost:!1,offset_factor:2},web_analytics:{enable:!0,baidu:null,google:"UA-179552593-1",gtag:null,tencent:{sid:null,cid:null},woyaola:null,cnzz:null,leancloud:{app_id:null,app_key:null,server_url:null}},search_path:"/local-search.xml"}</script><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"><a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"><a class="nav-link" target="_self">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner" id="banner" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="page-header text-center fade-in-up"><span class="h2" id="subtitle" title="Gradle 构建基础笔记"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2016-02-18 15:04" pubdate>2016年2月18日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 1.9k 字 </span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 24 分钟</span></div></div></div></div></div></header><main><div class="container-fluid nopadding-x"><div class="row nomargin-x"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-x-md"><div class="container nopadding-x-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto"><h1 style="display:none">Gradle 构建基础笔记</h1><div class="markdown-body"><p><img src="https://cdn.oss.link/markdown/hexo_gradle_logo.png" srcset="/img/loading.gif" lazyload alt="Gradle_logo"></p><blockquote><p>本文参考自 <a target="_blank" rel="noopener" href="https://www.gitbook.com/book/dongchuan/gradle-user-guide-/details">Gradle User Guide 中文版</a> 感谢其翻译贡献者</p></blockquote><h2 id="安装Gradle"><a href="#安装Gradle" class="headerlink" title="安装Gradle"></a>安装Gradle</h2><ul><li>下载安装包 <a target="_blank" rel="noopener" href="http://gradle.org/gradle-download/">下载地址</a></li><li>配置环境变量 如下</li></ul><p><img src="https://cdn.oss.link/markdown/hexo_gradle_home.jpg" srcset="/img/loading.gif" lazyload alt="GRADLE_HOME"></p><p><img src="https://cdn.oss.link/markdown/hexo_gradle_path.jpg" srcset="/img/loading.gif" lazyload alt="GRADLE_PATH"></p><h2 id="Gradle-基本概念"><a href="#Gradle-基本概念" class="headerlink" title="Gradle 基本概念"></a>Gradle 基本概念</h2><h3 id="Projects"><a href="#Projects" class="headerlink" title="Projects"></a>Projects</h3><blockquote><p>每一个构建由一个或者多个 Project 构成，每个 Project 代表一个资源，具体做什么取决与如何定义该 Project，它可能代表一个发布的 zip 文件，也可能代表某项动作，比如部署应用等。</p></blockquote><h3 id="Tasks"><a href="#Tasks" class="headerlink" title="Tasks"></a>Tasks</h3><blockquote><p>每个 Project 由一个或者多个 task 组成，每个 task 可以是更细致化的构建操作，比如编译 class文件，创建 jar 文件，生成 javadoc 文档等。</p></blockquote><h2 id="Gradle-Hello-World"><a href="#Gradle-Hello-World" class="headerlink" title="Gradle Hello World"></a>Gradle Hello World</h2><blockquote><p>我们可以通过 <code>gradle</code> 命令来完成一次构建，**<code>gradle</code> 命令会在当前目录查找一个叫 <code>build.gradle</code> 的描述文件来完成构建**。严格来说它是一个构建脚本，类似于 Maven 的 <code>POM.xml</code> 文件；用来描述整个构建过程；以下是一个 <code>Hello World</code> 示例。</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs groovy">task helloWorld &#123;
+    doLast &#123;
+        println <span class="hljs-string">&#x27;Hello World!&#x27;</span>
+    &#125;
+&#125;
+</code></pre></div><p>将以上脚本保存为 <code>build.gradle</code>；并在当前目录执行 <code>gradle -q helloWorld</code> 尝试运行该 task。<br><strong>注意：<code>-q</code> 代表 quite 模式，不显示 Gradle 的日志信息。</strong></p><h2 id="快捷定义任务"><a href="#快捷定义任务" class="headerlink" title="快捷定义任务"></a>快捷定义任务</h2><p>以上代码，<code>doLast</code> 作为 <code>helloWorld</code> 的一个 Action，此时可以通过如下方式快捷定义：</p><div class="hljs code-wrapper"><pre><code class="hljs groovy">task helloWorld &lt;&lt; &#123;
+    println <span class="hljs-string">&#x27;Hello World!&#x27;</span>
+&#125;
+</code></pre></div><h2 id="在-Gradle-中使用-Groovy"><a href="#在-Gradle-中使用-Groovy" class="headerlink" title="在 Gradle 中使用 Groovy"></a>在 Gradle 中使用 Groovy</h2><p>Gradle 是基于 Groovy 的，在 build.gradle 中可以使用 Groovy 书写(虽然我不会…)；样例如下(测试命令行中文乱码)：</p><div class="hljs code-wrapper"><pre><code class="hljs groovy">task upper &lt;&lt; &#123;
+    String testStr = <span class="hljs-string">&quot;AbcD&quot;</span>
+    println <span class="hljs-string">&quot;原始字符：&quot;</span> + testStr
+    println <span class="hljs-string">&quot;转换大写：&quot;</span> + testStr.toUpperCase()
+&#125;
+</code></pre></div><h2 id="任务依赖性"><a href="#任务依赖性" class="headerlink" title="任务依赖性"></a>任务依赖性</h2><p>Gradle 支持任务间的依赖关系，如下所示：</p><div class="hljs code-wrapper"><pre><code class="hljs grovvy">task testDepends &lt;&lt; &#123;
+    println &quot;taskDepends&quot;
+&#125;
+
+&#x2F;&#x2F; 设置依赖关系
+task test1(dependsOn: testDepends) &lt;&lt; &#123;
+    println &quot;test1&quot;
+&#125;
+</code></pre></div><p>执行 <code>gradle -q test1</code> 命令运行 task1 任务，此时由于 task1 任务依赖于 testDepends 任务，所以会先执行 testDepends 任务，在执行 test1 任务。</p><p><strong>注意：build.gradle 脚本中，任务依赖时没有顺序区分，也就是说可以先声明一个任务依赖于另一个任务，而后定义另一个任务，总结来说就是 task 书写顺序不会影响 任务间依赖关系。</strong></p><h2 id="任务的动态性"><a href="#任务的动态性" class="headerlink" title="任务的动态性"></a>任务的动态性</h2><p>由于 Gradle 使用 Groovy 作为构建语言，Groovy 函数式的特性可以让我们动态的创建任务，而无需预先设定好(个人认为实际构建可能没这么变态的需要)；样例如下：</p><div class="hljs code-wrapper"><pre><code class="hljs groovy"><span class="hljs-comment">// 此时相当于定义了 4个 task 分别是 taskDynamic0、...1、...2、...3</span>
+<span class="hljs-number">4.</span>times &#123; counter -&gt;
+    task <span class="hljs-string">&quot;taskDynamic$counter&quot;</span> &lt;&lt; &#123;
+        println <span class="hljs-string">&quot;taskDynamic$counter&quot;</span>
+    &#125;
+&#125;
+</code></pre></div><h2 id="通过API使用已存在的任务"><a href="#通过API使用已存在的任务" class="headerlink" title="通过API使用已存在的任务"></a>通过API使用已存在的任务</h2><p>Gradle 中可以先定义 task，然后再指定这些 task 之间的关系，就像下面这样：</p><div class="hljs code-wrapper"><pre><code class="hljs groovy"><span class="hljs-comment">// 先利用动态性 创建4个任务</span>
+<span class="hljs-number">4.</span>times &#123; counter -&gt;
+    task <span class="hljs-string">&quot;task$counter&quot;</span> &lt;&lt; &#123;
+        println <span class="hljs-string">&quot;task----&gt; $counter&quot;</span>
+    &#125;
+&#125;
+
+<span class="hljs-comment">// 再指定依赖关系</span>
+task0.dependsOn task1,task3
+</code></pre></div><p>同时 Gradle 还允许在任务定以后动态的改变或添加其行为，如下所示：</p><div class="hljs code-wrapper"><pre><code class="hljs groovy"><span class="hljs-comment">// 首先定义任务</span>
+task test1 &lt;&lt; &#123;
+    println <span class="hljs-string">&quot;default&quot;</span>
+&#125;
+
+<span class="hljs-comment">// 然后动态添加 任务开始动作</span>
+test1.doFirst &#123;
+    println <span class="hljs-string">&quot;First&quot;</span>
+&#125;
+
+<span class="hljs-comment">// 动态添加 任务结束动作</span>
+test1.doLast &#123;
+    println <span class="hljs-string">&quot;Last&quot;</span>
+&#125;
+
+<span class="hljs-comment">// 在添加一个结束动作</span>
+test1 &lt;&lt; &#123;
+    println <span class="hljs-string">&quot;the end&quot;</span>
+&#125;
+</code></pre></div><p><strong>注意：上面一直使用的 <code>&lt;&lt;</code> 实际是 doLast 的简写形式。</strong></p><h2 id="任务引用-短标记语法"><a href="#任务引用-短标记语法" class="headerlink" title="任务引用(短标记语法)"></a>任务引用(短标记语法)</h2><p>Gradle 可以通过 <code>$</code> 符号引用另一个任务，可以是另一个任务的执行结果；也可以是其属性，比如 <code>task.name</code> 将返回某个任务的名字，样例如下：</p><div class="hljs code-wrapper"><pre><code class="hljs groovy"><span class="hljs-comment">// 首先定义一个任务</span>
+task test1 &lt;&lt; &#123;
+    prinln <span class="hljs-string">&quot;test1111111&quot;</span>
+&#125;
+<span class="hljs-comment">// 然后在另一个任务里引用</span>
+task test2 &lt;&lt; &#123;
+    println <span class="hljs-string">&quot;test2---&gt;$test1.name&quot;</span>
+&#125;
+</code></pre></div><h2 id="自定义任务属性"><a href="#自定义任务属性" class="headerlink" title="自定义任务属性"></a>自定义任务属性</h2><p>在 Gradle 中我们可以自定义任务的属性，然后再恰当的时候加以引用，在设置某个任务属性时 <strong>采用 <code>ext</code> 关键字定义该属性</strong>；个人理解类似 java 的 this 关键字；样例如下：</p><div class="hljs code-wrapper"><pre><code class="hljs groovy"><span class="hljs-comment">// 定义 testTask1 的两个属性</span>
+task testTask1 &#123;
+    ext.property1 = <span class="hljs-string">&quot;1&quot;</span>
+    ext.property2 = <span class="hljs-string">&quot;2&quot;</span>
+&#125;
+<span class="hljs-comment">// 可直接打印引用，字符串中可采用短标记 $ 引用</span>
+task testTask2 &lt;&lt; &#123;
+    println testTask1.property1
+    println <span class="hljs-string">&quot;$testTask1.property2&quot;</span>
+&#125;
+</code></pre></div><p><strong>注意：定义任务属性时必须在任务体中，而不能在 doLast 或 doFirst Action 中定义！</strong></p><h2 id="调用-Ant-任务"><a href="#调用-Ant-任务" class="headerlink" title="调用 Ant 任务"></a>调用 Ant 任务</h2><blockquote><p>以下直接 copy 的，本人没玩过 Ant……</p></blockquote><p>Ant 任务是 Gradle 的一等公民. Gradle 通过 Groovy 出色的集成了 Ant 任务. Groovy 自带了一个 AntBuilder. 相比于从一个 build.xml 文件中使用 Ant 任务, 在 Gradle 里使用 Ant 任务更为方便和强大. 从下面的例子中, 你可以学习如何执行 Ant 任务以及如何访问 ant 属性：</p><div class="hljs code-wrapper"><pre><code class="hljs groovy">task loadfile &lt;&lt; &#123;
+    <span class="hljs-keyword">def</span> files = file(<span class="hljs-string">&#x27;../antLoadfileResources&#x27;</span>).listFiles().sort()
+        files.each &#123; File file -&gt;
+        <span class="hljs-keyword">if</span> (file.isFile()) &#123;
+            ant.loadfile(<span class="hljs-attr">srcFile:</span> file, <span class="hljs-attr">property:</span> file.name)
+            println <span class="hljs-string">&quot; *** $file.name ***&quot;</span>
+            println <span class="hljs-string">&quot;$&#123;ant.properties[file.name]&#125;&quot;</span>
+        &#125;
+    &#125;
+&#125;
+</code></pre></div><h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><blockquote><p>又用 Ant…… My God ….. 接着 copy</p></blockquote><p>Gradle 能很好地衡量你编写脚本的逻辑能力. 首先要做的是如何提取一个方法.</p><div class="hljs code-wrapper"><pre><code class="hljs groovy">task checksum &lt;&lt; &#123;
+    fileList(<span class="hljs-string">&#x27;../antLoadfileResources&#x27;</span>).each &#123;File file -&gt;
+        ant.checksum(<span class="hljs-attr">file:</span> file, <span class="hljs-attr">property:</span> <span class="hljs-string">&quot;cs_$file.name&quot;</span>)
+        println <span class="hljs-string">&quot;$file.name Checksum: $&#123;ant.properties[&quot;</span>cs_$file.name<span class="hljs-string">&quot;]&#125;&quot;</span>
+    &#125;
+&#125;
+task loadfile &lt;&lt; &#123;
+    fileList(<span class="hljs-string">&#x27;../antLoadfileResources&#x27;</span>).each &#123;File file -&gt;
+        ant.loadfile(<span class="hljs-attr">srcFile:</span> file, <span class="hljs-attr">property:</span> file.name)
+        println <span class="hljs-string">&quot;I&#x27;m fond of $file.name&quot;</span>
+    &#125;
+&#125;
+File[] fileList(String dir) &#123;
+    file(dir).listFiles(&#123;file -&gt; file.isFile() &#125; <span class="hljs-keyword">as</span> FileFilter).sort()
+&#125;
+</code></pre></div><h2 id="默认任务"><a href="#默认任务" class="headerlink" title="默认任务"></a>默认任务</h2><blockquote><p>终于没有 Ant 了……</p></blockquote><p>Gradle 允许在一个构建脚本(<code>build.gradle</code>) 中定义默认需要执行的任务，只需要使用 <code>defaultTasks</code> 关键字即可，此时可直接在构建脚本目录执行 <code>gradle [-q]</code> 来执行构建过程，样例如下</p><div class="hljs code-wrapper"><pre><code class="hljs groovy"><span class="hljs-comment">// 定义 默认的任务</span>
+defaultTasks <span class="hljs-string">&quot;testTask1&quot;</span>,<span class="hljs-string">&quot;testTask2&quot;</span>
+task testTask1 &lt;&lt; &#123;
+    println <span class="hljs-string">&quot;testTask1&quot;</span>
+&#125;
+task testTask2 &lt;&lt; &#123;
+    println <span class="hljs-string">&quot;testTask2&quot;</span>
+&#125;
+task testTask3 &lt;&lt; &#123;
+    println <span class="hljs-string">&quot;testTask3&quot;</span>
+&#125;
+</code></pre></div><h2 id="DAG-配置"><a href="#DAG-配置" class="headerlink" title="DAG 配置"></a>DAG 配置</h2><p><strong>原文：</strong>正如我们之后的详细描述, Gradle 有一个配置阶段和执行阶<br>段. 在配置阶段后, Gradle 将会知道应执行的所有任务. Gradle 为你提供一个”钩子”, 以便利用这些信息. 举个例子, 判断发布的任务是否在要被执行的任务当中. 根据这一点, 你可以给一些变量指定不同的值.</p><p><strong>样例代码：</strong></p><div class="hljs code-wrapper"><pre><code class="hljs groovy">task distribution &lt;&lt; &#123;
+    println <span class="hljs-string">&quot;We build the zip with version=$version&quot;</span>
+&#125;
+task release(<span class="hljs-attr">dependsOn:</span> <span class="hljs-string">&#x27;distribution&#x27;</span>) &lt;&lt; &#123;
+    println <span class="hljs-string">&#x27;We release now&#x27;</span>
+&#125;
+gradle.taskGraph.whenReady &#123;taskGraph -&gt;
+    <span class="hljs-keyword">if</span> (taskGraph.hasTask(release)) &#123;
+        version = <span class="hljs-string">&#x27;1.0&#x27;</span>
+    &#125; <span class="hljs-keyword">else</span> &#123;
+        version = <span class="hljs-string">&#x27;1.0-SNAPSHOT&#x27;</span>
+    &#125;
+&#125;
+</code></pre></div><p><strong>个人理解：</strong>关于 DAG 配置的描述，大致意思应该是说，Gradle 构建时会执行两个阶段：配置阶段、执行阶段；在配置阶段；Gradle 主要完成所有的配置工作，应该会读取整个构建脚本，分析里面的语义；这也可能是 Gradle 定义 task 等不分先后顺序的原因；在这个阶段，我们可以通过内置变量(DAG)和内置方法来动态的判断并调整后续的构建流程；当所有构建流程确定后，再进行第二个构建阶段。</p></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/java/">Java</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/java/">Java</a> <a class="hover-with-bg" href="/tags/gradle/">Gradle</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext"><article class="post-prev col-6"><a href="/2016/03/08/programmer&#39;s-self-cultivation/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">程序猿的自我修养</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"><a href="/2016/02/05/java-exception/"><span class="hidden-mobile">JAVA 异常处理</span> <span class="visible-mobile">下一篇</span> <i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments" lazyload><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2016/02/18/gradle-note/",this.page.identifier="/2016/02/18/gradle-note/"};Fluid.utils.loadComments("#disqus_thread",(function(){var e=document,t=e.createElement("script");t.src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}))</script><noscript>Please enable JavaScript to view the comments</noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div class="toc-body" id="toc-body"></div></div></div></div></div><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div></main><footer class="text-center mt-5 py-3"><div class="footer-content"><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></footer><script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css"><script>NProgress.configure({showSpinner:!1,trickleSpeed:200}),NProgress.start(),window.addEventListener("load",(function(){NProgress.done()}))</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script><script src="/js/events.js"></script><script src="/js/plugins.js"></script><script src="/js/img-lazyload.js"></script><script src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script><script src="/js/local-search.js"></script><script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js"></script><script>!function(t,i){(0,Fluid.plugins.typing)(i.getElementById("subtitle").title)}(window,document)</script><script defer>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-179552593-1","auto"),ga("send","pageview")</script><script async src="https://www.google-analytics.com/analytics.js"></script><script src="/js/boot.js"></script></body></html>

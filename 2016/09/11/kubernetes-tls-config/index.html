@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;dark&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="kubernetes 提供了多种安全认证机制，其中对于集群通讯间可采用 TLS(https) 双向认证机制，也可采用基于 Token 或用户名密码的单向 tls 认证，由于 kubernetes 某些组件只支持双向 TLS 认证，所以本文主要记录 kubernetes 双向认证配置。"><meta name="author" content="bleem"><meta name="keywords" content="kubernetes,Docker,Linux"><title>kubernetes 双向 TLS 配置 - bleem</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/atom-one-dark-reasonable.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script id="fluid-configs">var Fluid=window.Fluid||{},CONFIG={hostname:"mritd.com",root:"/",version:"1.8.11",typing:{enable:!0,typeSpeed:80,cursorChar:"_",loop:!1},anchorjs:{enable:!0,element:"h1,h2,h3,h4,h5,h6",placement:"right",visible:"hover",icon:"❡"},progressbar:{enable:!0,height_px:3,color:"#29d",options:{showSpinner:!1,trickleSpeed:200}},copy_btn:!0,image_zoom:{enable:!0,img_url_replace:["",""]},toc:{enable:!0,headingSelector:"h1,h2,h3,h4,h5,h6",collapseDepth:3},lazyload:{enable:!0,loading_img:"/img/loading.gif",onlypost:!1,offset_factor:2},web_analytics:{enable:!0,baidu:null,google:"UA-179552593-1",gtag:null,tencent:{sid:null,cid:null},woyaola:null,cnzz:null,leancloud:{app_id:null,app_key:null,server_url:null}},search_path:"/local-search.xml"}</script><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"><a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"><a class="nav-link" target="_self">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner" id="banner" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="page-header text-center fade-in-up"><span class="h2" id="subtitle" title="kubernetes 双向 TLS 配置"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2016-09-11 15:11" pubdate>2016年9月11日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 1.7k 字 </span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 26 分钟</span></div></div></div></div></div></header><main><div class="container-fluid nopadding-x"><div class="row nomargin-x"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-x-md"><div class="container nopadding-x-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto"><h1 style="display:none">kubernetes 双向 TLS 配置</h1><div class="markdown-body"><blockquote><p>本文参考 《kubernetes 实战》、《kubernetes 权威指南》、<a target="_blank" rel="noopener" href="https://coreos.com/kubernetes/docs/latest/getting-started.html">CoreOS Getting-Started</a></p></blockquote><h2 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h2><p>kubernetes 提供了多种安全认证机制，其中对于集群通讯间可采用 TLS(https) 双向认证机制，也可采用基于 Token 或用户名密码的单向 tls 认证，由于 kubernetes 某些组件只支持双向 TLS 认证，所以本文主要记录 kubernetes 双向认证配置。</p><h2 id="二、签发证书"><a href="#二、签发证书" class="headerlink" title="二、签发证书"></a>二、签发证书</h2><p>其中 TLS 双向认证需要预先自建 CA 签发证书，权威 CA 机构的证书应该不可用，因为大部分 kubernetes 应该基于内网部署，而内网应该都会采用私有 IP 地址通讯，权威 CA 好像只能签署域名证书，对于签署到 IP 可能无法实现。</p><h3 id="2-1、自签-CA"><a href="#2-1、自签-CA" class="headerlink" title="2.1、自签 CA"></a>2.1、自签 CA</h3><p>对于私有证书签发首先要自签署 一个 CA 根证书，关于 OpenSSL 使用等相关可参考 <a target="_blank" rel="noopener" href="http://mritd.me/2016/07/02/%E4%BA%92%E8%81%94%E7%BD%91%E5%8A%A0%E5%AF%86%E5%8F%8AOpenSSL%E4%BB%8B%E7%BB%8D%E5%92%8C%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">互联网加密及OpenSSL介绍和简单使用</a></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 创建证书存放目录</span>
+mkdir cert &amp;&amp; <span class="hljs-built_in">cd</span> cert
+<span class="hljs-comment"># 创建 CA 私钥</span>
+openssl genrsa -out ca-key.pem 2048
+<span class="hljs-comment"># 自签 CA</span>
+openssl req -x509 -new -nodes -key ca-key.pem -days 10000 -out ca.pem -subj <span class="hljs-string">&quot;/CN=kube-ca&quot;</span></code></pre></div><h3 id="2-2、签署-apiserver-证书"><a href="#2-2、签署-apiserver-证书" class="headerlink" title="2.2、签署 apiserver 证书"></a>2.2、签署 apiserver 证书</h3><p>自签 CA 后就需要使用这个根 CA 签署 apiserver 相关的证书了，首先先修改 openssl 的配置</p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 复制 openssl 配置文件</span>
+cp /etc/pki/tls/openssl.cnf .
+<span class="hljs-comment"># 编辑 openssl 配置使其支持 IP 认证</span>
+vim openssl.cnf
+<span class="hljs-comment"># 主要修改内容如下</span>
+[req]
+req_extensions = v3_req
+distinguished_name = req_distinguished_name
+[req_distinguished_name]
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = kubernetes
+DNS.2 = kubernetes.default
+DNS.3 = kubernetes.default.svc
+DNS.4 = kubernetes.default.svc.cluster.local
+IP.1 = <span class="hljs-variable">$&#123;K8S_SERVICE_IP&#125;</span>  <span class="hljs-comment"># kubernetes server ip</span>
+IP.2 = <span class="hljs-variable">$&#123;MASTER_HOST&#125;</span>     <span class="hljs-comment"># master ip(如果都在一台机器上写一个就行)</span></code></pre></div><p>然后开始签署 apiserver 相关的证书</p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 生成 apiserver 私钥</span>
+openssl genrsa -out apiserver-key.pem 2048
+<span class="hljs-comment"># 生成签署请求</span>
+openssl req -new -key apiserver-key.pem -out apiserver.csr -subj <span class="hljs-string">&quot;/CN=kube-apiserver&quot;</span> -config openssl.cnf
+<span class="hljs-comment"># 使用自建 CA 签署</span>
+openssl x509 -req -<span class="hljs-keyword">in</span> apiserver.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out apiserver.pem -days 365 -extensions v3_req -extfile openssl.cnf</code></pre></div><h3 id="2-3、签署-node-证书"><a href="#2-3、签署-node-证书" class="headerlink" title="2.3、签署 node 证书"></a>2.3、签署 node 证书</h3><p>apiserver 证书签署完成后还需要签署每个节点 node 的证书，同样需要先修改一下 openssl 配置</p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># copy master 的 openssl 配置</span>
+cp openssl.cnf worker-openssl.cnf
+<span class="hljs-comment"># 修改 worker-openssl 配置</span>
+vim worker-openssl.cnf
+<span class="hljs-comment"># 修改内容如下，主要是去掉 DNS 同时增加节点 IP</span>
+[req]
+req_extensions = v3_req
+distinguished_name = req_distinguished_name
+[req_distinguished_name]
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+[alt_names]
+IP.1 = NODE1-IP <span class="hljs-comment"># 此处填写 node 的内网 ip，多个 node ip 地址以此类推 IP.2 = NODE2-IP</span></code></pre></div><p>接下来签署 node 的证书，以 node1 IP为 192.168.1.142 为例</p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 先声明两个变量方便引用</span>
+WORKER_FQDN=node1          <span class="hljs-comment"># node 昵称</span>
+WORKER_IP=192.168.1.142    <span class="hljs-comment"># node IP</span>
+<span class="hljs-comment"># 生成 node 私钥</span>
+openssl genrsa -out <span class="hljs-variable">$&#123;WORKER_FQDN&#125;</span>-worker-key.pem 2048
+<span class="hljs-comment"># 生成 签署请求</span>
+openssl req -new -key <span class="hljs-variable">$&#123;WORKER_FQDN&#125;</span>-worker-key.pem -out <span class="hljs-variable">$&#123;WORKER_FQDN&#125;</span>-worker.csr -subj <span class="hljs-string">&quot;/CN=<span class="hljs-variable">$&#123;WORKER_FQDN&#125;</span>&quot;</span> -config worker-openssl.cnf
+<span class="hljs-comment"># 使用自建 CA 签署</span>
+openssl x509 -req -<span class="hljs-keyword">in</span> <span class="hljs-variable">$&#123;WORKER_FQDN&#125;</span>-worker.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out <span class="hljs-variable">$&#123;WORKER_FQDN&#125;</span>-worker.pem -days 365 -extensions v3_req -extfile worker-openssl.cnf</code></pre></div><h3 id="2-4、生成集群管理证书"><a href="#2-4、生成集群管理证书" class="headerlink" title="2.4、生成集群管理证书"></a>2.4、生成集群管理证书</h3><p>在 master(apiserver) 和 node 的证书签署完成后还需要签署一个集群管理证书</p><div class="hljs code-wrapper"><pre><code class="hljs sh">openssl genrsa -out admin-key.pem 2048
+openssl req -new -key admin-key.pem -out admin.csr -subj <span class="hljs-string">&quot;/CN=kube-admin&quot;</span>
+openssl x509 -req -<span class="hljs-keyword">in</span> admin.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out admin.pem -days 365</code></pre></div><p><strong>最终生成的文件清单如下</strong></p><p><img src="https://cdn.oss.link/markdown/hexo_kubernetes_tls_certs.png" srcset="/img/loading.gif" lazyload alt="hexo_kubernetes_tls_certs"></p><h2 id="三、配置-kubernetes"><a href="#三、配置-kubernetes" class="headerlink" title="三、配置 kubernetes"></a>三、配置 kubernetes</h2><h3 id="3-1、配置-master"><a href="#3-1、配置-master" class="headerlink" title="3.1、配置 master"></a>3.1、配置 master</h3><p>相关证书全部准备好以后，开始配置 master，首先复制证书</p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 先把证书 copy 到配置目录</span>
+mkdir -p /etc/kubernetes/ssl
+cp cert/ca.pem cert/apiserver.pem cert/apiserver-key.pem /etc/kubernetes/ssl
+<span class="hljs-comment"># rpm 安装的 kubernetes 默认使用 kube 用户，需要更改权限</span>
+chown kube:kube -R /etc/kubernetes/ssl</code></pre></div><p><strong>然后编辑 master 的 apiserver 配置</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 编辑 master apiserver 配置文件</span>
+vim /etc/kubernetes/apiserver
+<span class="hljs-comment"># 配置如下</span>
+KUBE_API_ADDRESS=<span class="hljs-string">&quot;--bind-address=192.168.1.142 --insecure-bind-address=127.0.0.1 &quot;</span>
+KUBE_API_PORT=<span class="hljs-string">&quot;--secure-port=6443 --insecure-port=8080&quot;</span>
+KUBE_ETCD_SERVERS=<span class="hljs-string">&quot;--etcd-servers=http://192.168.1.100:2379&quot;</span>
+KUBE_SERVICE_ADDRESSES=<span class="hljs-string">&quot;--service-cluster-ip-range=10.254.0.0/16&quot;</span>
+KUBE_ADMISSION_CONTROL=<span class="hljs-string">&quot;--admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota&quot;</span>
+KUBE_API_ARGS=<span class="hljs-string">&quot;--tls-cert-file=/etc/kubernetes/ssl/apiserver.pem --tls-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem --client-ca-file=/etc/kubernetes/ssl/ca.pem --service-account-key-file=/etc/kubernetes/ssl/apiserver-key.pem &quot;</span></code></pre></div><p><strong>接着编辑 controller manager 的配置</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 编辑 controller manager 配置</span>
+vim /etc/kubernetes/controller-manager
+<span class="hljs-comment"># 配置如下</span>
+KUBE_CONTROLLER_MANAGER_ARGS=<span class="hljs-string">&quot;--service-account-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem  --root-ca-file=/etc/kubernetes/ssl/ca.pem --master=http://127.0.0.1:8080&quot;</span></code></pre></div><p><strong>最后启动 apiserver 、controller manager 和 scheduler</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">systemctl start kube-apiserver
+systemctl start kube-controller-manager
+systemctl start kube-scheduler
+systemctl <span class="hljs-built_in">enable</span> kube-apiserver
+systemctl <span class="hljs-built_in">enable</span> kube-controller-manager
+systemctl <span class="hljs-built_in">enable</span> kube-scheduler
+systemctl status kube-apiserver
+systemctl status kube-controller-manager
+systemctl status kube-scheduler</code></pre></div><h3 id="3-2、配置-node"><a href="#3-2、配置-node" class="headerlink" title="3.2、配置 node"></a>3.2、配置 node</h3><p><strong>由于是测试，所以 node1 和 master 启动在同一台机器上，配置时同样先 copy 配置文件</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">cp cert/node1-worker-key.pem cert/node1-worker.pem /etc/kubernetes/ssl
+chown kube:kube -R /etc/kubernetes/ssl</code></pre></div><p><strong>修改 kubelet 配置</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">vim /etc/kubernetes/kubelet
+<span class="hljs-comment"># 配置如下</span>
+KUBELET_ADDRESS=<span class="hljs-string">&quot;--address=192.168.1.142&quot;</span>
+KUBELET_HOSTNAME=<span class="hljs-string">&quot;--hostname-override=192-168-1-142&quot;</span>
+KUBELET_API_SERVER=<span class="hljs-string">&quot;--api-servers=https://192.168.1.142:6443&quot;</span>
+KUBELET_ARGS=<span class="hljs-string">&quot;--tls-cert-file=/etc/kubernetes/ssl/node1-worker.pem --tls-private-key-file=/etc/kubernetes/ssl/node1-worker-key.pem --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml&quot;</span></code></pre></div><p><strong>如果使用了 <code>KUBELET_HOSTNAME</code>，那么 hostname 必须在本地 hosts 存在，所以还需要修改一下 hosts 文件</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;127.0.0.1 192-168-1-142&quot;</span> &gt;&gt; /etc/hosts</code></pre></div><p><strong>修改 config 配置</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">vim /etc/kubernetes/config
+<span class="hljs-comment"># 配置如下</span>
+KUBE_LOGTOSTDERR=<span class="hljs-string">&quot;--logtostderr=true&quot;</span>
+KUBE_LOG_LEVEL=<span class="hljs-string">&quot;--v=0&quot;</span>
+KUBE_ALLOW_PRIV=<span class="hljs-string">&quot;--allow-privileged=false&quot;</span>
+apiserver
+KUBE_MASTER=<span class="hljs-string">&quot;--master=https://192.168.1.142:6443&quot;</span></code></pre></div><p><strong>创建 kube-proxy 配置文件</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">vim /etc/kubernetes/worker-kubeconfig.yaml
+<span class="hljs-comment"># 内容如下</span>
+apiVersion: v1
+kind: Config
+clusters:
+- name: <span class="hljs-built_in">local</span>
+  cluster:
+    certificate-authority: /etc/kubernetes/ssl/ca.pem
+users:
+- name: kubelet
+  user:
+    client-certificate: /etc/kubernetes/ssl/node1-worker.pem
+    client-key: /etc/kubernetes/ssl/node1-worker-key.pem
+contexts:
+- context:
+    cluster: <span class="hljs-built_in">local</span>
+    user: kubelet
+  name: kubelet-context
+current-context: kubelet-context</code></pre></div><p><strong>配置 kube-proxy 使其使用证书</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">vim /etc/kubernetes/proxy
+<span class="hljs-comment"># 配置如下</span>
+KUBE_PROXY_ARGS=<span class="hljs-string">&quot;--master=https://192.168.1.100:6443 --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml&quot;</span></code></pre></div><p><strong>最后启动并测试</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 启动</span>
+systemctl start kubelet
+systemctl start kube-proxy
+systemctl <span class="hljs-built_in">enable</span> kubelet
+systemctl <span class="hljs-built_in">enable</span> kube-proxy
+systemctl status kubelet
+systemctl status kube-proxy
+<span class="hljs-comment"># 测试</span>
+kubectl get node
+<span class="hljs-comment"># 显示如下</span>
+NAME            STATUS    AGE
+192-168-1-142   Ready     13s</code></pre></div><h2 id="四、其他相关"><a href="#四、其他相关" class="headerlink" title="四、其他相关"></a>四、其他相关</h2><p>master 启动后发现一个错误，大致意思是内核版本过低，但是 CentOS 已经 upgrade 到官方最新稳定版了。。。无奈换了下内核好了，以下为记录升级到最新内核的方法</p><div class="hljs code-wrapper"><pre><code class="hljs rpm"># 导入 elrepo 的key
+rpm --import https:&#x2F;&#x2F;www.elrepo.org&#x2F;RPM-GPG-KEY-elrepo.org
+# 安装 elrepo 源
+rpm -Uvh http:&#x2F;&#x2F;www.elrepo.org&#x2F;elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+# 在yum的ELRepo源中，mainline 为最新版本的内核，so 安装 ml 的内核
+yum --enablerepo&#x3D;elrepo-kernel install  kernel-ml-devel kernel-ml -y
+# 切换 grub 引导，默认启动的顺序应该为1,升级以后内核是往前面插入，为0
+grub2-set-default 0
+# 最后重启
+reboot
+# 再看下检查下内核版本已经是 4.7.3-1.el7.elrepo.x86_64
+uname -r</code></pre></div></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/kubernetes/">Kubernetes</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/linux/">Linux</a> <a class="hover-with-bg" href="/tags/docker/">Docker</a> <a class="hover-with-bg" href="/tags/kubernetes/">Kubernetes</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext"><article class="post-prev col-6"><a href="/2016/09/13/quickly-create-custom-rpms-based-on-official-rpm/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">基于官方 rpm 快速创建自定义 rpm</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"><a href="/2016/09/07/set-up-kubernetes/"><span class="hidden-mobile">Kubernetes 集群搭建</span> <span class="visible-mobile">下一篇</span> <i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments" lazyload><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2016/09/11/kubernetes-tls-config/",this.page.identifier="/2016/09/11/kubernetes-tls-config/"};Fluid.utils.loadComments("#disqus_thread",(function(){var e=document,t=e.createElement("script");t.src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}))</script><noscript>Please enable JavaScript to view the comments</noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div class="toc-body" id="toc-body"></div></div></div></div></div><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div></main><footer class="text-center mt-5 py-3"><div class="footer-content"><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></footer><script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css"><script>NProgress.configure({showSpinner:!1,trickleSpeed:200}),NProgress.start(),window.addEventListener("load",(function(){NProgress.done()}))</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script><script src="/js/events.js"></script><script src="/js/plugins.js"></script><script src="/js/img-lazyload.js"></script><script src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script><script src="/js/local-search.js"></script><script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js"></script><script>!function(t,i){(0,Fluid.plugins.typing)(i.getElementById("subtitle").title)}(window,document)</script><script defer>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-179552593-1","auto"),ga("send","pageview")</script><script async src="https://www.google-analytics.com/analytics.js"></script><script src="/js/boot.js"></script></body></html>

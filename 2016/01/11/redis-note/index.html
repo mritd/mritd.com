@@ -1,0 +1,416 @@
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;dark&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Redis学习笔记"><meta name="author" content="bleem"><meta name="keywords" content="Redis"><title>Redis学习笔记 - bleem</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/atom-one-dark-reasonable.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script id="fluid-configs">var Fluid=window.Fluid||{},CONFIG={hostname:"mritd.com",root:"/",version:"1.8.11",typing:{enable:!0,typeSpeed:80,cursorChar:"_",loop:!1},anchorjs:{enable:!0,element:"h1,h2,h3,h4,h5,h6",placement:"right",visible:"hover",icon:"❡"},progressbar:{enable:!0,height_px:3,color:"#29d",options:{showSpinner:!1,trickleSpeed:200}},copy_btn:!0,image_zoom:{enable:!0,img_url_replace:["",""]},toc:{enable:!0,headingSelector:"h1,h2,h3,h4,h5,h6",collapseDepth:3},lazyload:{enable:!0,loading_img:"/img/loading.gif",onlypost:!1,offset_factor:2},web_analytics:{enable:!0,baidu:null,google:"UA-179552593-1",gtag:null,tencent:{sid:null,cid:null},woyaola:null,cnzz:null,leancloud:{app_id:null,app_key:null,server_url:null}},search_path:"/local-search.xml"}</script><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"><a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"><a class="nav-link" target="_self">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner" id="banner" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="page-header text-center fade-in-up"><span class="h2" id="subtitle" title="Redis学习笔记"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2016-01-11 15:11" pubdate>2016年1月11日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 8.2k 字 </span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 111 分钟</span></div></div></div></div></div></header><main><div class="container-fluid nopadding-x"><div class="row nomargin-x"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-x-md"><div class="container nopadding-x-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto"><h1 style="display:none">Redis学习笔记</h1><div class="markdown-body"><p><img src="https://cdn.oss.link/markdown/hexo_redis_logo1.jpg" srcset="/img/loading.gif" lazyload alt="hexo_redis_logo"></p><h2 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h2><blockquote><p>redis是一个key-value存储系统。和Memcached类似，它支持存储的value类型相对更多，包括string(字符串)、list(链表)、set(集合)、zset(有序集合)和hashs（哈希类型）。这些数据类型都支持push/pop、add/remove及取交集并集和差集及更丰富的操作，而且这些操作都是原子性的。在此基础上，redis支持各种不同方式的排序。与memcached一样，为了保证效率，数据都是缓存在内存中。</p></blockquote><blockquote><p>redis会周期性的把更新的数据写入磁盘或者把修改操作写入追加的记录文件，并且在此基础上实现了master-slave(主从)同步。Redis 是一个高性能的key-value数据库。 redis的出现，很大程度补偿了memcached这类key/value存储的不足，在部 分场合可以对关系数据库起到很好的补充作用。它提供了Python，Ruby，Erlang，PHP客户端，使用很方便。</p></blockquote><h2 id="二、Redis功能"><a href="#二、Redis功能" class="headerlink" title="二、Redis功能"></a>二、Redis功能</h2><ol><li><p>Redis 的Sharding</p><blockquote><p>Redis 支持客户端的Sharding 功能，通过一致性hash 算法实现，当前Redis 不支持故障冗余，在集群中不能在线增加或删除Redis。</p></blockquote></li><li><p>Redis 的master/slave 复制</p><blockquote><p>一个master 支持多个slave；Slave 可以接受其他slave 的连接来替代他连接master；复制在master 是非阻塞的，而在slave 是阻塞的；复制被利用来提供可扩展性，在slave 端只提供查询功能及数据的冗余。</p></blockquote></li><li><p>Redis 的Virtual Memory 功能(VM)</p><blockquote><p>vm 是Redis2.0 新增的一个非常稳定和可靠的功能，vm 的引入是为了提高Redis 的性能，也就是把很少使用的value 保存到disk，而key 保存在内存中。实际上就是如果你有10w 的keys 在内存中，而只有仅仅10%左右的key 经常使用，那么Redis 可以通过开启VM 尝试将不经常使用的Value 转换到disk 上保存。</p></blockquote></li><li><p>Redis 的附加档案（AOF）功能</p><blockquote><p>Redis 通过配置的策略将数据集保存到aof 中，当Redis 挂掉后能够通过aof 恢复到挂掉前的状态</p></blockquote></li></ol><h2 id="三、Redis-数据类型"><a href="#三、Redis-数据类型" class="headerlink" title="三、Redis 数据类型"></a>三、Redis 数据类型</h2><ul><li><p>字符串(Strings)</p><blockquote><p>字符串是一种最基本的Redis值类型。<strong>Redis字符串是二进制安全的，这意味着一个Redis字符串能包含任意类型的数据</strong>，例如： 一张JPEG格式的图片或者一个序列化的Ruby对象。<strong>一个字符串类型的值最多能存储512M字节的内容。</strong>与Memcached一样，一个key对应一个value，其上支持的操作与Memcached的操作类似；但它的功能更丰富。</p></blockquote></li><li><p>列表(Lists)</p><blockquote><p>Redis列表是简单的字符串列表，<strong>按照插入顺序排序</strong>。 你可以添加一个元素到列表的头部（左边）或者尾部（右边）。Lists是一个链表结构，主要功能是push、pop、获取一个范围的所有值等等。操作中<strong>key理解为链表的名字</strong>。LPUSH命令插入一个新元素到列表头部，而RPUSH命令 插入一个新元素到列表的尾部。<strong>当对一个空key执行其中某个命令时，将会创建一个新表</strong>。 类似的，<strong>如果一个操作要清空列表，那么key会从对应的key空间删除</strong>。这是个非常便利的语义，因为如果使用一个不存在的key作为参数，所有的列表命令都会像在对一个空表操作一样。</p></blockquote></li><li><p>集合(Sets)</p><blockquote><p>Redis集合是一个无序的字符串合集。你可以以 <strong>O(1)</strong> 的时间复杂度完成 <strong>添加、删除以及测试元素是否存在</strong> 的操作。Redis集合有着 <strong>不允许相同成员存在</strong> 的优秀特性。向集合中多次添加同一元素，在集合中最终只会存在一个此元素。实际上这就意味着，在添加元素前，你并不需要事先进行检验此元素是否已经存在的操作。Redis的集合支持集合运算，<strong>可以进行 合集、交集、差集运算。一个集合最多可以包含232-1个元素（4294967295，每个集合超过40亿个元素）。</strong></p></blockquote></li><li><p>有序集合(Sorted sets)</p><blockquote><p>Redis有序集合和Redis集合类似，是不包含 相同字符串的合集；他在set的基础上 <strong>增加了一个顺序属性</strong>，这一属性 <strong>在添加修改元素的时候可以指定，每次指定后自动重新按新的值调整顺序</strong>。可以理解了有两列的mysql表，一列存value，一列存顺序。操作中key理解为 Sorted sets 的名字。</p></blockquote></li><li><p>哈希(Hashes)</p><blockquote><p>Redis hash是一个string类型的field和value的映射表.一个key可对应多个field，一个field对应一个value。将一个对象存储为hash类型，较于每个字段都存储成string类型更能节省内存。新建一个hash对象时开始是用zipmap(又称为small hash)来存储的。这个zipmap其实并不是hash table，但是zipmap相比正常的hash实现可以节省不少hash本身需要的一些元数据存储开销。尽管zipmap的添加，删除，查找都是O(n)，但是由于一般对象的field数量都不太多。所以使用zipmap也是很快的,也就是说添加删除平均还是O(1)。如果field或者value的大小超出一定限制后，Redis会在内部自动将zipmap替换成正常的hash实现。</p></blockquote></li><li><p>Hashes相关</p></li></ul><blockquote><p>Hashes 相关方法如下</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">hset</span><span class="hljs-params">(key, field, value)</span></span>                             向名称为key的hash中添加元素field&lt;—&gt;value
+<span class="hljs-function"><span class="hljs-title">hget</span><span class="hljs-params">(key, field)</span></span>                                    返回名称为key的hash中field对应的value
+<span class="hljs-function"><span class="hljs-title">hmget</span><span class="hljs-params">(key, field1,...,field N)</span></span>                      返回名称为key的hash中field i对应的value
+<span class="hljs-function"><span class="hljs-title">hmset</span><span class="hljs-params">(key, field1, value1,...,field N, value N)</span></span>     向名称为key的hash中添加元素field i&lt;—&gt;value i
+<span class="hljs-function"><span class="hljs-title">hincrby</span><span class="hljs-params">(key, field, integer)</span></span>                        将名称为key的hash中field的value增加integer
+<span class="hljs-function"><span class="hljs-title">hexists</span><span class="hljs-params">(key, field)</span></span>                                 名称为key的hash中是否存在键为field的域
+<span class="hljs-function"><span class="hljs-title">hdel</span><span class="hljs-params">(key, field)</span></span>                                    删除名称为key的hash中键为field的域
+<span class="hljs-function"><span class="hljs-title">hlen</span><span class="hljs-params">(key)</span></span>                                           返回名称为key的hash中元素个数
+<span class="hljs-function"><span class="hljs-title">hkeys</span><span class="hljs-params">(key)</span></span>                                          返回名称为key的hash中所有键
+<span class="hljs-function"><span class="hljs-title">hvals</span><span class="hljs-params">(key)</span></span>                                          返回名称为key的hash中所有键对应的value
+<span class="hljs-function"><span class="hljs-title">hgetall</span><span class="hljs-params">(key)</span></span>                                        返回名称为key的hash中所有的键（field）及其对应的value</code></pre></div><blockquote><p>示例操作如下</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs sh">redis&gt; HMSET user:1000 username antirez password P1pp0 age 34
+OK
+redis&gt; HGETALL user:1000
+1) <span class="hljs-string">&quot;username&quot;</span>
+2) <span class="hljs-string">&quot;antirez&quot;</span>
+3) <span class="hljs-string">&quot;password&quot;</span>
+4) <span class="hljs-string">&quot;P1pp0&quot;</span>
+5) <span class="hljs-string">&quot;age&quot;</span>
+6) <span class="hljs-string">&quot;34&quot;</span>
+redis&gt; HSET user:1000 password 12345
+(<span class="hljs-built_in">integer</span>) 0
+redis&gt; HGETALL user:1000
+1) <span class="hljs-string">&quot;username&quot;</span>
+2) <span class="hljs-string">&quot;antirez&quot;</span>
+3) <span class="hljs-string">&quot;password&quot;</span>
+4) <span class="hljs-string">&quot;12345&quot;</span>
+5) <span class="hljs-string">&quot;age&quot;</span>
+6) <span class="hljs-string">&quot;34&quot;</span>
+redis&gt;</code></pre></div><h2 id="四、Redis-数据类型的常用操作"><a href="#四、Redis-数据类型的常用操作" class="headerlink" title="四、Redis 数据类型的常用操作"></a>四、Redis 数据类型的常用操作</h2><blockquote><p>由于命令太多，所以不一一列举，具体参考 <a target="_blank" rel="noopener" href="http://redisdoc.com/">Redis命令参考</a>，文档已进行离线缓存 <a target="_blank" rel="noopener" href="http://pan.baidu.com/s/1ntPny6d">Redis命令手册下载</a></p></blockquote><h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><h4 id="SET"><a href="#SET" class="headerlink" title="SET"></a>SET</h4><blockquote><p>将字符串值 <code>value</code> 关联到 <code>key</code> (设置值)。<br>如果 key 已经持有其他值，<code>SET</code> 就覆写旧值，无视类型。<br>对于某个原本带有生存时间（TTL）的键来说，当 <code>SET</code> 命令成功在这个键上执行时，这个键原有的 TTL 将被清除。</p></blockquote><p><strong>可选参数</strong></p><ul><li>EX<br>格式为 <code>EX second</code>；设置键的过期时间为 second 秒。 SET key value EX second 效果等同于 SETEX key second value 。</li><li>PX<br>格式为 <code>PX millisecond</code>；设置键的过期时间为 millisecond 毫秒。 SET key value PX millisecond 效果等同于 PSETEX key millisecond value 。</li><li>NX<br>只在键不存在时，才对键进行设置操作。 SET key value NX 效果等同于 SETNX key value 。</li><li>XX<br>只在键已经存在时，才对键进行设置操作。</li></ul><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SET KEY VALUE [OPTION] [OPTION_VALUE]</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SET a 10             <span class="hljs-comment"># 设置 key a value 10</span>
+SET a 10 EX 10       <span class="hljs-comment"># 同上，但有效期为10秒，过期后再 get key 则返回nil</span>
+SET a 10 PX 10000    <span class="hljs-comment"># 同上，有效期为10000毫秒</span>
+SET a 10 NX          <span class="hljs-comment"># 仅当 a 不存在时才进行设置，否则返回错误</span>
+SET a 10 XX          <span class="hljs-comment"># 仅当 a 存在时进行设置</span></code></pre></div><h4 id="GET"><a href="#GET" class="headerlink" title="GET"></a>GET</h4><blockquote><p>返回 <code>key</code> 所关联的字符串值。(获取值)<br>如果 <code>key</code> 不存在那么返回特殊值 <code>nil</code>。<br>假如 <code>key</code> 储存的值不是字符串类型，返回一个错误，因为 <code>GET</code> 只能用于处理字符串值。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">GET KEY</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SET a 10         <span class="hljs-comment"># 先设置一个值</span>
+GET a            <span class="hljs-comment"># 获取 a 的值，此时 a 必须为String，否则返回错误</span>
+GET b            <span class="hljs-comment"># 尝试获取一个不存在的值时 返回nil</span></code></pre></div><h4 id="MSET"><a href="#MSET" class="headerlink" title="MSET"></a>MSET</h4><blockquote><p>同时设置一个或多个 <code>key-value</code> 对。<br>如果某个给定 <code>key</code> 已经存在，那么 <code>MSET</code> 会用新值覆盖原来的旧值，如果这不是你所希望的效果，请考虑使用 <code>MSETNX</code> 命令：它只会在所有给定 <code>key</code> 都不存在的情况下进行设置操作。<br><strong><code>MSET</code> 是一个原子性(atomic)操作，所有给定 <code>key</code> 都会在同一时间内被设置，某些给定 <code>key</code> 被更新而另一些给定 <code>key</code> 没有改变的情况，不可能发生。</strong></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">MSET KEY1 VALUE1 KEY2 VALUE2 ...</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">MSET a 10 b 11 c 12       <span class="hljs-comment"># 同时设置 a、b、c的值，要么全部成功要么全部失败</span></code></pre></div><h4 id="MGET"><a href="#MGET" class="headerlink" title="MGET"></a>MGET</h4><blockquote><p>返回所有(一个或多个)给定 <code>key</code> 的值。<br>如果给定的 <code>key</code> 里面，**有某个 <code>key</code> 不存在，那么这个 <code>key</code> 返回特殊值 <code>nil</code>**。因此，该命令永不失败。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">MGET KEY1 KEY2 KEY3 ...</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; MSET a 10 b 11 c 12
+OK
+localhost:6379&gt; MGET a b c d              <span class="hljs-comment"># d 不存在 则返回 nil</span>
+1) <span class="hljs-string">&quot;10&quot;</span>
+2) <span class="hljs-string">&quot;11&quot;</span>
+3) <span class="hljs-string">&quot;12&quot;</span>
+4) (nil)
+localhost:6379&gt;</code></pre></div><h4 id="SETRANGE"><a href="#SETRANGE" class="headerlink" title="SETRANGE"></a>SETRANGE</h4><blockquote><p>用 <code>value</code> 参数覆写(overwrite)给定 <code>key</code> 所储存的字符串值，从偏移量 <code>offset</code> 开始。不存在的 <code>key</code> 当作空白字符串处理。<strong>可以理解为对指定位置字符串覆盖</strong><br><code>SETRANGE</code> 命令会确保字符串足够长以便将 <code>value</code> 设置在指定的偏移量上，<strong>如果给定 <code>key</code> 原来储存的字符串长度比偏移量小(比如字符串只有5个字符长，但你设置的 <code>offset</code> 是10)，那么原字符和偏移量之间的空白将用零字节<code>(zerobytes,&quot;\x00&quot;)</code>来填充。</strong><br>注意你能使用的最大偏移量是 2^29-1(536870911) ，因为 Redis 字符串的大小被限制在 512 兆(megabytes)以内。如果你需要使用比这更大的空间，你可以使用多个 key 。</p><p>当生成一个很长的字符串时，Redis 需要分配内存空间，该操作有时候可能会造成服务器阻塞(block)。在2010年的Macbook Pro上，设置偏移量为 536870911(512MB 内存分配)，耗费约 300 毫秒，设置偏移量为 134217728(128MB 内存分配)，耗费约 80 毫秒，设置偏移量 33554432(32MB 内存分配)，耗费约 30 毫秒，设置偏移量为 8388608(8MB 内存分配)，耗费约 8 毫秒。<strong>注意若首次内存分配成功之后，再对同一个 key 调用 SETRANGE 操作，无须再重新内存。</strong></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SETRANGE KEY STR_VALUE</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SET a <span class="hljs-string">&quot;123456789&quot;</span>
+OK
+localhost:6379&gt; SETRANGE a 5 <span class="hljs-string">&quot;XX&quot;</span>
+(<span class="hljs-built_in">integer</span>) 9
+localhost:6379&gt; GET a
+<span class="hljs-string">&quot;12345XX89&quot;</span>
+localhost:6379&gt; SETRANGE a 5 <span class="hljs-string">&quot;XXXXXXXXXXXXXX&quot;</span>     <span class="hljs-comment"># 超过原有长度自动拼接</span>
+(<span class="hljs-built_in">integer</span>) 19
+localhost:6379&gt; GET a
+<span class="hljs-string">&quot;12345XXXXXXXXXXXXXX&quot;</span>
+localhost:6379&gt; SETRANGE a 7 <span class="hljs-string">&quot;XXXX&quot;</span>               <span class="hljs-comment"># 不够的话自动用 \x00 占位</span>
+(<span class="hljs-built_in">integer</span>) 11
+localhost:6379&gt; GET a
+<span class="hljs-string">&quot;123\x00\x00\x00\x00XXXX&quot;</span></code></pre></div><h4 id="GETRANGE"><a href="#GETRANGE" class="headerlink" title="GETRANGE"></a>GETRANGE</h4><blockquote><p>返回 <code>key</code> 中字符串值的子字符串，字符串的截取范围由 <code>start</code> 和 <code>end</code> 两个偏移量决定(包括 start 和 end 在内)。负数偏移量表示从字符串最后开始计数， -1 表示最后一个字符， -2 表示倒数第二个，以此类推。<code>GETRANGE</code> 通过保证子字符串的值域(range)不超过实际字符串的值域来处理超出范围的值域请求。</p><p><strong>在 &lt;= 2.0 的版本里，GETRANGE 被叫作 SUBSTR。</strong></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">GETRANGE KEY START_INDEX END_INDEX</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SET a <span class="hljs-string">&quot;test GETRANGE&quot;</span>
+OK
+localhost:6379&gt; GETRANGE a 0 3          <span class="hljs-comment"># 获取0~3位置字符</span>
+<span class="hljs-string">&quot;test&quot;</span>
+localhost:6379&gt; GETRANGE a 0 100        <span class="hljs-comment"># 超过长度则表示获取全部</span>
+<span class="hljs-string">&quot;test GETRANGE&quot;</span>
+localhost:6379&gt; GETRANGE a -3 -1        <span class="hljs-comment"># 获取只能从左到右获取</span>
+<span class="hljs-string">&quot;NGE&quot;</span>
+localhost:6379&gt; GETRANGE a -1 -3        <span class="hljs-comment"># 回绕操作将返回空串</span>
+<span class="hljs-string">&quot;&quot;</span>
+localhost:6379&gt; GETRANGE a 0 -1         <span class="hljs-comment"># 正确的获取全部字符串</span>
+<span class="hljs-string">&quot;test GETRANGE&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="APPEND"><a href="#APPEND" class="headerlink" title="APPEND"></a>APPEND</h4><blockquote><p>如果 <code>key</code> 已经存在并且是一个字符串， <code>APPEND</code> 命令将 <code>value</code> 追加到 <code>key</code> 原来的值的末尾。<strong>如果 <code>key</code> 不存在，<code>APPEND</code> 就简单地将给定 key 设为 <code>value</code> ，就像执行 <code>SET key value</code> 一样。</strong></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">APPEND KEY STRING_VALUE</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; EXISTS b                      <span class="hljs-comment"># b 不存在</span>
+(<span class="hljs-built_in">integer</span>) 0
+localhost:6379&gt; APPEND b <span class="hljs-string">&quot;test not exists&quot;</span>    <span class="hljs-comment"># 此时进行 APPEND 操作等同于 SET</span>
+(<span class="hljs-built_in">integer</span>) 15
+localhost:6379&gt; GET b                         
+<span class="hljs-string">&quot;test not exists&quot;</span>
+localhost:6379&gt; APPEND b <span class="hljs-string">&quot;XXXXXXX&quot;</span>            <span class="hljs-comment"># 拼接字符串</span>
+(<span class="hljs-built_in">integer</span>) 22
+localhost:6379&gt; GET b
+<span class="hljs-string">&quot;test not existsXXXXXXX&quot;</span>
+localhost:6379&gt;</code></pre></div><h3 id="List类型"><a href="#List类型" class="headerlink" title="List类型"></a>List类型</h3><blockquote><p>List类型是按照插入顺序排序的字符串链表。和普通链表一样，可以在其头部和尾部添加新的元素。<strong>插入时，如果该键不存在，将为该键创建一个新的链表。与此相反，如果链表中所有的元素均被移除，那么该键也将会被从数据库中删除</strong>。List中可以包含的<strong>最大元素数量是4294967295</strong>。</p><p>从元素插入和删除的效率来看，<strong>如果我们是在链表的两头插入或删除元素，这将会是非常高效的操作</strong>，即使链表中已经存储了百万条记录，该操作也可以在常量时间内完成。<strong>如果元素插入或删除操作是作用于链表中间，那将会是非常低效的</strong>。</p></blockquote><h4 id="RPUSH-LPUSH"><a href="#RPUSH-LPUSH" class="headerlink" title="RPUSH/LPUSH"></a>RPUSH/LPUSH</h4><blockquote><p>将一个或多个值放入 <code>List</code>中，<code>RPUSH</code> 新加入的元素将放在 <code>List</code> 链表尾部(右)，<code>LPUSH</code> 同理放在左边，<strong>如果对应的 <code>List</code> 的 <code>key</code> 不存在，将自动创建一个 <code>List</code>，并将值放入 <code>List</code> 中</strong>；<strong>当 <code>key</code> 存在，且不是 <code>List</code> 类型时，将返回错误</strong>。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">RPUSH/LPUSH KEY VALUE1 VALUE2 VALUE3    <span class="hljs-comment"># 同时放入多个值</span>
+RPUSH/LPUSH KEY VALUE                   <span class="hljs-comment"># 每次只放入一个值</span></code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; RPUSH list1 1 2 3 4
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt; LRANGE list1 0 -1       <span class="hljs-comment"># 获取List所有值</span>
+1) <span class="hljs-string">&quot;1&quot;</span>
+2) <span class="hljs-string">&quot;2&quot;</span>
+3) <span class="hljs-string">&quot;3&quot;</span>
+4) <span class="hljs-string">&quot;4&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="LLEN"><a href="#LLEN" class="headerlink" title="LLEN"></a>LLEN</h4><blockquote><p>返回指定 <code>List</code> 的长度，<strong>如果给定的 <code>KEY</code> 不存在则返回0，如果给定的 <code>KEY</code> 不是 <code>List</code> 类型将返回错误</strong>。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">LLEN KEY</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; LLEN list1
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt; LLEN L
+(<span class="hljs-built_in">integer</span>) 0
+localhost:6379&gt;</code></pre></div><h4 id="LRANGE"><a href="#LRANGE" class="headerlink" title="LRANGE"></a>LRANGE</h4><blockquote><p>返回指定返回的 <code>List</code> 的值，<strong>如果开始值大于 <code>List</code> 的长度，那么将返回空列表，如果结束值大于 <code>List</code> 长度，那么将示结束值为 <code>List</code> 最大长度</strong>。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">LRANGE KEY START END</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; LRANGE list1 0 3
+1) <span class="hljs-string">&quot;1&quot;</span>
+2) <span class="hljs-string">&quot;2&quot;</span>
+3) <span class="hljs-string">&quot;3&quot;</span>
+4) <span class="hljs-string">&quot;4&quot;</span>
+localhost:6379&gt; LRANGE list1 10 11
+(empty list or <span class="hljs-built_in">set</span>)
+localhost:6379&gt; LRANGE list1 0 1000
+1) <span class="hljs-string">&quot;1&quot;</span>
+2) <span class="hljs-string">&quot;2&quot;</span>
+3) <span class="hljs-string">&quot;3&quot;</span>
+4) <span class="hljs-string">&quot;4&quot;</span></code></pre></div><h4 id="LTRIM"><a href="#LTRIM" class="headerlink" title="LTRIM"></a>LTRIM</h4><blockquote><p>截取列表指定位置的元素，<strong>当Start值大于 <code>List</code> 长度时，将返回空列表；当End值大于 <code>List</code> 长度时，示End值为 <code>List</code> 长度</strong>。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">LTRIM KEY START END</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; RPUSH list 1 2 3 4 5 6 7 8 9 10
+(<span class="hljs-built_in">integer</span>) 10
+localhost:6379&gt; LTRIM list 1 9
+OK
+localhost:6379&gt; LRANGE list 0 -1
+1) <span class="hljs-string">&quot;2&quot;</span>
+2) <span class="hljs-string">&quot;3&quot;</span>
+3) <span class="hljs-string">&quot;4&quot;</span>
+4) <span class="hljs-string">&quot;5&quot;</span>
+5) <span class="hljs-string">&quot;6&quot;</span>
+6) <span class="hljs-string">&quot;7&quot;</span>
+7) <span class="hljs-string">&quot;8&quot;</span>
+8) <span class="hljs-string">&quot;9&quot;</span>
+9) <span class="hljs-string">&quot;10&quot;</span>
+localhost:6379&gt; LTRIM list 5 100
+OK
+localhost:6379&gt; LRANGE list 0 -1
+1) <span class="hljs-string">&quot;7&quot;</span>
+2) <span class="hljs-string">&quot;8&quot;</span>
+3) <span class="hljs-string">&quot;9&quot;</span>
+4) <span class="hljs-string">&quot;10&quot;</span>
+localhost:6379&gt; LTRIM list 50 100
+OK
+localhost:6379&gt; LRANGE list 0 -1
+(empty list or <span class="hljs-built_in">set</span>)
+localhost:6379&gt;</code></pre></div><h4 id="LINDEX"><a href="#LINDEX" class="headerlink" title="LINDEX"></a>LINDEX</h4><blockquote><p>获取指定位置的值，<strong>超出位置(不在 <code>List</code> 范围内)返回nil</strong>。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">LINDEX KEY INDEX</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; RPUSH list 1 2 3 4 5 6 7 8 9
+(<span class="hljs-built_in">integer</span>) 9
+localhost:6379&gt; LINDEX list 3
+<span class="hljs-string">&quot;4&quot;</span>
+localhost:6379&gt; LINDEX list 100
+(nil)
+localhost:6379&gt;</code></pre></div><h4 id="LREM"><a href="#LREM" class="headerlink" title="LREM"></a>LREM</h4><blockquote><p>移除列表中与指定值相等的元素，</p><p><strong>在最新版本 3.0.6测试，无论下面的 count等于多少，都会移除所有目标值，只是搜索方向问题，尚不清楚原因</strong></p></blockquote><ul><li>count &gt; 0 : 从表头开始向表尾搜索，移除与 value 相等的元素，数量为 count 。</li><li>count &lt; 0 : 从表尾开始向表头搜索，移除与 value 相等的元素，数量为 count 的绝对值。</li><li>count = 0 : 移除表中所有与 value 相等的值。</li></ul><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">LREM KEY COUNT VALUE</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; RPUSH list 0 0 xxx 0 xxx xxx 0 0 0 xxx 0
+(<span class="hljs-built_in">integer</span>) 11
+localhost:6379&gt; LRANGE list 0 -1
+ 1) <span class="hljs-string">&quot;0&quot;</span>
+ 2) <span class="hljs-string">&quot;0&quot;</span>
+ 3) <span class="hljs-string">&quot;xxx&quot;</span>
+ 4) <span class="hljs-string">&quot;0&quot;</span>
+ 5) <span class="hljs-string">&quot;xxx&quot;</span>
+ 6) <span class="hljs-string">&quot;xxx&quot;</span>
+ 7) <span class="hljs-string">&quot;0&quot;</span>
+ 8) <span class="hljs-string">&quot;0&quot;</span>
+ 9) <span class="hljs-string">&quot;0&quot;</span>
+10) <span class="hljs-string">&quot;xxx&quot;</span>
+11) <span class="hljs-string">&quot;0&quot;</span>
+localhost:6379&gt; LREM list 5 xxx
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt; LRANGE list 0 -1
+1) <span class="hljs-string">&quot;0&quot;</span>
+2) <span class="hljs-string">&quot;0&quot;</span>
+3) <span class="hljs-string">&quot;0&quot;</span>
+4) <span class="hljs-string">&quot;0&quot;</span>
+5) <span class="hljs-string">&quot;0&quot;</span>
+6) <span class="hljs-string">&quot;0&quot;</span>
+7) <span class="hljs-string">&quot;0&quot;</span>
+localhost:6379&gt; del list
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; RPUSH list 0 0 xxx 0 xxx xxx 0 0 0 xxx 0
+(<span class="hljs-built_in">integer</span>) 11
+localhost:6379&gt; LRANGE list 0 -1
+ 1) <span class="hljs-string">&quot;0&quot;</span>
+ 2) <span class="hljs-string">&quot;0&quot;</span>
+ 3) <span class="hljs-string">&quot;xxx&quot;</span>
+ 4) <span class="hljs-string">&quot;0&quot;</span>
+ 5) <span class="hljs-string">&quot;xxx&quot;</span>
+ 6) <span class="hljs-string">&quot;xxx&quot;</span>
+ 7) <span class="hljs-string">&quot;0&quot;</span>
+ 8) <span class="hljs-string">&quot;0&quot;</span>
+ 9) <span class="hljs-string">&quot;0&quot;</span>
+10) <span class="hljs-string">&quot;xxx&quot;</span>
+11) <span class="hljs-string">&quot;0&quot;</span>
+localhost:6379&gt; LREM list 6 <span class="hljs-string">&quot;xxx&quot;</span>
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt; LRANGE list 0 -1
+1) <span class="hljs-string">&quot;0&quot;</span>
+2) <span class="hljs-string">&quot;0&quot;</span>
+3) <span class="hljs-string">&quot;0&quot;</span>
+4) <span class="hljs-string">&quot;0&quot;</span>
+5) <span class="hljs-string">&quot;0&quot;</span>
+6) <span class="hljs-string">&quot;0&quot;</span>
+7) <span class="hljs-string">&quot;0&quot;</span>
+localhost:6379&gt; del list
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; RPUSH list 0 0 xxx 0 xxx xxx 0 0 0 xxx 0
+(<span class="hljs-built_in">integer</span>) 11
+localhost:6379&gt; LREM list -6 <span class="hljs-string">&quot;xxx&quot;</span>
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt; LRANGE list 0 -1
+1) <span class="hljs-string">&quot;0&quot;</span>
+2) <span class="hljs-string">&quot;0&quot;</span>
+3) <span class="hljs-string">&quot;0&quot;</span>
+4) <span class="hljs-string">&quot;0&quot;</span>
+5) <span class="hljs-string">&quot;0&quot;</span>
+6) <span class="hljs-string">&quot;0&quot;</span>
+7) <span class="hljs-string">&quot;0&quot;</span>
+localhost:6379&gt; del list
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; RPUSH list 0 0 xxx 0 xxx xxx 0 0 0 xxx 0
+(<span class="hljs-built_in">integer</span>) 11
+localhost:6379&gt; LREM list 0 <span class="hljs-string">&quot;xxx&quot;</span>
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt; del list
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; RPUSH list 0 0 xxx 0 xxx xxx 0 0 0 xxx 0
+(<span class="hljs-built_in">integer</span>) 11
+localhost:6379&gt;</code></pre></div><h4 id="LSET"><a href="#LSET" class="headerlink" title="LSET"></a>LSET</h4><blockquote><p>向指定位置设置值，<strong>列表 <code>KEY</code> 不存在将返回错误，坐标不对返回对应错误信息</strong>。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">LSET KEY INDEX VALUE</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; RPUSH list 1 1 1 1 1
+(<span class="hljs-built_in">integer</span>) 5
+localhost:6379&gt; LSET list 2 xxxx
+OK
+localhost:6379&gt; LRANGE list 0 -1
+1) <span class="hljs-string">&quot;1&quot;</span>
+2) <span class="hljs-string">&quot;1&quot;</span>
+3) <span class="hljs-string">&quot;xxxx&quot;</span>
+4) <span class="hljs-string">&quot;1&quot;</span>
+5) <span class="hljs-string">&quot;1&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="RPOPLPUSH-LPOPRPUSH"><a href="#RPOPLPUSH-LPOPRPUSH" class="headerlink" title="RPOPLPUSH/LPOPRPUSH"></a>RPOPLPUSH/LPOPRPUSH</h4><blockquote><p>简单地说用于倒腾两个链表，<strong>RPOPLPUSH 将 A 链表最右侧一个元素删除并返回，同时将其放入到 B 链表最左侧</strong>，LPOPRPUSH 同理；<strong>测试最新版本 3.0.6 已经移除</strong>。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">LPOPRPUSH/RPOPLPUSH KEY1 SOURCE KEY2</code></pre></div><h3 id="SET类型"><a href="#SET类型" class="headerlink" title="SET类型"></a>SET类型</h3><blockquote><p><code>SET</code> 是一个无序的字符串合集，可以以O(1) 的时间复杂度完成 添加，删除以及测试元素是否存在的操作；<code>SET</code> 中不允许相同成员存在，<strong>向集合中多次添加同一元素，在集合中最终只会存在一个此元素。</strong>它支持一些服务端的命令进行集合运算。 我们可以在很短的时间内完成合并(<code>union</code>),求交(<code>intersection</code>)， 找出不同元素的操作。</p></blockquote><h4 id="SADD"><a href="#SADD" class="headerlink" title="SADD"></a>SADD</h4><blockquote><p>将一个或多个 <code>member(value)</code> 元素加入到集合 <code>key</code> 当中，已经存在于集合的 <code>member</code> 元素将被忽略。假如 <code>key</code> 不存在，则创建一个只包含 <code>member</code> 元素作成员的集合。当 <code>key</code> 不是集合类型时，返回一个错误。</p><p><strong>在Redis2.4版本以前， SADD 只接受单个 member 值。</strong></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SADD KEY MEMBER [MEMBER...]</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SADD set1 1 2 3 4
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt; SMEMBERS set1
+1) <span class="hljs-string">&quot;1&quot;</span>
+2) <span class="hljs-string">&quot;2&quot;</span>
+3) <span class="hljs-string">&quot;3&quot;</span>
+4) <span class="hljs-string">&quot;4&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="SREM"><a href="#SREM" class="headerlink" title="SREM"></a>SREM</h4><blockquote><p>移除集合 <code>key</code> 中的一个或多个 <code>member</code> 元素，不存在的 <code>member</code> 元素会被忽略。当 <code>key</code> 不是集合类型，返回一个错误。</p><p><strong>在 Redis 2.4 版本以前， SREM 只接受单个 member 值。</strong></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SREM KEY MEMBER [MEMBER...]</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SREM set1 1 2
+(<span class="hljs-built_in">integer</span>) 2
+localhost:6379&gt; SMEMBERS set1
+1) <span class="hljs-string">&quot;3&quot;</span>
+2) <span class="hljs-string">&quot;4&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="SPOP"><a href="#SPOP" class="headerlink" title="SPOP"></a>SPOP</h4><blockquote><p><strong>移除并返回集合中的一个随机元素。</strong>如果只想获取一个随机元素，但不想该元素从集合中被移除的话，可以使用 <code>SRANDMEMBER</code> 命令。被移除的随机元素当 <code>key</code> 不存在或 <code>key</code> 是空集时，返回 <code>nil</code> 。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SPOP KEY</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SPOP set1
+<span class="hljs-string">&quot;3&quot;</span>
+localhost:6379&gt; SMEMBERS set1
+1) <span class="hljs-string">&quot;4&quot;</span>
+localhost:6379&gt; SPOP set2
+(nil)
+localhost:6379&gt;</code></pre></div><h4 id="SMOVE"><a href="#SMOVE" class="headerlink" title="SMOVE"></a>SMOVE</h4><blockquote><p>将 <code>member</code> 元素从 <code>source</code> 集合移动到 <code>destination</code> 集合；**<code>SMOVE</code> 是原子性操作。**<br>如果 <code>source</code> 集合不存在或不包含指定的 <code>member</code> 元素，则 <code>SMOVE</code> 命令不执行任何操作，仅返回 0 。否则， <code>member</code> 元素从 <code>source</code> 集合中被移除，并添加到 <code>destination</code> 集合中去。当 <code>destination</code> 集合已经包含 <code>member</code> 元素时， <code>SMOVE</code> 命令只是简单地将 <code>source</code> 集合中的 <code>member</code> 元素删除。当 <code>source</code> 或 <code>destination</code> 不是集合类型时，返回一个错误。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SMOVE SOURCE DESTINATION MEMBER</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SADD set1 1 2 3 4
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt; SADD set2 5 6 7 8
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt; SMOVE set1 set2 4
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; SMEMBERS set2
+1) <span class="hljs-string">&quot;4&quot;</span>
+2) <span class="hljs-string">&quot;5&quot;</span>
+3) <span class="hljs-string">&quot;6&quot;</span>
+4) <span class="hljs-string">&quot;7&quot;</span>
+5) <span class="hljs-string">&quot;8&quot;</span>
+localhost:6379&gt; SMEMBERS set1
+1) <span class="hljs-string">&quot;1&quot;</span>
+2) <span class="hljs-string">&quot;2&quot;</span>
+3) <span class="hljs-string">&quot;3&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="SCARD"><a href="#SCARD" class="headerlink" title="SCARD"></a>SCARD</h4><blockquote><p>返回指定结合的元素数量</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SCARD KEY</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SCARD set2
+(<span class="hljs-built_in">integer</span>) 5
+localhost:6379&gt;</code></pre></div><h4 id="SISMEMBER"><a href="#SISMEMBER" class="headerlink" title="SISMEMBER"></a>SISMEMBER</h4><blockquote><p>判断指定元素是否存在与集合中；如果 <code>member</code> 元素是集合的成员，返回 1 。如果 <code>member</code> 元素不是集合的成员，或 <code>key</code> 不存在，返回 0 。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SISMEMBER KEY</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SISMEMBER set2 5
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; SISMEMBER set2 999
+(<span class="hljs-built_in">integer</span>) 0
+localhost:6379&gt;</code></pre></div><h4 id="SINTER"><a href="#SINTER" class="headerlink" title="SINTER"></a>SINTER</h4><blockquote><p>返回多个集合的交集，<strong>不存在的KEY将视为空集，与空集进行取交集操作将返回空集。</strong></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SINTER KEY1 KEY2 ...</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt;
+localhost:6379&gt; SADD set1 1 2 3
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SADD set2 2 3 4
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SINTER set1 set2
+1) <span class="hljs-string">&quot;2&quot;</span>
+2) <span class="hljs-string">&quot;3&quot;</span>
+localhost:6379&gt; SINTER set1 set44444
+(empty list or <span class="hljs-built_in">set</span>)
+localhost:6379&gt; SADD set3 2 5 6
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SINTER set1 set2 set3
+1) <span class="hljs-string">&quot;2&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="SINTERSTORE"><a href="#SINTERSTORE" class="headerlink" title="SINTERSTORE"></a>SINTERSTORE</h4><blockquote><p>基本同上，但是 <code>SINTERSTORE</code>可以将取出的交集保存到指定集合中。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SINTERSTORE DESTINATION SOURCE1 SOURCE2 ...</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SADD SET1 1 2 3
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SADD SET2 2 3 4
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SADD SET3 3 4 5
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SINTERSTORE SET4 SET1 SET2 SET3
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; SMEMBERS SET4
+1) <span class="hljs-string">&quot;3&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="SUNION"><a href="#SUNION" class="headerlink" title="SUNION"></a>SUNION</h4><blockquote><p>取指定集合的并集</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SUNION KEY1 KEY2 ...</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SADD SET1 1 2 3
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SADD SET2 2 3 4
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SADD SET3 3 4 5
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SUNION SET1 SET2 SET3
+1) <span class="hljs-string">&quot;1&quot;</span>
+2) <span class="hljs-string">&quot;2&quot;</span>
+3) <span class="hljs-string">&quot;3&quot;</span>
+4) <span class="hljs-string">&quot;4&quot;</span>
+5) <span class="hljs-string">&quot;5&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="SUNIONSTORE"><a href="#SUNIONSTORE" class="headerlink" title="SUNIONSTORE"></a>SUNIONSTORE</h4><blockquote><p>同 <code>SINTERSTORE</code>；不做阐述</p></blockquote><h4 id="SDIFF"><a href="#SDIFF" class="headerlink" title="SDIFF"></a>SDIFF</h4><blockquote><p>取指定集合的差集，同 <code>SINTER</code>、<code>SUNION</code></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">SDIFF KEY1 KEY2 ...</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; SADD SET1 1 2 3
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SADD SET2 2 3 4
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SADD SET3 3 4 5
+(<span class="hljs-built_in">integer</span>) 3
+localhost:6379&gt; SDIFF SET1 SET2 SET3
+1) <span class="hljs-string">&quot;1&quot;</span>
+localhost:6379&gt;</code></pre></div><blockquote><p><strong>对于集合的 合集、差集、并集操作，中文API的解释是 <code>返回一个集合的全部成员</code>，我的理解是，以第一个集合为准，返回的总是这个结合依次与后续集合运算的结果，并忽略后面集合的元素；具体还是不算太理解……以后研究</strong></p></blockquote><h3 id="ZSET"><a href="#ZSET" class="headerlink" title="ZSET"></a>ZSET</h3><blockquote><p>和Set类型极为相似，它们都是字符串的集合，都不允许重复的成员出现在一个Set中。它们之间的主要差别是zset中的每一个成员都会有一个分数(score)与之关联，Redis正是通过分数来为集合中的成员进行从小到大的排序。然而需要额外指出的是，尽管zset中的成员必须是唯一的，但是分数(score)却是可以重复的。<br>在zset中添加、删除或更新一个成员都是非常快速的操作，其时间复杂度为集合中成员数量的对数。由于zset中的成员在集合中的位置是有序的，因此，即便是访问位于集合中部的成员也仍然是非常高效的。事实上，Redis所具有的这一特征在很多其它类型的数据库中是很难实现的，换句话说，在该点上要想达到和Redis同样的高效，在其它数据库中进行建模是非常困难的。</p></blockquote><h4 id="ZADD"><a href="#ZADD" class="headerlink" title="ZADD"></a>ZADD</h4><blockquote><p>将一个或多个 <code>member</code> 元素及其 <code>score</code> 值加入到有序集 key 当中。如果某个 <code>member</code> 已经是有序集的成员，那么更新这个 <code>member</code> 的 <code>score</code> 值，并通过重新插入这个 <code>member</code> 元素，来保证该 <code>member</code> 在正确的位置上，<strong>同时返回0</strong>。<code>score</code> 值可以是整数值或双精度浮点数。如果 <code>key</code> 不存在，则创建一个空的有序集并执行 <code>ZADD</code> 操作。当 <code>key</code> 存在但不是有序集类型时，返回一个错误。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">ZADD KEY SCORE VALUE [SCORE VALUE ...]</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; ZADD ZSET1 1 <span class="hljs-string">&quot;TEST1&quot;</span>
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; ZADD ZSET1 2 <span class="hljs-string">&quot;TEST2&quot;</span> 3 <span class="hljs-string">&quot;TEST3&quot;</span>
+(<span class="hljs-built_in">integer</span>) 2
+localhost:6379&gt; ZRANGE ZSET1 0 -1 WITHSCORES
+1) <span class="hljs-string">&quot;TEST1&quot;</span>
+2) <span class="hljs-string">&quot;1&quot;</span>
+3) <span class="hljs-string">&quot;TEST2&quot;</span>
+4) <span class="hljs-string">&quot;2&quot;</span>
+5) <span class="hljs-string">&quot;TEST3&quot;</span>
+6) <span class="hljs-string">&quot;3&quot;</span>
+localhost:6379&gt; ZADD ZSET1 1 <span class="hljs-string">&quot;TEST10000&quot;</span>
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; ZADD ZSET1 1 <span class="hljs-string">&quot;TEST10000&quot;</span>
+(<span class="hljs-built_in">integer</span>) 0
+localhost:6379&gt;</code></pre></div><h4 id="ZCARD"><a href="#ZCARD" class="headerlink" title="ZCARD"></a>ZCARD</h4><blockquote><p>返回集合的长度</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">ZCARD KEY</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; ZCARD ZSET1
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt;</code></pre></div><h4 id="ZCOUNT"><a href="#ZCOUNT" class="headerlink" title="ZCOUNT"></a>ZCOUNT</h4><blockquote><p>返回指定 <code>SCORE</code> 之间的元素数量</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">ZCOUNT KEY MIN MAX</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; ZCOUNT ZSET1 1 3
+(<span class="hljs-built_in">integer</span>) 4
+localhost:6379&gt;</code></pre></div><h4 id="ZSCORE"><a href="#ZSCORE" class="headerlink" title="ZSCORE"></a>ZSCORE</h4><blockquote><p>查看指定成员的 <code>SCORE</code></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">ZSCORE KEY VALUE</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; ZSCORE ZSET1 <span class="hljs-string">&quot;TEST2&quot;</span>
+<span class="hljs-string">&quot;2&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="ZINCRBY"><a href="#ZINCRBY" class="headerlink" title="ZINCRBY"></a>ZINCRBY</h4><blockquote><p>对集合中指定 <code>VALUE</code> 的 <code>SROCE</code> 加上指定值；当集合 <code>KEY</code> 不存在时，相当于 <code>ZADD</code>。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">ZINCRBY KEY INCREMENT VALUE</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; ZINCRBY ZSET1 -1 <span class="hljs-string">&quot;TEST3&quot;</span>
+<span class="hljs-string">&quot;2&quot;</span>
+localhost:6379&gt; ZSCORE ZSET1 <span class="hljs-string">&quot;TEST3&quot;</span>
+<span class="hljs-string">&quot;2&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="ZRANGE"><a href="#ZRANGE" class="headerlink" title="ZRANGE"></a>ZRANGE</h4><blockquote><p>返回集合内指定区间的元素，其中成员的位置按 score 值递增(从小到大)来排序。具有相同 <code>score</code> 值的成员按字典序( <code>lexicographical order</code> )来排列。如果需要成员按 <code>score</code> 值递减(从大到小)来排列，请使用 <code>ZREVRANGE</code> 命令。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">ZRANGE KEY START STOP [WITHSCORES]</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; ZADD ZSET1 1 <span class="hljs-string">&quot;TEST1&quot;</span> 2 <span class="hljs-string">&quot;TEST2&quot;</span> 3 <span class="hljs-string">&quot;TEST3&quot;</span> 4 <span class="hljs-string">&quot;TEST4&quot;</span> 5 <span class="hljs-string">&quot;TEST5&quot;</span>
+(<span class="hljs-built_in">integer</span>) 5
+localhost:6379&gt; ZRANGE ZSET1 0 -1
+1) <span class="hljs-string">&quot;TEST1&quot;</span>
+2) <span class="hljs-string">&quot;TEST2&quot;</span>
+3) <span class="hljs-string">&quot;TEST3&quot;</span>
+4) <span class="hljs-string">&quot;TEST4&quot;</span>
+5) <span class="hljs-string">&quot;TEST5&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="ZREVRANGE"><a href="#ZREVRANGE" class="headerlink" title="ZREVRANGE"></a>ZREVRANGE</h4><blockquote><p>同 <code>ZRANGE</code> 只不过 <code>SCORE</code> 从大到小排列，略过</p></blockquote><h4 id="ZRANGEBYSCORE"><a href="#ZRANGEBYSCORE" class="headerlink" title="ZRANGEBYSCORE"></a>ZRANGEBYSCORE</h4><blockquote><p>基本同 <code>ZRANGE</code> 一样，但是返回分数在 <code>min</code> 和 <code>max</code> 之间的所有成员满足表达式 <code>min &lt;= score &lt;= max</code> 的成员，其中返回的成员是按照其分数从低到高的顺序返回，<strong>如果成员具有相同的分数，则按成员的字典顺序返回。</strong></p><p><code>(</code> 表示小于，默认 包含 <code>min</code> 和 <code>max</code>；极限 <code>min</code> 和 <code>max</code> 可以用 <code>-inf</code> 和 <code>+inf</code> 表示</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">ZRANGEBYSCORE KEY [(]MIN [(]MAX [WITHSCORES]</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; ZADD ZSET1 1 <span class="hljs-string">&quot;TEST1&quot;</span> 2 <span class="hljs-string">&quot;TEST2&quot;</span> 3 <span class="hljs-string">&quot;TEST3&quot;</span> 4 <span class="hljs-string">&quot;TEST4&quot;</span> 5 <span class="hljs-string">&quot;TEST5&quot;</span> 6 <span class="hljs-string">&quot;TEST6&quot;</span>
+(<span class="hljs-built_in">integer</span>) 6
+localhost:6379&gt; ZRANGEBYSCORE ZSET1 (2 5 WITHSCORES
+1) <span class="hljs-string">&quot;TEST3&quot;</span>
+2) <span class="hljs-string">&quot;3&quot;</span>
+3) <span class="hljs-string">&quot;TEST4&quot;</span>
+4) <span class="hljs-string">&quot;4&quot;</span>
+5) <span class="hljs-string">&quot;TEST5&quot;</span>
+6) <span class="hljs-string">&quot;5&quot;</span>
+localhost:6379&gt; ZRANGEBYSCORE ZSET1 2 +INF WITHSCORES
+ 1) <span class="hljs-string">&quot;TEST2&quot;</span>
+ 2) <span class="hljs-string">&quot;2&quot;</span>
+ 3) <span class="hljs-string">&quot;TEST3&quot;</span>
+ 4) <span class="hljs-string">&quot;3&quot;</span>
+ 5) <span class="hljs-string">&quot;TEST4&quot;</span>
+ 6) <span class="hljs-string">&quot;4&quot;</span>
+ 7) <span class="hljs-string">&quot;TEST5&quot;</span>
+ 8) <span class="hljs-string">&quot;5&quot;</span>
+ 9) <span class="hljs-string">&quot;TEST6&quot;</span>
+10) <span class="hljs-string">&quot;6&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="ZRANK"><a href="#ZRANK" class="headerlink" title="ZRANK"></a>ZRANK</h4><blockquote><p>返回指定成员位置</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">ZRANK KEY VALUE</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; ZRANK ZSET1 <span class="hljs-string">&quot;TEST3&quot;</span>
+(<span class="hljs-built_in">integer</span>) 2
+localhost:6379&gt;</code></pre></div><h3 id="ZREM"><a href="#ZREM" class="headerlink" title="ZREM"></a>ZREM</h3><blockquote><p>删除指定元素</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">ZREM KEY VALUE</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; ZREM ZSET1 <span class="hljs-string">&quot;TEST5&quot;</span>
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; ZRANGE ZSET1 1 -1 WITHSCORES
+1) <span class="hljs-string">&quot;TEST2&quot;</span>
+2) <span class="hljs-string">&quot;2&quot;</span>
+3) <span class="hljs-string">&quot;TEST3&quot;</span>
+4) <span class="hljs-string">&quot;3&quot;</span>
+5) <span class="hljs-string">&quot;TEST4&quot;</span>
+6) <span class="hljs-string">&quot;4&quot;</span>
+7) <span class="hljs-string">&quot;TEST6&quot;</span>
+8) <span class="hljs-string">&quot;6&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="ZSCORE-1"><a href="#ZSCORE-1" class="headerlink" title="ZSCORE"></a>ZSCORE</h4><blockquote><p>获取指定元素的 分数，如果该成员存在，以字符串的形式返回其分数，否则返回nil。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">ZSCORE KEY VALUE</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; ZSCORE ZSET1 <span class="hljs-string">&quot;TEST2&quot;</span>
+<span class="hljs-string">&quot;2&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="ZREVRANGEBYSCORE"><a href="#ZREVRANGEBYSCORE" class="headerlink" title="ZREVRANGEBYSCORE"></a>ZREVRANGEBYSCORE</h4><blockquote><p>除了排序方式是基于从高到低的分数排序之外，其它功能和参数含义均与 <code>ZRANGEBYSCORE</code> 相同。</p></blockquote><h4 id="ZREMRANGEBYRANK"><a href="#ZREMRANGEBYRANK" class="headerlink" title="ZREMRANGEBYRANK"></a>ZREMRANGEBYRANK</h4><blockquote><p>删除索引位置位于 <code>start</code> 和 <code>stop</code> 之间的成员，<code>start</code> 和 <code>stop</code> 都是 <code>0-based</code>，即 <code>0</code> 表示分数最低的成员，<code>-1</code> 表示最后一个成员，即分数最高的成员。</p></blockquote><h4 id="ZREMRANGEBYSCORE"><a href="#ZREMRANGEBYSCORE" class="headerlink" title="ZREMRANGEBYSCORE"></a>ZREMRANGEBYSCORE</h4><blockquote><p>删除分数在 <code>min</code> 和 <code>max</code> 之间的所有成员，即满足表达式 <code>min &lt;= score &lt;= max</code> 的所有成员。</p></blockquote><h3 id="Hashes类型"><a href="#Hashes类型" class="headerlink" title="Hashes类型"></a>Hashes类型</h3><blockquote><p>可以将 <code>Redis</code> 中的 <code>Hashes</code> 类型看成具有 <code>String Key</code> 和 <code>String Value</code> 的 <code>map</code> 容器。所以该类型非常适合于存储值对象的信息。如 <code>Username</code>、<code>Password</code> 和 <code>Age</code> 等。如果 <code>Hash</code> 中包含很少的字段，那么该类型的数据也将仅占用很少的磁盘空间。每一个 <code>Hash</code> 可以存储 <code>4294967295</code> 个键值对。</p></blockquote><h4 id="HSET"><a href="#HSET" class="headerlink" title="HSET"></a>HSET</h4><blockquote><p>将哈希表 key 中的域 field 的值设为 value 。如果 key 不存在，一个新的哈希表被创建并进行 HSET 操作。如果域 field 已经存在于哈希表中，旧值将被覆盖。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HSET KEY FIELD1 VALUE1</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HSET USER1 NAME <span class="hljs-string">&quot;ZAHNGSAN&quot;</span>
+(<span class="hljs-built_in">integer</span>) 1</code></pre></div><h4 id="HSETNX"><a href="#HSETNX" class="headerlink" title="HSETNX"></a>HSETNX</h4><blockquote><p>将哈希表 key 中的域 field 的值设置为 value ，当且仅当域 field 不存在。<strong>若域 field 已经存在，该操作无效。</strong>如果 key 不存在，一个新哈希表被创建并执行 HSETNX 命令。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HSETNX KEY FIELD VALUE</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HSETNX USER1 AGE 10
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; HGET USER1 AGE
+<span class="hljs-string">&quot;10&quot;</span>
+localhost:6379&gt; HSETNX USER1 NAME <span class="hljs-string">&quot;LISI&quot;</span>
+(<span class="hljs-built_in">integer</span>) 0
+localhost:6379&gt; HGET USER1 NAME
+<span class="hljs-string">&quot;ZAHNGSAN&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="HGET"><a href="#HGET" class="headerlink" title="HGET"></a>HGET</h4><blockquote><p>返回 key 中指定 field 的 value</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HGET KEY FIELD</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HGET USER1 NAME
+<span class="hljs-string">&quot;ZAHNGSAN&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="HGETALL"><a href="#HGETALL" class="headerlink" title="HGETALL"></a>HGETALL</h4><blockquote><p>获取指定 key 中全部 field 和 value</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HGETALL KEY</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HGETALL USER1
+1) <span class="hljs-string">&quot;NAME&quot;</span>
+2) <span class="hljs-string">&quot;ZAHNGSAN&quot;</span>
+3) <span class="hljs-string">&quot;AGE&quot;</span>
+4) <span class="hljs-string">&quot;10&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="HEXISTS"><a href="#HEXISTS" class="headerlink" title="HEXISTS"></a>HEXISTS</h4><blockquote><p>判断指定的 key 中的 field 是否存在，1表示存在，0表示 <strong>参数中的Field或Key不存在。</strong></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HEXISTS KEY FIELD</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HEXISTS USER1 NAME
+(<span class="hljs-built_in">integer</span>) 1
+localhost:6379&gt; HEXISTS USER1 ADDRESS
+(<span class="hljs-built_in">integer</span>) 0
+localhost:6379&gt; HEXISTS USER2 NAME
+(<span class="hljs-built_in">integer</span>) 0
+localhost:6379&gt;</code></pre></div><h4 id="HLEN"><a href="#HLEN" class="headerlink" title="HLEN"></a>HLEN</h4><blockquote><p>获取指定 key 中的 field 数量，当 key 不存在时，返回 0 。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HLEN KEY</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HLEN USER1
+(<span class="hljs-built_in">integer</span>) 2
+localhost:6379&gt;</code></pre></div><h4 id="HKEYS"><a href="#HKEYS" class="headerlink" title="HKEYS"></a>HKEYS</h4><blockquote><p>返回指定 key 中的 所有 field，当 key 不存在时，返回一个空表。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HKEYS KEY</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HKEYS USER1
+1) <span class="hljs-string">&quot;NAME&quot;</span>
+2) <span class="hljs-string">&quot;AGE&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="HVALS"><a href="#HVALS" class="headerlink" title="HVALS"></a>HVALS</h4><blockquote><p>返回指定 key 中所有 field 的 value，当 key 不存在时，返回一个空表。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HVALS KEY</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HVALS USER1
+1) <span class="hljs-string">&quot;ZAHNGSAN&quot;</span>
+2) <span class="hljs-string">&quot;10&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="HDEL"><a href="#HDEL" class="headerlink" title="HDEL"></a>HDEL</h4><blockquote><p>删除指定 key 中的一个或多个 field，返回被成功移除的域的数量，不包括被忽略的域。<strong>在Redis2.4以下的版本里， HDEL 每次只能删除单个域，如果你需要在一个原子时间内删除多个域，请将命令包含在 MULTI / EXEC 块内。</strong></p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HDEL KEY FIELD1 [FIELD2 ...]</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HDEL USER1 NAME AGE
+(<span class="hljs-built_in">integer</span>) 2
+localhost:6379&gt; HGETALL USER1
+1) <span class="hljs-string">&quot;ADDRESS&quot;</span>
+2) <span class="hljs-string">&quot;CHINA&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="HMSET"><a href="#HMSET" class="headerlink" title="HMSET"></a>HMSET</h4><blockquote><p>设置指定 key 的多个 field 对应的 value；此命令会覆盖哈希表中已存在的域。如果 key 不存在，一个空哈希表被创建并执行 HMSET 操作。</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HMSET KEY FIELD1 VALUE1 [FIELD2 VALUE2...]</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HMSET USER NAME <span class="hljs-string">&quot;ZHANGSAN&quot;</span> AGE 10 ADDRESS <span class="hljs-string">&quot;CHINA&quot;</span>
+OK
+localhost:6379&gt; HGETALL USER
+1) <span class="hljs-string">&quot;NAME&quot;</span>
+2) <span class="hljs-string">&quot;ZHANGSAN&quot;</span>
+3) <span class="hljs-string">&quot;AGE&quot;</span>
+4) <span class="hljs-string">&quot;10&quot;</span>
+5) <span class="hljs-string">&quot;ADDRESS&quot;</span>
+6) <span class="hljs-string">&quot;CHINA&quot;</span>
+localhost:6379&gt;</code></pre></div><h4 id="HMGET"><a href="#HMGET" class="headerlink" title="HMGET"></a>HMGET</h4><blockquote><p>获取指定 key 中的 多个 field 的 value</p></blockquote><p><strong>可接受的语法</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">HMGET KEY FIELD1 [FIELD2 ...]</code></pre></div><p><strong>代码示例</strong></p><div class="hljs code-wrapper"><pre><code class="hljs sh">localhost:6379&gt; HMGET USER NAME AGE
+1) <span class="hljs-string">&quot;ZHANGSAN&quot;</span>
+2) <span class="hljs-string">&quot;10&quot;</span>
+localhost:6379&gt;</code></pre></div></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/database/">Database</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/linux/">Linux</a> <a class="hover-with-bg" href="/tags/redis/">Redis</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext"><article class="post-prev col-6"><a href="/2016/01/11/redis3-compile-and-install/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">Redis3.0.6编译安装</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"><a href="/2016/01/08/dba-video-node/"><span class="hidden-mobile">DBA视频笔记</span> <span class="visible-mobile">下一篇</span> <i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments" lazyload><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2016/01/11/redis-note/",this.page.identifier="/2016/01/11/redis-note/"};Fluid.utils.loadComments("#disqus_thread",(function(){var e=document,t=e.createElement("script");t.src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}))</script><noscript>Please enable JavaScript to view the comments</noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div class="toc-body" id="toc-body"></div></div></div></div></div><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div></main><footer class="text-center mt-5 py-3"><div class="footer-content"><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></footer><script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css"><script>NProgress.configure({showSpinner:!1,trickleSpeed:200}),NProgress.start(),window.addEventListener("load",(function(){NProgress.done()}))</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script><script src="/js/events.js"></script><script src="/js/plugins.js"></script><script src="/js/img-lazyload.js"></script><script src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script><script src="/js/local-search.js"></script><script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js"></script><script>!function(t,i){(0,Fluid.plugins.typing)(i.getElementById("subtitle").title)}(window,document)</script><script defer>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-179552593-1","auto"),ga("send","pageview")</script><script async src="https://www.google-analytics.com/analytics.js"></script><script src="/js/boot.js"></script></body></html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;dark&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Raspberry Pi2 折腾"><meta name="author" content="bleem"><meta name="keywords" content="Linux,Raspberry Pi2"><title>Raspberry Pi2 折腾 - bleem</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/atom-one-dark-reasonable.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script id="fluid-configs">var Fluid=window.Fluid||{},CONFIG={hostname:"mritd.com",root:"/",version:"1.8.11",typing:{enable:!0,typeSpeed:80,cursorChar:"_",loop:!1},anchorjs:{enable:!0,element:"h1,h2,h3,h4,h5,h6",placement:"right",visible:"hover",icon:"❡"},progressbar:{enable:!0,height_px:3,color:"#29d",options:{showSpinner:!1,trickleSpeed:200}},copy_btn:!0,image_zoom:{enable:!0,img_url_replace:["",""]},toc:{enable:!0,headingSelector:"h1,h2,h3,h4,h5,h6",collapseDepth:3},lazyload:{enable:!0,loading_img:"/img/loading.gif",onlypost:!1,offset_factor:2},web_analytics:{enable:!0,baidu:null,google:"UA-179552593-1",gtag:null,tencent:{sid:null,cid:null},woyaola:null,cnzz:null,leancloud:{app_id:null,app_key:null,server_url:null}},search_path:"/local-search.xml"}</script><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"><a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"><a class="nav-link" target="_self">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner" id="banner" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="page-header text-center fade-in-up"><span class="h2" id="subtitle" title="Raspberry Pi2 折腾"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2015-12-31 15:11" pubdate>2015年12月31日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 4.5k 字 </span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 59 分钟</span></div></div></div></div></div></header><main><div class="container-fluid nopadding-x"><div class="row nomargin-x"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-x-md"><div class="container nopadding-x-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto"><h1 style="display:none">Raspberry Pi2 折腾</h1><div class="markdown-body"><h3 id="开启Root用户"><a href="#开启Root用户" class="headerlink" title="开启Root用户"></a>开启Root用户</h3><blockquote><p>初次使用pi用户登录后，默认密码为 raspberry，然后应该搞开Root用户，和Debian系列一样(我特么只用过基于Debian的，如Ubuntu，还没玩过纯血统Debian)，默认树莓派Root用户是未启用的，密码每次开机都变，执行以下命令开启Root用户，并更改密码:</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs sh">sudo passwd root
+<span class="hljs-comment"># 然后输两次密码，可以su过去了，不过这时你会发现</span>
+<span class="hljs-comment"># 仍然无法远程以root登录，修改如下配置中的 PermitRootLogin 参数即可</span>
+vi /etc/ssh/sshd_config
+<span class="hljs-comment"># 该参数码值如下</span>
+
+<span class="hljs-comment"># 允许root用户以任何认证方式登录</span>
+PermitRootLogin yes  
+
+<span class="hljs-comment"># 只允许root用public key认证方式登录</span>
+PermitRootLogin without-password      
+
+<span class="hljs-comment"># 不允许root远程登录</span>
+PermitRootLogin no</code></pre></div><hr><blockquote><p>以下相关设置大部分在root权限下进行</p></blockquote><hr><h3 id="解决vi方向-删除失灵"><a href="#解决vi方向-删除失灵" class="headerlink" title="解决vi方向/删除失灵"></a>解决vi方向/删除失灵</h3><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 直接编辑vim配置文件，注意先调整到要改的位置，再编辑</span>
+<span class="hljs-comment"># 因为一旦进入Insert模式 方向键是不好使的</span>
+vi /etc/vim/vimrc.tiny
+
+<span class="hljs-comment"># 修改后如下</span>
+<span class="hljs-built_in">set</span> nocompatible
+<span class="hljs-built_in">set</span> backspace=2</code></pre></div><h3 id="less语法高亮"><a href="#less语法高亮" class="headerlink" title="less语法高亮"></a>less语法高亮</h3><blockquote><ol><li>执行命令 <code>apt-get install source-highlight</code></li><li>加入环境变量(更详细参考 <a target="_blank" rel="noopener" href="http://leonyoung.sinaapp.com/blog/2013/10/syntax-highlight-in-less/">这里</a>)</li></ol></blockquote><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-built_in">export</span> LESSOPEN=<span class="hljs-string">&#x27;| /usr/share/source-highlight/src-hilite-lesspipe.sh %s&#x27;</span>
+<span class="hljs-built_in">export</span> LESS=<span class="hljs-string">&#x27; -R -N &#x27;</span></code></pre></div><h3 id="设置自动连接-WiFi"><a href="#设置自动连接-WiFi" class="headerlink" title="设置自动连接 WiFi"></a>设置自动连接 WiFi</h3><ul><li>编辑 /etc/network/interfaces 文件</li></ul><blockquote><p>一般只有一个无线网卡的话默认为 wlan0，修改 <code>iface wlan0 inet manual</code> 为 <code>iface wlan0 inet dhcp</code>，因为考虑到网络环境，频繁切换网络不适合设置静态IP，所以使用 DHCP 分配，样例配置文件如下:</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># Please note that this file is written to be used with dhcpcd.</span>
+<span class="hljs-comment"># For static IP, consult /etc/dhcpcd.conf and &#x27;man dhcpcd.conf&#x27;.</span>
+
+auto lo
+iface lo inet loopback
+
+<span class="hljs-comment"># 自动连接有线网卡</span>
+auto eth0
+allow-hotplug eth0
+iface eth0 inet manual
+
+<span class="hljs-comment"># 自动连接 无线网卡</span>
+auto wlan0
+<span class="hljs-comment"># 允许热插拔</span>
+allow-hotplug wlan0
+<span class="hljs-comment"># IP采用 DHCP 分配</span>
+iface wlan0 inet dhcp
+<span class="hljs-comment"># SSID 等相关设置(wifi密码啥的)</span>
+wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+
+auto wlan1
+allow-hotplug wlan1
+iface wlan1 inet dhcp
+wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf</code></pre></div><ul><li>编辑 /etc/wpa_supplicant/wpa_supplicant.conf 文件</li></ul><blockquote><p>该文件主要存储无线网络连接的相关设置，包括SSID、密码、加密方式等，配置样例如下</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs sh">ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network=&#123;
+  <span class="hljs-comment"># Wifi SSID</span>
+  ssid=<span class="hljs-string">&quot;mritd&quot;</span>
+  <span class="hljs-comment"># Wifi Password</span>
+  psk=<span class="hljs-string">&quot;12345678&quot;</span>
+  <span class="hljs-comment"># 网络优先级， network块可以有多个，也就是可以设置多个无线链接及密码，</span>
+  <span class="hljs-comment"># 当有多个Wifi都存在时，根据这个值选择优先链接，越大优先级越高，不可为负数</span>
+  priority=5
+&#125;</code></pre></div><p><strong>其中 network 部分最好使用工具生成，命令如下 <code>wpa_passphrase SSID PASSWD</code></strong></p><ul><li>启用网卡链接</li></ul><blockquote><p>执行 <code>ifup wlan0</code> 启动 wlan0 并连接，执行 <code>ifdown wlan0</code> 关闭并断开链接，如下图:<br><img src="http://7xoixd.com1.z0.glb.clouddn.com/raspberry_ifup_wlan0.png" srcset="/img/loading.gif" lazyload alt="ifup_wlan0"></p></blockquote><p>链接成功后可执行 <code>ifconfig</code> 或 <code>iwconfig</code>查看网络连接状况，如下图:<br><img src="http://7xoixd.com1.z0.glb.clouddn.com/raspberry_iwconfig_wlan0.png" srcset="/img/loading.gif" lazyload alt="iwconfig"></p><blockquote></blockquote><p><img src="http://7xoixd.com1.z0.glb.clouddn.com/raspberry_ifconfig_wlan0.png" srcset="/img/loading.gif" lazyload alt="ifconfig"></p><h3 id="关闭-WiFi-休眠"><a href="#关闭-WiFi-休眠" class="headerlink" title="关闭 WiFi 休眠"></a>关闭 WiFi 休眠</h3><p>默认情况下树莓派的 wifi 时会自动休眠的，使用如下命令关闭网卡休眠</p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 检测网卡休眠状态 1 代表会自动休眠 0 反之</span>
+cat /sys/module/8192cu/parameters/rtw_power_mgnt
+<span class="hljs-comment"># 如果为1 编辑 8192cu.conf 文件关闭休眠(此文件没有可新建)</span>
+vim /etc/modprobe.d/8192cu.conf
+<span class="hljs-comment"># 内容如下</span>
+
+<span class="hljs-comment"># Disable power saving</span>
+options 8192cu rtw_power_mgnt=0</code></pre></div><p>修改配置后重启即可</p><h3 id="设置命令提示符风格"><a href="#设置命令提示符风格" class="headerlink" title="设置命令提示符风格"></a>设置命令提示符风格</h3><ul><li>命令提示相关设置</li></ul><blockquote><p>Linxu命令提示符由 PS1变量控制，所以更改命令提示符样式也就是更改PS1变量，以下为相关码值:</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs livescript"><span class="hljs-string">\d</span> ：<span class="hljs-comment">#代表日期，格式为weekday month date，例如：&quot;Mon Aug 1&quot;   </span>
+<span class="hljs-string">\H</span> ：<span class="hljs-comment">#完整的主机名称。   </span>
+<span class="hljs-string">\h</span> ：<span class="hljs-comment">#仅取主机的第一个名字，如上例，则为fc4，.linux则被省略   </span>
+<span class="hljs-string">\t</span> ：<span class="hljs-comment">#显示时间为24小时格式，如：HH：MM：SS   </span>
+<span class="hljs-string">\T</span> ：<span class="hljs-comment">#显示时间为12小时格式   </span>
+<span class="hljs-string">\A</span> ：<span class="hljs-comment">#显示时间为24小时格式：HH：MM   </span>
+<span class="hljs-string">\u</span> ：<span class="hljs-comment">#当前用户的账号名称   </span>
+<span class="hljs-string">\v</span> ：<span class="hljs-comment">#BASH的版本信息   </span>
+<span class="hljs-string">\w</span> ：<span class="hljs-comment">#完整的工作目录名称。家目录会以 ~代替   </span>
+<span class="hljs-string">\W</span> ：<span class="hljs-comment">#利用basename取得工作目录名称，所以只会列出最后一个目录   </span>
+<span class="hljs-string">\#</span> ：<span class="hljs-comment">#下达的第几个命令   </span>
+<span class="hljs-string">\$</span> ：<span class="hljs-comment">#提示字符，如果是root时，提示符为：# ，普通用户则为：$</span></code></pre></div><blockquote><p>颜色及效果控制码值</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-code"> 前景    背景     颜色</span>
+------------------------
+<span class="hljs-code">  30      40      黑色   </span>
+<span class="hljs-code">  31      41      红色   </span>
+　32      42      绿色   
+　33      43      黄色   
+　34      44      蓝色   
+　35      45      紫红色   
+　36      46      青蓝色   
+　37      47      白色  
+　
+<span class="hljs-code"> 代码          意义   </span>
+<span class="hljs-bullet">-------------------------   </span>
+<span class="hljs-code">  0            OFF   </span>
+<span class="hljs-code">  1            高亮显示   </span>
+<span class="hljs-code">  4            underline   </span>
+<span class="hljs-code">  5            闪烁   </span>
+<span class="hljs-code">  7            反白显示   </span>
+<span class="hljs-code">  8            不可见  </span></code></pre></div><blockquote><p>设置PS1变量时，<code>\[\e[F;Bm]</code> 代表颜色开始，F为前景色，B为背景色，<code>\e[m]</code> 为颜色结束符，不写的话会造成整个命令行都是最后一种颜色，以下为我的PS1样式</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs sh">PS1=<span class="hljs-string">&#x27;\[\e[1;32m\][\u@\h\[\e[m\] \[\e[1;34m\]\W\[\e[m\]\[\e[1;32m\]]$\[\e[m\] &#x27;</span></code></pre></div><h3 id="设置开机自动同步时间"><a href="#设置开机自动同步时间" class="headerlink" title="设置开机自动同步时间"></a>设置开机自动同步时间</h3><blockquote><p>众所周知树莓派不加扩展板的情况下 没有硬件RTC时钟，也就意味着每次开机都要设置时钟，这特么可万万不能够啊，以下为设置开机自动同步时间的方法：</p></blockquote><ul><li>安装ntp</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh">apt-get install ntpdate</code></pre></div><ul><li>设置时区</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 执行如下命令</span>
+dpkg-reconfigure tzdata
+<span class="hljs-comment"># 选择 Asia(亚洲) 然后选择 ShanHai(上海)</span></code></pre></div><ul><li>手动校对时间</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 一般上面设置完市区就应该已经自动同步时间了</span>
+<span class="hljs-comment"># 执行以下命令可能会报socket占用，可忽略</span>
+<span class="hljs-comment"># 210.72.145.44 国家授时中心服务器IP</span>
+ntpdate 210.72.145.44</code></pre></div><ul><li>设置开机自动校对时间</li></ul><blockquote><p>编辑 <code>/ect/rc.local</code> 文件 执行 <code>vim /etc/rc.local</code>，加入 <code>htpdate -t -s 210.72.145.44</code> 这条命令，注意要放在 <code>exit 0</code> 前面，样例配置如下:</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-meta">#!/bin/sh -e</span>
+
+<span class="hljs-comment"># 此处省略1000行注释.....</span>
+
+<span class="hljs-comment"># Sync Time</span>
+htpdate -t -s 210.72.145.44
+
+<span class="hljs-comment"># Print the IP address</span>
+_IP=$(hostname -I) || <span class="hljs-literal">true</span>
+<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$_IP</span>&quot;</span> ]; <span class="hljs-keyword">then</span>
+  <span class="hljs-built_in">printf</span> <span class="hljs-string">&quot;My IP address is %s\n&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$_IP</span>&quot;</span>
+<span class="hljs-keyword">fi</span>
+
+<span class="hljs-built_in">exit</span> 0</code></pre></div><h3 id="合并剩余分区空间"><a href="#合并剩余分区空间" class="headerlink" title="合并剩余分区空间"></a>合并剩余分区空间</h3><blockquote><p>默认树莓派安装系统后并不会占用所有SD卡空间，一般只会使用4G左右，对于大内存卡来说剩下的空间属于未分配状态，即未分区无法使用，我们可以使用 <code>fdisk</code> 来合并后面的分区加以利用</p></blockquote><h4 id="使用-raspi-config-2016-08-13-更新"><a href="#使用-raspi-config-2016-08-13-更新" class="headerlink" title="使用 raspi-config(2016-08-13 更新)"></a>使用 raspi-config(2016-08-13 更新)</h4><p>推荐直接使用树莓派提供的工具，执行 <code>raspi-config</code>，然后选择第一项，提示选择 OK ，最终 Finish 即可。</p><h4 id="使用-分区工具"><a href="#使用-分区工具" class="headerlink" title="使用 分区工具"></a>使用 分区工具</h4><ul><li>查看分区及起始参数</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 进入fdisk</span>
+fdisk /dev/mmcblk0
+<span class="hljs-comment"># 按 P 显示分区信息，并记录 Type 为Linux的分区起始柱面(122880)，打印如下:</span>
+Device         Boot  Start     End Sectors Size Id Type
+/dev/mmcblk0p1        8192  122879  114688  56M  c W95 FAT32 (LBA)
+/dev/mmcblk0p2      122880 8447999 8325120   4G 83 Linux</code></pre></div><ul><li>删除 主分区(Linux分区)</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 按D 并选择删除分区2，再按P 查看分区信息，打印如下:</span>
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): d
+Partition number (1,2, default 2): 2
+
+Partition 2 has been deleted.
+
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): p
+Disk /dev/mmcblk0: 28.8 GiB, 30908350464 bytes, 60367872 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel <span class="hljs-built_in">type</span>: dos
+Disk identifier: 0xba2edfb9
+
+Device         Boot Start    End Sectors Size Id Type
+/dev/mmcblk0p1       8192 122879  114688  56M  c W95 FAT32 (LBA)</code></pre></div><ul><li>增加新分区</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 按N 执行新建分区，再按P 选择增加主分区，并输入起始柱面(122880)，打印如下:</span>
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): n
+Partition <span class="hljs-built_in">type</span>
+   p   primary (1 primary, 0 extended, 3 free)
+   e   extended (container <span class="hljs-keyword">for</span> logical partitions)
+Select (default p): p
+Partition number (2-4, default 2): 2
+First sector (2048-60367871, default 2048): 122880
+Last sector, +sectors or +size&#123;K,M,G,T,P&#125; (122880-60367871, default 60367871):
+
+Created a new partition 2 of <span class="hljs-built_in">type</span> <span class="hljs-string">&#x27;Linux&#x27;</span> and of size 28.7 GiB.</code></pre></div><ul><li>执行增加分区操作</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 首先按P 查看一下，确认分区增加无误，然后按W 执行分区操作，打印如下:</span>
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): p
+Disk /dev/mmcblk0: 28.8 GiB, 30908350464 bytes, 60367872 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel <span class="hljs-built_in">type</span>: dos
+Disk identifier: 0xba2edfb9
+
+Device         Boot  Start      End  Sectors  Size Id Type
+/dev/mmcblk0p1        8192   122879   114688   56M  c W95 FAT32 (LBA)
+/dev/mmcblk0p2      122880 60367871 60244992 28.7G 83 Linux
+
+
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): w
+The partition table has been altered.
+<span class="hljs-comment"># 此处说明 设备忙碌，新的分区表将在下次重启生效</span>
+Calling ioctl() to re-read partition table.
+Re-reading the partition table failed.: Device or resource busy
+
+The kernel still uses the old table. The new table will be used at the next reboot or after you run partprobe(8) or kpartx(8).</code></pre></div><ul><li>重启并执行分区修复</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 由于上面已经提示了重启生效，所以执行重启命令</span>
+reboot
+<span class="hljs-comment"># 重启后需要进行一次分区修复，否则df查看磁盘占用是不变的，执行如下命令修复分区</span>
+resize2fs /dev/mmcblk0p2
+<span class="hljs-comment"># 执行成功后使用df查看分区占用情况，打印如下:</span>
+[root@raspberrypi ~]<span class="hljs-comment"># df</span>
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       29586708 3255252  25069844  12% /
+devtmpfs          469756       0    469756   0% /dev
+tmpfs             474060       0    474060   0% /dev/shm
+tmpfs             474060    6412    467648   2% /run
+tmpfs               5120       4      5116   1% /run/lock
+tmpfs             474060       0    474060   0% /sys/fs/cgroup
+/dev/mmcblk0p1     57288   20232     37056  36% /boot
+tmpfs              94812       0     94812   0% /run/user/1000</code></pre></div><h3 id="安装lrzsz-快捷上传下载"><a href="#安装lrzsz-快捷上传下载" class="headerlink" title="安装lrzsz(快捷上传下载)"></a>安装lrzsz(快捷上传下载)</h3><blockquote><p>操作简单，但大有用处，执行一条命令 <code>apt-get install lrzsz</code> 就安装成功了；作用就是在使用xShell通过ssh连接到树莓派后，上传文件只需要敲 <code>rz</code> 命令就会弹出文件选择对话框，选择文件后就直接上传到当前shell显示的目录下了，也可以直接将文件拖向命令行，也会直接将文件上传到当前目录；下载的话直接敲 <code>sz FILENAME</code> 就会马上弹出下载选择框，选择到哪就会下载到那个目录，奏是这么吊！</p></blockquote><h3 id="切换国内源"><a href="#切换国内源" class="headerlink" title="切换国内源"></a>切换国内源</h3><p>默认树莓派连接的源是官方源，其服务器在美国，然后你懂得……编辑 <code>/etc/apt/sources.list</code> 注释掉其他源，从 <a target="_blank" rel="noopener" href="http://www.raspbian.org/RaspbianMirrors">树莓派源列表</a> 中选择一个填入，然后 <code>apt-get update</code> 即可，以下为 <code>/etc/apt/sources.lis</code> 文件参考(清华大学源)</p><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment">#deb http://mirrordirector.raspbian.org/raspbian/ jessie main contrib non-free rpi</span>
+<span class="hljs-comment"># Uncomment line below then &#x27;apt-get update&#x27; to enable &#x27;apt-get source&#x27;</span>
+<span class="hljs-comment">#deb-src http://archive.raspbian.org/raspbian/ jessie main contrib non-free rpi</span>
+deb http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ jessie main non-free contrib
+deb-src http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ jessie main non-free contrib</code></pre></div><h3 id="编译并安装Nginx"><a href="#编译并安装Nginx" class="headerlink" title="编译并安装Nginx"></a>编译并安装Nginx</h3><blockquote><p>由于做J2EE开发，想搞个Nginx，so 鼓捣吧……</p></blockquote><ul><li>下载相关组件源码</li></ul><blockquote><p>Nginx 编译安装需要 如下支持<br>gcc pcre pcre-devel zlib zlib-devel openssl openssl-devel<br>默认gcc树莓派已经自带了，剩下的 pcre、zlib、openssl 需要自己下载，下载地址: <a target="_blank" rel="noopener" href="http://www.pcre.org/">pcre</a>、<a target="_blank" rel="noopener" href="http://www.zlib.net/">zlib</a>、<a target="_blank" rel="noopener" href="https://www.openssl.org/source/">openssl</a>、<a target="_blank" rel="noopener" href="http://nginx.org/en/download.html">Nginx</a></p></blockquote><ul><li>解压相关组件</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 下载下来想办法搞到树莓派上，然后解压</span>
+tar -zxvf openssl-1.0.2d.tar.gz
+tar -zxvf pcre-8.37.tar.gz
+tar -zxvf zlib-1.2.8.tar.gz
+tar -zxvf nginx-1.8.0.tar.gz</code></pre></div><ul><li>执行编译安装</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 首先进入到 nginx目录</span>
+<span class="hljs-built_in">cd</span> nginx-1.8.0
+<span class="hljs-comment"># 执行编译，编译参数如下:</span>
+./configure
+--sbin-path=/usr/<span class="hljs-built_in">local</span>/nginx/nginx
+--conf-path=/usr/<span class="hljs-built_in">local</span>/nginx/nginx.conf
+--pid-path=/usr/<span class="hljs-built_in">local</span>/nginx/nginx.pid
+--with-http_ssl_module
+--with-pcre=../pcre-8.37
+--with-zlib=../zlib-1.2.8
+--with-openssl=../openssl-1.0.2d
+<span class="hljs-comment"># 最后安装(时间有点长......)</span>
+make &amp;&amp; make install</code></pre></div><h3 id="安装花生壳-内网穿透"><a href="#安装花生壳-内网穿透" class="headerlink" title="安装花生壳(内网穿透)"></a>安装花生壳(内网穿透)</h3><blockquote><p>作为一名 Java Web狗，Nginx、Tomcat已经搞起了，只能内网访问怎么可以；所以必须搞一个 花生壳做内网映射，使之通过域名可直接从外网访问到内网下的树莓派中部署的项目。</p></blockquote><ul><li>下载花生壳并解压</li></ul><blockquote><p>花生壳树莓派版下载地址: <a target="_blank" rel="noopener" href="http://hsk.oray.com/download/#type=http|shumeipai">点击下载</a><br>下载后上传到树莓派，执行 <code>tar -zxvf phddns_raspberry.tgz</code> 解压文件</p></blockquote><ul><li>安装并运行花生壳</li></ul><blockquote><p>解压后会生成 <code>phddns2</code> 目录，<code>cd</code> 进去，执行 <code>./oraynewph start</code> 命令进行安装，安装完成后屏幕上会显示几行信息，其中一个是 __SN码__，记录下这个 __SN码__，一般是一串复杂的类似于md5的字符串<br>然后进入 <a target="_blank" rel="noopener" href="http://b.oray.com/">b.oray.com</a> ，选择使用 <strong>SN码</strong> 登录，默认密码是admin，<em><strong>注意：此时树莓派必须成功连接外网，否则无法登陆</strong></em>，登录如下图所示:</p></blockquote><blockquote><p><img src="http://7xoixd.com1.z0.glb.clouddn.com/raspberry_oray_login.png" srcset="/img/loading.gif" lazyload alt="登录"></p></blockquote><blockquote><p>登陆后首先选择 <em><strong>动态域名解析</strong></em> ，然后 <em><strong>注册一个壳域名</strong></em> ，再回到首页选择 <em><strong>内网映射</strong></em> ，配置一个域名内网映射即可，映射配置如下图:</p></blockquote><blockquote><p><img src="http://7xoixd.com1.z0.glb.clouddn.com/raspberry_oray_netmapper.png" srcset="/img/loading.gif" lazyload alt="内网映射配置"></p></blockquote><blockquote><p>其他关于更详细的花生壳使用教程请谷歌，安装教程参考 <a target="_blank" rel="noopener" href="http://service.oray.com/question/2680.html">这里</a>，最后附上一张装好逼的截图:</p></blockquote><blockquote><p><img src="http://7xoixd.com1.z0.glb.clouddn.com/raspberry_oray_netmapperopen.png" srcset="/img/loading.gif" lazyload alt="动态域名访问树莓派Nginx"></p></blockquote><h3 id="编译安装Nexus"><a href="#编译安装Nexus" class="headerlink" title="编译安装Nexus"></a>编译安装Nexus</h3><blockquote><p>由于现在项目都使用Maven，所以也想搞一个私服Nexus，无奈Nexus官方二进制包中并不提供 arm平台支持，主要是wrapper 没有arm平台的可执行文件和动态链接库，故需要自己编译wrapper，所以有了 “编译安装Nexus” 这一说法。</p></blockquote><ul><li>下载 Nexus</li></ul><blockquote><p>登录 <a target="_blank" rel="noopener" href="http://www.sonatype.org/nexus/go/">Nexus官网</a> 选择 TGZ 格式下载，上传到 树莓派并解压，然后 mv 到你想要放置的目录。配置一个环境变量，样例如下 : <code>export NEXUS_HOME=&#39;/usr/local/java/nexus/nexus-2.11.4-01&#39;</code>，并将 <code>$NEXUS_HOME/bin</code> 加入到 <code>PATH</code> 中。</p></blockquote><ul><li>下载wrapper</li></ul><blockquote><p>为何需要下载 <code>wrapper</code> : <code>nexus</code> 本身确实自带了 <code>wrapper</code>，但 <code>wrapper</code> 这玩意是跟平台结合的，目前 <code>Nexus</code> 不支持 <code>arm</code> 平台，所以需要我们手动编译一个替换 <code>Nexu</code> 中的 <code>wrapper</code>。</p><hr><ol><li>目前下载的最新版 Nexus-2.11.4-01 依赖的是 wrapper3.2.3，下载地址 <a target="_blank" rel="noopener" href="http://wrapper.tanukisoftware.com/download/3.5.9/wrapper_3.5.9_src.tar.gz?mode=html">点这里</a> ***(注意我们下载的事3.5.9版本)***。</li><li>下载完 src 源码包后上传到树莓派并解压，在开始编译前，需要正确的配置<code>JAVA_HOME</code> 和 <code>PATH</code>，这里有个小问题，树莓派2自带了JDK8，但 <code>JAVA_HOME</code> 啥的没配置，所以会有问题；但直接卸载的话 <code>apt-get</code> 会自动给你安装 <code>open-jdk7</code>，可执行 <code>apt-cache rdepends oracle-java8-jdk</code> 查看依赖 <code>jdk</code> 的相关软件包，并执行 <code>apt-get purge xxxxx</code> 卸载他们，基本这些软件包都是教学用的，可以删掉；然后自己下载 <code>arm</code> 平台的 <code>jdk7</code> (感觉8太新了怕不稳定) 安装、配置环境。</li></ol></blockquote><ul><li>编译 wrapper</li></ul><blockquote><ol><li>配置完 <code>JAVA_HOME</code>、<code>PATH</code> 变量以后还需要下载一个 <code>Ant</code>，因为 <code>wrapper</code> 是基于 <code>Ant</code> 构建的，基本步骤也是。 <a target="_blank" rel="noopener" href="http://ant.apache.org/bindownload.cgi">下载Ant</a> 然后解压到指定目录，配置一下 <code>ANT_HOME</code>，方法自查。</li><li>在正式编译前需要 <code>cp src/c/Makefile-linux-x86-32.make</code> to <code>src/c/Makefile-linux-arm-32.make</code> (老外的原文，说来了就是 <code>copy</code> 一份到当前目录并重命名一下)。</li><li>进入到 <code>wrapper</code> 解压后的目录执行 <code>./build32.sh</code> 进行编译，如果 <code>JAVA_HOME</code>、<code>PATH</code>、<code>Ant</code>、<code>.make 文件</code> 没问题的话编译一般不会出错。</li><li>编译完成后在 <code>nexus-2.11.4-01/bin/jsw</code> 下新建一个 <code>linux-armv7l-32</code> 文件夹，复制编译好的 <code>wrapper_3.5.9_src/bin/wrapper</code> 文件到 刚刚新建的 <code>linux-armv7l-32</code> 目录下，由于<em><strong>使用了高版本</strong></em> <code>wrapper</code>，<code>wrapper.jar</code> 复制过去后需要先删掉原来的 <code>wrapper-3.2.3.jar</code> 并将 <code>wrapper.jar</code> 重命名为 <code>wrapper-3.2.3.jar</code>。</li></ol></blockquote><ul><li>配置并启动 Nexus</li></ul><blockquote><ul><li>新建用户 <code>nexus</code> : <code>adduser nexus</code> (别用 <code>useradd</code> 我一直以为这两个命令一样，但你在树莓派2下可以试试)</li><li>改密码 : <code>passwd nexus</code></li><li>改两个配置文件 : <code>nexus-2.11.4-01/bin/nexus</code>、<code>nexus-2.11.4-01/bin/jsw/conf/wrapper.conf</code>，两个配置要改的地方贴出来如下 (更详细的参见 <a target="_blank" rel="noopener" href="http://mritd.me/archives/2024">Nexus 2.11 CentOS搭建教程</a>) :</li></ul></blockquote><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment">###############################</span>
+<span class="hljs-comment">## nexus-2.11.4-01/bin/nexus ##</span>
+<span class="hljs-comment">###############################</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Set the JVM executable</span>
+<span class="hljs-comment"># (modify this to absolute path if you need a Java that is not on the OS path)</span>
+<span class="hljs-comment"># 配置 jdk中 java 可执行文件的位置(其实我感觉jre就可以，没测试，有兴趣的测试一下)</span>
+wrapper.java.command=/usr/<span class="hljs-built_in">local</span>/java/jdk1.7.0_79/bin/java</code></pre></div><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment">##############################################</span>
+<span class="hljs-comment">## nexus-2.11.4-01/bin/jsw/conf/wrapper.con ##</span>
+<span class="hljs-comment">##############################################</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># Set this to the root of the Nexus installation</span>
+<span class="hljs-comment"># 设置 nexus 主目录，就是解压后的那个 nexus目录绝对路径</span>
+NEXUS_HOME=<span class="hljs-string">&quot;/usr/local/java/nexus-2.11.4-01&quot;</span></code></pre></div><blockquote><ul><li>先切换到 <code>nexus</code> 用户，因为官方不推荐以 <code>root</code> 用户运行，执行 : <code>su - nexus</code>，然后启动 <code>nexus</code>，执行 <code>nexus start</code> 启动，时间比较长，大约2分钟，使用 <code>tail -f nexus-2.11.4-01/logs/wrapper.log</code> 查看进度，启动成功后访问 <code>IP:8081/nexus</code> 即可，默认用户 <code>admin</code>，密码 <code>admin123</code>；到此结束。</li></ul></blockquote><h3 id="编译安装MySQL"><a href="#编译安装MySQL" class="headerlink" title="编译安装MySQL"></a>编译安装MySQL</h3><ul><li>安装Screen</li></ul><blockquote><p>执行 <code>apt-get install screen</code> 安装screen，用于后台运行编译任务，防止断网等原因造成的编译失败。</p></blockquote><ul><li>下载MySQL5.6源码</li></ul><blockquote><p>可去官网下载，百度云分享 <a target="_blank" rel="noopener" href="http://pan.baidu.com/s/1dDwPxRV">点击这里</a> 密码: g2ab<br>下载完成后上传到树莓派并解压</p></blockquote><ul><li>系统设置初始化</li></ul><blockquote><p>编译前需要做以下操作:</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 新建mysql用户</span>
+adduser mysql
+<span class="hljs-comment"># 创建MySQL安装目录</span>
+<span class="hljs-built_in">cd</span> /usr/<span class="hljs-built_in">local</span>
+mkdir mysql
+<span class="hljs-built_in">cd</span> /usr/<span class="hljs-built_in">local</span>/mysql
+mkdir data</code></pre></div><ul><li>安装依赖包</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 首先升级软件源(如果改过非官方源必须改回来)</span>
+apt-get update
+<span class="hljs-comment"># 升级已安装软件包</span>
+apt-get upgrade
+<span class="hljs-comment"># 安装mysql编译时依赖</span>
+apt-get isntall cmake make bison bzr libncurses5-dev g++ libtinfo5 ncurses-bin libncurses5 libtinfo-dev</code></pre></div><ul><li>开始编译MySQL</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 进入源码目录</span>
+<span class="hljs-built_in">cd</span> mysql-5.6.27/
+<span class="hljs-comment"># 开启screen session 防止断网等造成的免疫中断</span>
+screen -S mysqlinstall
+<span class="hljs-comment"># 执行 cmake 预编译(最少一小时)</span>
+cmake -DCMAKE_INSTALL_PREFIX=/usr/<span class="hljs-built_in">local</span>/mysql -DMYSQL_UNIX_ADDR=/usr/<span class="hljs-built_in">local</span>/mysql/data/mysql.sock -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DEXTRA_CHARSETS=all -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DENABLED_LOCAL_INFILE=1 -DMYSQL_DATADIR=/usr/<span class="hljs-built_in">local</span>/mysql/data -DMYSQL_USER=mysql -DWITH_DEBUG=0</code></pre></div><blockquote><p>关于cmake预编译参数设置参考 <a target="_blank" rel="noopener" href="http://ohgenlong16300.blog.51cto.com/499130/1264096">这里</a></p></blockquote><ul><li>执行安装</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh">make &amp;&amp; make install</code></pre></div><ul><li>后续操作</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 更改所有者</span>
+<span class="hljs-built_in">cd</span> /usr/<span class="hljs-built_in">local</span>/
+chown -R mysql.mysql mysql
+<span class="hljs-comment"># 创建配置文件</span>
+<span class="hljs-built_in">cd</span> /usr/<span class="hljs-built_in">local</span>/mysql/support-files  
+cp my-default.cnf  /etc/my.cnf
+<span class="hljs-comment"># 初始化数据库</span>
+<span class="hljs-built_in">cd</span> /usr/<span class="hljs-built_in">local</span>/mysql
+./scripts/mysql_install_db --user=mysql
+<span class="hljs-comment"># 安全启动(后台)</span>
+/usr/<span class="hljs-built_in">local</span>/mysql/bin/mysqld_safe --user=mysql --port=3306 --sock=/usr/<span class="hljs-built_in">local</span>/mysql/data/mysql.sock &amp;
+<span class="hljs-comment"># 开机自启动</span>
+cp /usr/<span class="hljs-built_in">local</span>/mysql/support-files/mysql.server /etc/init.d/mysql
+chkconfig --add mysql</code></pre></div><blockquote><p>mysql5.6的默认参数设置问题，更改my.cnf，调整以下参数<br><code>performance_schema_max_table_instances=600</code><br><code>table_definition_cache=400</code><br><code>table_open_cache=256</code><br>这时mysql启动后内存就只占用40–60M内存了</p></blockquote><h3 id="安装-xrdp远程桌面"><a href="#安装-xrdp远程桌面" class="headerlink" title="安装 xrdp远程桌面"></a>安装 xrdp远程桌面</h3><blockquote><p>其实树莓派感觉没必要买显示器，因为直接可以安装远程桌面，执行 <code>apt-get install xrdp</code> 安装，在 <code>Windows</code> 下可直接使用远程桌面连接，按 <code>Win+R</code> 键输入 <code>mstsc</code>，再输入树莓派地址和用户名密码 就可以，截图如下:<br><img src="http://7xoixd.com1.z0.glb.clouddn.com/raspberry_xrdp.png" srcset="/img/loading.gif" lazyload alt="远程桌面"></p></blockquote></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/linux/">Linux</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/linux/">Linux</a> <a class="hover-with-bg" href="/tags/raspberry-pi2/">Raspberry Pi2</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext"><article class="post-prev col-6"><a href="/2016/01/02/git-chinese-garbled-solution/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">Git 中文乱码解决方案</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"><a href="/2015/12/31/maven-tutorial/"><span class="hidden-mobile">Maven 教程</span> <span class="visible-mobile">下一篇</span> <i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments" lazyload><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2015/12/31/raspberry-pi2-build/",this.page.identifier="/2015/12/31/raspberry-pi2-build/"};Fluid.utils.loadComments("#disqus_thread",(function(){var e=document,t=e.createElement("script");t.src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}))</script><noscript>Please enable JavaScript to view the comments</noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div class="toc-body" id="toc-body"></div></div></div></div></div><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div></main><footer class="text-center mt-5 py-3"><div class="footer-content"><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></footer><script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css"><script>NProgress.configure({showSpinner:!1,trickleSpeed:200}),NProgress.start(),window.addEventListener("load",(function(){NProgress.done()}))</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script><script src="/js/events.js"></script><script src="/js/plugins.js"></script><script src="/js/img-lazyload.js"></script><script src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script><script src="/js/local-search.js"></script><script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js"></script><script>!function(t,i){(0,Fluid.plugins.typing)(i.getElementById("subtitle").title)}(window,document)</script><script defer>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-179552593-1","auto"),ga("send","pageview")</script><script async src="https://www.google-analytics.com/analytics.js"></script><script src="/js/boot.js"></script></body></html>

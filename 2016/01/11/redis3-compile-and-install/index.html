@@ -1,0 +1,299 @@
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="&#34;dark&#34;"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" href="/img/favicon.ico"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="Redis3.0.6编译安装"><meta name="author" content="bleem"><meta name="keywords" content="Redis,Linux,CentOS"><title>Redis3.0.6编译安装 - bleem</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/atom-one-dark-reasonable.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css"><link rel="stylesheet" href="/css/main.css"><script id="fluid-configs">var Fluid=window.Fluid||{},CONFIG={hostname:"mritd.com",root:"/",version:"1.8.11",typing:{enable:!0,typeSpeed:80,cursorChar:"_",loop:!1},anchorjs:{enable:!0,element:"h1,h2,h3,h4,h5,h6",placement:"right",visible:"hover",icon:"❡"},progressbar:{enable:!0,height_px:3,color:"#29d",options:{showSpinner:!1,trickleSpeed:200}},copy_btn:!0,image_zoom:{enable:!0,img_url_replace:["",""]},toc:{enable:!0,headingSelector:"h1,h2,h3,h4,h5,h6",collapseDepth:3},lazyload:{enable:!0,loading_img:"/img/loading.gif",onlypost:!1,offset_factor:2},web_analytics:{enable:!0,baidu:null,google:"UA-179552593-1",gtag:null,tencent:{sid:null,cid:null},woyaola:null,cnzz:null,leancloud:{app_id:null,app_key:null,server_url:null}},search_path:"/local-search.xml"}</script><script src="/js/utils.js"></script><script src="/js/color-schema.js"></script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="bleem" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="bleem" type="application/rss+xml">
+</head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>bleem</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item"><a class="nav-link" href="/friends/"><i class="iconfont icon-link-fill"></i> 友链</a></li><li class="nav-item" id="search-btn"><a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i class="iconfont icon-search"></i>&nbsp;</a></li><li class="nav-item" id="color-toggle-btn"><a class="nav-link" target="_self">&nbsp;<i class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a></li></ul></div></div></nav><div class="banner" id="banner" parallax="true" style="background:url(/img/default.jpg) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="page-header text-center fade-in-up"><span class="h2" id="subtitle" title="Redis3.0.6编译安装"></span><div class="mt-3"><span class="post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2016-01-11 15:11" pubdate>2016年1月11日 下午</time></span></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 3.7k 字 </span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 44 分钟</span></div></div></div></div></div></header><main><div class="container-fluid nopadding-x"><div class="row nomargin-x"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-x-md"><div class="container nopadding-x-md" id="board-ctn"><div class="py-5" id="board"><article class="post-content mx-auto"><h1 style="display:none">Redis3.0.6编译安装</h1><div class="markdown-body"><p><img src="https://cdn.oss.link/markdown/hexo_redis_logo1.jpg" srcset="/img/loading.gif" lazyload alt="hexo_redis_logo"></p><h2 id="扯淡"><a href="#扯淡" class="headerlink" title="扯淡"></a>扯淡</h2><blockquote><p>最近在学习Redis，准备在Linux下安装一下，现记录一下编译安装过程。<br>环境为 CentOS6.7、Redis3.0.6、Xshell5</p></blockquote><h2 id="一、准备工作"><a href="#一、准备工作" class="headerlink" title="一、准备工作"></a>一、准备工作</h2><ol><li>下载Redis安装包 <a target="_blank" rel="noopener" href="http://download.redis.io/releases/redis-3.0.6.tar.gz">下载地址</a></li><li>安装好CentOS6系统</li><li>Xshell5连接CentOS</li></ol><h2 id="二、开始安装"><a href="#二、开始安装" class="headerlink" title="二、开始安装"></a>二、开始安装</h2><ol><li>下载 Redis Linux安装包，或者先下载再上传</li></ol><div class="hljs code-wrapper"><pre><code class="hljs sh">wget http://download.redis.io/releases/redis-3.0.6.tar.gz</code></pre></div><ol start="2"><li>解压Redis安装包</li></ol><div class="hljs code-wrapper"><pre><code class="hljs sh">tar -zxvf redis-3.0.6.tar.gz</code></pre></div><ol start="3"><li>安装相关依赖</li></ol><div class="hljs code-wrapper"><pre><code class="hljs sh">yum install gcc
+yum install gcc-c++</code></pre></div><ol start="4"><li>编译&amp;&amp;安装</li></ol><div class="hljs code-wrapper"><pre><code class="hljs sh">make &amp;&amp; make install</code></pre></div><h2 id="三、更改配置"><a href="#三、更改配置" class="headerlink" title="三、更改配置"></a>三、更改配置</h2><blockquote><p>Redis许多特性通过配置文件设置，编辑 <code>redis.conf</code> 修改相关配置，以下参考自 <a target="_blank" rel="noopener" href="http://yijiebuyi.com/blog/bc2b3d3e010bf87ba55267f95ab3aa71.html">一介布衣</a> 建议更改后将其放在 <code>/etc/redis.conf</code></p></blockquote><hr><ul><li>基本配置</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 当配置中需要配置内存大小时，可以使用 1k, 5GB, 4M 等类似的格式，其转换方式如下(不区分大小写)</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 1k =&gt; 1000 bytes</span>
+<span class="hljs-comment"># 1kb =&gt; 1024 bytes</span>
+<span class="hljs-comment"># 1m =&gt; 1000000 bytes</span>
+<span class="hljs-comment"># 1mb =&gt; 1024*1024 bytes</span>
+<span class="hljs-comment"># 1g =&gt; 1000000000 bytes</span>
+<span class="hljs-comment"># 1gb =&gt; 1024*1024*1024 bytes</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 内存配置大小写是一样的.比如 1gb 1Gb 1GB 1gB</span>
+
+<span class="hljs-comment"># daemonize no 默认情况下，redis不是在后台运行的，如果需要在后台运行，把该项的值更改为yes</span>
+daemonize yes
+
+<span class="hljs-comment"># 当redis在后台运行的时候，[Redis](http://yijiebuyi.com/so.html?k=redis)默认会把pid文件放在/var/run/redis.pid，你可以配置到其他地址。</span>
+<span class="hljs-comment"># 当运行多个redis服务时，需要指定不同的pid文件和端口</span>
+pidfile /var/run/redis.pid
+
+<span class="hljs-comment"># 指定redis运行的端口，默认是6379</span>
+port 6379
+
+<span class="hljs-comment"># 指定redis只接收来自于该IP地址的请求，如果不进行设置，那么将处理所有请求，</span>
+<span class="hljs-comment"># 在生产环境中最好设置该项</span>
+<span class="hljs-comment"># bind 127.0.0.1</span>
+
+<span class="hljs-comment"># Specify the path for the unix socket that will be used to listen for</span>
+<span class="hljs-comment"># incoming connections. There is no default, so Redis will not listen</span>
+<span class="hljs-comment"># on a unix socket when not specified.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># unixsocket /tmp/redis.sock</span>
+<span class="hljs-comment"># unixsocketperm 755</span>
+
+<span class="hljs-comment"># 设置客户端连接时的超时时间，单位为秒。当客户端在这段时间内没有发出任何指令，那么关闭该连接</span>
+<span class="hljs-comment"># 0是关闭此设置</span>
+timeout 0
+
+<span class="hljs-comment"># 指定日志记录级别</span>
+<span class="hljs-comment"># Redis总共支持四个级别：debug、verbose、notice、warning，默认为verbose</span>
+<span class="hljs-comment"># debug 记录很多信息，用于开发和测试</span>
+<span class="hljs-comment"># varbose 有用的信息，不像debug会记录那么多</span>
+<span class="hljs-comment"># notice 普通的verbose，常用于生产环境</span>
+<span class="hljs-comment"># warning 只有非常重要或者严重的信息会记录到日志</span>
+loglevel debug
+
+<span class="hljs-comment"># 配置log文件地址</span>
+<span class="hljs-comment"># 默认值为stdout，标准输出，若后台模式会输出到/dev/null</span>
+<span class="hljs-comment">#logfile stdout</span>
+logfile /var/<span class="hljs-built_in">log</span>/redis/redis.log
+
+<span class="hljs-comment"># To enable logging to the system logger, just set &#x27;syslog-enabled&#x27; to yes,</span>
+<span class="hljs-comment"># and optionally update the other syslog parameters to suit your needs.</span>
+<span class="hljs-comment"># syslog-enabled no</span>
+
+<span class="hljs-comment"># Specify the syslog identity.</span>
+<span class="hljs-comment"># syslog-ident redis</span>
+
+<span class="hljs-comment"># Specify the syslog facility.  Must be USER or between LOCAL0-LOCAL7.</span>
+<span class="hljs-comment"># syslog-facility local0</span>
+
+<span class="hljs-comment"># 可用数据库数</span>
+<span class="hljs-comment"># 默认值为16，默认数据库为0，数据库范围在0-（database-1）之间</span>
+databases 16
+
+<span class="hljs-comment">################################ 快照  #################################</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 保存数据到磁盘，格式如下:</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#   save &lt;seconds&gt; &lt;changes&gt;</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#   指出在多长时间内，有多少次更新操作，就将数据同步到数据文件rdb。</span>
+<span class="hljs-comment">#   相当于条件触发抓取快照，这个可以多个条件配合</span>
+<span class="hljs-comment">#    </span>
+<span class="hljs-comment">#   比如默认配置文件中的设置，就设置了三个条件</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#   save 900 1  900秒内至少有1个key被改变</span>
+<span class="hljs-comment">#   save 300 10  300秒内至少有300个key被改变</span>
+<span class="hljs-comment">#   save 60 10000  60秒内至少有10000个key被改变</span>
+
+save 900 1
+save 300 10
+save 60 10000
+
+<span class="hljs-comment"># 存储至本地数据库时（持久化到rdb文件）是否压缩数据，默认为yes</span>
+rdbcompression yes
+
+
+<span class="hljs-comment"># 本地持久化数据库文件名，默认值为dump.rdb</span>
+dbfilename dump.rdb
+
+<span class="hljs-comment"># 工作目录</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 数据库镜像备份的文件放置的路径。</span>
+<span class="hljs-comment"># 这里的路径跟文件名要分开配置是因为redis在进行备份时，先会将当前数据库的状态写入到一个临时文件中，等备份完成时，</span>
+<span class="hljs-comment"># 再把该该临时文件替换为上面所指定的文件，而这里的临时文件和上面所配置的备份文件都会放在这个指定的路径当中。</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># AOF文件也会存放在这个目录下面</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 注意这里必须制定一个目录而不是文件</span>
+dir ./
+
+<span class="hljs-comment">################################# 复制 #################################</span>
+
+<span class="hljs-comment"># 主从复制. 设置该数据库为其他数据库的从数据库.</span>
+<span class="hljs-comment"># 设置当本机为slav服务时，设置master服务的IP地址及端口，在Redis启动时，它会自动从master进行数据同步</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># slaveof &lt;masterip&gt; &lt;masterport&gt;</span>
+
+<span class="hljs-comment"># 当master服务设置了密码保护时(用requirepass制定的密码)</span>
+<span class="hljs-comment"># slav服务连接master的密码</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># masterauth &lt;master-password&gt;</span>
+
+
+<span class="hljs-comment"># 当从库同主机失去连接或者复制正在进行，从机库有两种运行方式：</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 1) 如果slave-serve-stale-data设置为yes(默认设置)，从库会继续相应客户端的请求</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 2) 如果slave-serve-stale-data是指为no，出去INFO和SLAVOF命令之外的任何请求都会返回一个</span>
+<span class="hljs-comment">#    错误&quot;SYNC with master in progress&quot;</span>
+<span class="hljs-comment">#</span>
+slave-serve-stale-data yes
+
+<span class="hljs-comment"># 从库会按照一个时间间隔向主库发送PINGs.可以通过repl-ping-slave-period设置这个时间间隔，默认是10秒</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># repl-ping-slave-period 10</span>
+
+<span class="hljs-comment"># repl-timeout 设置主库批量数据传输时间或者ping回复时间间隔，默认值是60秒</span>
+<span class="hljs-comment"># 一定要确保repl-timeout大于repl-ping-slave-period</span>
+<span class="hljs-comment"># repl-timeout 60   </span></code></pre></div><ul><li>安全配置</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment">################################## 安全 ###################################</span>
+
+<span class="hljs-comment"># 设置客户端连接后进行任何其他指定前需要使用的密码。</span>
+<span class="hljs-comment"># 警告：因为redis速度相当快，所以在一台比较好的服务器下，一个外部的用户可以在一秒钟进行150K次的密码尝试，这意味着你需要指定非常非常强大的密码来防止暴力破解</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># requirepass foobared</span>
+
+<span class="hljs-comment"># 命令重命名.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 在一个共享环境下可以重命名相对危险的命令。比如把CONFIG重名为一个不容易猜测的字符。</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 举例:</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># rename-command CONFIG b840fc02d524045429941cc15f59e41cb7be6c52</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 如果想删除一个命令，直接把它重命名为一个空字符&quot;&quot;即可，如下：</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># rename-command CONFIG &quot;&quot;</span></code></pre></div><ul><li>Redis 约束</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment">################################### 约束 ####################################</span>
+
+<span class="hljs-comment"># 设置同一时间最大客户端连接数，默认无限制，Redis可以同时打开的客户端连接数为Redis进程可以打开的最大文件描述符数，</span>
+<span class="hljs-comment"># 如果设置 maxclients 0，表示不作限制。</span>
+<span class="hljs-comment"># 当客户端连接数到达限制时，Redis会关闭新的连接并向客户端返回max number of clients reached错误信息</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># maxclients 128</span>
+
+<span class="hljs-comment"># 指定Redis最大内存限制，Redis在启动时会把数据加载到内存中，达到最大内存后，Redis会先尝试清除已到期或即将到期的Key</span>
+<span class="hljs-comment"># Redis同时也会移除空的list对象</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 当此方法处理后，仍然到达最大内存设置，将无法再进行写入操作，但仍然可以进行读取操作</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 注意：Redis新的vm机制，会把Key存放内存，Value会存放在swap区</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># maxmemory的设置比较适合于把redis当作于类似memcached的缓存来使用，而不适合当做一个真实的DB。</span>
+<span class="hljs-comment"># 当把Redis当做一个真实的数据库使用的时候，内存使用将是一个很大的开销</span>
+<span class="hljs-comment"># maxmemory &lt;bytes&gt;</span>
+
+<span class="hljs-comment"># 当内存达到最大值的时候Redis会选择删除哪些数据？有五种方式可供选择</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># volatile-lru -&gt; 利用LRU算法移除设置过过期时间的key (LRU:最近使用 Least Recently Used )</span>
+<span class="hljs-comment"># allkeys-lru -&gt; 利用LRU算法移除任何key</span>
+<span class="hljs-comment"># volatile-random -&gt; 移除设置过过期时间的随机key</span>
+<span class="hljs-comment"># allkeys-&gt;random -&gt; remove a random key, any key</span>
+<span class="hljs-comment"># volatile-ttl -&gt; 移除即将过期的key(minor TTL)</span>
+<span class="hljs-comment"># noeviction -&gt; 不移除任何可以，只是返回一个写错误</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 注意：对于上面的策略，如果没有合适的key可以移除，当写的时候Redis会返回一个错误</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#       写命令包括: set setnx setex append</span>
+<span class="hljs-comment">#       incr decr rpush lpush rpushx lpushx linsert lset rpoplpush sadd</span>
+<span class="hljs-comment">#       sinter sinterstore sunion sunionstore sdiff sdiffstore zadd zincrby</span>
+<span class="hljs-comment">#       zunionstore zinterstore hset hsetnx hmset hincrby incrby decrby</span>
+<span class="hljs-comment">#       getset mset msetnx exec sort</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 默认是:</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># maxmemory-policy volatile-lru</span>
+
+<span class="hljs-comment"># LRU 和 minimal TTL 算法都不是精准的算法，但是相对精确的算法(为了节省内存)，随意你可以选择样本大小进行检测。</span>
+<span class="hljs-comment"># Redis默认的灰选择3个样本进行检测，你可以通过maxmemory-samples进行设置</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># maxmemory-samples 3</span></code></pre></div><ul><li>其他配置</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment">############################## AOF ###############################</span>
+
+<span class="hljs-comment"># 默认情况下，redis会在后台异步的把数据库镜像备份到磁盘，但是该备份是非常耗时的，而且备份也不能很频繁，如果发生诸如拉闸限电、拔插头等状况，那么将造成比较大范围的数据丢失。</span>
+<span class="hljs-comment"># 所以redis提供了另外一种更加高效的数据库备份及灾难恢复方式。</span>
+<span class="hljs-comment"># 开启append only模式之后，redis会把所接收到的每一次写操作请求都追加到appendonly.aof文件中，当redis重新启动时，会从该文件恢复出之前的状态。</span>
+<span class="hljs-comment"># 但是这样会造成appendonly.aof文件过大，所以redis还支持了BGREWRITEAOF指令，对appendonly.aof 进行重新整理。</span>
+<span class="hljs-comment"># 你可以同时开启asynchronous dumps 和 AOF</span>
+
+appendonly no
+
+<span class="hljs-comment"># AOF文件名称 (默认: &quot;appendonly.aof&quot;)</span>
+<span class="hljs-comment"># appendfilename appendonly.aof</span>
+
+
+<span class="hljs-comment"># Redis支持三种同步AOF文件的策略:</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># no: 不进行同步，系统去操作 . Faster.</span>
+<span class="hljs-comment"># always: always表示每次有写操作都进行同步. Slow, Safest.</span>
+<span class="hljs-comment"># everysec: 表示对写操作进行累积，每秒同步一次. Compromise.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 默认是&quot;everysec&quot;，按照速度和安全折中这是最好的。</span>
+<span class="hljs-comment"># 如果想让Redis能更高效的运行，你也可以设置为&quot;no&quot;，让操作系统决定什么时候去执行</span>
+<span class="hljs-comment"># 或者相反想让数据更安全你也可以设置为&quot;always&quot;</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 如果不确定就用 &quot;everysec&quot;.</span>
+
+<span class="hljs-comment"># appendfsync always</span>
+appendfsync everysec
+<span class="hljs-comment"># appendfsync no</span>
+
+<span class="hljs-comment"># AOF策略设置为always或者everysec时，后台处理进程(后台保存或者AOF日志重写)会执行大量的I/O操作</span>
+<span class="hljs-comment"># 在某些Linux配置中会阻止过长的fsync()请求。注意现在没有任何修复，即使fsync在另外一个线程进行处理</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 为了减缓这个问题，可以设置下面这个参数no-appendfsync-on-rewrite</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># This means that while another child is saving the durability of Redis is</span>
+<span class="hljs-comment"># the same as &quot;appendfsync none&quot;, that in pratical terms means that it is</span>
+<span class="hljs-comment"># possible to lost up to 30 seconds of log in the worst scenario (with the</span>
+<span class="hljs-comment"># default Linux settings).</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># If you have latency problems turn this to &quot;yes&quot;. Otherwise leave it as</span>
+<span class="hljs-comment"># &quot;no&quot; that is the safest pick from the point of view of durability.</span>
+no-appendfsync-on-rewrite no
+
+<span class="hljs-comment"># Automatic rewrite of the append only file.</span>
+<span class="hljs-comment"># AOF 自动重写</span>
+<span class="hljs-comment"># 当AOF文件增长到一定大小的时候Redis能够调用 BGREWRITEAOF 对日志文件进行重写</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 它是这样工作的：Redis会记住上次进行些日志后文件的大小(如果从开机以来还没进行过重写，那日子大小在开机的时候确定)</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 基础大小会同现在的大小进行比较。如果现在的大小比基础大小大制定的百分比，重写功能将启动</span>
+<span class="hljs-comment"># 同时需要指定一个最小大小用于AOF重写，这个用于阻止即使文件很小但是增长幅度很大也去重写AOF文件的情况</span>
+<span class="hljs-comment"># 设置 percentage 为0就关闭这个特性</span>
+
+
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb</code></pre></div><ul><li>Log 文件配置</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment">################################## SLOW LOG ###################################</span>
+
+<span class="hljs-comment"># Redis Slow Log 记录超过特定执行时间的命令。执行时间不包括I/O计算比如连接客户端，返回结果等，只是命令执行时间</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 可以通过两个参数设置slow log：一个是告诉Redis执行超过多少时间被记录的参数slowlog-log-slower-than(微妙)，</span>
+<span class="hljs-comment"># 另一个是slow log 的长度。当一个新命令被记录的时候最早的命令将被从队列中移除</span>
+
+
+<span class="hljs-comment"># 下面的时间以微妙微单位，因此1000000代表一分钟。</span>
+<span class="hljs-comment"># 注意制定一个负数将关闭慢日志，而设置为0将强制每个命令都会记录</span>
+slowlog-log-slower-than 10000
+
+
+<span class="hljs-comment"># 对日志长度没有限制，只是要注意它会消耗内存</span>
+<span class="hljs-comment"># 可以通过 SLOWLOG RESET 回收被慢日志消耗的内存</span>
+slowlog-max-len 1024</code></pre></div><ul><li>限制</li></ul><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment">############################### ADVANCED CONFIG ###############################</span>
+
+<span class="hljs-comment"># 当hash中包含超过指定元素个数并且最大的元素没有超过临界时，</span>
+<span class="hljs-comment"># hash将以一种特殊的编码方式（大大减少内存使用）来存储，这里可以设置这两个临界值</span>
+<span class="hljs-comment"># Redis Hash对应Value内部实际就是一个HashMap，实际这里会有2种不同实现，</span>
+<span class="hljs-comment"># 这个Hash的成员比较少时Redis为了节省内存会采用类似一维数组的方式来紧凑存储，而不会采用真正的HashMap结构，对应的value redisObject的encoding为zipmap,</span>
+<span class="hljs-comment"># 当成员数量增大时会自动转成真正的HashMap,此时encoding为ht。</span>
+hash-max-zipmap-entries 512
+hash-max-zipmap-value 64
+
+<span class="hljs-comment"># list数据类型多少节点以下会采用去指针的紧凑存储格式。</span>
+<span class="hljs-comment"># list数据类型节点值大小小于多少字节会采用紧凑存储格式。</span>
+list-max-ziplist-entries 512
+list-max-ziplist-value 64
+
+<span class="hljs-comment"># set数据类型内部数据如果全部是数值型，且包含多少节点以下会采用紧凑格式存储。</span>
+set-max-intset-entries 512
+
+<span class="hljs-comment"># zsort数据类型多少节点以下会采用去指针的紧凑存储格式。</span>
+<span class="hljs-comment"># zsort数据类型节点值大小小于多少字节会采用紧凑存储格式。</span>
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+
+
+<span class="hljs-comment"># Redis将在每100毫秒时使用1毫秒的CPU时间来对redis的hash表进行重新hash，可以降低内存的使用</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 当你的使用场景中，有非常严格的实时性需要，不能够接受Redis时不时的对请求有2毫秒的延迟的话，把这项配置为no。</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 如果没有这么严格的实时性要求，可以设置为yes，以便能够尽可能快的释放内存</span>
+activerehashing yes
+
+<span class="hljs-comment">################################## INCLUDES ###################################</span>
+
+<span class="hljs-comment"># 指定包含其它的配置文件，可以在同一主机上多个Redis实例之间使用同一份配置文件，而同时各个实例又拥有自己的特定配置文件</span>
+
+<span class="hljs-comment"># include /path/to/local.conf</span>
+<span class="hljs-comment"># include /path/to/other.conf</span></code></pre></div><h2 id="五、连接测试"><a href="#五、连接测试" class="headerlink" title="五、连接测试"></a>五、连接测试</h2><p>1、启动 Redis 服务</p><div class="hljs code-wrapper"><pre><code class="hljs sh">redis-server /etc/redis.conf</code></pre></div><p>2、启动 Redis Cli 客户端</p><div class="hljs code-wrapper"><pre><code class="hljs sh">redis-cli -h localhost -p 6379</code></pre></div><blockquote><p>此时如果能正常启动并连接则代表安装成功。</p></blockquote><h2 id="六、其他异常信息"><a href="#六、其他异常信息" class="headerlink" title="六、其他异常信息"></a>六、其他异常信息</h2><blockquote><p>其他异常信息参考 <a target="_blank" rel="noopener" href="http://blog.csdn.net/u012969732/article/details/45049065">CentOS7下安装Redis3.0及安装时遇到的问题</a></p></blockquote></div><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/linux/">Linux</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/linux/">Linux</a> <a class="hover-with-bg" href="/tags/redis/">Redis</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 国际许可协议进行许可，转载请注明出处。</p><div class="post-prevnext"><article class="post-prev col-6"><a href="/2016/01/13/wo-he-wo-de-jue-jiang/"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">我和我的倔强</span> <span class="visible-mobile">上一篇</span></a></article><article class="post-next col-6"><a href="/2016/01/11/redis-note/"><span class="hidden-mobile">Redis学习笔记</span> <span class="visible-mobile">下一篇</span> <i class="iconfont icon-arrowright"></i></a></article></div></div><article class="comments" id="comments" lazyload><div class="disqus" style="width:100%"><div id="disqus_thread"></div><script type="text/javascript">var disqus_config=function(){this.page.url="https://mritd.com/2016/01/11/redis3-compile-and-install/",this.page.identifier="/2016/01/11/redis3-compile-and-install/"};Fluid.utils.loadComments("#disqus_thread",(function(){var e=document,t=e.createElement("script");t.src="//bleem.disqus.com/embed.js",t.setAttribute("data-timestamp",new Date),(e.head||e.body).appendChild(t)}))</script><noscript>Please enable JavaScript to view the comments</noscript></div></article></article></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div class="toc-body" id="toc-body"></div></div></div></div></div><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div></main><footer class="text-center mt-5 py-3"><div class="footer-content"><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div></footer><script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css"><script>NProgress.configure({showSpinner:!1,trickleSpeed:200}),NProgress.start(),window.addEventListener("load",(function(){NProgress.done()}))</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script><script src="/js/events.js"></script><script src="/js/plugins.js"></script><script src="/js/img-lazyload.js"></script><script src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script><script src="/js/local-search.js"></script><script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js"></script><script>!function(t,i){(0,Fluid.plugins.typing)(i.getElementById("subtitle").title)}(window,document)</script><script defer>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-179552593-1","auto"),ga("send","pageview")</script><script async src="https://www.google-analytics.com/analytics.js"></script><script src="/js/boot.js"></script></body></html>
