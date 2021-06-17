@@ -1101,23 +1101,16 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/2015/12/08/how-to-use-nexus/</loc>
+    
+    <lastmod>2015-12-08</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mritd.com/2015/12/06/apt-get-common-cmds/</loc>
     
     <lastmod>2015-12-06</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2012/01/02/wei-lai-ke-ji-xuan-ran-shi-pin/</loc>
-    
-    <lastmod>2012-01-02</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/2012/01/02/how-to-use-nexus/</loc>
-    
-    <lastmod>2012-01-02</lastmod>
     
   </url>
   
@@ -1173,6 +1166,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/tags/kubernetes/</loc>
+    <lastmod>2021-06-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://mritd.com/tags/mysql/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
@@ -1181,13 +1181,6 @@
   
   <url>
     <loc>https://mritd.com/tags/ceph/</loc>
-    <lastmod>2021-06-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/tags/kubernetes/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1299,6 +1292,13 @@
   </url>
   
   <url>
+    <loc>https://mritd.com/tags/nerdctl/</loc>
+    <lastmod>2021-06-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://mritd.com/tags/mac/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
@@ -1307,13 +1307,6 @@
   
   <url>
     <loc>https://mritd.com/tags/rime/</loc>
-    <lastmod>2021-06-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://mritd.com/tags/nerdctl/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1448,14 +1441,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/linux/</loc>
+    <loc>https://mritd.com/categories/docker/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/docker/</loc>
+    <loc>https://mritd.com/categories/linux/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1469,13 +1462,6 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/database/</loc>
-    <lastmod>2021-06-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://mritd.com/categories/kubernetes/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
@@ -1483,7 +1469,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/kubernetes/docker/</loc>
+    <loc>https://mritd.com/categories/database/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1498,6 +1484,13 @@
   
   <url>
     <loc>https://mritd.com/categories/hackintosh/</loc>
+    <lastmod>2021-06-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/categories/kubernetes/docker/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1525,14 +1518,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/mac/</loc>
+    <loc>https://mritd.com/categories/containerd/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/containerd/</loc>
+    <loc>https://mritd.com/categories/mac/</loc>
     <lastmod>2021-06-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
