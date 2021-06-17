@@ -2695,6 +2695,85 @@
   
   
   <entry>
+    <title>MySQL 常用操作</title>
+    <link href="/2015/12/28/mysql-common-command/"/>
+    <url>/2015/12/28/mysql-common-command/</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>真心不是搞运维的，命令几天就忘，哎，岁数大了……<br>常用的一些MySQL命令在这里记录一下撒</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#开启远程登录</span>grant all privileges on *.* to <span class="hljs-string">&#x27;user&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span> identified by <span class="hljs-string">&#x27;passwd&#x27;</span> with grant option;<span class="hljs-comment">#创建数据库</span>create database DB;<span class="hljs-comment">#创建用户</span>insert into mysql.user(Host,User,Password) values(<span class="hljs-string">&quot;localhost&quot;</span>,<span class="hljs-string">&quot;user&quot;</span>,password(<span class="hljs-string">&quot;passwd&quot;</span>));<span class="hljs-comment">#删除用户</span>DELETE FROM user WHERE user=<span class="hljs-string">&quot;username&quot;</span> and HOST=<span class="hljs-string">&quot;localhost&quot;</span>;<span class="hljs-comment">#修改指定用户密码</span>update mysql.user <span class="hljs-built_in">set</span> password=password(<span class="hljs-string">&#x27;new passwd&#x27;</span>) <span class="hljs-built_in">where</span> user=<span class="hljs-string">&quot;username&quot;</span> and host=<span class="hljs-string">&quot;localhost&quot;</span>;<span class="hljs-comment">#用户授权</span>grant all privileges on DB.* to <span class="hljs-string">&#x27;user&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> identified by <span class="hljs-string">&#x27;passwd&#x27;</span>;grant select,update on DB.* to <span class="hljs-string">&#x27;user&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> identified by <span class="hljs-string">&#x27;passwd&#x27;</span>;<span class="hljs-comment">#刷新权限</span>flush privileges;<span class="hljs-comment">#数据库导出</span>mysqldump -uUSRENAME -pPASSWD DATABASE &gt; DATABASE.sql<span class="hljs-comment">#数据库导出(只导出表结构 -d)</span>mysqldump -uUSRENAME -pPASSWD -d DATABASE &gt; DATABASE.sql<span class="hljs-comment">#数据库导入</span><span class="hljs-comment">#1.切换数据库</span>use DATABASE;<span class="hljs-comment">#2.设置编码</span><span class="hljs-built_in">set</span> names utf8;<span class="hljs-comment">#3.执行导入操作</span><span class="hljs-built_in">source</span> /home/abc/abc.sql;<span class="hljs-comment">#直接导入</span>mysql -uUSERNAME -p DATABASE &lt; DATABASE.sql</code></pre></div>]]></content>
+    
+    
+    <categories>
+      
+      <category>Linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>MySQL</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Linux 下 MySQL 密码强制修改</title>
+    <link href="/2015/12/28/forced-change-mysql-passowrd-on-linux/"/>
+    <url>/2015/12/28/forced-change-mysql-passowrd-on-linux/</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>好吧好吧，这事不怨我，二逼同事打扰我，就输错了……</p></blockquote><h3 id="一、停掉mysql服务"><a href="#一、停掉mysql服务" class="headerlink" title="一、停掉mysql服务"></a>一、停掉mysql服务</h3><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#单独安装的mysql</span>service mysqld stop<span class="hljs-comment">#其他如lnmp脚本安装的</span>lnmp mysql stop</code></pre></div><h3 id="二、启动mysql，禁止权限验证"><a href="#二、启动mysql，禁止权限验证" class="headerlink" title="二、启动mysql，禁止权限验证"></a>二、启动mysql，禁止权限验证</h3><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#在mysql安装目录的bin目录下执行(&amp;后台执行)</span>/usr/<span class="hljs-built_in">local</span>/mysql/bin/mysqld_safe --skip-grant-tables &amp;</code></pre></div><h3 id="三、本地登录，更改密码"><a href="#三、本地登录，更改密码" class="headerlink" title="三、本地登录，更改密码"></a>三、本地登录，更改密码</h3><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#本地 localhost登录无需密码</span>mysql -u root<span class="hljs-comment">#切换数据库</span>mysql&gt;use mysql;<span class="hljs-comment">#更改密码</span>mysql&gt;update user <span class="hljs-built_in">set</span> password=password(<span class="hljs-string">&quot;newpasswd&quot;</span>) <span class="hljs-built_in">where</span> user=<span class="hljs-string">&quot;root&quot;</span>;<span class="hljs-comment">#刷新权限</span>mysql&gt;flush privileges;<span class="hljs-comment">#退出</span>mysql&gt;\q</code></pre></div><h3 id="四、启动mysql"><a href="#四、启动mysql" class="headerlink" title="四、启动mysql"></a>四、启动mysql</h3><ul><li>先停掉已经跳过权限的mysql启动进程</li></ul><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#查询mysql是否启动</span>ps aux | grep <span class="hljs-string">&quot;mysql&quot;</span><span class="hljs-comment">#如果发现 有  --skip-grant-tables  类似的进程 找到其 PID kill掉</span><span class="hljs-comment">#然后在 kill掉其他进程</span><span class="hljs-comment">#PID : 用户名后面的 数字为PID</span><span class="hljs-built_in">kill</span> -9 PID</code></pre></div><ul><li>正常启动mysql</li></ul><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#普通直接安装</span>service mysqld start<span class="hljs-comment">#lnmp脚本安装</span>lnmp mysql start</code></pre></div><ul><li>登录测试</li></ul><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#输入密码</span>mysql -uroot -p</code></pre></div>]]></content>
+    
+    
+    <categories>
+      
+      <category>Linux</category>
+      
+      <category>Database</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Linux</tag>
+      
+      <tag>MySQL</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>apt-get 常用命令</title>
+    <link href="/2015/12/06/apt-get-common-cmds/"/>
+    <url>/2015/12/06/apt-get-common-cmds/</url>
+    
+    <content type="html"><![CDATA[<div class="hljs code-wrapper"><pre><code class="hljs bash">apt-cache search package    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg）</span>apt-cache show package      <span class="hljs-comment">#显示包的相关信息，如说明、大小、版本等</span>apt-cache showpg package    <span class="hljs-comment">#显示包的相关信息，如Reverse Depends（反向依赖）、依赖等</span>apt-get install package       <span class="hljs-comment">#安装包</span>apt-get reinstall package     <span class="hljs-comment">#重新安装包</span>apt-get -f install package    <span class="hljs-comment">#强制安装</span></code></pre></div><div class="hljs code-wrapper"><pre><code class="hljs bash">apt-get remove package        <span class="hljs-comment">#删除包（只是删掉数据和可执行文件，不删除配置文件）</span>apt-get remove --purge package       <span class="hljs-comment">#删除包，包括删除配置文件等</span>apt-get autoremove --purge package   <span class="hljs-comment">#删除包及其依赖的软件包+配置文件等</span>apt-get update          <span class="hljs-comment">#更新源</span>apt-get upgrade         <span class="hljs-comment">#更新已安装的包</span>apt-get dist-upgrade    <span class="hljs-comment">#升级系统</span>apt-get dselect-upgrade        <span class="hljs-comment">#使用 dselect 升级</span>apt-cache depends package      <span class="hljs-comment">#了解使用依赖</span>apt-cache rdepends package     <span class="hljs-comment">#查看该包被哪些包依赖</span>apt-get build-dep package   <span class="hljs-comment">#安装相关的编译环境</span>apt-get <span class="hljs-built_in">source</span> package      <span class="hljs-comment">#下载该包的源代码</span>apt-get clean &amp;&amp; apt-get autoclean  <span class="hljs-comment">#清理下载文件的存档 &amp;&amp; 只清理过时的包</span>apt-get check             <span class="hljs-comment">#检查是否有损坏的依赖</span>dpkg -S filename          <span class="hljs-comment">#查找filename属于哪个软件包</span>apt-file search filename  <span class="hljs-comment">#查找filename属于哪个软件包</span>apt-file list packagename <span class="hljs-comment">#列出软件包的内容</span>apt-file update           <span class="hljs-comment">#更新apt-file的数据库</span>dpkg -l      <span class="hljs-comment">#列出当前系统中所有的包.可以和参数less一起使用在分屏查看（类似于rpm -qa）</span>dpkg -l |grep -i <span class="hljs-string">&quot;pkg&quot;</span>   <span class="hljs-comment">#查看系统中与&quot;pkg&quot;相关联的包（类似于rpm -qa | grep pkg）</span>dpkg -s pkg  <span class="hljs-comment">#查询一个已安装的包的详细信息（类似于rpm -qi）</span>dpkg -L pkg  <span class="hljs-comment">#查询一个已安装的软件包释放了哪些文件（类似于rpm -ql）</span>dpkg -S file     <span class="hljs-comment">#查询系统中某个文件属于哪个软件包（类似于rpm -qf）</span>dpkg -c pkg.deb  <span class="hljs-comment">#查询一个未安装的deb包将会释放哪些文件（类似于rpm -qpl）</span>dpkg -I pkg.deb  <span class="hljs-comment">#查看一个未安装的deb包的详细信息（类似于rpm -qpi）</span>dpkg -i pkg.deb  <span class="hljs-comment">#手动安装软件包（不能解决软依赖性问题，可以用apt-get -f install解决）</span>dpkg -r pkg      <span class="hljs-comment">#卸载软件包（不是完全的卸载，它的配置文件还存在）</span>dpkg -P pkg      <span class="hljs-comment">#全部卸载（不能解决依赖性的问题）</span>dpkg-reconfigure pkg     <span class="hljs-comment">#重新配置</span>dpkg -x pkg.deb dir      <span class="hljs-comment">#将一个deb包解开至dir目录</span>dpkg --pending --remove  <span class="hljs-comment">#移除多余的软件</span><span class="hljs-comment"># 强制安装一个包(忽略依赖及其它问题)</span>dpkg --force-all -i pkg.deb    <span class="hljs-comment">#可以参考dpkg --force-help</span><span class="hljs-comment"># 强制卸载一个包</span>dpkg --force-all -P pkg.debaptitude update   <span class="hljs-comment">#更新可用的包列表</span>aptitude upgrade  <span class="hljs-comment">#升级可用的包</span>aptitude dist-upgrade     <span class="hljs-comment">#将系统升级到新的发行版</span>aptitude install pkgname  <span class="hljs-comment">#安装包</span>aptitude remove pkgname   <span class="hljs-comment">#删除包</span>aptitude purge pkgname    <span class="hljs-comment">#删除包及其配置文件</span>aptitude search string    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg，重要）</span>aptitude show pkgname     <span class="hljs-comment">#显示包的详细信息 （相当于yum info pkg，重要）</span>aptitude clean            <span class="hljs-comment">#删除下载的包文件</span>aptitude autoclean        <span class="hljs-comment">#仅删除过期的包文件</span>apt-get install xrdp      <span class="hljs-comment">#安装图形化</span></code></pre></div>]]></content>
+    
+    
+    <categories>
+      
+      <category>Linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Linux</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>做自己尊重的人-2015北大最短毕业致辞</title>
     <link href="/2012/01/02/zuo-zi-ji-zun-zhong-de-ren-2015-bei-da-zui-duan-bi-ye-zhi-ci/"/>
     <url>/2012/01/02/zuo-zi-ji-zun-zhong-de-ren-2015-bei-da-zui-duan-bi-ye-zhi-ci/</url>
@@ -3298,31 +3377,6 @@
   
   
   <entry>
-    <title>MySQL 常用操作</title>
-    <link href="/2012/01/02/mysql-common-command/"/>
-    <url>/2012/01/02/mysql-common-command/</url>
-    
-    <content type="html"><![CDATA[<blockquote><p>真心不是搞运维的，命令几天就忘，哎，岁数大了……<br>常用的一些MySQL命令在这里记录一下撒</p></blockquote><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#开启远程登录</span>grant all privileges on *.* to <span class="hljs-string">&#x27;user&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span> identified by <span class="hljs-string">&#x27;passwd&#x27;</span> with grant option;<span class="hljs-comment">#创建数据库</span>create database DB;<span class="hljs-comment">#创建用户</span>insert into mysql.user(Host,User,Password) values(<span class="hljs-string">&quot;localhost&quot;</span>,<span class="hljs-string">&quot;user&quot;</span>,password(<span class="hljs-string">&quot;passwd&quot;</span>));<span class="hljs-comment">#删除用户</span>DELETE FROM user WHERE user=<span class="hljs-string">&quot;username&quot;</span> and HOST=<span class="hljs-string">&quot;localhost&quot;</span>;<span class="hljs-comment">#修改指定用户密码</span>update mysql.user <span class="hljs-built_in">set</span> password=password(<span class="hljs-string">&#x27;new passwd&#x27;</span>) <span class="hljs-built_in">where</span> user=<span class="hljs-string">&quot;username&quot;</span> and host=<span class="hljs-string">&quot;localhost&quot;</span>;<span class="hljs-comment">#用户授权</span>grant all privileges on DB.* to <span class="hljs-string">&#x27;user&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> identified by <span class="hljs-string">&#x27;passwd&#x27;</span>;grant select,update on DB.* to <span class="hljs-string">&#x27;user&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> identified by <span class="hljs-string">&#x27;passwd&#x27;</span>;<span class="hljs-comment">#刷新权限</span>flush privileges;<span class="hljs-comment">#数据库导出</span>mysqldump -uUSRENAME -pPASSWD DATABASE &gt; DATABASE.sql<span class="hljs-comment">#数据库导出(只导出表结构 -d)</span>mysqldump -uUSRENAME -pPASSWD -d DATABASE &gt; DATABASE.sql<span class="hljs-comment">#数据库导入</span><span class="hljs-comment">#1.切换数据库</span>use DATABASE;<span class="hljs-comment">#2.设置编码</span><span class="hljs-built_in">set</span> names utf8;<span class="hljs-comment">#3.执行导入操作</span><span class="hljs-built_in">source</span> /home/abc/abc.sql;<span class="hljs-comment">#直接导入</span>mysql -uUSERNAME -p DATABASE &lt; DATABASE.sql</code></pre></div>]]></content>
-    
-    
-    <categories>
-      
-      <category>Linux</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>MySQL</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>Minio - AWS S3 存储开源实现</title>
     <link href="/2012/01/02/minio-aws-s3-storage-open-source-implementation/"/>
     <url>/2012/01/02/minio-aws-s3-storage-open-source-implementation/</url>
@@ -3847,35 +3901,6 @@
   
   
   <entry>
-    <title>Linux 下 MySQL 密码强制修改</title>
-    <link href="/2012/01/02/forced-change-mysql-passowrd-on-linux/"/>
-    <url>/2012/01/02/forced-change-mysql-passowrd-on-linux/</url>
-    
-    <content type="html"><![CDATA[<blockquote><p>好吧好吧，这事不怨我，二逼同事打扰我，就输错了……</p></blockquote><h3 id="一、停掉mysql服务"><a href="#一、停掉mysql服务" class="headerlink" title="一、停掉mysql服务"></a>一、停掉mysql服务</h3><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#单独安装的mysql</span>service mysqld stop<span class="hljs-comment">#其他如lnmp脚本安装的</span>lnmp mysql stop</code></pre></div><h3 id="二、启动mysql，禁止权限验证"><a href="#二、启动mysql，禁止权限验证" class="headerlink" title="二、启动mysql，禁止权限验证"></a>二、启动mysql，禁止权限验证</h3><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#在mysql安装目录的bin目录下执行(&amp;后台执行)</span>/usr/<span class="hljs-built_in">local</span>/mysql/bin/mysqld_safe --skip-grant-tables &amp;</code></pre></div><h3 id="三、本地登录，更改密码"><a href="#三、本地登录，更改密码" class="headerlink" title="三、本地登录，更改密码"></a>三、本地登录，更改密码</h3><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#本地 localhost登录无需密码</span>mysql -u root<span class="hljs-comment">#切换数据库</span>mysql&gt;use mysql;<span class="hljs-comment">#更改密码</span>mysql&gt;update user <span class="hljs-built_in">set</span> password=password(<span class="hljs-string">&quot;newpasswd&quot;</span>) <span class="hljs-built_in">where</span> user=<span class="hljs-string">&quot;root&quot;</span>;<span class="hljs-comment">#刷新权限</span>mysql&gt;flush privileges;<span class="hljs-comment">#退出</span>mysql&gt;\q</code></pre></div><h3 id="四、启动mysql"><a href="#四、启动mysql" class="headerlink" title="四、启动mysql"></a>四、启动mysql</h3><ul><li>先停掉已经跳过权限的mysql启动进程</li></ul><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#查询mysql是否启动</span>ps aux | grep <span class="hljs-string">&quot;mysql&quot;</span><span class="hljs-comment">#如果发现 有  --skip-grant-tables  类似的进程 找到其 PID kill掉</span><span class="hljs-comment">#然后在 kill掉其他进程</span><span class="hljs-comment">#PID : 用户名后面的 数字为PID</span><span class="hljs-built_in">kill</span> -9 PID</code></pre></div><ul><li>正常启动mysql</li></ul><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#普通直接安装</span>service mysqld start<span class="hljs-comment">#lnmp脚本安装</span>lnmp mysql start</code></pre></div><ul><li>登录测试</li></ul><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#输入密码</span>mysql -uroot -p</code></pre></div>]]></content>
-    
-    
-    <categories>
-      
-      <category>Linux</category>
-      
-      <category>Database</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>Linux</tag>
-      
-      <tag>MySQL</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>Gradle 构建基础笔记</title>
     <link href="/2012/01/02/gradle-note/"/>
     <url>/2012/01/02/gradle-note/</url>
@@ -4155,31 +4180,6 @@
     <tags>
       
       <tag>AspectJ</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>apt-get 常用命令</title>
-    <link href="/2006/01/02/apt-get-common-cmds/"/>
-    <url>/2006/01/02/apt-get-common-cmds/</url>
-    
-    <content type="html"><![CDATA[<div class="hljs code-wrapper"><pre><code class="hljs bash">apt-cache search package    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg）</span>apt-cache show package      <span class="hljs-comment">#显示包的相关信息，如说明、大小、版本等</span>apt-cache showpg package    <span class="hljs-comment">#显示包的相关信息，如Reverse Depends（反向依赖）、依赖等</span>apt-get install package       <span class="hljs-comment">#安装包</span>apt-get reinstall package     <span class="hljs-comment">#重新安装包</span>apt-get -f install package    <span class="hljs-comment">#强制安装</span></code></pre></div><div class="hljs code-wrapper"><pre><code class="hljs bash">apt-get remove package        <span class="hljs-comment">#删除包（只是删掉数据和可执行文件，不删除配置文件）</span>apt-get remove --purge package       <span class="hljs-comment">#删除包，包括删除配置文件等</span>apt-get autoremove --purge package   <span class="hljs-comment">#删除包及其依赖的软件包+配置文件等</span>apt-get update          <span class="hljs-comment">#更新源</span>apt-get upgrade         <span class="hljs-comment">#更新已安装的包</span>apt-get dist-upgrade    <span class="hljs-comment">#升级系统</span>apt-get dselect-upgrade        <span class="hljs-comment">#使用 dselect 升级</span>apt-cache depends package      <span class="hljs-comment">#了解使用依赖</span>apt-cache rdepends package     <span class="hljs-comment">#查看该包被哪些包依赖</span>apt-get build-dep package   <span class="hljs-comment">#安装相关的编译环境</span>apt-get <span class="hljs-built_in">source</span> package      <span class="hljs-comment">#下载该包的源代码</span>apt-get clean &amp;&amp; apt-get autoclean  <span class="hljs-comment">#清理下载文件的存档 &amp;&amp; 只清理过时的包</span>apt-get check             <span class="hljs-comment">#检查是否有损坏的依赖</span>dpkg -S filename          <span class="hljs-comment">#查找filename属于哪个软件包</span>apt-file search filename  <span class="hljs-comment">#查找filename属于哪个软件包</span>apt-file list packagename <span class="hljs-comment">#列出软件包的内容</span>apt-file update           <span class="hljs-comment">#更新apt-file的数据库</span>dpkg -l      <span class="hljs-comment">#列出当前系统中所有的包.可以和参数less一起使用在分屏查看（类似于rpm -qa）</span>dpkg -l |grep -i <span class="hljs-string">&quot;pkg&quot;</span>   <span class="hljs-comment">#查看系统中与&quot;pkg&quot;相关联的包（类似于rpm -qa | grep pkg）</span>dpkg -s pkg  <span class="hljs-comment">#查询一个已安装的包的详细信息（类似于rpm -qi）</span>dpkg -L pkg  <span class="hljs-comment">#查询一个已安装的软件包释放了哪些文件（类似于rpm -ql）</span>dpkg -S file     <span class="hljs-comment">#查询系统中某个文件属于哪个软件包（类似于rpm -qf）</span>dpkg -c pkg.deb  <span class="hljs-comment">#查询一个未安装的deb包将会释放哪些文件（类似于rpm -qpl）</span>dpkg -I pkg.deb  <span class="hljs-comment">#查看一个未安装的deb包的详细信息（类似于rpm -qpi）</span>dpkg -i pkg.deb  <span class="hljs-comment">#手动安装软件包（不能解决软依赖性问题，可以用apt-get -f install解决）</span>dpkg -r pkg      <span class="hljs-comment">#卸载软件包（不是完全的卸载，它的配置文件还存在）</span>dpkg -P pkg      <span class="hljs-comment">#全部卸载（不能解决依赖性的问题）</span>dpkg-reconfigure pkg     <span class="hljs-comment">#重新配置</span>dpkg -x pkg.deb dir      <span class="hljs-comment">#将一个deb包解开至dir目录</span>dpkg --pending --remove  <span class="hljs-comment">#移除多余的软件</span><span class="hljs-comment"># 强制安装一个包(忽略依赖及其它问题)</span>dpkg --force-all -i pkg.deb    <span class="hljs-comment">#可以参考dpkg --force-help</span><span class="hljs-comment"># 强制卸载一个包</span>dpkg --force-all -P pkg.debaptitude update   <span class="hljs-comment">#更新可用的包列表</span>aptitude upgrade  <span class="hljs-comment">#升级可用的包</span>aptitude dist-upgrade     <span class="hljs-comment">#将系统升级到新的发行版</span>aptitude install pkgname  <span class="hljs-comment">#安装包</span>aptitude remove pkgname   <span class="hljs-comment">#删除包</span>aptitude purge pkgname    <span class="hljs-comment">#删除包及其配置文件</span>aptitude search string    <span class="hljs-comment">#搜索包（相当于yum list | grep pkg，重要）</span>aptitude show pkgname     <span class="hljs-comment">#显示包的详细信息 （相当于yum info pkg，重要）</span>aptitude clean            <span class="hljs-comment">#删除下载的包文件</span>aptitude autoclean        <span class="hljs-comment">#仅删除过期的包文件</span>apt-get install xrdp      <span class="hljs-comment">#安装图形化</span></code></pre></div>]]></content>
-    
-    
-    <categories>
-      
-      <category>Linux</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>Linux</tag>
       
     </tags>
     
