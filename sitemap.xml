@@ -1469,14 +1469,14 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/linux/</loc>
+    <loc>https://mritd.com/categories/docker/</loc>
     <lastmod>2021-06-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/docker/</loc>
+    <loc>https://mritd.com/categories/linux/</loc>
     <lastmod>2021-06-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1504,7 +1504,7 @@
   </url>
   
   <url>
-    <loc>https://mritd.com/categories/kubernetes/docker/</loc>
+    <loc>https://mritd.com/categories/golang/caddy/</loc>
     <lastmod>2021-06-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -1519,6 +1519,13 @@
   
   <url>
     <loc>https://mritd.com/categories/hackintosh/</loc>
+    <lastmod>2021-06-30</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://mritd.com/categories/kubernetes/docker/</loc>
     <lastmod>2021-06-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
