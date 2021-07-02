@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>Caddy2 file server 自动重定向问题</title>
+    <link href="/2021/07/02/fix-caddy2-fileserver-auto-redirect/"/>
+    <url>/2021/07/02/fix-caddy2-fileserver-auto-redirect/</url>
+    
+    <content type="html"><![CDATA[<h2 id="一、事情起因"><a href="#一、事情起因" class="headerlink" title="一、事情起因"></a>一、事情起因</h2><p>自打很多年前开始使用静态博客工具来发布博客，现在基本上博客源码编译后就是一堆 html 等静态文件；一开始使用 nginx 作为静态文件服务器，后来切换到的 Caddy2；不过最近在 Google Search Console 中发现了大量的无效链接，给出的提示是 “网页会自动重定向”。</p><p><img src="https://cdn.oss.link/markdown/V71ZCH.png"></p><p>经过测试后发现这些链接地址在访问时都会重定向一下，然后在结尾加上 <code>/</code>；没办法我就开始探索这个 <code>/</code> 是怎么来的了。</p><h2 id="二、源码分析"><a href="#二、源码分析" class="headerlink" title="二、源码分析"></a>二、源码分析</h2><p>没办法，也不知道那个配置影响的，只能去翻 file server 的源码，在几经查找之后找到了以下代码(而且还带着注释):</p><p><img src="https://cdn.oss.link/markdown/LbCAVp.png"></p><p>从代码逻辑上看，只要 <code>*fsrv.CanonicalURIs</code> 这个变量为 <code>true</code>，那么就会触发自动重定像，并在 “目录” 尾部补上 <code>/</code>；注释里也说的很清楚是为了目录规范化，如果想看详细讨论可以参考那两个 issue。</p><h2 id="三、解决方案"><a href="#三、解决方案" class="headerlink" title="三、解决方案"></a>三、解决方案</h2><h3 id="3-1、Admin-API"><a href="#3-1、Admin-API" class="headerlink" title="3.1、Admin API"></a>3.1、Admin API</h3><p>翻了这个 <code>*fsrv.CanonicalURIs</code> 变量以后，突然发现 Caddyfile 里其实是不支持这个配置的；所以比较 low 的办法就是利用 Admin API，先把 json 弄出来，然后加上配置再。POST 回去:</p><div class="hljs code-wrapper"><pre><code class="hljs diff">&#123;&quot;apps&quot;: &#123;&quot;http&quot;: &#123;&quot;servers&quot;: &#123;&quot;srv0&quot;: &#123;&quot;listen&quot;: [&quot;:80&quot;],&quot;routes&quot;: [&#123;&quot;handle&quot;: [&#123;<span class="hljs-addition">+&quot;canonical_uris&quot;: false,</span>&quot;handler&quot;: &quot;file_server&quot;,&quot;hide&quot;: [&quot;./Caddyfile&quot;]&#125;]&#125;]&#125;&#125;&#125;&#125;&#125;</code></pre></div><div class="hljs code-wrapper"><pre><code class="hljs sh">curl -XPOST http://localhost:2019/load -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -d @caddy.json</code></pre></div><h3 id="3-2、升级版本"><a href="#3-2、升级版本" class="headerlink" title="3.2、升级版本"></a>3.2、升级版本</h3><p>现在可以直接从 master 构建 Caddy，或者等待 <code>v2.4.4</code> 版本发布，这两种方式产生的 Caddy 二进制文件已经支持了这个配置选项，配置样例如下:</p><div class="hljs code-wrapper"><pre><code class="hljs go">:<span class="hljs-number">80</span>file_server &#123;disable_canonical_uris&#125;</code></pre></div>]]></content>
+    
+    
+    <categories>
+      
+      <category>Golang</category>
+      
+      <category>Caddy</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Caddy</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Caddyfile 语法浅析</title>
     <link href="/2021/06/30/understand-caddyfile-syntax/"/>
     <url>/2021/06/30/understand-caddyfile-syntax/</url>
