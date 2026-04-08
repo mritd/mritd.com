@@ -1,0 +1,979 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="Golang,Telegram">
+  
+    <meta name="description" content="Telegram 确实好用，搓个 Bot 也好玩">
+<meta property="og:type" content="article">
+<meta property="og:title" content="搓一个 Telegram Bot">
+<meta property="og:url" content="https://mritd.com/2021/06/03/make-a-telegram-bot/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="Telegram 确实好用，搓个 Bot 也好玩">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/telegram.jpg">
+<meta property="article:published_time" content="2021-06-03T04:20:00.000Z">
+<meta property="article:modified_time" content="2021-06-03T04:20:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="Telegram">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/telegram.jpg">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>搓一个 Telegram Bot - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="搓一个 Telegram Bot"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-06-03 12:20" pubdate>
+          2021年6月3日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          39 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">搓一个 Telegram Bot</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>在一个月光如雪的晚上和 PMheart 在 Telegram 闲聊，突然发现群里一个人的昵称是当前时间，然后观察一会儿发现还在不停变化… 最可气的是他还弄个 “东半球🌏最准报时” 的头衔，我一开始以为是 Telegram 又出的什么 “高级功能”(毕竟微信炸💩都是 Telegram 好久之前玩剩下的)，几经 Google 我发现其实就是自己写个 Bot，然后定时 rename；<strong>那我要不整个 “东半球最浪漫诗人” 岂不是太面了🤔。</strong></p>
+</blockquote>
+<h2 id="一、Telegram-Bot-介绍"><a href="#一、Telegram-Bot-介绍" class="headerlink" title="一、Telegram Bot 介绍"></a>一、Telegram Bot 介绍</h2><p>在 Telegram 官方的文档描述中，其 Bot Api 实质上分为两种，这两种 Api 用途也各不相同:</p>
+<h3 id="1-1、标准-Bot"><a href="#1-1、标准-Bot" class="headerlink" title="1.1、标准 Bot"></a>1.1、标准 Bot</h3><p>由用户自行联系 <code>BotFather</code> (人如其名)交互式创建，该 Bot 是官方所认为的标准 Bot，其主要目的就是作为一个真正的 Bot；我们可以通过一个 Token 调用 Telegram Api 来控制它，玩法很多，包括不限于发送告警、作为群管机器人、交互式的帮你做各种自动化等等；同时这个 Bot 具有严格的隐私权限控制，比如拉到群里可以控制 Bot 对群消息是否可见等等(Telegram 这点做的非常 OJBK)；借助于这类 Bot，也有些脑洞大开的大哥在浪的边缘疯狂试探，比如下面的扫雷机器人:</p>
+<p><img src="https://cdn.oss.link/markdown/I3IcQn.png" srcset="/img/loading.gif" lazyload alt="I3IcQn"></p>
+<p>还有算命的:<br><img src="https://cdn.oss.link/markdown/pIZYSS.png" srcset="/img/loading.gif" lazyload alt="pIZYSS"></p>
+<p>Github 真正干活的:<br><img src="https://cdn.oss.link/markdown/9wPxeI.png" srcset="/img/loading.gif" lazyload alt="9wPxeI"></p>
+<p>我的证书告警:<br><img src="https://cdn.oss.link/markdown/HAvQny.png" srcset="/img/loading.gif" lazyload alt="HAvQny"></p>
+<p>当然肯定有高铁动车组的(🔞我是正经人):<br><img src="https://cdn.oss.link/markdown/1zmI2m.png" srcset="/img/loading.gif" lazyload alt="1zmI2m"></p>
+<h3 id="1-2、客户端-Bot"><a href="#1-2、客户端-Bot" class="headerlink" title="1.2、客户端 Bot"></a>1.2、客户端 Bot</h3><p>准确的官方介绍是 <code>TDLib – build your own Telegram</code>，从这个介绍可以看出，这一个 “Bot” Api 本质上并不是让你写 Bot，而是作为开发一个第三方 Telegram 客户端用的；所以这个 Api 的权限很大，可以完整的模拟一个用户；目前我发现被滥用最多的就是用这个 Api 作为恶意拉人、发广告等，简直是币圈割韭菜御用。</p>
+<p><strong>TDLib 本质上是一个 C++ 的 lib，官方提供了引导页面来帮助你用主流语言跨语言调用来使用它:</strong></p>
+<p><img src="https://cdn.oss.link/markdown/yTAC3k.png" srcset="/img/loading.gif" lazyload alt="yTAC3k"></p>
+<h2 id="二、标准-Bot-使用"><a href="#二、标准-Bot-使用" class="headerlink" title="二、标准 Bot 使用"></a>二、标准 Bot 使用</h2><p>标准 Bot 使用相对简单，按照官方文档跟 <code>BotFather</code> 聊天创建一个即可:</p>
+<p><img src="https://cdn.oss.link/markdown/gPhI8O.png" srcset="/img/loading.gif" lazyload alt="gPhI8O"></p>
+<p>当创建完成后在 Bot 设置界面你可以获取一个 <code>Token</code>，使用这个 Token 连接 Bot Api 地址就可以开始控制你的 Bot；Golang 开发可以考虑使用 <a target="_blank" rel="noopener" href="https://github.com/tucnak/telebot">https://github.com/tucnak/telebot</a> 这个库，用法相当简单:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;log&quot;</span><br>	<span class="hljs-string">&quot;time&quot;</span><br><br>	tb <span class="hljs-string">&quot;gopkg.in/tucnak/telebot.v2&quot;</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	b, err := tb.NewBot(tb.Settings&#123;<br>		<span class="hljs-comment">// You can also set custom API URL.</span><br>		<span class="hljs-comment">// If field is empty it equals to &quot;https://api.telegram.org&quot;.</span><br>		URL: <span class="hljs-string">&quot;http://195.129.111.17:8012&quot;</span>,<br><br>		Token:  <span class="hljs-string">&quot;TOKEN_HERE&quot;</span>,<br>		Poller: &amp;tb.LongPoller&#123;Timeout: <span class="hljs-number">10</span> * time.Second&#125;,<br>	&#125;)<br><br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(err)<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	b.Handle(<span class="hljs-string">&quot;/hello&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(m *tb.Message)</span></span> &#123;<br>		b.Send(m.Sender, <span class="hljs-string">&quot;Hello World!&quot;</span>)<br>	&#125;)<br><br>	b.Start()<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>基于这个库，我为了方便使用写了一个命令行小工具，方便我发送告警信息等: <a target="_blank" rel="noopener" href="https://github.com/mritd/tgsend">tgsend</a></p>
+<p><img src="https://cdn.oss.link/markdown/BCSMIV.png" srcset="/img/loading.gif" lazyload alt="BCSMIV"></p>
+<p><img src="https://cdn.oss.link/markdown/warOjJ.png" srcset="/img/loading.gif" lazyload alt="warOjJ"></p>
+<h2 id="三、客户端-Api-使用"><a href="#三、客户端-Api-使用" class="headerlink" title="三、客户端 Api 使用"></a>三、客户端 Api 使用</h2><p>标准 Bot Api 很丰富，日常干活啥的也完全能满足，但是！**人如果不会装X那和咸鱼有什么区别？**我的 “东半球最浪漫诗人” 得提上日程。</p>
+<h3 id="3-1、TDLib-构建"><a href="#3-1、TDLib-构建" class="headerlink" title="3.1、TDLib 构建"></a>3.1、TDLib 构建</h3><p>关于 Api 易用性，开发生态环境，这一点说实话，Telegram 能把所有国内 IM 按在地上摩擦，就像这样:</p>
+<p><img src="https://cdn.oss.link/markdown/iI1jz8.jpg" srcset="/img/loading.gif" lazyload alt="iI1jz8"></p>
+<p>Telegram 官方提供了完整的 “点一点” 构建 TDLib 引导页面: <a target="_blank" rel="noopener" href="https://tdlib.github.io/td/build.html">https://tdlib.github.io/td/build.html</a></p>
+<p>勾选好自己的语言、操作系统、系统版本、甚至是编译的内存大小等设置后，无脑复制下面的命令执行就行:</p>
+<p><img src="https://cdn.oss.link/markdown/DnZdvD.png" srcset="/img/loading.gif" lazyload alt="DnZdvD"></p>
+<h3 id="3-2、Telegram-API-HASH"><a href="#3-2、Telegram-API-HASH" class="headerlink" title="3.2、Telegram API HASH"></a>3.2、Telegram API HASH</h3><p>TDLib 构建完成后，需要自行申请一个 API_HASH，API_HASH 类似一个让 Telegram 识别你的客户端的 “合法标识”；API_HASH 申请需要登陆 <a target="_blank" rel="noopener" href="https://my.telegram.org/">https://my.telegram.org/</a>，然后选择 <strong>API development tools</strong>:</p>
+<p><img src="https://cdn.oss.link/markdown/qp2BjK.png" srcset="/img/loading.gif" lazyload alt="qp2BjK"></p>
+<p>然后填写相关信息，最后 Telegram 就会为你生成好 API_HASH:</p>
+<p><img src="https://cdn.oss.link/markdown/QGoh8Q.png" srcset="/img/loading.gif" lazyload alt="QGoh8Q"></p>
+<h3 id="3-3、TDLib-使用"><a href="#3-3、TDLib-使用" class="headerlink" title="3.3、TDLib 使用"></a>3.3、TDLib 使用</h3><p>TDLib 构建好了，API HASH 也有了，那么根据自己选择的语言找一个靠谱的 SDK 使用即可；比如 Golang 开发，我选择了 <a target="_blank" rel="noopener" href="https://github.com/Arman92/go-tdlib">https://github.com/Arman92/go-tdlib</a>，这个库使用相当简单:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;fmt&quot;</span><br><br>	<span class="hljs-string">&quot;github.com/Arman92/go-tdlib&quot;</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	tdlib.SetLogVerbosityLevel(<span class="hljs-number">1</span>)<br>	tdlib.SetFilePath(<span class="hljs-string">&quot;./errors.txt&quot;</span>)<br><br>	<span class="hljs-comment">// Create new instance of client</span><br>	client := tdlib.NewClient(tdlib.Config&#123;<br>		APIID:               <span class="hljs-string">&quot;187786&quot;</span>,<br>		APIHash:             <span class="hljs-string">&quot;e782045df67ba48e441ccb105da8fc85&quot;</span>,<br>		SystemLanguageCode:  <span class="hljs-string">&quot;en&quot;</span>,<br>		DeviceModel:         <span class="hljs-string">&quot;Server&quot;</span>,<br>		SystemVersion:       <span class="hljs-string">&quot;1.0.0&quot;</span>,<br>		ApplicationVersion:  <span class="hljs-string">&quot;1.0.0&quot;</span>,<br>		UseMessageDatabase:  <span class="hljs-literal">true</span>,<br>		UseFileDatabase:     <span class="hljs-literal">true</span>,<br>		UseChatInfoDatabase: <span class="hljs-literal">true</span>,<br>		UseTestDataCenter:   <span class="hljs-literal">false</span>,<br>		DatabaseDirectory:   <span class="hljs-string">&quot;./tdlib-db&quot;</span>,<br>		FileDirectory:       <span class="hljs-string">&quot;./tdlib-files&quot;</span>,<br>		IgnoreFileNames:     <span class="hljs-literal">false</span>,<br>	&#125;)<br><br>	<span class="hljs-keyword">for</span> &#123;<br>		currentState, _ := client.Authorize()<br>		<span class="hljs-keyword">if</span> currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitPhoneNumberType &#123;<br>			fmt.Print(<span class="hljs-string">&quot;Enter phone: &quot;</span>)<br>			<span class="hljs-keyword">var</span> number <span class="hljs-type">string</span><br>			fmt.Scanln(&amp;number)<br>			_, err := client.SendPhoneNumber(number)<br>			<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>				fmt.Printf(<span class="hljs-string">&quot;Error sending phone number: %v&quot;</span>, err)<br>			&#125;<br>		&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitCodeType &#123;<br>			fmt.Print(<span class="hljs-string">&quot;Enter code: &quot;</span>)<br>			<span class="hljs-keyword">var</span> code <span class="hljs-type">string</span><br>			fmt.Scanln(&amp;code)<br>			_, err := client.SendAuthCode(code)<br>			<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>				fmt.Printf(<span class="hljs-string">&quot;Error sending auth code : %v&quot;</span>, err)<br>			&#125;<br>		&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitPasswordType &#123;<br>			fmt.Print(<span class="hljs-string">&quot;Enter Password: &quot;</span>)<br>			<span class="hljs-keyword">var</span> password <span class="hljs-type">string</span><br>			fmt.Scanln(&amp;password)<br>			_, err := client.SendAuthPassword(password)<br>			<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>				fmt.Printf(<span class="hljs-string">&quot;Error sending auth password: %v&quot;</span>, err)<br>			&#125;<br>		&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateReadyType &#123;<br>			fmt.Println(<span class="hljs-string">&quot;Authorization Ready! Let&#x27;s rock&quot;</span>)<br>			<span class="hljs-keyword">break</span><br>		&#125;<br>	&#125;<br><br>	<span class="hljs-comment">// Main loop</span><br>	<span class="hljs-keyword">for</span> update := <span class="hljs-keyword">range</span> client.RawUpdates &#123;<br>		<span class="hljs-comment">// Show all updates</span><br>		fmt.Println(update.Data)<br>		fmt.Print(<span class="hljs-string">&quot;\n\n&quot;</span>)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>由于 Telegram 是允许多客户端登陆的(<strong>跟我一起喊:微信垃圾、张小龙垃圾</strong>)，所以使用 TDLib 我们可以完全控制我们的账户行为；那么 “东半球最浪漫诗人” 实现就相对简单:</p>
+<ul>
+<li>自己爬一点古诗名句: <a target="_blank" rel="noopener" href="https://github.com/mritd/poetbot/blob/master/poet.txt">https://github.com/mritd/poetbot/blob/master/poet.txt</a></li>
+<li>写点代码定时 rename: <a target="_blank" rel="noopener" href="https://github.com/mritd/poetbot/blob/master/main.go#L165">https://github.com/mritd/poetbot/blob/master/main.go#L165</a></li>
+</ul>
+<p>核心代码就这几行:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 一个定时任务工具</span><br>cn := cron.New()<br><br><span class="hljs-comment">// 默认 30s 执行一次</span><br>_, err = cn.AddFunc(c.String(<span class="hljs-string">&quot;cron&quot;</span>), <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>    rand.Seed(time.Now().Unix())<br>    <span class="hljs-comment">// 随机取一句诗</span><br>    name := data[rand.Intn(<span class="hljs-built_in">len</span>(data)<span class="hljs-number">-1</span>)]<br>    logger.Infof(<span class="hljs-string">&quot;update name to [%s]...&quot;</span>, name)<br>    <span class="hljs-comment">// 调用 TDLib 改名</span><br>    _, err := client.SetName(name, <span class="hljs-string">&quot;&quot;</span>)<br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>        logger.Error(err)<br>    &#125;<br>&#125;)<br></code></pre></td></tr></table></figure>
+
+<p>效果嘛，就这样:</p>
+<p><img src="https://cdn.oss.link/markdown/A15b2P.png" srcset="/img/loading.gif" lazyload alt="A15b2P"></p>
+<p><img src="https://cdn.oss.link/markdown/3MXSCI.png" srcset="/img/loading.gif" lazyload alt="3MXSCI"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/golang/" class="category-chain-item">Golang</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/golang/" class="print-no-link">#Golang</a>
+      
+        <a href="/tags/telegram/" class="print-no-link">#Telegram</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>搓一个 Telegram Bot</div>
+      <div>https://mritd.com/2021/06/03/make-a-telegram-bot/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2021年6月3日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/06/04/liao-liao-fu-sheng-mo-wen-qian-cheng/" title="寥寥浮生，莫问前程">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">寥寥浮生，莫问前程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/06/01/nerdctl-test/" title="nerdctl 初试">
+                        <span class="hidden-mobile">nerdctl 初试</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2021/06/03/make-a-telegram-bot/';
+          this.page.identifier = '/2021/06/03/make-a-telegram-bot/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d2a1f"/>
+      <stop offset="100%" style="stop-color:#1a4a35"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+
+  <!-- x*y=k AMM curve -->
+  <g transform="translate(400, 140)">
+    <!-- Axes -->
+    <line x1="-130" y1="80" x2="140" y2="80" stroke="#81c784" stroke-width="1.5" opacity="0.4"/>
+    <line x1="-120" y1="90" x2="-120" y2="-80" stroke="#81c784" stroke-width="1.5" opacity="0.4"/>
+    <!-- Curve x*y=k -->
+    <path d="M-100,-60 C-80,-40 -50,10 -20,30 S60,65 120,72" fill="none" stroke="#81c784" stroke-width="3"/>
+    <!-- Point on curve -->
+    <circle cx="-20" cy="30" r="6" fill="#81c784"/>
+    <!-- Dotted projection lines -->
+    <line x1="-20" y1="30" x2="-20" y2="80" stroke="#81c784" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+    <line x1="-20" y1="30" x2="-120" y2="30" stroke="#81c784" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+  </g>
+  <!-- Label -->
+  <text x="540" y="125" fill="#81c784" font-family="'Helvetica Neue', Arial, sans-serif" font-size="18" font-style="italic" opacity="0.7">x * y = k</text>
+
+  <text x="400" y="310" text-anchor="middle" fill="#e8eaed" font-family="'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="700">vAMM Perpetuals</text>
+  <text x="400" y="350" text-anchor="middle" fill="#81c784" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="400">Virtual AMM Evolution</text>
+  <rect x="340" y="370" width="120" height="3" rx="1.5" fill="#81c784"/>
+</svg>

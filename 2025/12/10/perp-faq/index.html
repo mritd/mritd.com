@@ -1,0 +1,1907 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="Web3,永续合约,FAQ,清算,vAMM,JIT,JELLY">
+  
+    <meta name="description" content="本文整理了永续合约相关的 30 个边界问题, 涵盖 OI 机制, 保证金细节, 清算边界, vAMM 可行性, JIT 做市以及 JELLY 攻击等实际场景">
+<meta property="og:type" content="article">
+<meta property="og:title" content="永续合约 11 - 一些边界问题">
+<meta property="og:url" content="https://mritd.com/2025/12/10/perp-faq/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="本文整理了永续合约相关的 30 个边界问题, 涵盖 OI 机制, 保证金细节, 清算边界, vAMM 可行性, JIT 做市以及 JELLY 攻击等实际场景">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/perp-faq.svg">
+<meta property="article:published_time" content="2025-12-10T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-12-10T02:00:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="FAQ">
+<meta property="article:tag" content="Web3">
+<meta property="article:tag" content="永续合约">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/perp-faq.svg">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>永续合约 11 - 一些边界问题 - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="永续合约 11 - 一些边界问题"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-12-10 10:00" pubdate>
+          2025年12月10日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          17k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          145 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">永续合约 11 - 一些边界问题</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>本文整理了永续合约相关的 30 个边界问题, 涵盖 OI 机制, 保证金细节, 清算边界条件, vAMM 可行性, JIT 做市以及 JELLY 攻击等场景, 每个问题附对应文档链接.</p>
+<hr>
+<h2 id="一、目录"><a href="#一、目录" class="headerlink" title="一、目录"></a>一、目录</h2><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>分类</th>
+<th>问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>基础概念</td>
+<td>OI (未平仓合约) 为什么 long &#x3D; short?</td>
+</tr>
+<tr>
+<td>2</td>
+<td>交易</td>
+<td>开仓后亏了能取消吗?</td>
+</tr>
+<tr>
+<td>3</td>
+<td>保证金</td>
+<td>合约盈利了, 为什么显示的保证金反而在减少?</td>
+</tr>
+<tr>
+<td>4</td>
+<td>保证金</td>
+<td>持仓保证金 vs 维持保证金到底什么关系?</td>
+</tr>
+<tr>
+<td>5</td>
+<td>保证金</td>
+<td>$300 → $90 之间发生了什么?</td>
+</tr>
+<tr>
+<td>6</td>
+<td>保证金</td>
+<td>维持保证金率是谁定的?</td>
+</tr>
+<tr>
+<td>7</td>
+<td>清算</td>
+<td>ADL 触发后盈利方怎么被选中?</td>
+</tr>
+<tr>
+<td>8</td>
+<td>清算</td>
+<td>Chainlink Keepers 是 Chainlink 自己的清算机器人吗?</td>
+</tr>
+<tr>
+<td>9</td>
+<td>清算</td>
+<td>级联清算为什么会进入死亡螺旋? 为什么没人去 “捡钱”?</td>
+</tr>
+<tr>
+<td>10</td>
+<td>模型</td>
+<td>vAMM 还有人在用吗?</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Oracle</td>
+<td>CEX 互相引用价格会不会 “死锁”?</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Funding</td>
+<td>为什么用 premium 而不是 basis 计算资金费率?</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Funding</td>
+<td>资金费率计算方式是公开的吗?</td>
+</tr>
+<tr>
+<td>14</td>
+<td>撮合</td>
+<td>买单最高价优先, 卖单为什么最低价优先?</td>
+</tr>
+<tr>
+<td>15</td>
+<td>撮合</td>
+<td>买方出 $3000, 卖方要 $2900, 差价归谁?</td>
+</tr>
+<tr>
+<td>16</td>
+<td>撮合</td>
+<td>为什么交易所不自己赚差价?</td>
+</tr>
+<tr>
+<td>17</td>
+<td>JIT</td>
+<td>JIT 做市靠的是 Solana 原生支持永续合约吗?</td>
+</tr>
+<tr>
+<td>18</td>
+<td>JIT</td>
+<td>JIT 窗口只有 400ms, 做市商来得及吗?</td>
+</tr>
+<tr>
+<td>19</td>
+<td>JIT</td>
+<td>JIT 失败只损失 gas 吗?</td>
+</tr>
+<tr>
+<td>20</td>
+<td>GMX</td>
+<td>GMX Swap vs Uniswap, 能替代 DEX 换币吗?</td>
+</tr>
+<tr>
+<td>21</td>
+<td>GMX</td>
+<td>GLP vs 直接持有资产, 谁更划算?</td>
+</tr>
+<tr>
+<td>22</td>
+<td>GMX</td>
+<td>GLP 持有者和 GMX Staker 什么区别?</td>
+</tr>
+<tr>
+<td>23</td>
+<td>GMX</td>
+<td>为什么 GMX 需要双代币设计?</td>
+</tr>
+<tr>
+<td>24</td>
+<td>Hyperliquid</td>
+<td>为什么要做现货订单簿?</td>
+</tr>
+<tr>
+<td>25</td>
+<td>Hyperliquid</td>
+<td>代码不开源怎么确认安全?</td>
+</tr>
+<tr>
+<td>26</td>
+<td>Hyperliquid</td>
+<td>HIP-1 意味着任何人发币就有流动性?</td>
+</tr>
+<tr>
+<td>27</td>
+<td>攻击</td>
+<td>JELLY 攻击者怎么用两个账户盈利?</td>
+</tr>
+<tr>
+<td>28</td>
+<td>攻击</td>
+<td>Hyperliquid 为什么没发现异常?</td>
+</tr>
+<tr>
+<td>29</td>
+<td>基础设施</td>
+<td>OP Stack 是什么?</td>
+</tr>
+<tr>
+<td>30</td>
+<td>术语</td>
+<td>L2 Book 里的 L2 是什么意思?</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="二、基础概念"><a href="#二、基础概念" class="headerlink" title="二、基础概念"></a>二、基础概念</h2><h3 id="2-1-OI-未平仓合约-为什么-long-总量-short-总量-q1"><a href="#2-1-OI-未平仓合约-为什么-long-总量-short-总量-q1" class="headerlink" title="2.1 OI (未平仓合约) 为什么 long 总量 &#x3D; short 总量? {#q1}"></a>2.1 OI (未平仓合约) 为什么 long 总量 &#x3D; short 总量? {#q1}</h3><blockquote>
+<p>相关: <a href="/2025/07/15/perp-mechanics/">永续合约机制详解</a> §1</p>
+</blockquote>
+<p><strong>因为每一笔成交必然同时产生 1 个 long position + 1 个 short position.</strong> 这是撮合机制的数学必然, 不是市场行为的结果.</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs arduino">OI = Σ <span class="hljs-type">long</span> notional = Σ <span class="hljs-type">short</span> notional    <span class="hljs-comment">// 恒等式, 不是取 min 也不是取 max</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>常见误解: “我做多, 没人做空, OI 怎么算?”</strong></p>
+<p>答案: 没人做空, 你的订单就不会成交, OI 不增加.</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>交易所类型</th>
+<th>没有对手方时的表现</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>订单簿型 (dYdX, Hyperliquid)</td>
+<td>你的 long order 挂在 order book 上, 无人吃单, 不成交, OI 不变</td>
+</tr>
+<tr>
+<td>Oracle 型 (GMX)</td>
+<td>LP 池 (GLP&#x2F;GM) 充当对手方, 但有 OI 上限 (max open interest cap), 超限拒绝开仓</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>“未平仓” 这个翻译容易误导.</strong> “未平仓合约” 不是 “还没成交的合约”, 而是 “已成交但还没关闭的合约”:</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs arduino">挂单 (order) → 成交/开仓 (fill) → 持仓中 (open position, 计入 OI) → 平仓 (close, OI 减少)<br></code></pre></td></tr></table></figure>
+
+<p><strong>杠杆不影响配对关系.</strong> 假设 ETH @ $3,000:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>保证金</th>
+<th>杠杆</th>
+<th>名义价值</th>
+<th>数量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A (Long)</td>
+<td>$300</td>
+<td>10x</td>
+<td>$3,000</td>
+<td>1 ETH</td>
+</tr>
+<tr>
+<td>B (Short)</td>
+<td>$150</td>
+<td>20x</td>
+<td>$3,000</td>
+<td>1 ETH</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>撮合按<strong>数量</strong> (1 ETH) 匹配, 不看保证金和杠杆. OI +&#x3D; 1 ETH. 如果 B 想做空 2 ETH 但只有 A 的 1 ETH 买单, 则成交 1 ETH, B 剩余 1 ETH 卖单继续挂着, 不计入 OI.</p>
+<p><strong>平仓不需要原对手方配合.</strong> 你平仓 long &#x3D; 你在市场上卖出, 接单的可以是任何人:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>接单方</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>新人开 long</td>
+<td>你的仓位关了, 新人开了, OI 不变</td>
+</tr>
+<tr>
+<td>某个 short 平仓</td>
+<td>两个仓位都关了, OI -&#x3D; 1</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>你和原对手方之间没有绑定关系, 开仓和平仓是两笔独立的撮合.</p>
+<p><strong>OI 的计价单位.</strong> 各平台不统一, 常见三种 (以 ETH @ $3,000 为例, 同一笔 OI):</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>计价方式</th>
+<th>例子</th>
+<th>使用平台</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>张 (contracts)</td>
+<td>OI &#x3D; 50,000 张, 每张 &#x3D; 0.01 ETH → 500 ETH</td>
+<td>Binance, OKX (币本位合约)</td>
+</tr>
+<tr>
+<td>底层资产数量</td>
+<td>OI &#x3D; 500 ETH</td>
+<td>Hyperliquid, dYdX, GMX</td>
+</tr>
+<tr>
+<td>USD 名义价值</td>
+<td>OI &#x3D; $1,500,000</td>
+<td>数据聚合平台 (Coinglass, DeFiLlama)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>互转公式:</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk">张数 × 面值 = 底层资产数量        <span class="hljs-regexp">//</span> <span class="hljs-number">50</span>,<span class="hljs-number">000</span> × <span class="hljs-number">0.01</span> = <span class="hljs-number">500</span> ETH<br>底层资产数量 × 价格 = USD 名义价值  <span class="hljs-regexp">//</span> <span class="hljs-number">500</span> × <span class="hljs-variable">$3</span>,<span class="hljs-number">000</span> = <span class="hljs-variable">$1</span>,<span class="hljs-number">500</span>,<span class="hljs-number">000</span><br></code></pre></td></tr></table></figure>
+
+<p>注意: Binance 币本位合约 (coin-margined) 的 “张” &#x3D; 固定 USD 面值 (BTC 合约 1 张 &#x3D; $100, ETH 合约 1 张 &#x3D; $10); U 本位合约 (USDT-margined) 通常直接用底层资产数量, 没有 “张” 的概念.</p>
+<blockquote>
+<p>USD 计价的 OI 会随价格波动: ETH 从 $3,000 涨到 $4,000, 即使没有新开仓, USD OI 也会从 $1,500,000 变成 $2,000,000. 所以看 OI 变化时要区分 “真实开仓增加” 还是 “价格波动导致的名义值变化”.</p>
+</blockquote>
+<hr>
+<h2 id="三、交易"><a href="#三、交易" class="headerlink" title="三、交易"></a>三、交易</h2><h3 id="3-1-开仓后亏了能取消吗"><a href="#3-1-开仓后亏了能取消吗" class="headerlink" title="3.1 开仓后亏了能取消吗?"></a>3.1 开仓后亏了能取消吗?</h3><blockquote>
+<p>相关: <a href="/2025/08/10/perp-gmx/">GMX 协议深度解析</a> §4</p>
+</blockquote>
+<p><strong>不能.</strong> 永续合约开仓执行后, 没有 “撤回” 操作, 只能平仓止损.</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs sqf">GMX Two-<span class="hljs-keyword">Step</span> 开仓流程:<br><br>  <span class="hljs-keyword">Step</span> <span class="hljs-number">1</span>: createIncreasePosition() → 创建请求, 进入队列<br>  <span class="hljs-keyword">Step</span> <span class="hljs-number">2</span>: Keeper 执行 → 查 oracle 价格 → 开仓成交<br><br>  <span class="hljs-keyword">Step</span> <span class="hljs-number">1</span> 和 <span class="hljs-keyword">Step</span> <span class="hljs-number">2</span> 之间有极短窗口 (~<span class="hljs-number">30</span>s):<br>    → 可以调 cancelOrder() 取消请求<br>    → 但这个窗口极短, 且只能取消未执行的请求<br><br>  <span class="hljs-keyword">Step</span> <span class="hljs-number">2</span> 执行后:<br>    → 仓位已开, 无法取消<br>    → 只能通过平仓 (close <span class="hljs-built_in">position</span>) 退出<br></code></pre></td></tr></table></figure>
+
+<p><strong>为什么不允许 “亏了撤回”?</strong> 因为这会产生 <strong>free option (免费期权) 漏洞</strong>:</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs powershell">假设允许亏损时撤回:<br><br>  <span class="hljs-number">1</span>. 你做多 ETH <span class="hljs-selector-tag">@</span> <span class="hljs-variable">$3000</span>, <span class="hljs-number">10</span>x 杠杆<br>  <span class="hljs-number">2</span>. ETH 涨到 <span class="hljs-variable">$3100</span> → 你赚了, 不撤回, 平仓获利 <span class="hljs-variable">$1000</span><br>  <span class="hljs-number">3</span>. ETH 跌到 <span class="hljs-variable">$2900</span> → 你亏了, 撤回, 假装没开过仓<br><br>  结果: 你永远只赚不亏<br>  <span class="hljs-built_in">LP</span> 的处境: 只要交易者赚, 就要赔; 交易者亏, 拿不回来<br>  → <span class="hljs-built_in">LP</span> 几天内被抽干, 没人愿意当 <span class="hljs-built_in">LP</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>限制损失的正确手段:</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>手段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Acceptable Price</td>
+<td>开仓时设最大滑点, oracle 价超过则拒绝执行</td>
+</tr>
+<tr>
+<td>Stop-Loss</td>
+<td>设止损价, 亏损到阈值自动平仓</td>
+</tr>
+<tr>
+<td>Take-Profit</td>
+<td>设止盈价, 达到目标自动平仓</td>
+</tr>
+<tr>
+<td>小仓位试探</td>
+<td>先开小仓位测试方向, 确认后再加仓</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="四、保证金"><a href="#四、保证金" class="headerlink" title="四、保证金"></a>四、保证金</h2><h3 id="4-1-合约盈利了-为什么显示的保证金反而在减少-q3"><a href="#4-1-合约盈利了-为什么显示的保证金反而在减少-q3" class="headerlink" title="4.1 合约盈利了, 为什么显示的保证金反而在减少? {#q3}"></a>4.1 合约盈利了, 为什么显示的保证金反而在减少? {#q3}</h3><blockquote>
+<p>相关: <a href="/2025/07/28/perp-margin-and-liquidation/">保证金管理与清算引擎</a></p>
+</blockquote>
+<p><strong>现象</strong>: 做空盈利时, 未实现盈亏 ↑ 但 “保证金” ↓; 反之亏损时保证金 ↑. 看起来钱在变少.</p>
+<p><strong>原因</strong>: 交易所界面显示的 “保证金” 不是你最初存入的固定金额, 而是按当前标记价格动态计算的:</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs abnf">显示的保证金 <span class="hljs-operator">=</span> 当前仓位名义价值 / 杠杆<br>            <span class="hljs-operator">=</span> mark_price × size / leverage<br></code></pre></td></tr></table></figure>
+
+<p>做空时, 价格跌 (你盈利) → 仓位名义价值变小 → 显示的保证金跟着变小:</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs routeros">开仓: <span class="hljs-attribute">mark_price</span>=<span class="hljs-variable">$100</span>, <span class="hljs-attribute">size</span>=100, 10x<br>  名义价值 = <span class="hljs-variable">$10</span>,000 → 显示保证金 = <span class="hljs-variable">$1</span>,000, 未实现盈亏 = <span class="hljs-variable">$0</span><br><br>价格跌到 <span class="hljs-variable">$95</span> (盈利):<br>  名义价值 = <span class="hljs-variable">$9</span>,500  → 显示保证金 = <span class="hljs-variable">$950</span>,  未实现盈亏 = +<span class="hljs-variable">$500</span><br><br>价格涨到 <span class="hljs-variable">$103</span> (亏损):<br>  名义价值 = <span class="hljs-variable">$10</span>,300 → 显示保证金 = <span class="hljs-variable">$1</span>,030, 未实现盈亏 = -<span class="hljs-variable">$300</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>关键</strong>: 你的钱没有变少. 真正要看的是 <strong>仓位权益</strong>:</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs autoit">仓位权益 = 初始保证金 + 未实现盈亏<br>        = $1,<span class="hljs-number">000</span> + $500 = $1,<span class="hljs-number">500</span>  (价格 $95 时)<br>        = $1,<span class="hljs-number">000</span> - $300 = $700   (价格 $103 时)<br></code></pre></td></tr></table></figure>
+
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>含义</th>
+<th>是否变化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>初始保证金 (Initial Margin)</td>
+<td>你投入的 $1,000</td>
+<td>固定不变</td>
+</tr>
+<tr>
+<td>显示保证金 (Displayed Margin)</td>
+<td>mark_price × size &#x2F; leverage</td>
+<td>随价格变化</td>
+</tr>
+<tr>
+<td>未实现盈亏 (Unrealized PnL)</td>
+<td>当前浮盈浮亏</td>
+<td>随价格变化</td>
+</tr>
+<tr>
+<td>仓位权益 (Position Equity)</td>
+<td>初始保证金 + 未实现盈亏</td>
+<td>才是你真正拥有的</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>区分真实损耗</strong>: funding rate 扣款会让仓位权益下降, 那才是真正在 “吃” 你的钱. 而显示保证金的变化只是名义价值重算, 不影响仓位权益.</p>
+</blockquote>
+<hr>
+<h3 id="4-2-持仓保证金-vs-维持保证金到底什么关系"><a href="#4-2-持仓保证金-vs-维持保证金到底什么关系" class="headerlink" title="4.2 持仓保证金 vs 维持保证金到底什么关系?"></a>4.2 持仓保证金 vs 维持保证金到底什么关系?</h3><blockquote>
+<p>相关: <a href="/2025/07/28/perp-margin-and-liquidation/">保证金管理与清算引擎</a></p>
+</blockquote>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs gcode">例: 做多 ETH $<span class="hljs-number">3000</span>, <span class="hljs-number">10</span>x 杠杆<br><br>持仓保证金 <span class="hljs-comment">(Initial Margin, IM)</span>:<br>  = 仓位价值 / 杠杆 = $<span class="hljs-number">3000</span> / <span class="hljs-number">10</span> = $<span class="hljs-number">300</span><br>  → 开仓时实际掏的钱, 可以理解为 <span class="hljs-string">&quot;本金&quot;</span> / <span class="hljs-string">&quot;押金&quot;</span><br>  → 这是开仓的最低门槛<br><br>维持保证金 <span class="hljs-comment">(Maintenance Margin, MM)</span>:<br>  = 仓位价值 × 维持保证金率<br>  → 比如维持保证金率 <span class="hljs-number">3</span><span class="hljs-meta">%</span>, MM = $<span class="hljs-number">3000</span> × <span class="hljs-number">3</span><span class="hljs-meta">%</span> = $<span class="hljs-number">90</span><br>  → 这是 <span class="hljs-string">&quot;保住仓位&quot;</span> 的最低底线<br><br>关系:<br>  IM <span class="hljs-comment">($300)</span> &gt; MM <span class="hljs-comment">($90)</span><br>  IM = <span class="hljs-string">&quot;开仓要多少钱&quot;</span> <span class="hljs-comment">(入场门票)</span><br>  MM = <span class="hljs-string">&quot;什么时候被清算&quot;</span> <span class="hljs-comment">(清算红线)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-300-→-90-之间发生了什么"><a href="#4-3-300-→-90-之间发生了什么" class="headerlink" title="4.3 $300 → $90 之间发生了什么?"></a>4.3 $300 → $90 之间发生了什么?</h3><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs autoit">开仓后, 保证金余额 = 初始保证金 - 未实现亏损:<br><br>  ETH 从 $3000 跌到 $2930:<br>    未实现亏损 = $70<br>    保证金余额 = $300 - $70 = $230<br><br>  这 $230 就是你此刻的 <span class="hljs-string">&quot;账面本金&quot;</span>:<br>    平仓 → 拿回 $230, 确认亏 $70<br>    不平仓 → 继续扛, 等反弹<br><br>  $300 → $90 之间: 你有选择权 (扛或跑)<br>  到 $90 以下: 选择权没了, 系统替你做决定 (强制清算)<br><br>清算后能拿回多少?<br>  理想: 剩余保证金扣掉清算罚金 → 剩几块钱还给你<br>  穿仓: 价格跳空, 亏损 &gt; 保证金 → 差额由 Insurance Fund / ADL 承担<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-维持保证金率是谁定的"><a href="#4-4-维持保证金率是谁定的" class="headerlink" title="4.4 维持保证金率是谁定的?"></a>4.4 维持保证金率是谁定的?</h3><figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">CEX (Binance, OKX)</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">平台单方面设定, 随时可调</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">通常阶梯制: 仓位越大, 保证金率越高</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">极端行情前可能临时上调</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">用户没有话语权</span><br><br><span class="hljs-attribute">DEX</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">初始参数由团队设定</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">之后走链上治理:</span><br>    <span class="hljs-attribute">dYdX v4</span><span class="hljs-punctuation">:</span> <span class="hljs-string">DYDX 持有者投票 (链上提案 → 投票 → 自动执行)</span><br>    <span class="hljs-attribute">GMX</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Snapshot 投票 (实际团队影响力大)</span><br>    <span class="hljs-attribute">Hyperliquid</span><span class="hljs-punctuation">:</span> <span class="hljs-string">团队直接调整 (偏中心化)</span><br><br><span class="hljs-attribute">现实矛盾</span><span class="hljs-punctuation">:</span><br>  维持保证金率是风控参数, 需要快速响应 (行情剧变时几分钟内调)<br>  但链上治理投票要好几天<br>  → 大部分 DEX 给团队 &quot;紧急调参&quot; 权限, 事后补治理流程<br>  → 本质上和 CEX 没太大区别<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、清算"><a href="#五、清算" class="headerlink" title="五、清算"></a>五、清算</h2><h3 id="5-1-ADL-触发后盈利方怎么被选中"><a href="#5-1-ADL-触发后盈利方怎么被选中" class="headerlink" title="5.1 ADL 触发后盈利方怎么被选中?"></a>5.1 ADL 触发后盈利方怎么被选中?</h3><blockquote>
+<p>相关: <a href="/2025/07/28/perp-margin-and-liquidation/">保证金管理与清算引擎</a>, <a href="/2025/08/25/perp-dydx/">dYdX 演进之路 §5.3</a></p>
+</blockquote>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">ADL (Auto-Deleveraging, 自动减仓) 触发链</span><span class="hljs-punctuation">:</span><br><span class="hljs-punctuation"></span><br>  <span class="hljs-attribute">穿仓 → Insurance Fund 兜底 → Insurance Fund 耗尽 → ADL</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">选中规则</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">系统按 &quot;盈利比例 × 杠杆倍数&quot; 排序</span><br><span class="hljs-attribute">  排名越靠前 → 越先被强制减仓</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">  例</span><span class="hljs-punctuation">:</span><br>    <span class="hljs-attribute">李四</span><span class="hljs-punctuation">:</span> <span class="hljs-string">做空 ETH, 浮盈 200%, 5x 杠杆 → 分数 = 200% × 5 = 10</span><br>    <span class="hljs-attribute">王五</span><span class="hljs-punctuation">:</span> <span class="hljs-string">做空 ETH, 浮盈 50%, 2x 杠杆  → 分数 = 50% × 2 = 1</span><br>    <span class="hljs-attribute">→ 李四先被 ADL</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">  这就是为什么很多交易者会</span><span class="hljs-punctuation">:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">主动降杠杆 (降低分数)</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">分批止盈 (降低盈利比例)</span><br>    → 避免成为 ADL 首选目标<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-2-Chainlink-Keepers-是-Chainlink-自己的清算机器人吗"><a href="#5-2-Chainlink-Keepers-是-Chainlink-自己的清算机器人吗" class="headerlink" title="5.2 Chainlink Keepers 是 Chainlink 自己的清算机器人吗?"></a>5.2 Chainlink Keepers 是 Chainlink 自己的清算机器人吗?</h3><blockquote>
+<p>相关: <a href="/2025/11/25/perp-liquidation-engine/">清算引擎架构与实现</a></p>
+</blockquote>
+<p>不是. Chainlink Keepers (现已改名 <strong>Chainlink Automation</strong>) 是一个<strong>通用的链上自动化服务</strong>, 不是专门的清算机器人. 它的作用是 “当条件满足时, 帮你调一个合约函数”, 仅此而已.</p>
+<p><strong>和清算 Keeper 的区别</strong>:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Chainlink Automation</th>
+<th>清算 Keeper</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>本质</td>
+<td>通用任务调度服务</td>
+<td>专门的清算机器人</td>
+</tr>
+<tr>
+<td>运行者</td>
+<td>Chainlink 节点网络</td>
+<td>协议自建 or 第三方套利者</td>
+</tr>
+<tr>
+<td>懂清算吗</td>
+<td>不懂, 只检查条件调函数</td>
+<td>懂, 专门为此设计</td>
+</tr>
+<tr>
+<td>驱动力</td>
+<td>按 LINK 付费</td>
+<td>清算奖励 (0.25%~1%)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>工作流程</strong>: 你的合约实现两个函数:</p>
+<ul>
+<li><code>checkUpkeep()</code>: Chainlink 节点链下模拟调用 (不花 gas), 你在里面写 “有没有仓位 margin &lt;&#x3D; MM?”, 返回 true 则触发</li>
+<li><code>performUpkeep()</code>: 条件满足时 Chainlink 发链上交易执行, 你在里面写实际清算逻辑</li>
+</ul>
+<p><strong>实际上谁在用什么?</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>协议</th>
+<th>清算方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Aave</td>
+<td>Chainlink Automation 触发清算 + 利率更新</td>
+</tr>
+<tr>
+<td>GMX</td>
+<td>自建 Keeper 网络</td>
+</tr>
+<tr>
+<td>dYdX</td>
+<td>链下清算引擎, 不需要链上 Keeper</td>
+</tr>
+<tr>
+<td>大部分 DeFi</td>
+<td>套利者自建 Keeper (利润驱动)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>为什么高利润清算不用 Chainlink Automation?</strong> 大仓位清算奖励高, 被专业 MEV 搜索者盯上 — 他们自建机器人 + Flashbots 抢跑, 延迟比 Chainlink 节点网络低得多. Chainlink Automation 更适合 “没人抢但必须有人做” 的任务: 定时更新价格, 自动复投收益, 喂价超时检测等.</p>
+<blockquote>
+<p>一句话: Chainlink Automation 是 “通用闹钟”, 不是 “清算专家”. 协议可以用它来触发清算, 但高竞争场景下自建机器人更有优势.</p>
+</blockquote>
+<h3 id="5-3-级联清算为什么会进入死亡螺旋-为什么没人去-“捡钱”"><a href="#5-3-级联清算为什么会进入死亡螺旋-为什么没人去-“捡钱”" class="headerlink" title="5.3 级联清算为什么会进入死亡螺旋? 为什么没人去 “捡钱”?"></a>5.3 级联清算为什么会进入死亡螺旋? 为什么没人去 “捡钱”?</h3><blockquote>
+<p>相关: <a href="/2025/07/28/perp-margin-and-liquidation/">保证金管理与清算引擎</a>, <a href="/2025/10/05/perp-mev/">永续合约中的 MEV</a> §7</p>
+</blockquote>
+<h4 id="为什么会进入死亡螺旋"><a href="#为什么会进入死亡螺旋" class="headerlink" title="为什么会进入死亡螺旋?"></a>为什么会进入死亡螺旋?</h4><p>直觉上, 清算 &#x3D; 有人爆仓 &#x3D; 有人能低价接盘赚钱, 应该自动恢复平衡. 但实际上级联清算是一个<strong>正反馈循环</strong>, 越清算越跌, 越跌越清算:</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs abnf">价格下跌 → 多头仓位触发清算<br>  → 清算 <span class="hljs-operator">=</span> 强制平仓 <span class="hljs-operator">=</span> 在订单簿上挂卖单<br>  → 卖压增大 → 价格进一步下跌<br>  → 更多多头仓位触发清算<br>  → 更多卖单涌入 → 价格继续跌<br>  → 循环...<br></code></pre></td></tr></table></figure>
+
+<p>关键: <strong>做空的人并不能帮忙 “接盘”</strong>. 清算多头 &#x3D; 卖出, 新开空单 &#x3D; 也是卖出. 两者站在订单簿的同一边, 都在竞争稀缺的买方流动性:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>在订单簿上等价于</th>
+<th>需要谁来接?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>清算多头</td>
+<td>卖出</td>
+<td>买方</td>
+</tr>
+<tr>
+<td>新开空单</td>
+<td>卖出</td>
+<td>买方</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>真正能 “接住” 清算单的只有: <strong>新开多仓的人</strong> 或 <strong>空头获利了结 (&#x3D; 买入)</strong>. 但暴跌时几乎没人愿意做这两件事.</p>
+<h4 id="为什么没人去-“捡钱”"><a href="#为什么没人去-“捡钱”" class="headerlink" title="为什么没人去 “捡钱”?"></a>为什么没人去 “捡钱”?</h4><p>正常行情下, 清算人 (Keeper&#x2F;MEV Searcher) 确实会抢着接盘, 因为有清算奖励可赚. 但极端行情下 “捡钱” 变成了 “接刀”:</p>
+<p><strong>1. 不确定性 — 不知道底在哪</strong></p>
+<p>价格还在跌, 你 “捡” 到的仓位可能马上又被清算. 2022 年 LUNA 从 $80 跌到 $0.00001, 每个价位都有人觉得 “到底了”, 结果都成了新的被清算者.</p>
+<p><strong>2. 流动性枯竭 — 做市商主动撤单</strong></p>
+<p>极端行情时做市商会关掉机器人撤走挂单, 因为提供流动性的风险远大于赚价差的收益. 订单簿买方深度瞬间变薄, 即使想接盘也可能滑点巨大.</p>
+<p><strong>3. 基础设施过载 — 交易发不出去</strong></p>
+<p>链上拥堵 (gas 暴涨), 交易所 API 延迟&#x2F;宕机, 清算机器人的交易发不出去. 2021 年 5.19 期间以太坊 gas 飙到几千 gwei, 很多链上清算机器人因为 gas 不够直接停摆.</p>
+<p><strong>4. 对冲困难 — 小市值 token 无处可对冲</strong></p>
+<p>清算人的标准操作: 接盘 → 立刻在其他交易所对冲锁定利润. 但如果被清算的是 JELLY 这种垃圾 token, 根本没有足够的对冲场所, 接盘 &#x3D; 纯赌方向.</p>
+<h4 id="防线逐层击穿的过程"><a href="#防线逐层击穿的过程" class="headerlink" title="防线逐层击穿的过程"></a>防线逐层击穿的过程</h4><figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">第一层</span><span class="hljs-punctuation">:</span> <span class="hljs-string">清算人/Keeper       — 正常情况下抢着接, 有利可图</span><br>  <span class="hljs-attribute">击穿</span><span class="hljs-punctuation">:</span> <span class="hljs-string">价格跌太快 / 标的流动性太差 / 基础设施过载</span><br><br><span class="hljs-attribute">第二层</span><span class="hljs-punctuation">:</span> <span class="hljs-string">保险基金             — 兜底清算中的穿仓亏损</span><br>  <span class="hljs-attribute">击穿</span><span class="hljs-punctuation">:</span> <span class="hljs-string">亏损金额 &gt; 基金余额 (LUNA 崩盘时多个平台被打穿)</span><br><br><span class="hljs-attribute">第三层</span><span class="hljs-punctuation">:</span> <span class="hljs-string">ADL (自动减仓)       — 强制减仓盈利方, 不依赖订单簿</span><br>  <span class="hljs-attribute">击穿</span><span class="hljs-punctuation">:</span> <span class="hljs-string">没有盈利的对手方可减 (单边行情, 所有人都在亏)</span><br><br><span class="hljs-attribute">最终</span><span class="hljs-punctuation">:</span> <span class="hljs-string">各平台的兜底策略不同</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">GMX: GLP/GM 池承担</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">Hyperliquid: HLP vault 接管</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">dYdX: 坏账挂账 + 治理介入</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>核心结论</strong>: 级联清算的本质是 — 卖压自我强化, 而买方在恐慌中消失. 所有防护机制 (保险基金, ADL) 都基于一个假设: “有足够的对手方”. 当这个假设不成立时, 系统就会进入死亡螺旋.</p>
+<hr>
+<h2 id="六、模型"><a href="#六、模型" class="headerlink" title="六、模型"></a>六、模型</h2><h3 id="6-1-vAMM-还有人在用吗"><a href="#6-1-vAMM-还有人在用吗" class="headerlink" title="6.1 vAMM 还有人在用吗?"></a>6.1 vAMM 还有人在用吗?</h3><blockquote>
+<p>相关: <a href="/2025/09/06/perp-vamm/">vAMM 永续合约演进史</a></p>
+</blockquote>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">纯 vAMM → 基本死了</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">Perpetual Protocol</span><span class="hljs-punctuation">:</span> <span class="hljs-string">2021 巅峰 $60M TVL → 现在 &lt; $2M, 基本停滞</span><br><br>  <span class="hljs-attribute">死因</span><span class="hljs-punctuation">:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">滑点大 (k 值靠治理调)</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">容易被操纵 (大户单边推价格逼仓)</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">脱锚 (vAMM 价格经常偏离现货)</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">Oracle 型和订单簿型全面碾压</span><br><br><span class="hljs-attribute">混合模型 → 还活着</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">Drift Protocol (Solana)</span><span class="hljs-punctuation">:</span> <span class="hljs-string">vAMM 只作兜底, 优先 JIT 做市商 + DLOB 限价单</span><br>  <span class="hljs-attribute">→ vAMM 已经不是核心, 是 fallback</span><br><span class="hljs-attribute">  → 有一定用户量, 但远不如 Hyperliquid / dYdX</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">根本问题</span><span class="hljs-punctuation">:</span><br>  虚拟流动性 ≠ 真实流动性<br>  GMX 用 oracle 绕开了流动性问题<br>  dYdX 用真实订单簿正面解决了<br>  vAMM 用虚拟数字模拟 → 两头不靠<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="七、Oracle"><a href="#七、Oracle" class="headerlink" title="七、Oracle"></a>七、Oracle</h2><h3 id="7-1-CEX-互相引用价格会不会-“死锁”-q11"><a href="#7-1-CEX-互相引用价格会不会-“死锁”-q11" class="headerlink" title="7.1 CEX 互相引用价格会不会 “死锁”? {#q11}"></a>7.1 CEX 互相引用价格会不会 “死锁”? {#q11}</h3><blockquote>
+<p>相关: <a href="/2025/07/15/perp-mechanics/">永续合约机制详解</a> §2 (Index Price &#x2F; Mark Price)</p>
+</blockquote>
+<p>多家 CEX 互相引用对方价格来计算 Index Price (指数价格), 看起来像循环依赖:</p>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs delphi">Binance <span class="hljs-keyword">Index</span> = Coinbase 现货价 + Kraken 现货价 + ...<br>Coinbase <span class="hljs-keyword">Index</span> = Binance 现货价 + Kraken 现货价 + ...<br>Kraken <span class="hljs-keyword">Index</span>  = Binance 现货价 + Coinbase 现货价 + ...<br></code></pre></td></tr></table></figure>
+
+<p><strong>不会死锁</strong>. 因为 Index Price 引用的是对方的 <strong>现货成交价 (spot last traded price)</strong>, 不是对方的 Index Price. 现货价由各自订单簿上的真实买卖交易独立产生, 不依赖任何外部 index, 所以没有环.</p>
+<p>用代码类比: 不是 <code>A.lock() → wait B.lock()</code> (互相等待), 而是 <code>A.read(B.spot)</code> 和 <code>B.read(A.spot)</code>, 两个 spot 都是独立可读的值.</p>
+<p><strong>但有回声效应 (Echo Effect):</strong></p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs markdown">虽然不会死锁, 但存在价格传染:<br><br><span class="hljs-bullet">  1.</span> 攻击者在 Kraken (流动性薄) 砸盘, Kraken 现货暴跌<br><span class="hljs-bullet">  2.</span> Binance Index 引用了 Kraken → Binance Mark Price 下降 → 触发部分清算<br><span class="hljs-bullet">  3.</span> 清算卖压让 Binance 现货也下跌<br><span class="hljs-bullet">  4.</span> Coinbase Index 引用了 Binance → Coinbase 也受影响<br><span class="hljs-bullet">  5.</span> 波动在多个交易所之间来回放大<br><br>这是级联故障 (cascading failure), 不是死锁.<br></code></pre></td></tr></table></figure>
+
+<p><strong>防护手段:</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>手段</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>偏离剔除</td>
+<td>某 CEX 价格偏离中位数 &gt; 阈值时自动踢出</td>
+</tr>
+<tr>
+<td>权重按流动性分配</td>
+<td>薄流动性的 CEX 权重低, 影响小</td>
+</tr>
+<tr>
+<td>EMA 平滑</td>
+<td>不用瞬时价格, 用时间窗口内的加权平均</td>
+</tr>
+<tr>
+<td>熔断机制</td>
+<td>价格短时间剧烈波动时暂停引用</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>真正的风险场景: 小市值 token, 各 CEX 流动性都很薄, 攻击者用很少的钱就能在多个交易所制造价格偏移, 回声放大后触发大量清算. 这也是 JELLY 事件能发生的背景条件之一 (Q27).</p>
+</blockquote>
+<hr>
+<h2 id="八、Funding"><a href="#八、Funding" class="headerlink" title="八、Funding"></a>八、Funding</h2><h3 id="8-1-为什么用-premium-而不是-basis-计算资金费率-q12"><a href="#8-1-为什么用-premium-而不是-basis-计算资金费率-q12" class="headerlink" title="8.1 为什么用 premium 而不是 basis 计算资金费率? {#q12}"></a>8.1 为什么用 premium 而不是 basis 计算资金费率? {#q12}</h3><blockquote>
+<p>相关: <a href="/2025/07/15/perp-mechanics/">永续合约机制详解</a> §2.3 (Basis), §3 (Funding Rate)</p>
+</blockquote>
+<p>两者都在描述 “永续价格偏离现货”, 但取值来源不同:</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs abnf"><span class="hljs-attribute">basis</span>   <span class="hljs-operator">=</span> mark_price - index_price    (标记价格 - 指数价格)<br><span class="hljs-attribute">premium</span> <span class="hljs-operator">=</span> mid_price  - index_price    (订单簿中间价 - 指数价格)<br></code></pre></td></tr></table></figure>
+
+<p><strong>关键区别</strong>:</p>
+<ul>
+<li><code>mark_price</code> 经过 EMA&#x2F;TWAP 平滑, 变化慢, 抗操纵</li>
+<li><code>mid_price</code> &#x3D; (best_bid + best_ask) &#x2F; 2, 实时反映订单簿当前供需</li>
+</ul>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>basis (mark - index)</th>
+<th>premium (mid - index)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据源</td>
+<td>mark (已平滑)</td>
+<td>mid (实时订单簿)</td>
+</tr>
+<tr>
+<td>反应速度</td>
+<td>慢 (EMA&#x2F;TWAP 滞后)</td>
+<td>快 (瞬时)</td>
+</tr>
+<tr>
+<td>抗操纵</td>
+<td>强</td>
+<td>弱 (一笔大单能影响)</td>
+</tr>
+<tr>
+<td>用途</td>
+<td>描述市场整体趋势</td>
+<td>计算 funding rate</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>为什么 funding rate 需要用 premium</strong>: 资金费率的目标是 <strong>纠偏</strong>, 必须感知当下. 有人拉盘 → mid_price 瞬间偏离 → premium 立刻变大 → funding rate 加重惩罚偏离方. 如果用 basis (已平滑), 拉盘后要等几轮 EMA 才反映出来, 纠偏太慢.</p>
+<p>但也不能直接用单次 premium (容易被一笔大单操纵), 所以对 premium 再做一次 TWAP&#x2F;EMA 平滑后才作为最终费率:</p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs excel">完整链路<span class="hljs-symbol">:</span><br>  订单簿 mid_price (实时)<br>      ↓<br>  premium = <span class="hljs-built_in">mid</span> - <span class="hljs-built_in">index</span> (实时偏差, 可能被操纵)<br>      ↓<br>  TWAP/EMA 平滑 premium (抗操纵)<br>      ↓<br>  funding_rate (最终费率, 既及时又稳定)<br><br>如果用 bas<span class="hljs-symbol">is:</span> 等于从一个已被平滑过的值再出发, 灵敏度不够 (二阶滞后)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="8-2-资金费率计算方式是公开的吗-q13"><a href="#8-2-资金费率计算方式是公开的吗-q13" class="headerlink" title="8.2 资金费率计算方式是公开的吗? {#q13}"></a>8.2 资金费率计算方式是公开的吗? {#q13}</h3><blockquote>
+<p>相关: <a href="/2025/07/15/perp-mechanics/">永续合约机制详解</a> §3 (Funding Rate), <a href="/2025/08/25/perp-dydx/">dYdX 演进之路</a> §6 (dYdX Funding)</p>
+</blockquote>
+<p><strong>全部公开</strong>, CEX 和 DEX 都是. 不公开的话交易者没法做套利, 没人套利费率就拉不回来, 整个锚定机制失效. 公开公式是 <strong>机制正常运行的前提</strong>.</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>平台</th>
+<th>公开程度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Binance</td>
+<td>公开公式 + 实时数据</td>
+<td>文档详列 premium index, interest rate, clamp 规则, API 可查</td>
+</tr>
+<tr>
+<td>OKX &#x2F; Bybit</td>
+<td>同上</td>
+<td>各家公式略有差异, 但都完整公开</td>
+</tr>
+<tr>
+<td>dYdX v4</td>
+<td>开源代码</td>
+<td>费率逻辑在链上模块, 任何人可审计</td>
+</tr>
+<tr>
+<td>Hyperliquid</td>
+<td>公开公式</td>
+<td>文档描述计算方式, 但代码不开源, 无法验证实现是否与文档一致</td>
+</tr>
+<tr>
+<td>GMX v2</td>
+<td>开源合约</td>
+<td>资金费率逻辑在 Solidity 合约中, 链上可验证</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>“公开” 不等于 “相同”</strong>, 各平台差异点:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>可能不同的地方</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>采样频率</td>
+<td>每 15s &#x2F; 每 1min &#x2F; 每个区块</td>
+</tr>
+<tr>
+<td>平滑方式</td>
+<td>TWAP (Binance) &#x2F; EMA (GMX) &#x2F; 每分钟采样取中位数 (dYdX)</td>
+</tr>
+<tr>
+<td>Clamp 范围</td>
+<td>±0.05%&#x2F;8h ~ ±0.75%&#x2F;8h, 各家不同</td>
+</tr>
+<tr>
+<td>Interest Rate</td>
+<td>有的固定 0.01%&#x2F;8h, 有的为 0, 有的可治理调整</td>
+</tr>
+<tr>
+<td>结算频率</td>
+<td>每 8h &#x2F; 每 1h &#x2F; 每个区块连续累积</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>同一时刻, 同一个 ETH-USD 永续合约, Binance 和 dYdX 的 funding rate 可能完全不同. 这也是跨平台 funding rate 套利能存在的原因: 在费率高的平台做反向, 在费率低的平台做正向, 吃差价.</p>
+</blockquote>
+<hr>
+<h2 id="九、撮合引擎"><a href="#九、撮合引擎" class="headerlink" title="九、撮合引擎"></a>九、撮合引擎</h2><h3 id="9-1-买单最高价优先-卖单为什么最低价优先"><a href="#9-1-买单最高价优先-卖单为什么最低价优先" class="headerlink" title="9.1 买单最高价优先, 卖单为什么最低价优先?"></a>9.1 买单最高价优先, 卖单为什么最低价优先?</h3><blockquote>
+<p>相关: <a href="/2025/11/08/perp-matching-engine/">撮合引擎原理与 Go 实现 §3.2 Price-Time Priority</a></p>
+</blockquote>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs autoit">两边的目标都是 <span class="hljs-string">&quot;让交易尽快发生&quot;</span>:<br><br>  你想买 ETH, 卖家有三个:<br>    Dave $3003, Eve $3005, Frank $3010<br>    → 你当然想买最便宜的 → 卖单最低价排最前<br><br>  你想卖 ETH, 买家有三个:<br>    Alice $3002, Bob $3001, Carol $3000<br>    → 你当然想卖给出价最高的 → 买单最高价排最前<br><br>本质: 让最容易成交的订单排在最前面<br><br>  Bids: $3002 &gt; $3001 &gt; $3000 (高→低)<br>  Asks: $3003 &lt; $3005 &lt; $3010 (低→高)<br>            ↑           ↑<br>       $3002 和 $3003 最接近 → 各自排第一<br>       如果反过来排: $3002 配 $3010 → 根本成交不了<br></code></pre></td></tr></table></figure>
+
+<h3 id="9-2-买方出-3000-卖方要-2900-差价归谁"><a href="#9-2-买方出-3000-卖方要-2900-差价归谁" class="headerlink" title="9.2 买方出 $3000, 卖方要 $2900, 差价归谁?"></a>9.2 买方出 $3000, 卖方要 $2900, 差价归谁?</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs bash">成交价按 maker (先挂单的人) 的价格, 差价归 taker (后到的人):<br><br>  场景 A: 卖方先挂<br>    Dave 先挂 Sell @ <span class="hljs-variable">$2900</span> (maker)<br>    Alice 后下 Buy @ <span class="hljs-variable">$3000</span> (taker)<br>    → 成交价 = <span class="hljs-variable">$2900</span><br>    → Alice 本想花 <span class="hljs-variable">$3000</span>, 实际花 <span class="hljs-variable">$2900</span>, 省了 <span class="hljs-variable">$100</span><br><br>  场景 B: 买方先挂<br>    Alice 先挂 Buy @ <span class="hljs-variable">$3000</span> (maker)<br>    Dave 后下 Sell @ <span class="hljs-variable">$2900</span> (taker)<br>    → 成交价 = <span class="hljs-variable">$3000</span><br>    → Dave 本想卖 <span class="hljs-variable">$2900</span>, 实际卖 <span class="hljs-variable">$3000</span>, 多赚 <span class="hljs-variable">$100</span><br><br>为什么用 maker 的价格:<br>  maker 先挂单, 他的报价 = 他愿意接受的价格 → 按此成交他满意<br>  taker 后到, 获得 <span class="hljs-string">&quot;价格改善&quot;</span> (比预期更好) → 他也满意<br>  双方都不吃亏, 交易所也不从中抽差价<br><br>实际上大差价很少出现: 做市商在 bid/ask 两侧密集挂单, spread 通常只有几美分.<br></code></pre></td></tr></table></figure>
+
+<h3 id="9-3-为什么交易所不自己赚差价"><a href="#9-3-为什么交易所不自己赚差价" class="headerlink" title="9.3 为什么交易所不自己赚差价?"></a>9.3 为什么交易所不自己赚差价?</h3><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs autoit">三种现实中的处理方式:<br><br>  <span class="hljs-number">1.</span> 标准撮合 (主流 CEX/DEX):<br>     成交价 = maker 价, 差价归 taker<br>     交易所不碰差价, 只收手续费<br>     Binance, dYdX, Hyperliquid 都是这样<br>     → 公平透明, 用户信任 = 长期利益<br><br>  <span class="hljs-number">2.</span> 交易所吃差价 (早期/小型 CEX):<br>     对买方报 $3000, 对卖方报 $2900, 中间 $100 归平台<br>     合规的叫 <span class="hljs-string">&quot;internalization&quot;</span> (内部化)<br>     不合规的叫 <span class="hljs-string">&quot;吃客损&quot;</span> / 对赌<br><br>  <span class="hljs-number">3.</span> PFOF (Payment <span class="hljs-keyword">for</span> Order Flow, 订单流付费):<br>     Robinhood 模式 (美国股市):<br>       用户下单 Buy @ $100<br>       Robinhood 卖给 Citadel (做市商)<br>       Citadel 以 $99<span class="hljs-number">.90</span> 成交, 给用户 $99<span class="hljs-number">.95</span><br>       差价 $0<span class="hljs-number">.05</span>: Citadel 和 Robinhood 分<br>       → 用户以为 <span class="hljs-string">&quot;零佣金&quot;</span>, 实际被吃了差价<br>       → 欧盟已经禁了 PFOF<br><br>为什么正规交易所不吃:<br>  - 信任崩塌: 用户发现 → 跑了 (DEX 链上可验证, 一眼看出)<br>  - 手续费更赚: Binance 日交易量 $10B, <span class="hljs-number">0.1</span>% 手续费 = $10M/天<br>  - 监管风险: 不披露吃差价 = 违法<br>  - DEX 做不到: 开源代码 + 链上可查, 改不了成交价<br>    (但 Hyperliquid 闭源... 理论上可以做手脚, 用户无法验证)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十、JIT-做市"><a href="#十、JIT-做市" class="headerlink" title="十、JIT 做市"></a>十、JIT 做市</h2><h3 id="10-1-JIT-做市靠的是-Solana-原生支持永续合约吗"><a href="#10-1-JIT-做市靠的是-Solana-原生支持永续合约吗" class="headerlink" title="10.1 JIT 做市靠的是 Solana 原生支持永续合约吗?"></a>10.1 JIT 做市靠的是 Solana 原生支持永续合约吗?</h3><blockquote>
+<p>相关: <a href="/2025/09/06/perp-vamm/">vAMM 永续合约演进史 §5.3 JIT 做市商</a></p>
+</blockquote>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">不是. Solana 是通用公链, 不原生支持永续合约.</span><br><span class="hljs-attribute">JIT 能在 Solana 上实现, 靠的是链的两个底层能力</span><span class="hljs-punctuation">:</span><br><span class="hljs-punctuation"></span><br>  <span class="hljs-attribute">1. 交易可见性 (Transaction Visibility)</span><br><span class="hljs-attribute">     交易提交后, 执行前, 其他人能看到</span><br><span class="hljs-attribute">     Solana</span><span class="hljs-punctuation">:</span> <span class="hljs-string">验证者 / RPC 可见待执行交易</span><br>     <span class="hljs-attribute">Ethereum</span><span class="hljs-punctuation">:</span> <span class="hljs-string">mempool 公开可见</span><br><br>  <span class="hljs-attribute">2. 交易排序可控性 (Transaction Ordering)</span><br><span class="hljs-attribute">     能在目标交易之前插入自己的交易</span><br><span class="hljs-attribute">     Solana</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Leader 控制排序, 做市商可通过 Priority Fee 争取优先</span><br>     <span class="hljs-attribute">Ethereum</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Block Builder 控制排序 (Flashbots)</span><br><br><span class="hljs-attribute">Solana 的优势不是 &quot;原生支持永续&quot;</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">slot 时间短 (400ms) → JIT 响应窗口合理</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">gas 极低 (~$0.001) → 高频操作成本可接受</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">并行执行 → 不同市场的 JIT 互不干扰</span><br><br><span class="hljs-attribute">同样的技术在 Ethereum 上</span><span class="hljs-punctuation">:</span><br>  &quot;看到交易 → 抢先插入&quot; 如果害用户 = 三明治攻击 (MEV)<br>  &quot;看到交易 → 注入流动性&quot; 如果帮用户 = JIT 做市<br>  技术完全相同, 区别在于用户是否得到更好价格<br></code></pre></td></tr></table></figure>
+
+<h3 id="10-2-JIT-窗口只有-400ms-做市商来得及吗"><a href="#10-2-JIT-窗口只有-400ms-做市商来得及吗" class="headerlink" title="10.2 JIT 窗口只有 400ms, 做市商来得及吗?"></a>10.2 JIT 窗口只有 400ms, 做市商来得及吗?</h3><figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">很紧张, 而且需要验证者配合</span><span class="hljs-punctuation">:</span><br><span class="hljs-punctuation"></span><br>  <span class="hljs-attribute">拆解 400ms 窗口</span><span class="hljs-punctuation">:</span><br>    <span class="hljs-attribute">网络传播 (收到交易通知)</span><span class="hljs-punctuation">:</span> <span class="hljs-string">   ~50-100ms</span><br>    <span class="hljs-attribute">计算报价 (查价格, 算 spread)</span><span class="hljs-punctuation">:</span> <span class="hljs-string">~1-5ms</span><br>    <span class="hljs-attribute">提交 JIT 交易 (发给 Leader)</span><span class="hljs-punctuation">:</span> <span class="hljs-string"> ~50-100ms</span><br>    <span class="hljs-attribute">Leader 排序</span><span class="hljs-punctuation">:</span> <span class="hljs-string">                不确定</span><br>    <span class="hljs-attribute">────────────────────────────────</span><br><span class="hljs-attribute">    剩余窗口</span><span class="hljs-punctuation">:</span> <span class="hljs-string">100-200ms, 可能来不及</span><br><br>  <span class="hljs-attribute">做市商怎么抢到排序?</span><br><span class="hljs-attribute">    1. 地理优势</span><span class="hljs-punctuation">:</span> <span class="hljs-string">服务器和 Leader 放同一机房 (co-location)</span><br>    <span class="hljs-attribute">2. Priority Fee</span><span class="hljs-punctuation">:</span> <span class="hljs-string">给更多小费, Leader 优先排你</span><br>    <span class="hljs-attribute">3. 直连 Leader</span><span class="hljs-punctuation">:</span> <span class="hljs-string">不走公开 RPC, 私有端口直连</span><br><br>  <span class="hljs-attribute">所以 JIT 做市商往往是</span><span class="hljs-punctuation">:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">专业量化团队 (Wintermute, Jump)</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">有自己的 Solana 验证者节点</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">服务器在验证者同机房</span><br>    <span class="hljs-attribute">→ 普通人根本做不了</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">  成功率</span><span class="hljs-punctuation">:</span><br>    <span class="hljs-attribute">~60-70% 交易通过 JIT 成交 (最优价格)</span><br><span class="hljs-attribute">    ~20-30% 通过 DLOB 成交</span><br><span class="hljs-attribute">    ~5-10% 通过 vAMM 兜底</span><br><span class="hljs-attribute">    → 这就是 Drift 需要三层架构的原因</span><span class="hljs-punctuation">:</span> <span class="hljs-string">JIT 不保证成功</span><br><br>  <span class="hljs-attribute">和 CEX 高频交易本质一样</span><span class="hljs-punctuation">:</span><br>    <span class="hljs-attribute">CEX</span><span class="hljs-punctuation">:</span> <span class="hljs-string">服务器放交易所机房, 专线网络, 抢速度</span><br>    <span class="hljs-attribute">Solana JIT</span><span class="hljs-punctuation">:</span> <span class="hljs-string">服务器放验证者机房, 直连 Leader, 抢速度</span><br>    &quot;去中心化&quot; 的永续合约, 做市环节其实非常中心化<br></code></pre></td></tr></table></figure>
+
+<h3 id="10-3-JIT-失败只损失-gas-吗"><a href="#10-3-JIT-失败只损失-gas-吗" class="headerlink" title="10.3 JIT 失败只损失 gas 吗?"></a>10.3 JIT 失败只损失 gas 吗?</h3><figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">几乎是, JIT 失败的成本极低</span><span class="hljs-punctuation">:</span><br><span class="hljs-punctuation"></span><br>  <span class="hljs-attribute">场景 1</span><span class="hljs-punctuation">:</span> <span class="hljs-string">交易没被打包 (超时/Leader 没收到)</span><br>    <span class="hljs-attribute">→ 损失</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$0 (没上链, 不扣 gas)</span><br><br>  <span class="hljs-attribute">场景 2</span><span class="hljs-punctuation">:</span> <span class="hljs-string">被打包但排序靠后 (别人抢先了)</span><br>    <span class="hljs-attribute">→ 损失</span><span class="hljs-punctuation">:</span> <span class="hljs-string">~$0.001 (Solana gas)</span><br>    <span class="hljs-attribute">→ 注入的流动性没人吃, 自动过期或撤回</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">  Solana vs Ethereum 失败成本</span><span class="hljs-punctuation">:</span><br>    <span class="hljs-attribute">Solana</span><span class="hljs-punctuation">:</span> <span class="hljs-string">~$0.001/tx → 10 万笔失败 = $100/天</span><br>    <span class="hljs-attribute">Ethereum</span><span class="hljs-punctuation">:</span> <span class="hljs-string">~$0.5-5/tx → 10 万笔失败 = $50,000-500,000/天</span><br>    <span class="hljs-attribute">→ 500-5000 倍差距, 这是 JIT 在 Solana 可行的关键</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">真正的风险不是 gas, 而是 JIT 成功后</span><span class="hljs-punctuation">:</span><br><span class="hljs-punctuation"></span><br>  <span class="hljs-attribute">1. 价格移动风险</span><br><span class="hljs-attribute">     JIT 成交后做市商持有敞口 ~400ms</span><br><span class="hljs-attribute">     如果这 400ms 内价格跳变 → 亏损</span><br><span class="hljs-attribute">     → 但 400ms 极短, 且可以立即对冲</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">  2. 毒流量 (Toxic Flow)</span><br><span class="hljs-attribute">     知情交易者 (知道即将有大新闻) 下单</span><br><span class="hljs-attribute">     做市商不知情, JIT 给了报价 → 成交 → 价格暴动 → 亏了</span><br><span class="hljs-attribute">     → 和传统做市的逆向选择风险一样, 只是时间窗口缩短了</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">  3. 利润被竞争压缩</span><br><span class="hljs-attribute">     多个做市商竞争同一笔 JIT → spread 越报越窄</span><br><span class="hljs-attribute">     → 最终只有基础设施最好的团队能赚钱 (速度军备竞赛)</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">总结</span><span class="hljs-punctuation">:</span> <span class="hljs-string">JIT 失败 ≈ 免费 (Solana gas 可忽略)</span><br>     JIT 成功后的风险也很小 (400ms 暴露时间)<br>     → 这是做市商愿意给更窄 spread 的根本原因<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十一、GMX"><a href="#十一、GMX" class="headerlink" title="十一、GMX"></a>十一、GMX</h2><h3 id="11-1-GMX-Swap-vs-Uniswap-能替代-DEX-换币吗"><a href="#11-1-GMX-Swap-vs-Uniswap-能替代-DEX-换币吗" class="headerlink" title="11.1 GMX Swap vs Uniswap, 能替代 DEX 换币吗?"></a>11.1 GMX Swap vs Uniswap, 能替代 DEX 换币吗?</h3><blockquote>
+<p>相关: <a href="/2025/08/10/perp-gmx/">GMX 协议深度解析</a> §3.1</p>
+</blockquote>
+<p>GMX Swap 看起来很诱人: 零滑点 (基于 oracle 价格成交) + 不被 MEV 三明治攻击. 但<strong>手续费 0.2%~0.8%, 远高于 Uniswap 的 0.01%~0.3%</strong>.</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">小额交易 ($100~$5000)</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">Uniswap</span><span class="hljs-punctuation">:</span> <span class="hljs-string">手续费低, 滑点小 → 总成本更低</span><br>  <span class="hljs-attribute">GMX Swap</span><span class="hljs-punctuation">:</span> <span class="hljs-string">手续费高, 吃掉了零滑点的优势</span><br><br><span class="hljs-attribute">大额交易 ($50,000+)</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">Uniswap</span><span class="hljs-punctuation">:</span> <span class="hljs-string">手续费低, 但滑点大 (吃掉深度)</span><br>  <span class="hljs-attribute">GMX Swap</span><span class="hljs-punctuation">:</span> <span class="hljs-string">手续费固定比例, 零滑点 → 可能更便宜</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>“零滑点” 不是免费午餐:</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Uniswap</th>
+<th>GMX Swap</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定价</td>
+<td>AMM 曲线 (供需决定)</td>
+<td>Oracle 喂价 (外部决定)</td>
+</tr>
+<tr>
+<td>滑点</td>
+<td>有, 随金额增大</td>
+<td>无 (oracle 价格不受单笔交易影响)</td>
+</tr>
+<tr>
+<td>手续费</td>
+<td>0.01%~0.3%</td>
+<td>0.2%~0.8%</td>
+</tr>
+<tr>
+<td>MEV 风险</td>
+<td>有 (三明治攻击)</td>
+<td>无 (不走 mempool 撮合)</td>
+</tr>
+<tr>
+<td>LP 风险</td>
+<td>无常损失 (Impermanent Loss)</td>
+<td>方向性风险 (交易者赚 &#x3D; LP 亏)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>GMX 的高费率是 LP 承担方向性风险的补偿 – LP 本质上在做交易者的对手方, 必须收更高费率覆盖风险.</p>
+<p><strong>结论:</strong> GMX 核心优势是杠杆交易, 不是现货兑换. 日常换币用 Uniswap&#x2F;1inch, 大额 swap 可以比较一下 GMX 的报价.</p>
+<h3 id="11-2-GLP-vs-直接持有资产-谁更划算"><a href="#11-2-GLP-vs-直接持有资产-谁更划算" class="headerlink" title="11.2 GLP vs 直接持有资产, 谁更划算?"></a>11.2 GLP vs 直接持有资产, 谁更划算?</h3><blockquote>
+<p>相关: <a href="/2025/08/10/perp-gmx/">GMX 协议深度解析</a> §7</p>
+</blockquote>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs gcode">直接买 ETH + BTC:<br>  收益 = 资产涨跌<br>  就这么简单<br><br>买 GLP:<br>  收益 = 资产涨跌 + 手续费 <span class="hljs-comment">(APR ~15-40%)</span> + 交易者净亏损<br>  风险 = 资产涨跌 + 交易者净盈利 <span class="hljs-comment">(你赔)</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>GLP 本质: 持有一篮子加密资产 + 卖出 “交易者盈利” 的看涨期权.</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>直接持有</th>
+<th>GLP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>资产组合</td>
+<td>你自己决定</td>
+<td>固定比例 (~50% 稳定币, ~25% ETH, ~25% BTC)</td>
+</tr>
+<tr>
+<td>额外收益</td>
+<td>无</td>
+<td>手续费分成 (70%) + 交易者亏损</td>
+</tr>
+<tr>
+<td>额外风险</td>
+<td>无</td>
+<td>交易者盈利时 LP 亏损</td>
+</tr>
+<tr>
+<td>灵活性</td>
+<td>随时调仓</td>
+<td>赎回有冷却期, 组合比例固定</td>
+</tr>
+<tr>
+<td>牛市表现</td>
+<td>纯跟涨</td>
+<td>涨幅被稳定币稀释, 但手续费补偿</td>
+</tr>
+<tr>
+<td>熊市表现</td>
+<td>纯跟跌</td>
+<td>跌幅被稳定币缓冲, 手续费补偿</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>如果你本来就打算 hold 一篮子加密资产, GLP 是增强收益的选择.</strong> 手续费 APR 15-40% 不是白给的 – 你在用方向性风险换取这个收益. 历史上交易者整体净亏损, 所以 GLP 持有者整体是赚的, 但不保证未来也是.</p>
+<h3 id="11-3-GLP-持有者和-GMX-Staker-什么区别"><a href="#11-3-GLP-持有者和-GMX-Staker-什么区别" class="headerlink" title="11.3 GLP 持有者和 GMX Staker 什么区别?"></a>11.3 GLP 持有者和 GMX Staker 什么区别?</h3><blockquote>
+<p>相关: <a href="/2025/08/10/perp-gmx/">GMX 协议深度解析</a> §7</p>
+</blockquote>
+<p>用赌场类比最直观:</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">GLP 持有者 = 赌场庄家 (LP)</span><br><span class="hljs-attribute">  投入</span><span class="hljs-punctuation">:</span> <span class="hljs-string">真金白银 (ETH, BTC, USDC 等)</span><br>  <span class="hljs-attribute">收入</span><span class="hljs-punctuation">:</span> <span class="hljs-string">70% 手续费 + 交易者亏损</span><br>  <span class="hljs-attribute">风险</span><span class="hljs-punctuation">:</span> <span class="hljs-string">交易者赚钱时你赔钱 (方向性风险)</span><br>  <span class="hljs-attribute">本质</span><span class="hljs-punctuation">:</span> <span class="hljs-string">用资产做对手方, 承担风险换收益</span><br><br><span class="hljs-attribute">GMX Staker = 赌场股东</span><br><span class="hljs-attribute">  投入</span><span class="hljs-punctuation">:</span> <span class="hljs-string">GMX 代币</span><br>  <span class="hljs-attribute">收入</span><span class="hljs-punctuation">:</span> <span class="hljs-string">30% 手续费 (以 ETH/AVAX 发放, 不是代币通胀)</span><br>  <span class="hljs-attribute">风险</span><span class="hljs-punctuation">:</span> <span class="hljs-string">GMX 代币价格波动 (无对赌风险)</span><br>  <span class="hljs-attribute">本质</span><span class="hljs-punctuation">:</span> <span class="hljs-string">持有治理代币, 分享协议利润</span><br></code></pre></td></tr></table></figure>
+
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>GLP 持有者</th>
+<th>GMX Staker</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>角色</td>
+<td>LP (庄家)</td>
+<td>质押者 (股东)</td>
+</tr>
+<tr>
+<td>投入资产</td>
+<td>ETH, BTC, USDC 等</td>
+<td>GMX 代币</td>
+</tr>
+<tr>
+<td>手续费分成</td>
+<td>70%</td>
+<td>30%</td>
+</tr>
+<tr>
+<td>收益形式</td>
+<td>ETH&#x2F;AVAX + esGMX</td>
+<td>ETH&#x2F;AVAX + esGMX + MP</td>
+</tr>
+<tr>
+<td>对赌风险</td>
+<td>有 (交易者盈利 &#x3D; 你亏损)</td>
+<td>无</td>
+</tr>
+<tr>
+<td>收益稳定性</td>
+<td>波动大 (取决于交易者盈亏)</td>
+<td>相对稳定 (只看手续费)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>MP &#x3D; Multiplier Points, 质押越久积累越多, 增加 ETH 分成比例, 激励长期持有.</p>
+</blockquote>
+<h3 id="11-4-为什么-GMX-需要双代币设计-GLP-GMX"><a href="#11-4-为什么-GMX-需要双代币设计-GLP-GMX" class="headerlink" title="11.4 为什么 GMX 需要双代币设计 (GLP + GMX)?"></a>11.4 为什么 GMX 需要双代币设计 (GLP + GMX)?</h3><blockquote>
+<p>相关: <a href="/2025/08/10/perp-gmx/">GMX 协议深度解析</a> §7</p>
+</blockquote>
+<p><strong>GLP 解决 “谁来出钱当庄家”, GMX 解决 “谁来长期拥有和治理赌场”.</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs powershell">如果只有 GLP, 没有 GMX:<br><br>  问题 <span class="hljs-number">1</span>: <span class="hljs-built_in">LP</span> 没有长期绑定<br>    手续费高 → <span class="hljs-built_in">LP</span> 涌入; 手续费低 → <span class="hljs-built_in">LP</span> 跑路<br>    流动性不稳定, 交易体验忽好忽坏<br><br>  问题 <span class="hljs-number">2</span>: 没有治理<br>    参数调整 (手续费率, OI 上限, 支持哪些资产) 谁决定?<br>    GLP 持有者目标不统一 (有人要高收益, 有人要低风险)<br><br>  问题 <span class="hljs-number">3</span>: 无法融资<br>    协议早期需要资金开发, GLP 是 <span class="hljs-built_in">LP</span> 资产, 不能拿来花<br>    需要一个可以出售的 <span class="hljs-string">&quot;股权代币&quot;</span> 募资<br></code></pre></td></tr></table></figure>
+
+<p><strong>GMX 代币的三个作用:</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>作用</th>
+<th>机制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>治理</td>
+<td>GMX 持有者投票决定协议参数</td>
+</tr>
+<tr>
+<td>利润分享</td>
+<td>30% 手续费以 ETH&#x2F;AVAX 发放 (<strong>real yield</strong>, 不是通胀代币)</td>
+</tr>
+<tr>
+<td>长期绑定</td>
+<td>esGMX + Multiplier Points 奖励长期质押者</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>esGMX (Escrowed GMX) 的设计巧妙之处:</strong></p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">质押 GMX → 获得 esGMX 奖励</span><br><span class="hljs-attribute">esGMX 不能直接卖, 有两个选择</span><span class="hljs-punctuation">:</span><br><span class="hljs-punctuation"></span><br>  <span class="hljs-attribute">选择 1</span><span class="hljs-punctuation">:</span> <span class="hljs-string">质押 esGMX → 和 GMX 一样获得手续费分成</span><br>  <span class="hljs-attribute">选择 2</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Vest esGMX → 1 年线性解锁为 GMX → 可以卖</span><br><br>→ 想卖要等 1 年, 短期投机者没耐心<br>→ 长期持有者不在乎, 边等边赚手续费<br>→ 自然过滤出真正的长期参与者<br></code></pre></td></tr></table></figure>
+
+<p><strong>Real Yield 模式 vs 通胀代币模式:</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>GMX (Real Yield)</th>
+<th>典型 DeFi 协议 (通胀)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>质押收益来源</td>
+<td>协议真实手续费收入</td>
+<td>增发新代币</td>
+</tr>
+<tr>
+<td>收益币种</td>
+<td>ETH&#x2F;AVAX (硬通货)</td>
+<td>自家代币 (不断稀释)</td>
+</tr>
+<tr>
+<td>可持续性</td>
+<td>只要有交易量就有收益</td>
+<td>通胀停止则收益归零</td>
+</tr>
+<tr>
+<td>代币价格压力</td>
+<td>小 (收益不靠增发)</td>
+<td>大 (持续卖压)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="十二、Hyperliquid"><a href="#十二、Hyperliquid" class="headerlink" title="十二、Hyperliquid"></a>十二、Hyperliquid</h2><h3 id="12-1-Hyperliquid-为什么要做现货订单簿"><a href="#12-1-Hyperliquid-为什么要做现货订单簿" class="headerlink" title="12.1 Hyperliquid 为什么要做现货订单簿?"></a>12.1 Hyperliquid 为什么要做现货订单簿?</h3><blockquote>
+<p>相关: <a href="/2025/09/20/perp-hyperliquid/">Hyperliquid 深度解析 §7 Spot 交易</a></p>
+</blockquote>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs markdown">三个战略价值:<br><br><span class="hljs-bullet">  1.</span> 价格自主权<br><span class="hljs-code">     永续合约需要现货价格做锚点</span><br><span class="hljs-code">     没有自己的现货市场 → 依赖外部 oracle / CEX 价格</span><br><span class="hljs-code">     JELLY 事件就是被外部价格操纵搞垮的</span><br><span class="hljs-code">     有自己的现货 → 套利者在内部搬砖, 天然锚定</span><br><span class="hljs-code"></span><br><span class="hljs-bullet">  2.</span> 上币权 = 收入 + 生态<br><span class="hljs-code">     HIP-1 荷兰拍卖: 新 token 上线要竞拍 ticker</span><br><span class="hljs-code">     拍卖收入归协议 (热门 ticker 拍出几百万美元)</span><br><span class="hljs-code">     项目方选择在 Hyperliquid 首发 = 用户留在生态内</span><br><span class="hljs-code"></span><br><span class="hljs-bullet">  3.</span> 套利闭环<br><span class="hljs-code">     现货 + 永续在同一条链 → 套利者天然活跃</span><br><span class="hljs-code">     套利行为 = 免费的价格锚定 + 手续费收入</span><br><span class="hljs-code"></span><br>本质: 永续是赚钱的, 但现货是根基.<br><span class="hljs-code">     没有自己的现货 = 建在别人地基上的楼.</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="12-2-代码不开源怎么确认安全"><a href="#12-2-代码不开源怎么确认安全" class="headerlink" title="12.2 代码不开源怎么确认安全?"></a>12.2 代码不开源怎么确认安全?</h3><figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">简短回答</span><span class="hljs-punctuation">:</span> <span class="hljs-string">没法确认, 只能选择信不信.</span><br><br><span class="hljs-attribute">当前信任来源 (都不是技术验证)</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">1. 链上可审计 → 能验证 &quot;结果&quot;, 但无法验证 &quot;过程&quot; (撮合引擎是黑盒)</span><br><span class="hljs-attribute">  2. 验证者声誉 → 约 16 个, 多数知名机构, 但他们也看不到源码</span><br><span class="hljs-attribute">  3. Bridge 合约有审计 → 但核心撮合引擎 (Rust) 没有公开审计</span><br><span class="hljs-attribute">  4. 市场验证 → 跑了一年多没出资金安全事故 (≠ 安全)</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">社区质疑</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">撮合公平性: 团队能不能 &quot;偷看&quot; 订单簿抢跑? → 不知道</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">紧急干预权限: 边界是什么? → 不透明</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">验证者跑的是编译好的二进制, 无法确认内容一致性</span><br><br><span class="hljs-attribute">透明度对比</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">dYdX v4</span><span class="hljs-punctuation">:</span> <span class="hljs-string">全开源 (Go), 多次审计, 任何人可审查撮合逻辑</span><br>  <span class="hljs-attribute">GMX</span><span class="hljs-punctuation">:</span> <span class="hljs-string">全开源 (Solidity), 多次审计</span><br>  <span class="hljs-attribute">Hyperliquid</span><span class="hljs-punctuation">:</span> <span class="hljs-string">仅 Bridge 审计, 核心闭源</span><br><br><span class="hljs-attribute">不开源的可能原因</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">竞争壁垒 (HyperBFT 是核心竞争力, 开源 = 被 fork)</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">快速迭代 (闭源不受社区约束)</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;Security through obscurity&quot; (靠隐藏求安全, 安全界普遍不认可)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="12-3-HIP-1-意味着任何人发币就有流动性"><a href="#12-3-HIP-1-意味着任何人发币就有流动性" class="headerlink" title="12.3 HIP-1 意味着任何人发币就有流动性?"></a>12.3 HIP-1 意味着任何人发币就有流动性?</h3><figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">不完全是, 有门槛</span><span class="hljs-punctuation">:</span><br><span class="hljs-punctuation"></span><br>  <span class="hljs-attribute">第 1 步</span><span class="hljs-punctuation">:</span> <span class="hljs-string">荷兰拍卖竞拍 Ticker (门槛在这)</span><br>    <span class="hljs-attribute">热门 ticker</span><span class="hljs-punctuation">:</span> <span class="hljs-string">几十万~几百万美元</span><br>    <span class="hljs-attribute">冷门 ticker</span><span class="hljs-punctuation">:</span> <span class="hljs-string">几千~几万美元</span><br>    <span class="hljs-attribute">→ 不是免费的, 拍卖费 = 上币成本</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">  第 2 步</span><span class="hljs-punctuation">:</span> <span class="hljs-string">部署代币</span><br><br>  <span class="hljs-attribute">第 3 步</span><span class="hljs-punctuation">:</span> <span class="hljs-string">HIP-2 自动做市 (流动性来了)</span><br>    <span class="hljs-attribute">协议自动在订单簿两侧挂单</span><br><span class="hljs-attribute">    → 不需要自己找做市商</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">但这个 &quot;流动性&quot; 质量有限</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">协议做市不是无限资金, spread 可能很大</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">没有外部做市商补充, 深度很差</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">流动性薄 → 容易被操纵 (JELLY 事件的根源)</span><br><br><span class="hljs-attribute">更准确的说法</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">HIP-2 提供的是 &quot;能交易&quot; 的最低流动性</span><br><span class="hljs-attribute">  不是 &quot;交易体验好&quot; 的充足流动性</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">vs 其他上币方式</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">Uniswap</span><span class="hljs-punctuation">:</span> <span class="hljs-string">无门槛, 但需要自己注入真金白银做 LP</span><br>  <span class="hljs-attribute">pump.fun</span><span class="hljs-punctuation">:</span> <span class="hljs-string">零门槛, 几美元, 99% rug pull</span><br>  <span class="hljs-attribute">HIP-1</span><span class="hljs-punctuation">:</span> <span class="hljs-string">拍卖过滤, 但有钱的骗子也拍得起</span><br>  <span class="hljs-attribute">Binance</span><span class="hljs-punctuation">:</span> <span class="hljs-string">极高门槛 (审核 + 做市商协议)</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十三、攻击"><a href="#十三、攻击" class="headerlink" title="十三、攻击"></a>十三、攻击</h2><h3 id="13-1-JELLY-攻击者怎么用两个账户盈利"><a href="#13-1-JELLY-攻击者怎么用两个账户盈利" class="headerlink" title="13.1 JELLY 攻击者怎么用两个账户盈利?"></a>13.1 JELLY 攻击者怎么用两个账户盈利?</h3><blockquote>
+<p>相关: <a href="/2025/09/20/perp-hyperliquid/">Hyperliquid 深度解析 §11.2 JELLY 事件</a></p>
+</blockquote>
+<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs mel">核心: 两个市场联动 + 两个账户配合<br><br>  账户 A: $2M 做空 JELLY (故意送死的 <span class="hljs-string">&quot;炸弹&quot;</span>)<br>  账户 B: $5M 做多 JELLY (赚钱的主力)<br><br>  第 <span class="hljs-number">1</span> 步: 现货拉盘<br>    花 $3M 在 DEX 买 JELLY, 价格从 $0<span class="hljs-number">.01</span> → $0<span class="hljs-number">.03</span><br><br>  第 <span class="hljs-number">2</span> 步: 账户 A 空头爆仓<br>    价格涨 <span class="hljs-number">200</span>%, <span class="hljs-number">5</span>x 杠杆空头 → 穿仓<br>    损失 = $2M 保证金 (全没了)<br>    剩余亏损 → HLP 自动接盘 (被迫持有这个毒空头)<br><br>  第 <span class="hljs-number">3</span> 步: 账户 B 做多猛赚<br>    价格涨 <span class="hljs-number">200</span>%, 做多盈利 = $5M × <span class="hljs-number">200</span>% = $10M<br><br>  算账:<br>    账户 A: -$2M<br>    账户 B: +$10M<br>    现货买卖: 约持平<br>    净利润: ~$8M<br>    谁亏了: HLP 用户 (存 USDC 的普通人)<br><br>本质:<br>  做空亏损有上限 = 保证金没了就没了 (穿仓后 HLP 兜底)<br>  做多收益无上限 = 价格涨多少赚多少<br>  → 用有限亏损换无限收益, 差额转嫁给 HLP<br></code></pre></td></tr></table></figure>
+
+<h3 id="13-2-Hyperliquid-为什么没发现异常"><a href="#13-2-Hyperliquid-为什么没发现异常" class="headerlink" title="13.2 Hyperliquid 为什么没发现异常?"></a>13.2 Hyperliquid 为什么没发现异常?</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs markdown">三个风控漏洞 (缺一不可):<br><br><span class="hljs-bullet">  1.</span> 无关联账户检测<br><span class="hljs-bullet">     -</span> 账户 A 做空, 账户 B 做多, 同一个人<br><span class="hljs-bullet">     -</span> CEX 有 KYC + IP + 行为分析, 能识别<br><span class="hljs-bullet">     -</span> Hyperliquid 无 KYC, 钱包地址随便建 → 无法检测<br><br><span class="hljs-bullet">  2.</span> 单方向 OI 异常没触发风控<br><span class="hljs-bullet">     -</span> 小 token 突然出现巨额空头, 应该触发警报<br><span class="hljs-bullet">     -</span> 实际 OI 上限设置过高, 没拦截<br><br><span class="hljs-bullet">  3.</span> OI 与市值不匹配<br><span class="hljs-bullet">     -</span> JELLY 市值 ~$10M, 但允许远超市值的 OI<br><span class="hljs-bullet">     -</span> 操纵现货的成本 &lt;&lt; 永续端能获取的利润<br><span class="hljs-bullet">     -</span> 合理做法: OI 上限 ≤ 现货市值的 20-30%<br><br>CEX 为什么很少被这样攻击:<br>  不是技术更好, 而是有 KYC (追溯到人), 实时风控团队 (异常冻结),<br>  法律威慑 (市场操纵 = 刑事犯罪).<br>  DEX 拆掉了这些 &quot;中心化护栏&quot;, 就必须用纯技术手段补, Hyperliquid 没补到位.<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十四、基础设施"><a href="#十四、基础设施" class="headerlink" title="十四、基础设施"></a>十四、基础设施</h2><h3 id="14-1-OP-Stack-是什么"><a href="#14-1-OP-Stack-是什么" class="headerlink" title="14.1 OP Stack 是什么?"></a>14.1 OP Stack 是什么?</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">类比:<br>  Cosmos SDK → 造 L1 的工具包 (dYdX v4 用它造链)<br>  <span class="hljs-keyword">OP</span> Stack   → 造 L2 的工具包 (Base, Worldcoin 用它造 L2)<br><br>组成:<br>  执行层 (<span class="hljs-keyword">op</span>-geth)     → 修改版 go-ethereum, 处理交易<br>  排序器 (<span class="hljs-keyword">op</span>-<span class="hljs-keyword">node</span><span class="hljs-title">)     → 接收交易, 排序, 出块</span><br><span class="hljs-title">  数据发布 (DA</span>)        → 压缩后发到 Ethereum L1<br>  欺诈证明 (Fault Proof) → L1 上的挑战合约 (<span class="hljs-number">7</span> 天窗口)<br>  跨链桥 (Bridge)      → L1 ↔ L2 资产转移<br><br>谁在用 (Superchain 生态):<br>  Base (Coinbase), Worldcoin, Mantle, Zora, Mode, Lisk<br><br>vs 其他方案:<br>  <span class="hljs-keyword">OP</span> Stack     → Optimistic Rollup 工具包 (<span class="hljs-number">7</span> 天挑战期)<br>  Arbitrum Orbit → 类似定位, Arbitrum 生态<br>  ZK Stack     → ZK Rollup 工具包 (无需 <span class="hljs-number">7</span> 天等待)<br>  Cosmos SDK   → 独立 L1 工具包 (不是 L2)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十五、术语"><a href="#十五、术语" class="headerlink" title="十五、术语"></a>十五、术语</h2><h3 id="15-1-L2-Book-里的-L2-是什么意思"><a href="#15-1-L2-Book-里的-L2-是什么意思" class="headerlink" title="15.1 L2 Book 里的 L2 是什么意思?"></a>15.1 L2 Book 里的 L2 是什么意思?</h3><blockquote>
+<p>相关: <a href="/2025/09/20/perp-hyperliquid/">Hyperliquid 深度解析 §10.2</a></p>
+</blockquote>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">L2</span> = Level <span class="hljs-number">2</span> (二档行情), 不是 Layer <span class="hljs-number">2</span> (二层网络)!<br><br>这是交易所 API 的通用术语, 来自传统金融 (比区块链早几十年):<br><br>  L1 (Level <span class="hljs-number">1</span>): 只有最优报价<br>    best bid: <span class="hljs-variable">$3000</span> × <span class="hljs-number">50</span> ETH<br>    best ask: <span class="hljs-variable">$3001</span> × <span class="hljs-number">30</span> ETH<br><br>  L2 (Level <span class="hljs-number">2</span>): 多档聚合报价<br>    bid: <span class="hljs-variable">$3000</span> × <span class="hljs-number">50</span>, <span class="hljs-variable">$2999</span> × <span class="hljs-number">120</span>, <span class="hljs-variable">$2998</span> × <span class="hljs-number">200</span> ...<br>    ask: <span class="hljs-variable">$3001</span> × <span class="hljs-number">30</span>, <span class="hljs-variable">$3002</span> × <span class="hljs-number">80</span>, <span class="hljs-variable">$3003</span> × <span class="hljs-number">150</span> ...<br>    → 同一价格的订单合并, 只显示总量<br><br>  L3 (Level <span class="hljs-number">3</span>): 每笔订单明细<br>    bid: <span class="hljs-variable">$3000</span> × <span class="hljs-number">10</span> (order <span class="hljs-comment">#1), $3000 × 25 (order #2) ...</span><br>    → 不聚合, 每笔单独显示, 做市商用<br><br>Binance, OKX, dYdX, Hyperliquid 的 API 都用同样的命名.<br></code></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>这些问题的共同特点</strong>: 都是 “教程不会讲, 但实战中一定会遇到” 的问题. 理解这些延伸 case, 比背诵主线机制更能帮你判断一个协议的真实风险.</p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/web3/" class="category-chain-item">Web3</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/web3/" class="print-no-link">#Web3</a>
+      
+        <a href="/tags/%E6%B0%B8%E7%BB%AD%E5%90%88%E7%BA%A6/" class="print-no-link">#永续合约</a>
+      
+        <a href="/tags/faq/" class="print-no-link">#FAQ</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>永续合约 11 - 一些边界问题</div>
+      <div>https://mritd.com/2025/12/10/perp-faq/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年12月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/11/25/perp-liquidation-engine/" title="永续合约 10 - 清算引擎架构与实现">
+                        <span class="hidden-mobile">永续合约 10 - 清算引擎架构与实现</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2025/12/10/perp-faq/';
+          this.page.identifier = '/2025/12/10/perp-faq/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

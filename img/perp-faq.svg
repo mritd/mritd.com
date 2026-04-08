@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2530"/>
+      <stop offset="100%" style="stop-color:#2a3a48"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+
+  <!-- Question marks pattern -->
+  <g fill="none" stroke="#80cbc4" font-family="'Helvetica Neue', Arial, sans-serif">
+    <text x="310" y="110" font-size="50" fill="#80cbc4" opacity="0.15">?</text>
+    <text x="440" y="90" font-size="65" fill="#80cbc4" opacity="0.2">?</text>
+    <text x="370" y="170" font-size="80" fill="#80cbc4" opacity="0.35">?</text>
+    <text x="280" y="200" font-size="40" fill="#80cbc4" opacity="0.12">?</text>
+    <text x="500" y="175" font-size="45" fill="#80cbc4" opacity="0.15">?</text>
+    <!-- Central large question mark -->
+    <text x="400" y="195" text-anchor="middle" font-size="100" fill="#80cbc4" opacity="0.5">?</text>
+  </g>
+
+  <text x="400" y="310" text-anchor="middle" fill="#e8eaed" font-family="'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="700">Perpetuals FAQ</text>
+  <text x="400" y="350" text-anchor="middle" fill="#80cbc4" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="400">30 Niche Questions Answered</text>
+  <rect x="340" y="370" width="120" height="3" rx="1.5" fill="#80cbc4"/>
+</svg>

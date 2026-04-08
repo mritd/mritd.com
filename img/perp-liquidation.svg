@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a1520"/>
+      <stop offset="100%" style="stop-color:#452535"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+
+  <!-- Liquidation cascade / waterfall -->
+  <g transform="translate(400, 130)">
+    <!-- Cascade steps -->
+    <rect x="-100" y="-70" width="200" height="28" rx="4" fill="#f48fb1" fill-opacity="0.15" stroke="#f48fb1" stroke-width="1.5"/>
+    <text x="0" y="-51" text-anchor="middle" fill="#f48fb1" font-family="monospace" font-size="12">PARTIAL LIQUIDATION</text>
+
+    <line x1="0" y1="-42" x2="0" y2="-30" stroke="#f48fb1" stroke-width="1.5" opacity="0.5"/>
+
+    <rect x="-100" y="-30" width="200" height="28" rx="4" fill="#f48fb1" fill-opacity="0.25" stroke="#f48fb1" stroke-width="1.5"/>
+    <text x="0" y="-11" text-anchor="middle" fill="#f48fb1" font-family="monospace" font-size="12">FULL LIQUIDATION</text>
+
+    <line x1="0" y1="0" x2="0" y2="12" stroke="#f48fb1" stroke-width="1.5" opacity="0.5"/>
+
+    <rect x="-100" y="12" width="200" height="28" rx="4" fill="#f48fb1" fill-opacity="0.35" stroke="#f48fb1" stroke-width="1.5"/>
+    <text x="0" y="31" text-anchor="middle" fill="#f48fb1" font-family="monospace" font-size="12">INSURANCE FUND</text>
+
+    <line x1="0" y1="42" x2="0" y2="54" stroke="#f48fb1" stroke-width="1.5" opacity="0.5"/>
+
+    <rect x="-100" y="54" width="200" height="28" rx="4" fill="#f48fb1" fill-opacity="0.45" stroke="#f48fb1" stroke-width="1.5"/>
+    <text x="0" y="73" text-anchor="middle" fill="#f48fb1" font-family="monospace" font-size="12">ADL</text>
+  </g>
+
+  <text x="400" y="310" text-anchor="middle" fill="#e8eaed" font-family="'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="700">Liquidation Engine</text>
+  <text x="400" y="350" text-anchor="middle" fill="#f48fb1" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="400">Architecture &amp; Implementation</text>
+  <rect x="340" y="370" width="120" height="3" rx="1.5" fill="#f48fb1"/>
+</svg>

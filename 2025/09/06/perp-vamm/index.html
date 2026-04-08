@@ -1,0 +1,1864 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="Web3,永续合约,vAMM,Perpetual Protocol,Drift,DLOB">
+  
+    <meta name="description" content="本文梳理 vAMM 永续合约的演进路径, 从 Perpetual Protocol v1 的 x*y&#x3D;k 到 v2 集中流动性, 再到 Drift 的 vAMM+DLOB 混合方案, 分析每一代的改进和取舍">
+<meta property="og:type" content="article">
+<meta property="og:title" content="永续合约 05 - vAMM 永续合约演进史">
+<meta property="og:url" content="https://mritd.com/2025/09/06/perp-vamm/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="本文梳理 vAMM 永续合约的演进路径, 从 Perpetual Protocol v1 的 x*y&#x3D;k 到 v2 集中流动性, 再到 Drift 的 vAMM+DLOB 混合方案, 分析每一代的改进和取舍">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/perp-vamm.svg">
+<meta property="article:published_time" content="2025-09-06T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-06T02:00:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="Drift">
+<meta property="article:tag" content="Web3">
+<meta property="article:tag" content="vAMM">
+<meta property="article:tag" content="永续合约">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/perp-vamm.svg">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>永续合约 05 - vAMM 永续合约演进史 - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="永续合约 05 - vAMM 永续合约演进史"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-09-06 10:00" pubdate>
+          2025年9月6日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          21k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          173 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">永续合约 05 - vAMM 永续合约演进史</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>vAMM (Virtual AMM) 是 DeFi 永续合约的第一代链上定价方案, 借用 <code>x * y = k</code> 曲线定价但不持有真实代币. 本文梳理从 Perpetual Protocol v1 到 v2 集中流动性再到 Drift 的 vAMM+DLOB 混合方案的演进过程, 分析每一代的改进点和遗留问题.</p>
+<h2 id="一、术语表"><a href="#一、术语表" class="headerlink" title="一、术语表"></a>一、术语表</h2><h3 id="1-1-vAMM-基础"><a href="#1-1-vAMM-基础" class="headerlink" title="1.1 vAMM 基础"></a>1.1 vAMM 基础</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>vAMM</td>
+<td>Virtual AMM</td>
+<td>虚拟自动做市商, 用 AMM 公式定价但不持有真实代币</td>
+</tr>
+<tr>
+<td>虚拟储备</td>
+<td>Virtual Reserves</td>
+<td>vAMM 中的 x_v 和 y_v, 仅用于计算价格, 不是实际代币余额</td>
+</tr>
+<tr>
+<td>k 值</td>
+<td>k (Constant Product)</td>
+<td>x_v * y_v &#x3D; k 中的常数, 决定池子的虚拟深度和滑点</td>
+</tr>
+<tr>
+<td>保证金池</td>
+<td>Margin Vault &#x2F; Clearing House</td>
+<td>存放所有交易者保证金的合约, 负责真实资金的结算</td>
+</tr>
+<tr>
+<td>虚拟价格</td>
+<td>vAMM Price</td>
+<td>由虚拟储备计算的价格, price &#x3D; y_v &#x2F; x_v</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-2-协议与架构"><a href="#1-2-协议与架构" class="headerlink" title="1.2 协议与架构"></a>1.2 协议与架构</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Clearing House</td>
+<td>清算所</td>
+<td>管理保证金、开平仓、清算的核心合约</td>
+</tr>
+<tr>
+<td>Insurance Fund</td>
+<td>保险基金</td>
+<td>用于覆盖穿仓损失的资金池</td>
+</tr>
+<tr>
+<td>DLOB</td>
+<td>Decentralized Limit Order Book</td>
+<td>去中心化限价订单簿, Drift 的混合流动性层之一</td>
+</tr>
+<tr>
+<td>JIT</td>
+<td>Just-In-Time Liquidity</td>
+<td>Drift 中做市商在交易执行前一刻注入的即时流动性</td>
+</tr>
+<tr>
+<td>Maker</td>
+<td>流动性提供者</td>
+<td>Perp v2 中在 vAMM 内提供集中流动性的角色</td>
+</tr>
+<tr>
+<td>Taker</td>
+<td>交易者</td>
+<td>在 vAMM 中执行交易的一方</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-3-风险"><a href="#1-3-风险" class="headerlink" title="1.3 风险"></a>1.3 风险</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Squeeze</td>
+<td>挤压&#x2F;逼仓</td>
+<td>大户通过大量单边交易推动虚拟价格到极端, 触发他人清算</td>
+</tr>
+<tr>
+<td>脱锚</td>
+<td>De-peg &#x2F; Price Divergence</td>
+<td>vAMM 价格长时间偏离现货指数价格</td>
+</tr>
+<tr>
+<td>k 值治理</td>
+<td>k Governance</td>
+<td>通过治理调整 k 值, 平衡滑点和价格灵敏度</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="二、vAMM-概念-虚拟的做市商"><a href="#二、vAMM-概念-虚拟的做市商" class="headerlink" title="二、vAMM 概念: 虚拟的做市商"></a>二、vAMM 概念: 虚拟的做市商</h2><h3 id="2-1-从真实-AMM-到虚拟-AMM"><a href="#2-1-从真实-AMM-到虚拟-AMM" class="headerlink" title="2.1 从真实 AMM 到虚拟 AMM"></a>2.1 从真实 AMM 到虚拟 AMM</h3><p>在 Uniswap (真实 AMM) 中:</p>
+<ul>
+<li>LP 存入真实的 token0 和 token1, 形成储备 x, y</li>
+<li>交易者用一种 token 换另一种, x * y &#x3D; k 决定价格</li>
+<li><strong>LP 承担无常损失, 交易者获得真实 token</strong></li>
+</ul>
+<p>vAMM 的核心洞察: <strong>永续合约不需要真实的 token 交换, 只需要一个定价机制</strong>.</p>
+<p>在 vAMM 中:</p>
+<ul>
+<li><strong>没有 LP 存入代币</strong>, x_v 和 y_v 是协议设定的虚拟数字</li>
+<li>交易者开多&#x2F;开空, 虚拟储备发生变化, 产生一个虚拟价格</li>
+<li><strong>所有资金结算在独立的保证金池 (Clearing House) 中进行</strong></li>
+</ul>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f472b6"/>
+    </marker>
+  </defs>
+  <rect width="720" height="400" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">真实 AMM vs vAMM: 资金流与定价分离</text>
+  <!-- Real AMM -->
+  <rect x="20" y="42" width="330" height="340" rx="6" fill="#818cf8" fill-opacity="0.06" stroke="#818cf8" stroke-width="1"/>
+  <text x="185" y="62" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="10" font-weight="bold">真实 AMM (Uniswap)</text>
+  <!-- Pool -->
+  <rect x="100" y="120" width="160" height="80" rx="6" fill="#818cf8" fill-opacity="0.12" stroke="#818cf8" stroke-width="1"/>
+  <text x="180" y="145" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">Pool</text>
+  <text x="180" y="162" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="8">x * y = k</text>
+  <text x="180" y="178" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">真实 ETH + USDC 储备</text>
+  <!-- LP -->
+  <rect x="50" y="80" width="60" height="24" rx="4" fill="#34d399" fill-opacity="0.15" stroke="#34d399" stroke-width="1"/>
+  <text x="80" y="96" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">LP</text>
+  <line x1="110" y1="92" x2="130" y2="120" stroke="#34d399" stroke-width="1"/>
+  <text x="105" y="112" fill="#34d399" font-family="monospace" font-size="6">存入真实 token</text>
+  <!-- Trader -->
+  <rect x="50" y="230" width="60" height="24" rx="4" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1"/>
+  <text x="80" y="246" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">Trader</text>
+  <line x1="110" y1="240" x2="149" y2="201" stroke="#f472b6" stroke-width="1" marker-end="url(#arr)"/>
+  <text x="145" y="228" fill="#f472b6" font-family="monospace" font-size="6">ETH ↔ USDC</text>
+  <text x="185" y="280" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="7">定价 + 资金 在同一个池子</text>
+  <text x="185" y="295" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">LP 承担无常损失</text>
+  <text x="185" y="310" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">交易者获得真实 token</text>
+  <!-- Separator -->
+  <line x1="360" y1="50" x2="360" y2="370" stroke="#9ca3af" stroke-width="1" stroke-dasharray="4"/>
+  <!-- vAMM -->
+  <rect x="370" y="42" width="330" height="340" rx="6" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="1"/>
+  <text x="535" y="62" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">vAMM (Perpetual Protocol)</text>
+  <!-- vAMM Pool -->
+  <rect x="445" y="90" width="170" height="70" rx="6" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="1"/>
+  <text x="530" y="112" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">vAMM (虚拟池)</text>
+  <text x="530" y="128" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">x_v * y_v = k</text>
+  <text x="530" y="144" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">没有真实代币! 纯数字</text>
+  <!-- Clearing House -->
+  <rect x="445" y="200" width="170" height="70" rx="6" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="1"/>
+  <text x="530" y="222" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">Clearing House</text>
+  <text x="530" y="238" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">保证金池 (真实 USDC)</text>
+  <text x="530" y="254" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">所有结算在这里发生</text>
+  <!-- Arrow: vAMM -> Clearing House -->
+  <line x1="530" y1="160" x2="530" y2="200" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3"/>
+  <text x="560" y="183" fill="#9ca3af" font-family="monospace" font-size="6">仅传递价格</text>
+  <!-- Trader -->
+  <rect x="395" y="230" width="40" height="24" rx="4" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1"/>
+  <text x="415" y="246" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">Trader</text>
+  <line x1="415" y1="230" x2="460" y2="160" stroke="#f472b6" stroke-width="1" stroke-dasharray="3"/>
+  <text x="410" y="192" fill="#f472b6" font-family="monospace" font-size="6">影响虚拟价格</text>
+  <line x1="435" y1="240" x2="445" y2="240" stroke="#fbbf24" stroke-width="1"/>
+  <text x="410" y="266" fill="#fbbf24" font-family="monospace" font-size="6">存入/取出 USDC</text>
+  <!-- No LP -->
+  <rect x="395" y="100" width="40" height="24" rx="4" fill="#9ca3af" fill-opacity="0.15" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3"/>
+  <text x="415" y="116" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">无 LP</text>
+  <text x="535" y="300" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">定价 (vAMM) 与资金 (Vault) 分离</text>
+  <text x="535" y="315" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">无需 LP, 无无常损失</text>
+  <text x="535" y="330" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">交易者只持有合约仓位</text>
+</svg>
+</div>
+
+<blockquote>
+<p><strong>关键洞察</strong>: vAMM 把 AMM 的两个功能拆开了:</p>
+<ul>
+<li><strong>定价功能</strong> → vAMM (虚拟池)</li>
+<li><strong>资金托管功能</strong> → Clearing House (保证金池)</li>
+</ul>
+<p>这样就不需要 LP 存入两种 token, 只要交易者存入 USDC 保证金就够了.</p>
+</blockquote>
+<h3 id="2-2-为什么叫-“虚拟”"><a href="#2-2-为什么叫-“虚拟”" class="headerlink" title="2.2 为什么叫 “虚拟”?"></a>2.2 为什么叫 “虚拟”?</h3><figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs gcode">真实 AMM <span class="hljs-comment">(Uniswap)</span>:<br>  池子里有 <span class="hljs-number">100</span> ETH + <span class="hljs-number">200</span>,<span class="hljs-number">000</span> USDC<br>  x <span class="hljs-comment">(base储备)</span> * y <span class="hljs-comment">(quote储备)</span> = <span class="hljs-number">100</span> * <span class="hljs-number">200000</span> = <span class="hljs-number">20</span>,<span class="hljs-number">000</span>,<span class="hljs-number">000</span><br>  price <span class="hljs-comment">(价格)</span> = y/x = <span class="hljs-number">2000</span> USDC/ETH<br>  → 这些 ETH 和 USDC 是真实存在的代币<br><br>虚拟 AMM:<br>  x_v <span class="hljs-comment">(虚拟base储备)</span> = <span class="hljs-number">100</span> <span class="hljs-comment">(虚拟 ETH 储备)</span><br>  y_v <span class="hljs-comment">(虚拟quote储备)</span> = <span class="hljs-number">200</span>,<span class="hljs-number">000</span> <span class="hljs-comment">(虚拟 USDC 储备)</span><br>  k <span class="hljs-comment">(常数乘积)</span> = <span class="hljs-number">100</span> * <span class="hljs-number">200000</span> = <span class="hljs-number">20</span>,<span class="hljs-number">000</span>,<span class="hljs-number">000</span><br>  price <span class="hljs-comment">(价格)</span> = y_v / x_v = <span class="hljs-number">2000</span> USDC/ETH<br>  → x_v 和 y_v 只是数字, 合约里没有 <span class="hljs-number">100</span> ETH<br>  → 它们的唯一作用是: 计算交易的成交价格和滑点<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、Perpetual-Protocol-v1"><a href="#三、Perpetual-Protocol-v1" class="headerlink" title="三、Perpetual Protocol v1"></a>三、Perpetual Protocol v1</h2><h3 id="3-1-历史背景"><a href="#3-1-历史背景" class="headerlink" title="3.1 历史背景"></a>3.1 历史背景</h3><p>Perpetual Protocol v1 (2020 年底, xDai&#x2F;Gnosis Chain) 是第一个将 vAMM 概念落地的永续合约协议. 它证明了一个重要的事情: <strong>链上永续合约不需要订单簿, 也不需要 LP</strong>.</p>
+<h3 id="3-2-架构"><a href="#3-2-架构" class="headerlink" title="3.2 架构"></a>3.2 架构</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5eead4"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"/>
+    </marker>
+  </defs>
+  <rect width="720" height="340" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Perpetual Protocol v1 架构</text>
+  <!-- Trader -->
+  <rect x="40" y="130" width="90" height="50" rx="6" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1"/>
+  <text x="85" y="155" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">Trader</text>
+  <text x="85" y="168" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">存入 USDC 保证金</text>
+  <!-- Arrow: Trader -> Clearing House -->
+  <line x1="130" y1="155" x2="198" y2="155" stroke="#fbbf24" stroke-width="1" marker-end="url(#arr1)"/>
+  <text x="165" y="148" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="6">USDC</text>
+  <!-- Clearing House -->
+  <rect x="205" y="100" width="160" height="120" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="285" y="120" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">Clearing House</text>
+  <text x="285" y="140" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">• 管理保证金账户</text>
+  <text x="285" y="155" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">• 计算 PnL</text>
+  <text x="285" y="170" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">• 执行清算</text>
+  <text x="285" y="185" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">• 结算 funding</text>
+  <text x="285" y="200" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">(真实资金在这里)</text>
+  <!-- Arrow: Clearing House -> vAMM -->
+  <line x1="365" y1="155" x2="428" y2="155" stroke="#5eead4" stroke-width="1" marker-end="url(#arr0)"/>
+  <text x="398" y="148" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="6">查询价格</text>
+  <!-- vAMM -->
+  <rect x="435" y="110" width="150" height="90" rx="6" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1"/>
+  <text x="510" y="132" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">vAMM</text>
+  <text x="510" y="150" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">x_v * y_v = k</text>
+  <text x="510" y="165" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">• 计算成交价格</text>
+  <text x="510" y="180" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">• 计算滑点</text>
+  <text x="510" y="195" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">(没有真实资金)</text>
+  <!-- Insurance Fund -->
+  <rect x="220" y="260" width="130" height="50" rx="6" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-width="1"/>
+  <text x="285" y="282" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">Insurance Fund</text>
+  <text x="285" y="298" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">覆盖穿仓损失</text>
+  <!-- Arrow: CH -> Insurance -->
+  <line x1="285" y1="220" x2="285" y2="260" stroke="#34d399" stroke-width="1" stroke-dasharray="3"/>
+  <text x="310" y="244" fill="#34d399" font-family="monospace" font-size="6">穿仓时补偿</text>
+  <!-- Oracle -->
+  <rect x="480" y="260" width="100" height="44" rx="6" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1"/>
+  <text x="530" y="280" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9">Chainlink</text>
+  <text x="530" y="294" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">index price</text>
+  <!-- Arrow: Oracle -> CH -->
+  <line x1="480" y1="270" x2="365" y2="200" stroke="#818cf8" stroke-width="1" stroke-dasharray="3"/>
+  <text x="440" y="248" fill="#818cf8" font-family="monospace" font-size="6">funding rate 参考</text>
+</svg>
+</div>
+
+<p>三个核心组件:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>职责</th>
+<th align="center">是否持有真实资金</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>vAMM</strong></td>
+<td>定价: 根据交易方向和大小, 计算成交价格</td>
+<td align="center">否</td>
+</tr>
+<tr>
+<td><strong>Clearing House</strong></td>
+<td>结算: 管理保证金, 计算盈亏, 执行清算</td>
+<td align="center"><strong>是</strong></td>
+</tr>
+<tr>
+<td><strong>Insurance Fund</strong></td>
+<td>兜底: 当清算不足以覆盖亏损时, 由保险基金补偿</td>
+<td align="center"><strong>是</strong></td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="3-3-开多-开空在-vAMM-中的运作"><a href="#3-3-开多-开空在-vAMM-中的运作" class="headerlink" title="3.3 开多&#x2F;开空在 vAMM 中的运作"></a>3.3 开多&#x2F;开空在 vAMM 中的运作</h3><p>核心直觉:</p>
+<ul>
+<li><strong>开多 (Long)</strong> &#x3D; 在虚拟池中用 quote token (USDC) 买入 base token (ETH) → 推高虚拟价格</li>
+<li><strong>开空 (Short)</strong> &#x3D; 在虚拟池中卖出 base token (ETH) 换取 quote token → 压低虚拟价格</li>
+<li><strong>平仓</strong> &#x3D; 反向操作</li>
+</ul>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs dns">示例 <span class="hljs-number">1</span> (合理 k 值): x_v (虚拟base)=<span class="hljs-number">10000</span>, y_v (虚拟quote)=<span class="hljs-number">20000000</span>, k (常数)=<span class="hljs-number">200000000000</span>, price (价格)=<span class="hljs-number">2000</span><br><br>Alice 开多, 保证金 <span class="hljs-number">10</span>,<span class="hljs-number">000</span> USDC, 杠杆 <span class="hljs-number">5</span>x = notional (名义价值) <span class="hljs-number">50</span>,<span class="hljs-number">000</span> USDC<br><br><span class="hljs-number">1</span>) 向虚拟池注入 <span class="hljs-number">50</span>,<span class="hljs-number">000</span> quote:<br>   y_v&#x27; = <span class="hljs-number">20</span>,<span class="hljs-number">000,000</span> + <span class="hljs-number">50</span>,<span class="hljs-number">000</span> = <span class="hljs-number">20</span>,<span class="hljs-number">050,000</span><br>   x_v&#x27; = k / y_v&#x27; = <span class="hljs-number">200,000</span>,<span class="hljs-number">000,000</span> / <span class="hljs-number">20</span>,<span class="hljs-number">050,000</span> ≈ <span class="hljs-number">9,975.06</span><br>   Alice 获得虚拟 base = <span class="hljs-number">10</span>,<span class="hljs-number">000</span> - <span class="hljs-number">9,975.06</span> = <span class="hljs-number">24</span>.<span class="hljs-number">94</span> vETH<br><br><span class="hljs-number">2</span>) 虚拟价格变化:<br>   开仓前: price = <span class="hljs-number">20</span>,<span class="hljs-number">000,000</span> / <span class="hljs-number">10</span>,<span class="hljs-number">000</span> = <span class="hljs-number">2</span>,<span class="hljs-number">000</span><br>   开仓后: price = <span class="hljs-number">20</span>,<span class="hljs-number">050,000</span> / <span class="hljs-number">9,975.06</span> ≈ <span class="hljs-number">2</span>,<span class="hljs-number">010</span><br>   slippage (滑点) = (<span class="hljs-number">2</span>,<span class="hljs-number">010</span> - <span class="hljs-number">2</span>,<span class="hljs-number">000</span>) / <span class="hljs-number">2</span>,<span class="hljs-number">000</span> = <span class="hljs-number">0</span>.<span class="hljs-number">5</span>%   ← 正常范围<br><br><span class="hljs-number">3</span>) 注意: 没有真实 ETH 被转移<br>   Alice 的 <span class="hljs-number">10</span>,<span class="hljs-number">000</span> USDC 保证金存入 Clearing House<br>   vAMM 只是记录了 &quot;Alice 有 <span class="hljs-number">24</span>.<span class="hljs-number">94</span> vETH 多头仓位&quot;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs gcode">示例 <span class="hljs-number">2</span> <span class="hljs-comment">(极端小 k)</span>: x_v <span class="hljs-comment">(虚拟base)</span>=<span class="hljs-number">100</span>, y_v <span class="hljs-comment">(虚拟quote)</span>=<span class="hljs-number">200000</span>, k <span class="hljs-comment">(常数)</span>=<span class="hljs-number">20000000</span>, price <span class="hljs-comment">(价格)</span>=<span class="hljs-number">2000</span><br><br>同样的 <span class="hljs-number">50</span>,<span class="hljs-number">000</span> USDC 开多:<br>   y_v<span class="hljs-string">&#x27; = 250,000</span><br><span class="hljs-string">   x_v&#x27;</span> = <span class="hljs-number">20</span>,<span class="hljs-number">000</span>,<span class="hljs-number">000</span> / <span class="hljs-number">250</span>,<span class="hljs-number">000</span> = <span class="hljs-number">80</span><br>   Alice 获得 <span class="hljs-number">20</span> vETH<br><br>   开仓后: price = <span class="hljs-number">250</span>,<span class="hljs-number">000</span> / <span class="hljs-number">80</span> = <span class="hljs-number">3</span>,<span class="hljs-number">125</span><br>   slippage <span class="hljs-comment">(滑点)</span> = <span class="hljs-comment">(3,125 - 2,000)</span> / <span class="hljs-number">2</span>,<span class="hljs-number">000</span> = <span class="hljs-number">56.25</span><span class="hljs-meta">%</span>  ← 滑点极大!<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>对比</strong>: 同样的交易, k 值差 10,000 倍, 滑点从 0.5% 飙到 56%.<br>k 值本质上决定了 vAMM 的 “虚拟深度”. 实际协议会设置很大的 k 来模拟合理的市场深度.<br>但 k 值设多大, 本身就是一个治理难题 (后面第 6 节讨论).</p>
+</blockquote>
+<h3 id="3-4-k-值的设定"><a href="#3-4-k-值的设定" class="headerlink" title="3.4 k 值的设定"></a>3.4 k 值的设定</h3><p>k 值决定了 vAMM 的 “虚拟深度”:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>k 值</th>
+<th>影响</th>
+<th>类比</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>k 大</strong></td>
+<td>滑点小, 交易体验好, 但价格对交易不敏感</td>
+<td>像一个深水游泳池, 扔石头几乎没波浪</td>
+</tr>
+<tr>
+<td><strong>k 小</strong></td>
+<td>滑点大, 价格对交易敏感, 容易被操纵</td>
+<td>像一个浅水杯, 滴一滴水就溢出</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>Perpetual Protocol v1 中, <strong>k 值由治理 (governance) 调整</strong>, 不是市场自然形成的.</p>
+<p>这是 vAMM 最根本的设计缺陷之一: <strong>深度是人为设定的, 不是真实供需决定的</strong>.</p>
+<hr>
+<h2 id="四、vAMM-的数学"><a href="#四、vAMM-的数学" class="headerlink" title="四、vAMM 的数学"></a>四、vAMM 的数学</h2><h3 id="4-1-虚拟储备常数乘积"><a href="#4-1-虚拟储备常数乘积" class="headerlink" title="4.1 虚拟储备常数乘积"></a>4.1 虚拟储备常数乘积</h3><p>vAMM 复用了 Uniswap V2 的常数乘积公式 (参见 Uniswap V2 常数乘积公式):</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">x_v (虚拟base储备) * y_v (虚拟<span class="hljs-literal">quote</span>储备) = k (常数乘积)<br><br>x_v = 虚拟 base <span class="hljs-keyword">token</span> 储备 (如 vETH)<br>y_v = 虚拟 <span class="hljs-literal">quote</span> <span class="hljs-keyword">token</span> 储备 (如 vUSDC)<br>k   = 常数, 由治理设定<br><br>当前价格:<br>  P (价格) = y_v / x_v<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-2-开多仓位计算"><a href="#4-2-开多仓位计算" class="headerlink" title="4.2 开多仓位计算"></a>4.2 开多仓位计算</h3><p>交易者用 notional_quote 金额开多 (实际支付 notional_quote &#x2F; leverage 的保证金):</p>
+<figure class="highlight sml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs sml">开多: 注入 Δy (quote增量) → 取出 Δx (base增量)<br><br>y_v&#x27; = y_v + Δy<br>x_v&#x27; = k / y_v&#x27; = k / (y_v + Δy)<br>Δx   = x_v - x_v&#x27; = x_v - k / (y_v + Δy)<br><br>avg_price (平均成交价) = Δy / Δx<br><br>new_price (新价格) = y_v&#x27; / x_v&#x27; = (y_v + Δy)^<span class="hljs-number">2</span> / k<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-开空仓位计算"><a href="#4-3-开空仓位计算" class="headerlink" title="4.3 开空仓位计算"></a>4.3 开空仓位计算</h3><figure class="highlight sml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sml">开空: 注入 Δx (base增量) → 取出 Δy (quote增量) (但这里没有真实 base token!)<br><br>实际操作: 协议用 notional (名义价值) 金额反推虚拟 base 数量<br><br>x_v&#x27; = x_v + Δx_implied (隐含base增量)<br>y_v&#x27; = k / x_v&#x27;<br>虚拟价格下降: y_v&#x27; / x_v&#x27; &lt; y_v / x_v<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-滑点公式"><a href="#4-4-滑点公式" class="headerlink" title="4.4 滑点公式"></a>4.4 滑点公式</h3><figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs coq">对于开多 (买入 base):<br><br>  slippage (滑点)(%) = | <span class="hljs-type">avg_price</span> (平均成交价) - initial_price (初始价格) | <span class="hljs-type">/ initial_price</span><br>  // 注意: 这里用平均成交价计算滑点 (更准确), 前面 §<span class="hljs-number">2.3</span> 的示例用的是 spot price 变化率 (更直觉但高估了实际滑点)<br><br>  avg_price = Δy (<span class="hljs-built_in">quote</span>增量) / Δx (base增量) = Δy / (x_v - k/(y_v + Δy))<br><br>  简化近似 (Δy &lt;&lt; y_v 时):<br>    slippage ≈ Δy / y_v = trade_size (交易规模) / virtual_quote_reserve (虚拟<span class="hljs-built_in">quote</span>储备)<br><br>  关键关系:<br>    slippage = f(trade_size / k)<br>    k (常数乘积) 越大 → 同样交易量的滑点越小<br></code></pre></td></tr></table></figure>
+
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300">
+  <rect width="720" height="300" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">vAMM 滑点 vs k 值 (开多 50,000 USDC)</text>
+  <!-- Axes -->
+  <line x1="80" y1="260" x2="680" y2="260" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="80" y1="40" x2="80" y2="260" stroke="#9ca3af" stroke-width="1"/>
+  <text x="380" y="290" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">k 值 (百万)</text>
+  <text x="30" y="150" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8" transform="rotate(-90 30 150)">滑点 (%)</text>
+  <!-- Y axis labels -->
+  <text x="70" y="264" text-anchor="end" fill="#9ca3af" font-family="monospace" font-size="7">0%</text>
+  <text x="70" y="220" text-anchor="end" fill="#9ca3af" font-family="monospace" font-size="7">10%</text>
+  <text x="70" y="176" text-anchor="end" fill="#9ca3af" font-family="monospace" font-size="7">25%</text>
+  <text x="70" y="106" text-anchor="end" fill="#9ca3af" font-family="monospace" font-size="7">50%</text>
+  <text x="70" y="48" text-anchor="end" fill="#9ca3af" font-family="monospace" font-size="7">75%</text>
+  <!-- X axis labels -->
+  <text x="80" y="278" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">1</text>
+  <text x="200" y="278" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">20</text>
+  <text x="320" y="278" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">50</text>
+  <text x="440" y="278" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">100</text>
+  <text x="560" y="278" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">200</text>
+  <text x="680" y="278" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">500</text>
+  <!-- Grid lines -->
+  <line x1="80" y1="220" x2="680" y2="220" stroke="#9ca3af" stroke-width="0.3" stroke-dasharray="3"/>
+  <line x1="80" y1="176" x2="680" y2="176" stroke="#9ca3af" stroke-width="0.3" stroke-dasharray="3"/>
+  <line x1="80" y1="106" x2="680" y2="106" stroke="#9ca3af" stroke-width="0.3" stroke-dasharray="3"/>
+  <!-- Curve: slippage decreasing as k increases -->
+  <polyline points="80,50 120,90 160,140 200,176 260,210 320,228 380,238 440,244 500,248 560,252 620,254 680,256" fill="none" stroke="#5eead4" stroke-width="2"/>
+  <!-- Highlight points -->
+  <circle cx="80" cy="50" r="4" fill="#f472b6"/>
+  <text x="95" y="55" fill="#f472b6" font-family="monospace" font-size="7">k=1M: 滑点~69%</text>
+  <circle cx="200" cy="176" r="4" fill="#fbbf24"/>
+  <text x="215" y="172" fill="#fbbf24" font-family="monospace" font-size="7">k=20M: 滑点~25%</text>
+  <circle cx="440" cy="244" r="4" fill="#34d399"/>
+  <text x="455" y="240" fill="#34d399" font-family="monospace" font-size="7">k=100M: 滑点~5%</text>
+  <circle cx="680" cy="256" r="4" fill="#818cf8"/>
+  <text x="595" y="250" fill="#818cf8" font-family="monospace" font-size="7">k=500M: 滑点~1%</text>
+  <!-- Annotation -->
+  <text x="400" y="56" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">k 太小 → 滑点不可接受</text>
+  <text x="520" y="210" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">k 越大 → 虚拟深度越大 → 滑点越小</text>
+</svg>
+</div>
+
+<h3 id="4-5-数值验证"><a href="#4-5-数值验证" class="headerlink" title="4.5 数值验证"></a>4.5 数值验证</h3><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs dns">初始: x_v (虚拟base)=<span class="hljs-number">1000</span>, y_v (虚拟quote)=<span class="hljs-number">2</span>,<span class="hljs-number">000,000</span>, k (常数)=<span class="hljs-number">2</span>,<span class="hljs-number">000,000</span>,<span class="hljs-number">000</span>, P (价格)=<span class="hljs-number">2000</span><br><br>Case <span class="hljs-number">1</span>: 开多 notional (名义价值) = <span class="hljs-number">100,000</span> USDC<br>  y_v&#x27; = <span class="hljs-number">2</span>,<span class="hljs-number">000,000</span> + <span class="hljs-number">100,000</span> = <span class="hljs-number">2,100,000</span><br>  x_v&#x27; = <span class="hljs-number">2</span>,<span class="hljs-number">000,000</span>,<span class="hljs-number">000</span> / <span class="hljs-number">2,100,000</span> = <span class="hljs-number">952.381</span><br>  Δx (base增量) = <span class="hljs-number">1000</span> - <span class="hljs-number">952.381</span> = <span class="hljs-number">47</span>.<span class="hljs-number">619</span> vETH<br>  avg_price (平均成交价) = <span class="hljs-number">100,000</span> / <span class="hljs-number">47</span>.<span class="hljs-number">619</span> = <span class="hljs-number">2</span>,<span class="hljs-number">100</span> USDC/ETH<br>  slippage (滑点) = (<span class="hljs-number">2100</span> - <span class="hljs-number">2000</span>) / <span class="hljs-number">2000</span> = <span class="hljs-number">5</span>%<br><br>Case <span class="hljs-number">2</span>: 开多 notional = <span class="hljs-number">500,000</span> USDC<br>  y_v&#x27; = <span class="hljs-number">2</span>,<span class="hljs-number">000,000</span> + <span class="hljs-number">500,000</span> = <span class="hljs-number">2</span>,<span class="hljs-number">500,000</span><br>  x_v&#x27; = <span class="hljs-number">2</span>,<span class="hljs-number">000,000</span>,<span class="hljs-number">000</span> / <span class="hljs-number">2</span>,<span class="hljs-number">500,000</span> = <span class="hljs-number">800</span><br>  Δx = <span class="hljs-number">1000</span> - <span class="hljs-number">800</span> = <span class="hljs-number">200</span> vETH<br>  avg_price = <span class="hljs-number">500,000</span> / <span class="hljs-number">200</span> = <span class="hljs-number">2</span>,<span class="hljs-number">500</span> USDC/ETH<br>  slippage = (<span class="hljs-number">2500</span> - <span class="hljs-number">2000</span>) / <span class="hljs-number">2000</span> = <span class="hljs-number">25</span>%<br><br>→ 交易量增大 <span class="hljs-number">5</span> 倍, 滑点增大 <span class="hljs-number">5</span> 倍. 基本呈线性关系 (在交易量远小于 k 时).<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、Perpetual-Protocol-v2-Curie"><a href="#五、Perpetual-Protocol-v2-Curie" class="headerlink" title="五、Perpetual Protocol v2 (Curie)"></a>五、Perpetual Protocol v2 (Curie)</h2><h3 id="5-1-v1-的问题"><a href="#5-1-v1-的问题" class="headerlink" title="5.1 v1 的问题"></a>5.1 v1 的问题</h3><p>Perpetual Protocol v1 上线后暴露了几个关键问题:</p>
+<ol>
+<li><strong>k 值治理</strong>: 人为设定深度, 调整滞后</li>
+<li><strong>资本效率低</strong>: 虚拟深度在全价格范围均匀分布 (和 Uniswap V2 一样的问题)</li>
+<li><strong>Maker 无激励</strong>: 没有 LP 的角色, 协议无法吸引做市流动性</li>
+<li><strong>滑点竞争力差</strong>: 和 CEX 及 Oracle 型协议相比, 滑点偏大</li>
+</ol>
+<h3 id="5-2-v2-的方案-用-Uniswap-V3-做-vAMM"><a href="#5-2-v2-的方案-用-Uniswap-V3-做-vAMM" class="headerlink" title="5.2 v2 的方案: 用 Uniswap V3 做 vAMM"></a>5.2 v2 的方案: 用 Uniswap V3 做 vAMM</h3><p>Perpetual Protocol v2 (2021, Optimism) 做了一个大胆的决定: <strong>直接复用 Uniswap V3 合约作为 vAMM 引擎</strong>.</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"/>
+    </marker>
+  </defs>
+  <rect width="720" height="340" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Perpetual Protocol v1 → v2 架构变化</text>
+  <!-- v1 -->
+  <rect x="20" y="42" width="330" height="280" rx="6" fill="#f472b6" fill-opacity="0.05" stroke="#f472b6" stroke-width="1"/>
+  <text x="185" y="62" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">v1: 自定义 vAMM</text>
+  <rect x="80" y="80" width="180" height="60" rx="5" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="170" y="105" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">自定义 x*y=k 合约</text>
+  <text x="170" y="122" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">全范围均匀流动性</text>
+  <text x="185" y="165" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">角色: 仅 Taker</text>
+  <text x="185" y="183" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">没有 Maker/LP</text>
+  <text x="185" y="200" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">k 由治理设定</text>
+  <text x="185" y="217" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">资本效率低 (和 V2 AMM 一样)</text>
+  <text x="185" y="250" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">xDai / Gnosis Chain</text>
+  <text x="185" y="270" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">2020.12 上线</text>
+  <!-- Arrow -->
+  <line x1="355" y1="180" x2="378" y2="180" stroke="#fbbf24" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- v2 -->
+  <rect x="390" y="42" width="310" height="280" rx="6" fill="#5eead4" fill-opacity="0.05" stroke="#5eead4" stroke-width="1"/>
+  <text x="545" y="62" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">v2 (Curie): Uniswap V3 as vAMM</text>
+  <rect x="420" y="80" width="260" height="60" rx="5" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="550" y="100" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Fork Uniswap V3 池子合约</text>
+  <text x="550" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">集中流动性 (Concentrated Liquidity)</text>
+  <text x="545" y="165" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">角色: Maker + Taker</text>
+  <text x="545" y="183" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Maker 在 vAMM 中提供集中流动性</text>
+  <text x="545" y="200" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">流动性由市场决定, 非治理</text>
+  <text x="545" y="217" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">资本效率提高 (V3 集中流动性)</text>
+  <text x="545" y="250" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">Optimism L2</text>
+  <text x="545" y="270" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">2021.11 上线</text>
+</svg>
+</div>
+
+<h3 id="5-3-Maker-vs-Taker"><a href="#5-3-Maker-vs-Taker" class="headerlink" title="5.3 Maker vs Taker"></a>5.3 Maker vs Taker</h3><p>v2 引入了 <strong>Maker</strong> 角色 (类比 Uniswap V3 的 LP):</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>行为</th>
+<th>盈利来源</th>
+<th>风险</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Taker</strong></td>
+<td>开多&#x2F;开空 (交易)</td>
+<td>仓位盈利</td>
+<td>仓位亏损, 清算</td>
+</tr>
+<tr>
+<td><strong>Maker</strong></td>
+<td>在 vAMM 的 tick 范围内提供流动性</td>
+<td>手续费 + funding 收入</td>
+<td>无常损失 (虚拟), 对手方风险</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>Maker 存入保证金到 Clearing House, 然后在 Uniswap V3 vAMM 的指定价格区间提供虚拟流动性. 这和在 Uniswap V3 做 LP 的体验类似, 但所有流动性都是虚拟的.</p>
+<h3 id="5-4-为什么选-Uniswap-V3"><a href="#5-4-为什么选-Uniswap-V3" class="headerlink" title="5.4 为什么选 Uniswap V3?"></a>5.4 为什么选 Uniswap V3?</h3><ol>
+<li><strong>成熟 &amp; 经过审计</strong>: Uniswap V3 是最经过实战检验的 AMM 合约</li>
+<li><strong>集中流动性</strong>: Maker 可以在当前价格附近集中提供流动性, 大幅减少滑点</li>
+<li><strong>Tick 系统</strong>: 现成的离散价格点和 bitmap 结构, 适合永续合约的精确定价</li>
+<li><strong>手续费机制</strong>: 可以复用 Uniswap V3 的手续费累积逻辑, 激励 Maker</li>
+</ol>
+<blockquote>
+<p>关于 Uniswap V3 的集中流动性机制, 详见 Uniswap V3 集中流动性机制.</p>
+</blockquote>
+<hr>
+<h2 id="六、Drift-Protocol-Solana"><a href="#六、Drift-Protocol-Solana" class="headerlink" title="六、Drift Protocol (Solana)"></a>六、Drift Protocol (Solana)</h2><h3 id="6-1-混合流动性模型"><a href="#6-1-混合流动性模型" class="headerlink" title="6.1 混合流动性模型"></a>6.1 混合流动性模型</h3><p>Drift Protocol (Solana, 2021) 采用了 vAMM + DLOB + JIT 的三层混合架构, 试图解决纯 vAMM 的流动性问题:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="400" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Drift Protocol: 三层流动性架构</text>
+  <!-- Layer 1: JIT -->
+  <text x="40" y="56" fill="#9ca3af" font-family="monospace" font-size="7">优先级</text>
+  <text x="40" y="66" fill="#9ca3af" font-family="monospace" font-size="7">高 ↑</text>
+  <rect x="70" y="45" width="610" height="85" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="95" y="70" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">Layer 1: JIT Liquidity (即时流动性, 最优先)</text>
+  <text x="95" y="90" fill="#cbd5e1" font-family="monospace" font-size="7">做市商在交易执行前 ~5s 注入即时流动性 (Just-In-Time)</text>
+  <text x="95" y="108" fill="#9ca3af" font-family="monospace" font-size="7">类似 Uniswap 的 JIT LP, 但专为永续设计. 做市商提供最优报价, 交易完成后撤出</text>
+  <!-- Arrow 1→2 -->
+  <line x1="375" y1="130" x2="375" y2="146" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr)"/>
+  <text x="390" y="145" fill="#9ca3af" font-family="monospace" font-size="7">JIT 未完全成交的部分</text>
+  <!-- Layer 2: DLOB -->
+  <rect x="70" y="155" width="610" height="85" rx="6" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="1"/>
+  <text x="95" y="180" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">Layer 2: DLOB (去中心化限价订单簿)</text>
+  <text x="95" y="200" fill="#cbd5e1" font-family="monospace" font-size="7">链上限价单和止损单, 由 Keeper 网络维护和撮合</text>
+  <text x="95" y="218" fill="#9ca3af" font-family="monospace" font-size="7">Keeper 监控订单条件是否满足, 触发后在链上执行</text>
+  <!-- Arrow 2→3 -->
+  <line x1="375" y1="240" x2="375" y2="256" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr)"/>
+  <text x="390" y="255" fill="#9ca3af" font-family="monospace" font-size="7">DLOB 仍未成交的部分</text>
+  <!-- Layer 3: vAMM -->
+  <text x="40" y="290" fill="#9ca3af" font-family="monospace" font-size="7">低 ↓</text>
+  <rect x="70" y="265" width="610" height="85" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="95" y="290" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">Layer 3: vAMM (兜底流动性)</text>
+  <text x="95" y="310" fill="#cbd5e1" font-family="monospace" font-size="7">虚拟 AMM 作为最后的流动性来源, 保证交易一定能成交</text>
+  <text x="95" y="328" fill="#9ca3af" font-family="monospace" font-size="7">类似 Perp Protocol v1, 但 k 值动态调整, 并受 Oracle 价格约束</text>
+  <!-- Bottom note -->
+  <text x="360" y="380" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">大部分交易在 Layer 1 (JIT) 完成, vAMM 只是最后兜底</text>
+</svg>
+</div>
+
+<h3 id="6-2-为什么用混合而不是纯-vAMM"><a href="#6-2-为什么用混合而不是纯-vAMM" class="headerlink" title="6.2 为什么用混合而不是纯 vAMM?"></a>6.2 为什么用混合而不是纯 vAMM?</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>纯 vAMM</th>
+<th>Drift 混合模型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>所有交易都和虚拟池成交</td>
+<td>JIT 做市商提供真实报价, 滑点更小</td>
+</tr>
+<tr>
+<td>k 值决定一切</td>
+<td>vAMM 只是兜底, 大部分交易在 JIT&#x2F;DLOB 完成</td>
+</tr>
+<tr>
+<td>容易被操纵</td>
+<td>多层流动性分散操纵风险</td>
+</tr>
+<tr>
+<td>价格可能长期脱锚</td>
+<td>DLOB 的限价单提供锚定力</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="6-3-JIT-做市商-Just-In-Time-Liquidity-详解"><a href="#6-3-JIT-做市商-Just-In-Time-Liquidity-详解" class="headerlink" title="6.3 JIT 做市商 (Just-In-Time Liquidity) 详解"></a>6.3 JIT 做市商 (Just-In-Time Liquidity) 详解</h3><p>JIT 做市是 Drift 最核心的创新: 做市商不是提前挂单等着, 而是<strong>看到交易请求后, 在执行前的瞬间注入流动性</strong>.</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">传统做市 (dYdX / CEX)</span><span class="hljs-punctuation">:</span><br><span class="hljs-punctuation"></span><br>  <span class="hljs-attribute">做市商 → 提前挂大量买卖单 → 等交易者来吃单</span><br><span class="hljs-attribute">  问题</span><span class="hljs-punctuation">:</span> <span class="hljs-string">挂单期间价格变动 → 做市商被套 (逆向选择风险)</span><br>  <span class="hljs-attribute">所以做市商要</span><span class="hljs-punctuation">:</span> <span class="hljs-string">不停撤单/改价, 每秒几十次 → 高频操作</span><br><br><span class="hljs-attribute">JIT 做市 (Drift)</span><span class="hljs-punctuation">:</span><br><span class="hljs-punctuation"></span><br>  <span class="hljs-attribute">做市商 → 不提前挂单, 而是监听待执行的交易</span><br><span class="hljs-attribute">  → 看到 &quot;有人要买 100 ETH&quot; → 瞬间注入卖单流动性</span><br><span class="hljs-attribute">  → 交易完成 → 做市商立即撤出</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">  类比</span><span class="hljs-punctuation">:</span> <span class="hljs-string">传统做市 = 开一家店等客人; JIT = 看到客人来了才摆摊</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>JIT 的完整流程:</strong></p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 340">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="820" height="340" rx="8" fill="#1a1a2e"/>
+  <text x="410" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">JIT 做市流程 (Drift Protocol)</text>
+  <!-- Timeline -->
+  <line x1="60" y1="70" x2="760" y2="70" stroke="#9ca3af" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <text x="60" y="62" fill="#9ca3af" font-family="monospace" font-size="7">时间 →</text>
+  <!-- Step 1 -->
+  <rect x="60" y="80" width="155" height="80" rx="5" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="137" y="100" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">1. 用户提交交易</text>
+  <text x="75" y="118" fill="#cbd5e1" font-family="monospace" font-size="7">"买 100 ETH, 市价"</text>
+  <text x="75" y="134" fill="#9ca3af" font-family="monospace" font-size="7">交易进入 Solana 的</text>
+  <text x="75" y="148" fill="#9ca3af" font-family="monospace" font-size="7">待执行队列 (~5s 窗口)</text>
+  <!-- Arrow -->
+  <line x1="215" y1="120" x2="238" y2="120" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 2 -->
+  <rect x="245" y="80" width="155" height="80" rx="5" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="322" y="100" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">2. 做市商监听</text>
+  <text x="260" y="118" fill="#cbd5e1" font-family="monospace" font-size="7">看到待执行的买单</text>
+  <text x="260" y="134" fill="#cbd5e1" font-family="monospace" font-size="7">计算: 当前 ETH 公允价</text>
+  <text x="260" y="148" fill="#cbd5e1" font-family="monospace" font-size="7">决定: 以 $3001 提供流动性</text>
+  <!-- Arrow -->
+  <line x1="400" y1="120" x2="423" y2="120" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 3 -->
+  <rect x="430" y="80" width="155" height="80" rx="5" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="507" y="100" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8" font-weight="bold">3. JIT 注入</text>
+  <text x="445" y="118" fill="#cbd5e1" font-family="monospace" font-size="7">做市商在执行前注入:</text>
+  <text x="445" y="134" fill="#34d399" font-family="monospace" font-size="7">"卖 100 ETH @ $3001"</text>
+  <text x="445" y="148" fill="#9ca3af" font-family="monospace" font-size="7">和用户的买单在同一 slot 撮合</text>
+  <!-- Arrow -->
+  <line x1="585" y1="120" x2="608" y2="120" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 4 -->
+  <rect x="615" y="80" width="155" height="80" rx="5" fill="#34d399" fill-opacity="0.08" stroke="#34d399" stroke-width="0.8"/>
+  <text x="692" y="100" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8" font-weight="bold">4. 成交 + 撤出</text>
+  <text x="630" y="118" fill="#cbd5e1" font-family="monospace" font-size="7">用户买到 100 ETH @ $3001</text>
+  <text x="630" y="134" fill="#cbd5e1" font-family="monospace" font-size="7">做市商卖出, 赚 spread</text>
+  <text x="630" y="148" fill="#34d399" font-family="monospace" font-size="7">做市商立即撤出, 不留仓位</text>
+  <!-- Comparison below -->
+  <rect x="60" y="180" width="350" height="130" rx="5" fill="#f472b6" fill-opacity="0.04" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="235" y="200" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">传统做市 (dYdX / CEX)</text>
+  <text x="75" y="220" fill="#cbd5e1" font-family="monospace" font-size="7">挂单 → 等待 → 被吃单 → 调整 → 循环</text>
+  <text x="75" y="240" fill="#fbbf24" font-family="monospace" font-size="7">风险: 挂单期间价格变动 → 被套利者吃掉</text>
+  <text x="75" y="256" fill="#fbbf24" font-family="monospace" font-size="7">成本: 每秒几十次更新报价 (高频操作)</text>
+  <text x="75" y="276" fill="#9ca3af" font-family="monospace" font-size="7">需要: 极低延迟 + 大量资金长期锁定在订单簿</text>
+  <text x="75" y="296" fill="#9ca3af" font-family="monospace" font-size="7">暴露时间: 长 (挂单 → 成交, 可能几秒到几小时)</text>
+  <!-- JIT comparison -->
+  <rect x="430" y="180" width="350" height="130" rx="5" fill="#5eead4" fill-opacity="0.04" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="605" y="200" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">JIT 做市 (Drift)</text>
+  <text x="445" y="220" fill="#cbd5e1" font-family="monospace" font-size="7">看到交易 → 瞬间注入 → 成交 → 撤出</text>
+  <text x="445" y="240" fill="#34d399" font-family="monospace" font-size="7">风险: 极低 (只在成交瞬间暴露)</text>
+  <text x="445" y="256" fill="#34d399" font-family="monospace" font-size="7">成本: 不需要持续挂单, 按需注入</text>
+  <text x="445" y="276" fill="#9ca3af" font-family="monospace" font-size="7">需要: 能监听待执行队列 (Solana 特有)</text>
+  <text x="445" y="296" fill="#9ca3af" font-family="monospace" font-size="7">暴露时间: 极短 (~400ms, 一个 Solana slot)</text>
+  <!-- Bottom -->
+  <text x="410" y="332" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">JIT 做市的核心优势: 做市商风险从 "长期暴露" 变成 "瞬间暴露" → 愿意给更窄的 spread → 用户得到更好价格</text>
+</svg>
+</div>
+
+<p><strong>为什么 JIT 只在 Solana 可行?</strong></p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">JIT 的前提</span><span class="hljs-punctuation">:</span> <span class="hljs-string">做市商能在交易执行前看到交易, 并插入自己的流动性</span><br><br><span class="hljs-attribute">Solana</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">交易提交后有一个等待窗口 (~5s) 才执行</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">做市商可以通过验证者 / RPC 节点看到待执行交易</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">在同一个 slot 内插入自己的 JIT 交易</span><br>  <span class="hljs-attribute">→ 技术上可行</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">Ethereum / Arbitrum</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">交易进入 mempool, 任何人都能看到</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">但 &quot;在别人交易前插入自己的交易&quot; = 这就是 MEV (三明治攻击)!</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">Uniswap 上的 JIT LP 被视为有争议的 MEV 行为</span><br>  <span class="hljs-attribute">→ 技术上可行, 但有道德和监管争议</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">dYdX / Hyperliquid</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">订单簿模型, 不需要 JIT, 做市商直接挂单就行</span><br>  → 不适用<br></code></pre></td></tr></table></figure>
+
+<p><strong>JIT vs 普通做市 vs AMM LP:</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>JIT 做市 (Drift)</th>
+<th>普通做市 (dYdX)</th>
+<th>AMM LP (Uniswap)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>流动性注入时机</td>
+<td>看到交易后瞬间注入</td>
+<td>提前挂单等待</td>
+<td>存入池子长期锁定</td>
+</tr>
+<tr>
+<td>风险暴露时间</td>
+<td>~400ms (1 个 slot)</td>
+<td>秒~小时 (挂单期间)</td>
+<td>永久 (直到撤出)</td>
+</tr>
+<tr>
+<td>逆向选择风险</td>
+<td>极低 (已知价格)</td>
+<td>高 (价格可能跳变)</td>
+<td>高 (无常损失)</td>
+</tr>
+<tr>
+<td>资金效率</td>
+<td>极高 (按需使用)</td>
+<td>中 (资金锁在挂单里)</td>
+<td>低 (大部分闲置)</td>
+</tr>
+<tr>
+<td>技术门槛</td>
+<td>高 (需要监听 + 快速响应)</td>
+<td>高 (高频交易基础设施)</td>
+<td>低 (存钱就行)</td>
+</tr>
+<tr>
+<td>对用户的好处</td>
+<td>更窄 spread, 更好价格</td>
+<td>深度好, 大单滑点低</td>
+<td>无需许可, 人人可参与</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>JIT 做市的本质</strong>: 做市商最怕的是 “我挂了单, 价格突然变了, 我被吃掉了” (逆向选择). JIT 把做市从 “猜价格方向的赌博” 变成了 “看到确定订单再报价的生意”. 风险大幅降低, 做市商愿意给更窄的 spread, 用户得到更好的价格. 这是 Drift 能在 Solana 上和订单簿型 DEX 竞争的关键.</p>
+</blockquote>
+<h3 id="6-4-为什么-Drift-选-Solana"><a href="#6-4-为什么-Drift-选-Solana" class="headerlink" title="6.4 为什么 Drift 选 Solana"></a>6.4 为什么 Drift 选 Solana</h3><p>Drift 选择 Solana 而非 EVM 链, 正是因为 JIT 做市需要 Solana 的特性:</p>
+<ul>
+<li><strong>低延迟</strong> (~400ms slot time): JIT 做市商必须在交易前瞬间响应, 400ms 窗口刚好够</li>
+<li><strong>低 Gas</strong>: 频繁更新订单簿不会造成高成本</li>
+<li><strong>并行执行</strong>: Sealevel 运行时允许不同市场并行处理</li>
+</ul>
+<hr>
+<h2 id="七、vAMM-的问题"><a href="#七、vAMM-的问题" class="headerlink" title="七、vAMM 的问题"></a>七、vAMM 的问题</h2><h3 id="7-1-Squeeze-风险-挤压-逼仓"><a href="#7-1-Squeeze-风险-挤压-逼仓" class="headerlink" title="7.1 Squeeze 风险 (挤压&#x2F;逼仓)"></a>7.1 Squeeze 风险 (挤压&#x2F;逼仓)</h3><p>这是 vAMM 最严重的问题:</p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs excel">场景<span class="hljs-symbol">:</span> 大户 Squeeze 攻击<br><br>初始<span class="hljs-symbol">:</span> x_v (虚拟<span class="hljs-built_in">base</span>)=<span class="hljs-number">1000</span>, y_v (虚拟quote)=<span class="hljs-number">2</span>,<span class="hljs-number">000</span>,<span class="hljs-number">000</span>, k (常数)=<span class="hljs-number">2</span>B, <span class="hljs-built_in">price</span> (价格)=<span class="hljs-number">2000</span><br>       多个小散户持有空头仓位<br><br><span class="hljs-number">1</span>) 大户 <span class="hljs-string">&quot;鲸鱼&quot;</span> 开巨额多头 (notional (名义价值) = <span class="hljs-number">1</span>,<span class="hljs-number">000</span>,<span class="hljs-number">000</span> USDC)<span class="hljs-symbol">:</span><br>   y_v&#x27; = <span class="hljs-number">3</span>,<span class="hljs-number">000</span>,<span class="hljs-number">000</span><br>   x_v&#x27; = <span class="hljs-number">2</span>B / <span class="hljs-number">3</span>M = <span class="hljs-number">666.67</span><br>   <span class="hljs-built_in">price</span> = <span class="hljs-number">3</span>,<span class="hljs-number">000</span>,<span class="hljs-number">000</span> / <span class="hljs-number">666.67</span> = <span class="hljs-number">4</span>,<span class="hljs-number">500</span><br>   → 虚拟价格从 <span class="hljs-number">2000</span> 暴涨到 <span class="hljs-number">4500</span> (+<span class="hljs-number">125%</span>)<br><br><span class="hljs-number">2</span>) 空头们的 mark <span class="hljs-built_in">price</span> 暴涨 → 触发清算<br>   小散户被强制平仓 (买入平空) → 虚拟价格进一步上涨<br><br><span class="hljs-number">3</span>) 清算的级联效应<span class="hljs-symbol">:</span><br>   清算空头 = 在虚拟池中买入 = 推高价格 = 触发更多清算<br>   → 清算螺旋 (Liquidation Cascade)<br><br><span class="hljs-number">4</span>) 鲸鱼在高价平多头获利, 走人<br>   留下 Insurance Fund 的窟窿<br></code></pre></td></tr></table></figure>
+
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f472b6"/>
+    </marker>
+  </defs>
+  <rect width="720" height="240" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="11" font-weight="bold">vAMM Squeeze 攻击流程</text>
+  <!-- Step 1 -->
+  <rect x="30" y="50" width="130" height="55" rx="5" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <text x="95" y="70" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">1. 鲸鱼开巨额多头</text>
+  <text x="95" y="85" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">虚拟价格暴涨</text>
+  <text x="95" y="97" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">2000 → 4500</text>
+  <line x1="160" y1="78" x2="188" y2="78" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 2 -->
+  <rect x="195" y="50" width="130" height="55" rx="5" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="260" y="70" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">2. 空头触发清算</text>
+  <text x="260" y="85" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">mark price > 清算价</text>
+  <text x="260" y="97" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">强制平仓 (买入)</text>
+  <line x1="325" y1="78" x2="353" y2="78" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 3 -->
+  <rect x="360" y="50" width="130" height="55" rx="5" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <text x="425" y="70" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">3. 清算级联</text>
+  <text x="425" y="85" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">清算 = 买入 = 涨价</text>
+  <text x="425" y="97" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">→ 更多清算</text>
+  <line x1="490" y1="78" x2="518" y2="78" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 4 -->
+  <rect x="525" y="50" width="160" height="55" rx="5" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-width="1"/>
+  <text x="605" y="70" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">4. 鲸鱼高价平仓获利</text>
+  <text x="605" y="85" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">保险基金亏损</text>
+  <text x="605" y="97" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">散户被清算出局</text>
+  <!-- Feedback loop arrow -->
+  <path d="M 425 105 Q 425 145 315 145 Q 260 145 260 115" fill="none" stroke="#f472b6" stroke-width="1" stroke-dasharray="3"/>
+  <text x="345" y="155" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">正反馈循环 (清算螺旋)</text>
+  <!-- Bottom note -->
+  <rect x="60" y="175" width="600" height="46" rx="5" fill="#f472b6" fill-opacity="0.05" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="360" y="194" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">核心原因: vAMM 的价格完全由交易量决定, 没有外部锚定</text>
+  <text x="360" y="210" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">在真实 AMM 中, 套利者会在价格偏离时搬砖; 在 vAMM 中, 没有现货可搬, 只能靠 funding rate 慢慢纠正</text>
+</svg>
+</div>
+
+<blockquote>
+<p>在真实 AMM (如 Uniswap) 中, 如果价格偏离, 套利者会立即搬砖纠正.<br>但 vAMM 没有真实的代币可以搬, 只有 funding rate 这一个纠偏手段, 而 funding rate 的纠偏速度太慢.</p>
+</blockquote>
+<h3 id="7-2-k-值治理难题"><a href="#7-2-k-值治理难题" class="headerlink" title="7.2 k 值治理难题"></a>7.2 k 值治理难题</h3><figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs gcode">k 太大:<br>  ✅ 滑点小, 交易体验好<br>  ❌ 价格不灵敏, 大量交易才能推动价格<br>  ❌ 和现货价格脱锚更严重 <span class="hljs-comment">(需要更多交易来纠偏)</span><br><br>k 太小:<br>  ✅ 价格灵敏, 快速反映交易意图<br>  ❌ 滑点大, 交易成本高<br>  ❌ 容易被操纵 <span class="hljs-comment">(少量资金就能大幅推动价格)</span><br><br>Perpetual Protocol 的治理投票:<br>  → 每次调 k 都是在两害之间取其轻<br>  → 而且市场状况实时变化, 治理投票的反应速度跟不上<br>  → 牛市需要大 k <span class="hljs-comment">(高交易量)</span>, 熊市需要小 k <span class="hljs-comment">(低交易量)</span>, 但治理无法快速切换<br></code></pre></td></tr></table></figure>
+
+<h3 id="7-3-脱锚风险"><a href="#7-3-脱锚风险" class="headerlink" title="7.3 脱锚风险"></a>7.3 脱锚风险</h3><p>vAMM 价格可能长时间偏离现货:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>原因</th>
+<th>后果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单边行情 (如暴跌)</td>
+<td>大量开空推低 vAMM 价格, 但 k 值限制纠偏速度</td>
+<td>vAMM 价格 &lt; 现货价格</td>
+</tr>
+<tr>
+<td>流动性真空</td>
+<td>某方向没人开仓, 无法推回价格</td>
+<td>长期脱锚</td>
+</tr>
+<tr>
+<td>Funding rate 不足</td>
+<td>即使 funding rate 很高, 如果没人愿意反方向开仓, 价格也回不来</td>
+<td>持续偏离</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="7-4-Funding-Rate-的局限性"><a href="#7-4-Funding-Rate-的局限性" class="headerlink" title="7.4 Funding Rate 的局限性"></a>7.4 Funding Rate 的局限性</h3><p>在 Oracle 型协议 (如 GMX) 中, funding rate 直接基于 OI 偏差计算, 且价格来自 Oracle.<br>在 vAMM 中, funding rate &#x3D; f(vAMM_price - index_price), 但:</p>
+<ul>
+<li>vAMM price 本身可能被操纵</li>
+<li>Funding rate 是 “事后纠偏”, 无法阻止 “事中操纵”</li>
+<li>如果套利者不够多, funding 的经济激励不足以吸引反方向交易</li>
+</ul>
+<hr>
+<h2 id="八、vAMM-vs-Oracle-型-vs-订单簿-综合对比"><a href="#八、vAMM-vs-Oracle-型-vs-订单簿-综合对比" class="headerlink" title="八、vAMM vs Oracle 型 vs 订单簿: 综合对比"></a>八、vAMM vs Oracle 型 vs 订单簿: 综合对比</h2><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>vAMM (Perp v1&#x2F;v2)</th>
+<th>Oracle 型 (GMX)</th>
+<th>订单簿 (dYdX&#x2F;Hyperliquid)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>定价来源</strong></td>
+<td>虚拟储备计算</td>
+<td>Chainlink Oracle</td>
+<td>买卖挂单撮合</td>
+</tr>
+<tr>
+<td><strong>滑点</strong></td>
+<td>取决于 k 值和交易量</td>
+<td>零滑点 (有 OI 上限)</td>
+<td>取决于订单簿深度</td>
+</tr>
+<tr>
+<td><strong>流动性来源</strong></td>
+<td>协议设定 (v1) &#x2F; Maker (v2)</td>
+<td>GLP 池 (LP 做对手方)</td>
+<td>做市商挂单</td>
+</tr>
+<tr>
+<td><strong>价格锚定</strong></td>
+<td>Funding rate (慢)</td>
+<td>Oracle 直接锚定</td>
+<td>套利者撮合</td>
+</tr>
+<tr>
+<td><strong>操纵风险</strong></td>
+<td><strong>高</strong> (Squeeze)</td>
+<td>中 (Oracle 抢跑)</td>
+<td><strong>低</strong> (需要真实挂单)</td>
+</tr>
+<tr>
+<td><strong>资本效率</strong></td>
+<td>中 (v2 用集中流动性)</td>
+<td>高 (零滑点复用)</td>
+<td>高 (做市商管理)</td>
+</tr>
+<tr>
+<td><strong>无许可性</strong></td>
+<td><strong>高</strong> (无需做市商)</td>
+<td>高 (LP 即可)</td>
+<td>中 (依赖做市商)</td>
+</tr>
+<tr>
+<td><strong>上线新市场</strong></td>
+<td><strong>容易</strong> (设 k 值即可)</td>
+<td>需要 Oracle 支持</td>
+<td>需要做市商愿意做市</td>
+</tr>
+<tr>
+<td><strong>链上成本</strong></td>
+<td>低 (一次合约调用)</td>
+<td>低</td>
+<td>高 (频繁挂撤单)</td>
+</tr>
+<tr>
+<td><strong>代表协议</strong></td>
+<td>Perp Protocol, Drift</td>
+<td>GMX, Jupiter Perps</td>
+<td>dYdX, Hyperliquid</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="九、Solidity-实现-vAMM-核心逻辑"><a href="#九、Solidity-实现-vAMM-核心逻辑" class="headerlink" title="九、Solidity 实现: vAMM 核心逻辑"></a>九、Solidity 实现: vAMM 核心逻辑</h2><h3 id="9-1-vAMM-合约-简化版"><a href="#9-1-vAMM-合约-简化版" class="headerlink" title="9.1 vAMM 合约 (简化版)"></a>9.1 vAMM 合约 (简化版)</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br></pre></td><td class="code"><pre><code class="hljs solidity">// SPDX-License-Identifier: MIT<br>pragma solidity ^0.8.19;<br><br>/// @title SimpleVAMM - vAMM 核心逻辑演示<br>/// @notice 仅用于学习, 生产环境需要完整的安全检查和精度处理<br>contract SimpleVAMM &#123;<br>    // 虚拟储备 (使用 uint256, 实际协议用定点数表示)<br>    uint256 public baseReserve;   // x_v: 虚拟 base (如 vETH)<br>    uint256 public quoteReserve;  // y_v: 虚拟 quote (如 vUSDC)<br>    uint256 public k;             // 常数乘积<br><br>    // 仓位信息<br>    struct Position &#123;<br>        int256  size;        // 正 = 多头, 负 = 空头 (base token 数量)<br>        uint256 openNotional; // 开仓的 quote 金额<br>        uint256 margin;       // 保证金<br>    &#125;<br><br>    mapping(address =&gt; Position) public positions;<br><br>    // 保证金池 (简化: 实际应独立为 Clearing House)<br>    uint256 public totalMargin;<br><br>    event PositionChanged(<br>        address indexed trader,<br>        int256 sizeChange,<br>        uint256 notional,<br>        uint256 newPrice<br>    );<br><br>    constructor(uint256 _baseReserve, uint256 _quoteReserve) &#123;<br>        baseReserve = _baseReserve;<br>        quoteReserve = _quoteReserve;<br>        k = _baseReserve * _quoteReserve;<br>    &#125;<br><br>    /// @notice 获取当前虚拟价格<br>    /// @return price = quoteReserve / baseReserve (quote per base)<br>    function getPrice() public view returns (uint256) &#123;<br>        return (quoteReserve * 1e18) / baseReserve; // 18 位精度<br>    &#125;<br><br>    /// @notice 开多头仓位<br>    /// @param _margin 保证金金额 (USDC)<br>    /// @param _leverage 杠杆倍数<br>    function openLong(uint256 _margin, uint256 _leverage) external &#123;<br>        require(positions[msg.sender].size == 0, &quot;position exists&quot;);<br><br>        uint256 notional = _margin * _leverage;<br><br>        // 向虚拟池注入 quote, 计算获得的 base<br>        uint256 newQuoteReserve = quoteReserve + notional;<br>        uint256 newBaseReserve = k / newQuoteReserve;<br>        uint256 baseReceived = baseReserve - newBaseReserve;<br><br>        // 更新虚拟储备<br>        quoteReserve = newQuoteReserve;<br>        baseReserve = newBaseReserve;<br><br>        // 记录仓位<br>        positions[msg.sender] = Position(&#123;<br>            size: int256(baseReceived),<br>            openNotional: notional,<br>            margin: _margin<br>        &#125;);<br><br>        totalMargin += _margin;<br><br>        emit PositionChanged(<br>            msg.sender,<br>            int256(baseReceived),<br>            notional,<br>            getPrice()<br>        );<br>    &#125;<br><br>    /// @notice 开空头仓位<br>    /// @param _margin 保证金金额<br>    /// @param _leverage 杠杆倍数<br>    function openShort(uint256 _margin, uint256 _leverage) external &#123;<br>        require(positions[msg.sender].size == 0, &quot;position exists&quot;);<br><br>        uint256 notional = _margin * _leverage;<br><br>        // 计算等值的虚拟 base 数量: baseAmount = notional / currentPrice<br>        // 即: baseAmount = notional * baseReserve / quoteReserve<br>        uint256 baseAmount = (notional * baseReserve) / quoteReserve;<br><br>        // 向虚拟池注入 base, 取出 quote<br>        uint256 newBaseReserve = baseReserve + baseAmount;<br>        uint256 newQuoteReserve = k / newBaseReserve;<br><br>        // 更新虚拟储备<br>        baseReserve = newBaseReserve;<br>        quoteReserve = newQuoteReserve;<br><br>        // 记录仓位 (空头 size 为负)<br>        positions[msg.sender] = Position(&#123;<br>            size: -int256(baseAmount),<br>            openNotional: notional,<br>            margin: _margin<br>        &#125;);<br><br>        totalMargin += _margin;<br><br>        emit PositionChanged(<br>            msg.sender,<br>            -int256(baseAmount),<br>            notional,<br>            getPrice()<br>        );<br>    &#125;<br><br>    /// @notice 完全平仓<br>    function closePosition() external &#123;<br>        Position storage pos = positions[msg.sender];<br>        require(pos.size != 0, &quot;no position&quot;);<br><br>        uint256 closeNotional;<br><br>        if (pos.size &gt; 0) &#123;<br>            // 多头平仓: 卖出 base (反向操作)<br>            uint256 baseToSell = uint256(pos.size);<br>            uint256 newBaseReserve = baseReserve + baseToSell;<br>            uint256 newQuoteReserve = k / newBaseReserve;<br>            closeNotional = quoteReserve - newQuoteReserve;<br><br>            baseReserve = newBaseReserve;<br>            quoteReserve = newQuoteReserve;<br>        &#125; else &#123;<br>            // 空头平仓: 买入 base (反向操作)<br>            uint256 baseToBuy = uint256(-pos.size);<br>            uint256 newBaseReserve = baseReserve - baseToBuy;<br>            uint256 newQuoteReserve = k / newBaseReserve;<br>            closeNotional = newQuoteReserve - quoteReserve;<br><br>            baseReserve = newBaseReserve;<br>            quoteReserve = newQuoteReserve;<br>        &#125;<br><br>        // 计算 PnL<br>        int256 pnl;<br>        if (pos.size &gt; 0) &#123;<br>            // 多头: PnL = closeNotional - openNotional<br>            pnl = int256(closeNotional) - int256(pos.openNotional);<br>        &#125; else &#123;<br>            // 空头: PnL = openNotional - closeNotional<br>            pnl = int256(pos.openNotional) - int256(closeNotional);<br>        &#125;<br><br>        // 结算: margin + pnl (简化, 实际需检查是否为负)<br>        uint256 withdrawal = uint256(int256(pos.margin) + pnl);<br>        totalMargin -= pos.margin;<br><br>        // 清除仓位<br>        delete positions[msg.sender];<br><br>        emit PositionChanged(msg.sender, 0, closeNotional, getPrice());<br><br>        // 实际应转 USDC 给 trader, 此处省略 token transfer<br>    &#125;<br><br>    /// @notice 获取仓位未实现盈亏<br>    function getUnrealizedPnl(address _trader) external view returns (int256) &#123;<br>        Position storage pos = positions[_trader];<br>        if (pos.size == 0) return 0;<br><br>        // 模拟平仓计算 PnL<br>        if (pos.size &gt; 0) &#123;<br>            uint256 baseToSell = uint256(pos.size);<br>            uint256 newBase = baseReserve + baseToSell;<br>            uint256 newQuote = k / newBase;<br>            uint256 closeNotional = quoteReserve - newQuote;<br>            return int256(closeNotional) - int256(pos.openNotional);<br>        &#125; else &#123;<br>            uint256 baseToBuy = uint256(-pos.size);<br>            uint256 newBase = baseReserve - baseToBuy;<br>            uint256 newQuote = k / newBase;<br>            uint256 closeNotional = newQuote - quoteReserve;<br>            return int256(pos.openNotional) - int256(closeNotional);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="9-2-Go-实现-vAMM-模拟器"><a href="#9-2-Go-实现-vAMM-模拟器" class="headerlink" title="9.2 Go 实现: vAMM 模拟器"></a>9.2 Go 实现: vAMM 模拟器</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;math/big&quot;</span><br>)<br><br><span class="hljs-comment">// VAMM 虚拟自动做市商模拟器</span><br><span class="hljs-keyword">type</span> VAMM <span class="hljs-keyword">struct</span> &#123;<br>	BaseReserve  *big.Float <span class="hljs-comment">// x_v: 虚拟 base 储备</span><br>	QuoteReserve *big.Float <span class="hljs-comment">// y_v: 虚拟 quote 储备</span><br>	K            *big.Float <span class="hljs-comment">// 常数乘积 k = x_v * y_v</span><br>&#125;<br><br><span class="hljs-comment">// Position 仓位信息</span><br><span class="hljs-keyword">type</span> Position <span class="hljs-keyword">struct</span> &#123;<br>	Size         *big.Float <span class="hljs-comment">// 正 = 多头, 负 = 空头</span><br>	OpenNotional *big.Float <span class="hljs-comment">// 开仓 notional</span><br>	AvgPrice     *big.Float <span class="hljs-comment">// 平均开仓价</span><br>&#125;<br><br><span class="hljs-comment">// NewVAMM 创建 vAMM 实例</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewVAMM</span><span class="hljs-params">(baseReserve, quoteReserve <span class="hljs-type">float64</span>)</span></span> *VAMM &#123;<br>	base := big.NewFloat(baseReserve)<br>	quote := big.NewFloat(quoteReserve)<br>	k := <span class="hljs-built_in">new</span>(big.Float).Mul(base, quote)<br>	<span class="hljs-keyword">return</span> &amp;VAMM&#123;<br>		BaseReserve:  base,<br>		QuoteReserve: quote,<br>		K:            k,<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// GetPrice 获取当前虚拟价格 (quote per base)</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(v *VAMM)</span></span> GetPrice() *big.Float &#123;<br>	<span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(big.Float).Quo(v.QuoteReserve, v.BaseReserve)<br>&#125;<br><br><span class="hljs-comment">// OpenLong 开多头: 注入 quote, 取出 base</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(v *VAMM)</span></span> OpenLong(notionalQuote <span class="hljs-type">float64</span>) *Position &#123;<br>	notional := big.NewFloat(notionalQuote)<br>	priceBefore := v.GetPrice()<br><br>	<span class="hljs-comment">// y_v&#x27; = y_v + notional</span><br>	newQuote := <span class="hljs-built_in">new</span>(big.Float).Add(v.QuoteReserve, notional)<br><br>	<span class="hljs-comment">// x_v&#x27; = k / y_v&#x27;</span><br>	newBase := <span class="hljs-built_in">new</span>(big.Float).Quo(v.K, newQuote)<br><br>	<span class="hljs-comment">// Δx = x_v - x_v&#x27; (base received)</span><br>	baseReceived := <span class="hljs-built_in">new</span>(big.Float).Sub(v.BaseReserve, newBase)<br><br>	<span class="hljs-comment">// 更新储备</span><br>	v.QuoteReserve = newQuote<br>	v.BaseReserve = newBase<br><br>	<span class="hljs-comment">// 计算平均成交价</span><br>	avgPrice := <span class="hljs-built_in">new</span>(big.Float).Quo(notional, baseReceived)<br><br>	priceAfter := v.GetPrice()<br><br>	<span class="hljs-comment">// 计算滑点</span><br>	slippage := <span class="hljs-built_in">new</span>(big.Float).Sub(avgPrice, priceBefore)<br>	slippage.Quo(slippage, priceBefore)<br>	slippageF, _ := slippage.Float64()<br><br>	fmt.Printf(<span class="hljs-string">&quot;  开多 notional=%.0f, base_received=%s, avg_price=%s\n&quot;</span>,<br>		notionalQuote, baseReceived.Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">4</span>), avgPrice.Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">2</span>))<br>	fmt.Printf(<span class="hljs-string">&quot;  价格: %s → %s, 滑点: %.2f%%\n&quot;</span>,<br>		priceBefore.Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">2</span>), priceAfter.Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">2</span>), slippageF*<span class="hljs-number">100</span>)<br><br>	<span class="hljs-keyword">return</span> &amp;Position&#123;<br>		Size:         baseReceived,<br>		OpenNotional: notional,<br>		AvgPrice:     avgPrice,<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// OpenShort 开空头: 注入 base, 取出 quote</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(v *VAMM)</span></span> OpenShort(notionalQuote <span class="hljs-type">float64</span>) *Position &#123;<br>	notional := big.NewFloat(notionalQuote)<br>	priceBefore := v.GetPrice()<br><br>	<span class="hljs-comment">// 计算等值 base: baseAmount = notional / currentPrice</span><br>	baseAmount := <span class="hljs-built_in">new</span>(big.Float).Quo(notional, priceBefore)<br><br>	<span class="hljs-comment">// x_v&#x27; = x_v + baseAmount</span><br>	newBase := <span class="hljs-built_in">new</span>(big.Float).Add(v.BaseReserve, baseAmount)<br><br>	<span class="hljs-comment">// y_v&#x27; = k / x_v&#x27;</span><br>	newQuote := <span class="hljs-built_in">new</span>(big.Float).Quo(v.K, newBase)<br><br>	<span class="hljs-comment">// 更新储备</span><br>	v.BaseReserve = newBase<br>	v.QuoteReserve = newQuote<br><br>	priceAfter := v.GetPrice()<br>	slippage := <span class="hljs-built_in">new</span>(big.Float).Sub(priceBefore, priceAfter)<br>	slippage.Quo(slippage, priceBefore)<br>	slippageF, _ := slippage.Float64()<br><br>	<span class="hljs-comment">// 空头 size 为负</span><br>	negBase := <span class="hljs-built_in">new</span>(big.Float).Neg(baseAmount)<br><br>	fmt.Printf(<span class="hljs-string">&quot;  开空 notional=%.0f, base_sold=%s\n&quot;</span>,<br>		notionalQuote, baseAmount.Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">4</span>))<br>	fmt.Printf(<span class="hljs-string">&quot;  价格: %s → %s, 滑点: %.2f%%\n&quot;</span>,<br>		priceBefore.Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">2</span>), priceAfter.Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">2</span>), slippageF*<span class="hljs-number">100</span>)<br><br>	<span class="hljs-keyword">return</span> &amp;Position&#123;<br>		Size:         negBase,<br>		OpenNotional: notional,<br>		AvgPrice:     priceBefore,<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// SimulateSlippage 模拟不同 k 值下的滑点</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">SimulateSlippage</span><span class="hljs-params">(tradeSize <span class="hljs-type">float64</span>)</span></span> &#123;<br>	fmt.Printf(<span class="hljs-string">&quot;\n=== 滑点 vs k 值 (trade_size=%.0f USDC) ===\n&quot;</span>, tradeSize)<br>	fmt.Println(<span class="hljs-string">&quot;初始价格固定为 2000 USDC/ETH&quot;</span>)<br>	fmt.Println()<br><br>	kValues := []<span class="hljs-type">float64</span>&#123;<span class="hljs-number">1e6</span>, <span class="hljs-number">5e6</span>, <span class="hljs-number">20e6</span>, <span class="hljs-number">100e6</span>, <span class="hljs-number">500e6</span>, <span class="hljs-number">2e9</span>&#125;<br>	<span class="hljs-keyword">for</span> _, kVal := <span class="hljs-keyword">range</span> kValues &#123;<br>		<span class="hljs-comment">// 从 k 和 price=2000 反推储备: y/x=2000, x*y=k</span><br>		<span class="hljs-comment">// x = sqrt(k/2000), y = sqrt(k*2000)</span><br>		xReserve := sqrt(kVal / <span class="hljs-number">2000</span>)<br>		yReserve := sqrt(kVal * <span class="hljs-number">2000</span>)<br><br>		<span class="hljs-comment">// 计算开多后的平均成交价</span><br>		newQuote := yReserve + tradeSize<br>		newBase := kVal / newQuote<br>		baseReceived := xReserve - newBase<br>		avgPrice := tradeSize / baseReceived<br>		slippage := (avgPrice - <span class="hljs-number">2000</span>) / <span class="hljs-number">2000</span> * <span class="hljs-number">100</span><br><br>		fmt.Printf(<span class="hljs-string">&quot;  k=%10.0f  base=%.2f  quote=%.0f  滑点=%.2f%%\n&quot;</span>,<br>			kVal, xReserve, yReserve, slippage)<br>	&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">sqrt</span><span class="hljs-params">(x <span class="hljs-type">float64</span>)</span></span> <span class="hljs-type">float64</span> &#123;<br>	<span class="hljs-comment">// Newton&#x27;s method</span><br>	z := x / <span class="hljs-number">2</span><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;<br>		z = (z + x/z) / <span class="hljs-number">2</span><br>	&#125;<br>	<span class="hljs-keyword">return</span> z<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	fmt.Println(<span class="hljs-string">&quot;=== vAMM 模拟 ===&quot;</span>)<br>	fmt.Println()<br><br>	<span class="hljs-comment">// 创建 vAMM: 1000 vETH, 2,000,000 vUSDC, price = 2000</span><br>	vamm := NewVAMM(<span class="hljs-number">1000</span>, <span class="hljs-number">2</span>_000_000)<br>	fmt.Printf(<span class="hljs-string">&quot;初始状态: base=%.0f, quote=%.0f, price=%s, k=%.0f\n&quot;</span>,<br>		<span class="hljs-number">1000.0</span>, <span class="hljs-number">2</span>_000_000<span class="hljs-number">.0</span>, vamm.GetPrice().Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">2</span>),<br>		<span class="hljs-number">2</span>_000_000_000<span class="hljs-number">.0</span>)<br>	fmt.Println()<br><br>	<span class="hljs-comment">// Alice 开多 100,000 USDC</span><br>	fmt.Println(<span class="hljs-string">&quot;--- Alice 开多 (notional=100,000 USDC) ---&quot;</span>)<br>	alice := vamm.OpenLong(<span class="hljs-number">100</span>_000)<br>	fmt.Println()<br><br>	<span class="hljs-comment">// Bob 开空 50,000 USDC</span><br>	fmt.Println(<span class="hljs-string">&quot;--- Bob 开空 (notional=50,000 USDC) ---&quot;</span>)<br>	_ = vamm.OpenShort(<span class="hljs-number">50</span>_000)<br>	fmt.Println()<br><br>	fmt.Printf(<span class="hljs-string">&quot;Alice 仓位: size=%s vETH, openNotional=%s, avgPrice=%s\n&quot;</span>,<br>		alice.Size.Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">4</span>),<br>		alice.OpenNotional.Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">0</span>),<br>		alice.AvgPrice.Text(<span class="hljs-string">&#x27;f&#x27;</span>, <span class="hljs-number">2</span>))<br><br>	<span class="hljs-comment">// 滑点对比</span><br>	SimulateSlippage(<span class="hljs-number">100</span>_000)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>运行输出:</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs routeros">=== vAMM 模拟 ===<br><br>初始状态: <span class="hljs-attribute">base</span>=1000, <span class="hljs-attribute">quote</span>=2000000, <span class="hljs-attribute">price</span>=2000.00, <span class="hljs-attribute">k</span>=2000000000<br><br>--- Alice 开多 (<span class="hljs-attribute">notional</span>=100,000 USDC) ---<br>  开多 <span class="hljs-attribute">notional</span>=100000, <span class="hljs-attribute">base_received</span>=47.6190, <span class="hljs-attribute">avg_price</span>=2100.00<br>  价格: 2000.00 → 2205.00, 滑点: 5.00%<br><br>--- Bob 开空 (<span class="hljs-attribute">notional</span>=50,000 USDC) ---<br>  开空 <span class="hljs-attribute">notional</span>=50000, <span class="hljs-attribute">base_sold</span>=22.6757<br>  价格: 2205.00 → 2103.63, 滑点: 4.60%<br><br>Alice 仓位: <span class="hljs-attribute">size</span>=47.6190 vETH, <span class="hljs-attribute">openNotional</span>=100000, <span class="hljs-attribute">avgPrice</span>=2100.00<br><br>=== 滑点 vs k 值 (<span class="hljs-attribute">trade_size</span>=100000 USDC) ===<br>初始价格固定为 2000 USDC/ETH<br><br>  k=   1000000  <span class="hljs-attribute">base</span>=22.36  <span class="hljs-attribute">quote</span>=44721  滑点=223.61%<br>  k=   5000000  <span class="hljs-attribute">base</span>=50.00  <span class="hljs-attribute">quote</span>=100000  滑点=100.00%<br>  k=  20000000  <span class="hljs-attribute">base</span>=100.00  <span class="hljs-attribute">quote</span>=200000  滑点=50.00%<br>  k= 100000000  <span class="hljs-attribute">base</span>=223.61  <span class="hljs-attribute">quote</span>=447214  滑点=22.36%<br>  k= 500000000  <span class="hljs-attribute">base</span>=500.00  <span class="hljs-attribute">quote</span>=1000000  滑点=10.00%<br>  <span class="hljs-attribute">k</span>=2000000000  <span class="hljs-attribute">base</span>=1000.00  <span class="hljs-attribute">quote</span>=2000000  滑点=5.00%<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十、小结-为什么-vAMM-在竞争中逐渐落后"><a href="#十、小结-为什么-vAMM-在竞争中逐渐落后" class="headerlink" title="十、小结: 为什么 vAMM 在竞争中逐渐落后"></a>十、小结: 为什么 vAMM 在竞争中逐渐落后</h2><h3 id="10-1-数据说话"><a href="#10-1-数据说话" class="headerlink" title="10.1 数据说话"></a>10.1 数据说话</h3><p>Perpetual Protocol 的 TVL 和交易量变化:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">Perpetual</span> Protocol TVL (近似值):<br>  <span class="hljs-number">2021</span> Q1 (v1 高峰):  ~<span class="hljs-variable">$60</span>M TVL, 日均交易量 ~<span class="hljs-variable">$100</span>M<br>  <span class="hljs-number">2022</span> Q1 (v2 上线):  ~<span class="hljs-variable">$30</span>M TVL, 日均交易量 ~<span class="hljs-variable">$50</span>M<br>  <span class="hljs-number">2023</span> Q1:            ~<span class="hljs-variable">$5</span>M TVL,  日均交易量 &lt;<span class="hljs-variable">$10</span>M<br>  <span class="hljs-number">2024</span> Q1:            &lt;<span class="hljs-variable">$2</span>M TVL,  基本停滞<br><br>同期对比:<br>  GMX (Oracle 型):    <span class="hljs-number">2023</span> TVL ~<span class="hljs-variable">$500</span>M<br>  dYdX (订单簿型):    <span class="hljs-number">2023</span> 日均交易量 ~<span class="hljs-variable">$1</span>B<br>  Hyperliquid:        <span class="hljs-number">2024</span> 日均交易量 ~<span class="hljs-variable">$3</span>B<br></code></pre></td></tr></table></figure>
+
+<h3 id="10-2-落后的根本原因"><a href="#10-2-落后的根本原因" class="headerlink" title="10.2 落后的根本原因"></a>10.2 落后的根本原因</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280">
+  <rect width="720" height="280" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="11" font-weight="bold">vAMM 竞争力衰退的根本原因</text>
+  <!-- Center: vAMM -->
+  <rect x="275" y="50" width="170" height="40" rx="5" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1"/>
+  <text x="360" y="75" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">vAMM 核心缺陷</text>
+  <!-- Problem 1 -->
+  <rect x="30" y="115" width="155" height="55" rx="5" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="0.5"/>
+  <text x="107" y="133" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">虚拟深度 ≠ 真实深度</text>
+  <text x="107" y="148" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">k 值人为设定</text>
+  <text x="107" y="161" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">无法反映真实市场</text>
+  <line x1="185" y1="135" x2="275" y2="80" stroke="#9ca3af" stroke-width="0.5" stroke-dasharray="3"/>
+  <!-- Problem 2 -->
+  <rect x="200" y="115" width="155" height="55" rx="5" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="0.5"/>
+  <text x="277" y="133" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">Squeeze 风险</text>
+  <text x="277" y="148" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">大户可操纵虚拟价格</text>
+  <text x="277" y="161" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">清算螺旋</text>
+  <line x1="310" y1="115" x2="340" y2="90" stroke="#9ca3af" stroke-width="0.5" stroke-dasharray="3"/>
+  <!-- Problem 3 -->
+  <rect x="370" y="115" width="155" height="55" rx="5" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="0.5"/>
+  <text x="447" y="133" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">脱锚风险</text>
+  <text x="447" y="148" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Funding rate 纠偏太慢</text>
+  <text x="447" y="161" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">无套利搬砖机制</text>
+  <line x1="415" y1="115" x2="385" y2="90" stroke="#9ca3af" stroke-width="0.5" stroke-dasharray="3"/>
+  <!-- Problem 4 -->
+  <rect x="540" y="115" width="155" height="55" rx="5" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="0.5"/>
+  <text x="617" y="133" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">滑点竞争力差</text>
+  <text x="617" y="148" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">GMX 零滑点, CEX 深度大</text>
+  <text x="617" y="161" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">vAMM 无法竞争</text>
+  <line x1="545" y1="135" x2="445" y2="80" stroke="#9ca3af" stroke-width="0.5" stroke-dasharray="3"/>
+  <!-- Bottom: result -->
+  <rect x="130" y="200" width="460" height="60" rx="6" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="1"/>
+  <text x="360" y="222" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9">市场选择结果</text>
+  <text x="360" y="242" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Oracle 型 (GMX): 零滑点 + 简单  |  订单簿 (dYdX/HL): 真实深度 + 专业</text>
+  <text x="360" y="254" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">vAMM 既没有 Oracle 的简洁, 也没有订单簿的效率 → 被夹在中间</text>
+</svg>
+</div>
+
+<p>总结:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>竞争对手</th>
+<th>对 vAMM 的优势</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>GMX (Oracle 型)</strong></td>
+<td>零滑点, 简单直觉, LP 只需存入即可, 价格由 Oracle 保证</td>
+</tr>
+<tr>
+<td><strong>dYdX (订单簿)</strong></td>
+<td>真实订单深度, 专业交易体验, 做市商竞争提供最优价格</td>
+</tr>
+<tr>
+<td><strong>Hyperliquid (链上订单簿)</strong></td>
+<td>链上订单簿 + 自研 L1, 兼具去中心化和性能</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>vAMM 的历史贡献:</p>
+<ul>
+<li><strong>开创了链上永续合约的定价范式</strong>, 证明了不需要订单簿就能做永续</li>
+<li><strong>无许可性最强</strong>: 不需要 LP, 不需要做市商, 设个 k 值就能启动新市场</li>
+<li>但这些优势在市场成熟后变得不那么重要, 用户更在意滑点和安全性</li>
+</ul>
+<hr>
+<h2 id="十一、下一步"><a href="#十一、下一步" class="headerlink" title="十一、下一步"></a>十一、下一步</h2><p>vAMM 型永续的故事, 本质上是 DeFi 永续合约定价机制探索的第一个阶段.</p>
+<ul>
+<li>从 vAMM 的 “虚拟深度” 到 Oracle 型的 “零滑点”, 再到订单簿的 “真实深度”</li>
+<li>市场在 2023-2024 年明确选择了 <strong>订单簿型</strong> 作为主流方向</li>
+</ul>
+<p>下一篇: <a href="/2025/09/20/perp-hyperliquid/">Hyperliquid 深度解析</a> - 看链上订单簿如何在自研 L1 上实现 CEX 级体验.</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/web3/" class="category-chain-item">Web3</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/web3/" class="print-no-link">#Web3</a>
+      
+        <a href="/tags/%E6%B0%B8%E7%BB%AD%E5%90%88%E7%BA%A6/" class="print-no-link">#永续合约</a>
+      
+        <a href="/tags/vamm/" class="print-no-link">#vAMM</a>
+      
+        <a href="/tags/drift/" class="print-no-link">#Drift</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>永续合约 05 - vAMM 永续合约演进史</div>
+      <div>https://mritd.com/2025/09/06/perp-vamm/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年9月6日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/09/20/perp-hyperliquid/" title="永续合约 06 - Hyperliquid 深度解析">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">永续合约 06 - Hyperliquid 深度解析</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/08/25/perp-dydx/" title="永续合约 04 - dYdX 演进之路">
+                        <span class="hidden-mobile">永续合约 04 - dYdX 演进之路</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2025/09/06/perp-vamm/';
+          this.page.identifier = '/2025/09/06/perp-vamm/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

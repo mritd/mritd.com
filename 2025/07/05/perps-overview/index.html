@@ -1,0 +1,1126 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="Web3,永续合约,DeFi,GMX,dYdX,Hyperliquid,撮合引擎,清算引擎">
+  
+    <meta name="description" content="本文是永续合约系列的总览, 梳理了从基础机制到 GMX&#x2F;dYdX&#x2F;Hyperliquid 协议再到撮合和清算引擎的学习路线, 附协议对比和阅读顺序建议">
+<meta property="og:type" content="article">
+<meta property="og:title" content="永续合约 00 - 总览与学习路线">
+<meta property="og:url" content="https://mritd.com/2025/07/05/perps-overview/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="本文是永续合约系列的总览, 梳理了从基础机制到 GMX&#x2F;dYdX&#x2F;Hyperliquid 协议再到撮合和清算引擎的学习路线, 附协议对比和阅读顺序建议">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/perp-overview.svg">
+<meta property="article:published_time" content="2025-07-05T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-07-05T02:00:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="Web3">
+<meta property="article:tag" content="永续合约">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/perp-overview.svg">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>永续合约 00 - 总览与学习路线 - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="永续合约 00 - 总览与学习路线"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-07-05 10:00" pubdate>
+          2025年7月5日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          9 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">永续合约 00 - 总览与学习路线</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>这个系列以 EVM 为主线, 从 funding rate 和保证金原理出发, 拆解 GMX, dYdX, Hyperliquid 三个主流协议的设计, 最后落到撮合与清算引擎的工程实现. 本文是整个系列的路线图, 列出了阅读顺序和各篇之间的依赖关系.</p>
+<h2 id="一、目录"><a href="#一、目录" class="headerlink" title="一、目录"></a>一、目录</h2><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>文档</th>
+<th>内容</th>
+<th>依赖</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><a href="/2025/07/15/perp-mechanics/">永续合约机制详解</a></td>
+<td>永续 vs 期货, funding rate, mark&#x2F;index price, 多空平衡</td>
+<td>定点数运算</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="/2025/07/28/perp-margin-and-liquidation/">保证金管理与清算引擎</a></td>
+<td>初始&#x2F;维持保证金, 清算引擎, ADL, 保险基金</td>
+<td>永续合约机制详解</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="/2025/08/10/perp-gmx/">GMX 协议深度解析</a></td>
+<td>GLP 池, Oracle 定价, 零滑点模型, 费率结构</td>
+<td>永续合约机制详解+保证金管理与清算引擎+预言机</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="/2025/08/25/perp-dydx/">dYdX 演进之路</a></td>
+<td>StarkEx → Cosmos appchain, 链下撮合, 做市商</td>
+<td>永续合约机制详解+保证金管理与清算引擎</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="/2025/09/06/perp-vamm/">vAMM 永续合约演进史</a></td>
+<td>Perpetual Protocol vAMM, Drift, Squeeze 风险</td>
+<td>永续合约机制详解+Uniswap 流动性</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="/2025/09/20/perp-hyperliquid/">Hyperliquid 深度解析</a></td>
+<td>L1 永续, 订单簿 on-chain, HLP vault, 清算机制</td>
+<td>永续合约机制详解+保证金管理与清算引擎</td>
+</tr>
+<tr>
+<td>7</td>
+<td><a href="/2025/10/05/perp-mev/">永续合约中的 MEV</a></td>
+<td>清算 MEV, Oracle 抢跑, 跨市场套利</td>
+<td>永续合约机制详解+MEV 基础</td>
+</tr>
+<tr>
+<td>8</td>
+<td><a href="/2025/10/22/perp-data/">永续合约数据解析实战</a></td>
+<td>合约交互, 持仓&#x2F;资金费率读取, Go 实现</td>
+<td>永续合约机制详解~Hyperliquid 深度解析</td>
+</tr>
+<tr>
+<td>9</td>
+<td><a href="/2025/11/08/perp-matching-engine/">撮合引擎原理与 Go 实现</a></td>
+<td>红黑树&#x2F;BTree 选型, 撮合算法, 扩容方案</td>
+<td>dYdX 演进之路+Hyperliquid 深度解析</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="/2025/11/25/perp-liquidation-engine/">清算引擎架构与实现</a></td>
+<td>链下清算服务 (Go), 链上清算合约 (Solidity), 保险基金, ADL</td>
+<td>保证金管理与清算引擎+撮合引擎原理与 Go 实现</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="/2025/12/10/perp-faq/">永续合约 FAQ</a></td>
+<td>保证金细节, 攻击手法, 撮合边角 case, 闭源风险</td>
+<td>永续合约机制详解~清算引擎架构与实现</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="二、协议对比"><a href="#二、协议对比" class="headerlink" title="二、协议对比"></a>二、协议对比</h2><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>GMX (Oracle 型)</th>
+<th>dYdX v4 (订单簿)</th>
+<th>Hyperliquid (链上订单簿)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定价</td>
+<td>Chainlink Oracle</td>
+<td>链下撮合</td>
+<td>链上订单簿</td>
+</tr>
+<tr>
+<td>滑点</td>
+<td>零滑点 (有限 OI)</td>
+<td>取决于深度</td>
+<td>取决于深度</td>
+</tr>
+<tr>
+<td>LP 模式</td>
+<td>GLP 池做对手方</td>
+<td>做市商</td>
+<td>HLP vault + 做市商</td>
+</tr>
+<tr>
+<td>结算层</td>
+<td>Arbitrum</td>
+<td>Cosmos appchain</td>
+<td>自研 L1</td>
+</tr>
+<tr>
+<td>最大杠杆</td>
+<td>50x</td>
+<td>20x</td>
+<td>50x</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h2 id="三、学习路线"><a href="#三、学习路线" class="headerlink" title="三、学习路线"></a>三、学习路线</h2><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 550">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="520" height="550" rx="8" fill="#1a1a2e"/>
+  <text x="260" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">学习路线</text>
+  <!-- P01 -->
+  <rect x="175" y="40" width="170" height="30" rx="5" fill="#5eead4" fill-opacity="0.15" stroke="#5eead4" stroke-width="1"/>
+  <text x="260" y="60" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">P01 永续机制 (核心概念)</text>
+  <!-- Arrow P01→P02 -->
+  <line x1="260" y1="70" x2="260" y2="93" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- P02 -->
+  <rect x="185" y="95" width="150" height="30" rx="5" fill="#fbbf24" fill-opacity="0.15" stroke="#fbbf24" stroke-width="1"/>
+  <text x="260" y="115" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">P02 保证金与清算</text>
+  <!-- Arrows P02→P03, P02→P04, P02→P05 -->
+  <line x1="210" y1="125" x2="105" y2="158" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="260" y1="125" x2="260" y2="158" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="310" y1="125" x2="415" y2="158" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- P03 -->
+  <rect x="30" y="160" width="140" height="30" rx="5" fill="#34d399" fill-opacity="0.15" stroke="#34d399" stroke-width="1"/>
+  <text x="100" y="180" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">P03 GMX (Oracle 型)</text>
+  <!-- P04 -->
+  <rect x="190" y="160" width="140" height="30" rx="5" fill="#34d399" fill-opacity="0.15" stroke="#34d399" stroke-width="1"/>
+  <text x="260" y="180" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">P04 dYdX (订单簿)</text>
+  <!-- P05 -->
+  <rect x="350" y="160" width="140" height="30" rx="5" fill="#34d399" fill-opacity="0.15" stroke="#34d399" stroke-width="1"/>
+  <text x="420" y="180" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">P05 vAMM 演进</text>
+  <!-- Arrows P03→P06, P04→P06, P05→P06 -->
+  <line x1="105" y1="190" x2="213" y2="223" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="260" y1="190" x2="260" y2="223" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="415" y1="190" x2="307" y2="223" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- P06 -->
+  <rect x="175" y="225" width="170" height="30" rx="5" fill="#a78bfa" fill-opacity="0.15" stroke="#a78bfa" stroke-width="1"/>
+  <text x="260" y="245" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="9" font-weight="bold">P06 Hyperliquid</text>
+  <!-- Arrow P06→P07 -->
+  <line x1="260" y1="255" x2="260" y2="283" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- P07 -->
+  <rect x="195" y="285" width="130" height="30" rx="5" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1"/>
+  <text x="260" y="305" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">P07 永续 MEV</text>
+  <!-- Arrow P07→P08 -->
+  <line x1="260" y1="315" x2="260" y2="343" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- P08 -->
+  <rect x="190" y="345" width="140" height="30" rx="5" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1"/>
+  <text x="260" y="365" text-anchor="middle" fill="#38bdf8" font-family="monospace" font-size="9">P08 数据解析实战</text>
+  <!-- Arrow P08→P09 -->
+  <line x1="260" y1="375" x2="260" y2="403" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- P09 -->
+  <rect x="190" y="405" width="140" height="30" rx="5" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1"/>
+  <text x="260" y="425" text-anchor="middle" fill="#38bdf8" font-family="monospace" font-size="9">P09 撮合引擎实现</text>
+  <!-- Arrow P09→P10 -->
+  <line x1="260" y1="435" x2="260" y2="461" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- P10 -->
+  <rect x="185" y="463" width="150" height="30" rx="5" fill="#fb923c" fill-opacity="0.15" stroke="#fb923c" stroke-width="1"/>
+  <text x="260" y="483" text-anchor="middle" fill="#fb923c" font-family="monospace" font-size="9">P10 清算引擎实现</text>
+  <!-- Arrow P10→P11 -->
+  <line x1="260" y1="493" x2="260" y2="515" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- P11 -->
+  <rect x="185" y="517" width="150" height="22" rx="5" fill="#9ca3af" fill-opacity="0.12" stroke="#9ca3af" stroke-width="0.8"/>
+  <text x="260" y="532" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">P11 FAQ (延伸问题)</text>
+</svg>
+</div>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/web3/" class="category-chain-item">Web3</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/web3/" class="print-no-link">#Web3</a>
+      
+        <a href="/tags/%E6%B0%B8%E7%BB%AD%E5%90%88%E7%BA%A6/" class="print-no-link">#永续合约</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>永续合约 00 - 总览与学习路线</div>
+      <div>https://mritd.com/2025/07/05/perps-overview/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年7月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/07/15/perp-mechanics/" title="永续合约 01 - 永续合约机制详解">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">永续合约 01 - 永续合约机制详解</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/01/16/openwrt-netease-uu-setup/" title="网易 UU + OpenWrt 单臂路由(旁路由)配置">
+                        <span class="hidden-mobile">网易 UU + OpenWrt 单臂路由(旁路由)配置</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2025/07/05/perps-overview/';
+          this.page.identifier = '/2025/07/05/perps-overview/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

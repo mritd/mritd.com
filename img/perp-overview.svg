@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d2137"/>
+      <stop offset="100%" style="stop-color:#1a3a4a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+
+  <!-- Network/roadmap nodes -->
+  <g stroke="#4dd0e1" stroke-width="2" fill="none">
+    <circle cx="400" cy="100" r="22"/>
+    <circle cx="260" cy="180" r="18"/>
+    <circle cx="540" cy="180" r="18"/>
+    <circle cx="190" cy="270" r="15"/>
+    <circle cx="330" cy="270" r="15"/>
+    <circle cx="470" cy="270" r="15"/>
+    <circle cx="610" cy="270" r="15"/>
+  </g>
+  <!-- Node fills -->
+  <g fill="#4dd0e1" opacity="0.3">
+    <circle cx="400" cy="100" r="22"/>
+    <circle cx="260" cy="180" r="18"/>
+    <circle cx="540" cy="180" r="18"/>
+    <circle cx="190" cy="270" r="15"/>
+    <circle cx="330" cy="270" r="15"/>
+    <circle cx="470" cy="270" r="15"/>
+    <circle cx="610" cy="270" r="15"/>
+  </g>
+  <!-- Connections -->
+  <g stroke="#4dd0e1" stroke-width="1.5" opacity="0.5">
+    <line x1="385" y1="118" x2="272" y2="166"/>
+    <line x1="415" y1="118" x2="528" y2="166"/>
+    <line x1="248" y1="195" x2="198" y2="258"/>
+    <line x1="270" y1="195" x2="322" y2="258"/>
+    <line x1="528" y1="195" x2="478" y2="258"/>
+    <line x1="552" y1="195" x2="602" y2="258"/>
+  </g>
+  <!-- Center dot -->
+  <circle cx="400" cy="100" r="6" fill="#4dd0e1"/>
+
+  <text x="400" y="340" text-anchor="middle" fill="#e8eaed" font-family="'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="700">Perpetual Swaps</text>
+  <text x="400" y="378" text-anchor="middle" fill="#4dd0e1" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="400">Learning Roadmap</text>
+  <rect x="340" y="395" width="120" height="3" rx="1.5" fill="#4dd0e1"/>
+</svg>

@@ -1,0 +1,999 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="filebeat">
+  
+    <meta name="description" content="本文主要介绍在 ELK 日志系统中，日志切割处理直接在 filebeat 端实现的一些方式；其中包括 filebeat processor 的扩展以及 module 扩展等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何在 Filebeat 端进行日志处理">
+<meta property="og:url" content="https://mritd.com/2020/08/19/how-to-modify-filebeat-source-code-to-processing-logs/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="本文主要介绍在 ELK 日志系统中，日志切割处理直接在 filebeat 端实现的一些方式；其中包括 filebeat processor 的扩展以及 module 扩展等。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/beats.png">
+<meta property="article:published_time" content="2020-08-19T06:01:00.000Z">
+<meta property="article:modified_time" content="2020-08-19T06:01:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="Kubernetes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/beats.png">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>如何在 Filebeat 端进行日志处理 - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="如何在 Filebeat 端进行日志处理"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2020-08-19 14:01" pubdate>
+          2020年8月19日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          73 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">如何在 Filebeat 端进行日志处理</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="一、起因"><a href="#一、起因" class="headerlink" title="一、起因"></a>一、起因</h2><p>目前某项目组日志需要做切割处理，针对日志信息进行分割并提取 k&#x2F;v 放入 es 中方便查询。这种需求在传统 ELK 中应当由 logstash 组件完成，通过 <code>gork</code> 等操作对日志进行过滤、切割等处理。不过很尴尬的是我并不会 ruby，logstash pipeline 的一些配置我也是极其头疼，而且还不想学…更不凑巧的是我会写点 go，<strong>那么理所应当的此时的我对 filebeat 源码产生了一些想法，比如我直接在 filebeat 端完成日志处理，然后直接发 es&#x2F;logstash，这样似乎更方便，而且还能分摊 logstash 的压力，我感觉这个操作并不过分😂…</strong></p>
+<h2 id="二、需求"><a href="#二、需求" class="headerlink" title="二、需求"></a>二、需求</h2><p>目前某项目组 java 日志格式如下:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sh">2020-04-30 21:56:30.117$<span class="hljs-variable">$api</span>-test-65c8c7cf7f-lng7h$<span class="hljs-variable">$http</span>-nio-8080-exec-3$$INFO$<span class="hljs-variable">$com</span>.example.api.common.filter.GlobalDataFilter$<span class="hljs-variable">$GlobalDataFilter</span>.java$$95$<span class="hljs-variable">$test</span><br>build commonData from header :&#123;<span class="hljs-string">&quot;romVersion&quot;</span>:<span class="hljs-string">&quot;W_V2.1.4&quot;</span>,<span class="hljs-string">&quot;softwareVersion&quot;</span>:<span class="hljs-string">&quot;15&quot;</span>,<span class="hljs-string">&quot;token&quot;</span>:<span class="hljs-string">&quot;aFxANNM3pnRYpohvLMSmENydgFSfsmFMgCbFWAosIE=&quot;</span>&#125;<br>$$$$<br></code></pre></td></tr></table></figure>
+
+<p>目前开发约定格式为日志通过 <code>$$</code> 进行分割，日志格式比较简单，但是 logstash 共用(nginx 等各种日志都会往这个 logstash 输出)，不想去折腾 logstash 配置的情况下，只需要让 filebeat 能够直接切割并设置好 k&#x2F;v 对应既可。</p>
+<h2 id="三、filebeat-module"><a href="#三、filebeat-module" class="headerlink" title="三、filebeat module"></a>三、filebeat module</h2><blockquote>
+<p>module 部份只做简介，以为实际上依托 es 完成，意义不大。</p>
+</blockquote>
+<p>当然在考虑修改 filebeat 源码后，我第一想到的是 filebeat 的 module，这个 module 在官方文档中是个很神奇的东西；通过开启一个 module 就可以对某种日志直接做处理，这种东西似乎就是我想要的；比如我写一个 “项目名” module，然后 filebeat 直接开启这个 module，这个项目的日志就直接自动处理好(听起来就很 “上流”)…</p>
+<p>针对于自定义 module，官方给出了文档: <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/beats/devguide/current/filebeat-modules-devguide.html">Creating a New Filebeat Module</a></p>
+<p>按照文档操作如下(假设我们的项目名为 cdm):</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs sh"><span class="hljs-comment"># 克隆源码</span><br>git <span class="hljs-built_in">clone</span> git@github.com:elastic/beats.git<br><span class="hljs-comment"># 切换到稳定分支</span><br><span class="hljs-built_in">cd</span> bests &amp;&amp; git checkout -b v7.6.2 v7.6.2-module<br><span class="hljs-comment"># 创建 module，GO111MODULE 需要设置为 off</span><br><span class="hljs-comment"># 在 7.6.2 版本官方尚未开始支持 go mod</span><br><span class="hljs-built_in">cd</span> filebeat<br>GO111MODULE=off make create-module MODULE=cdm<br></code></pre></td></tr></table></figure>
+
+<p>创建完成后目录结构如下</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs sh">➜  filebeat git:(v7.6.2-module) ✗ tree module/cdm<br>module/cdm<br>├── _meta<br>│   ├── config.yml<br>│   ├── docs.asciidoc<br>│   └── fields.yml<br>└── module.yml<br><br>1 directory, 4 files<br></code></pre></td></tr></table></figure>
+
+<p>这几个文件具体作用<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/beats/devguide/current/filebeat-modules-devguide.html">官方文档</a>都有详细的描述；但是根据文档描述光有这几个文件是不够的，**module 只是一个处理集合的定义，尚未包含任何处理，针对真正的处理需要继续创建 fileset，fileset 简单的理解就是针对具体的一组文件集合的处理；**例如官方 nginx module 中包含两个 fileset: <code>access</code> 和 <code>error</code>，这两个一个针对 access 日志处理一个针对 error 日志进行处理；在 fileset 中可以设置默认文件位置、处理方式。</p>
+<p>**But… 我翻了 nginx module 的样例配置才发现，module 这个东西实质上只做定义和存储处理表达式，具体的切割处理实际上交由 es 的 <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest.html">Ingest Node</a> 处理；表达式里仍需要定义 <code>grok</code> 等操作，而且这东西最终会编译到 go 静态文件里；**此时的我想说一句 “MMP”，本来我是不像写 grok 啥的才来折腾 filebeat，结果这个 module 折腾一圈还是要写 grok 啥的，而且这东西直接借助 es 完成导致压力回到了 es 同时每次修改还得重新编译 filebeat… 所以折腾到这我就放弃了，这已经违背了当初的目的，有兴趣的可以参考以下文档继续折腾:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/beats/devguide/current/filebeat-modules-devguide.html">Creating a New Filebeat Module</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest.html">Ingest nodeedit</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest-apis.html">Ingest APIs</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest-processors.html">Processors</a></li>
+</ul>
+<h2 id="四、filebeat-processors"><a href="#四、filebeat-processors" class="headerlink" title="四、filebeat processors"></a>四、filebeat processors</h2><p>经历了 module 的失望以后，我把目光对准了 processors；processors 是 filebeat 一个强大的功能，顾名思义它可以对 filbeat 收集到的日志进行一些处理；从官方 <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/beats/filebeat/current/filtering-and-enhancing-data.html">Processors</a> 页面可以看到其内置了大量的 processor；这些 processor 大部份都是直接对日志进行 “写” 操作，所以理论上我们自己写一个 processor 就可以 “为所欲为+为所欲为&#x3D;为所欲为”。</p>
+<p>不过不幸的是关于 processor 的开发官方并未给出文档，官方认为这是一个 <code>high level</code> 的东西，不过也找到了一个 issue 对其做了相关回答: <a target="_blank" rel="noopener" href="https://github.com/elastic/beats/issues/6760">How do I write a processor plugin by myself</a>；所以最好的办法就是直接看已有 processor 的源码抄一个。</p>
+<p>理所应当的找了一个软柿子捏: <code>add_host_metadata</code>，add_host_metadata processor 顾名思义在每个日志事件(以下简称为 event)中加入宿主机的信息，比如 hostname 啥的；以下为 add_host_metadata processor 的文件结构(processors 代码存储在 <code>libbeat/processors</code> 目录下)。</p>
+<p><img src="https://cdn.oss.link/markdown/axucc.jpg" srcset="/img/loading.gif" lazyload alt="dir_tree"></p>
+<p>通过阅读源码和 issue 的回答可以看出，我们自定义的 processor 只需要实现 <a target="_blank" rel="noopener" href="https://godoc.org/github.com/elastic/beats/libbeat/processors#Processor">Processor interface</a> 既可，这个接口定义如下:</p>
+<p><img src="https://cdn.oss.link/markdown/xuja6.png" srcset="/img/loading.gif" lazyload alt="Processor interface"></p>
+<p>通过查看 add_host_metadata 的源码，<code>String() string</code> 方法只需要返回这个 processor 名称既可(可以包含必要的配置信息)；<strong>而 <code>Run(event *beat.Event) (*beat.Event, error)</code> 方法表示在每一条日志被读取后都会转换为一个 event 对象，我们在方法内进行处理然后把 event 返回既可(其他 processor 可能也要处理)。</strong></p>
+<p><img src="https://cdn.oss.link/markdown/jhtnx.png" srcset="/img/loading.gif" lazyload alt="add_host_metadata source"></p>
+<p>有了这些信息就简单得多了，毕竟作为<strong>一名合格的 CCE(Ctrl C + Ctrl V + Engineer)</strong> 抄这种操作还是很简单的，直接照猫画虎写一个就行了</p>
+<p>config.go</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> cmd<br><br><span class="hljs-comment">// Config for cdm processor.</span><br><span class="hljs-keyword">type</span> Config <span class="hljs-keyword">struct</span> &#123;<br>	Name           <span class="hljs-type">string</span>          <span class="hljs-string">`config:&quot;name&quot;`</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">defaultConfig</span><span class="hljs-params">()</span></span> Config &#123;<br>	<span class="hljs-keyword">return</span> Config&#123;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>cdm.go</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> cmd<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;strings&quot;</span><br><br>	<span class="hljs-string">&quot;github.com/elastic/beats/libbeat/logp&quot;</span><br>	<span class="hljs-string">&quot;github.com/pkg/errors&quot;</span><br><br>	<span class="hljs-string">&quot;github.com/elastic/beats/libbeat/beat&quot;</span><br>	<span class="hljs-string">&quot;github.com/elastic/beats/libbeat/common&quot;</span><br>	<span class="hljs-string">&quot;github.com/elastic/beats/libbeat/processors&quot;</span><br>	jsprocessor <span class="hljs-string">&quot;github.com/elastic/beats/libbeat/processors/script/javascript/module/processor&quot;</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span> &#123;<br>	processors.RegisterPlugin(<span class="hljs-string">&quot;cdm&quot;</span>, New)<br>	jsprocessor.RegisterPlugin(<span class="hljs-string">&quot;CDM&quot;</span>, New)<br>&#125;<br><br><span class="hljs-keyword">type</span> cdm <span class="hljs-keyword">struct</span> &#123;<br>	config Config<br>	fields []<span class="hljs-type">string</span><br>	log    *logp.Logger<br>&#125;<br><br><span class="hljs-keyword">const</span> (<br>	processorName = <span class="hljs-string">&quot;cdm&quot;</span><br>	logName       = <span class="hljs-string">&quot;processor.cdm&quot;</span><br>)<br><br><span class="hljs-comment">// New constructs a new cdm processor.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">New</span><span class="hljs-params">(cfg *common.Config)</span></span> (processors.Processor, <span class="hljs-type">error</span>) &#123;<br>	<span class="hljs-comment">// 配置文件里就一个 Name 字段，结构体留着以后方便扩展</span><br>	config := defaultConfig()<br>	<span class="hljs-keyword">if</span> err := cfg.Unpack(&amp;config); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, errors.Wrapf(err, <span class="hljs-string">&quot;fail to unpack the %v configuration&quot;</span>, processorName)<br>	&#125;<br><br>	p := &amp;cdm&#123;<br>		config: config,<br>		<span class="hljs-comment">// 待分割的每段日志对应的 key</span><br>		fields: []<span class="hljs-type">string</span>&#123;<span class="hljs-string">&quot;timestamp&quot;</span>, <span class="hljs-string">&quot;hostname&quot;</span>, <span class="hljs-string">&quot;thread&quot;</span>, <span class="hljs-string">&quot;level&quot;</span>, <span class="hljs-string">&quot;logger&quot;</span>, <span class="hljs-string">&quot;file&quot;</span>, <span class="hljs-string">&quot;line&quot;</span>, <span class="hljs-string">&quot;serviceName&quot;</span>, <span class="hljs-string">&quot;traceId&quot;</span>, <span class="hljs-string">&quot;feTraceId&quot;</span>, <span class="hljs-string">&quot;msg&quot;</span>, <span class="hljs-string">&quot;exception&quot;</span>&#125;,<br>		log:    logp.NewLogger(logName),<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> p, <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">// 真正的日志处理逻辑</span><br><span class="hljs-comment">// 为了保证后面的 processor 正常处理，这里面没有 return 任何 error，只是简单的打印</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(p *cdm)</span></span> Run(event *beat.Event) (*beat.Event, <span class="hljs-type">error</span>) &#123;<br>	<span class="hljs-comment">// 尝试获取 message，理论上这一步不应该出现问题</span><br>	msg, err := event.GetValue(<span class="hljs-string">&quot;message&quot;</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		p.log.Error(err)<br>		<span class="hljs-keyword">return</span> event, <span class="hljs-literal">nil</span><br>	&#125;<br><br>	message, ok := msg.(<span class="hljs-type">string</span>)<br>	<span class="hljs-keyword">if</span> !ok &#123;<br>		p.log.Error(<span class="hljs-string">&quot;failed to parse message&quot;</span>)<br>		<span class="hljs-keyword">return</span> event, <span class="hljs-literal">nil</span><br>	&#125;<br><br>	<span class="hljs-comment">// 分割日志</span><br>	fieldsValue := strings.Split(message, <span class="hljs-string">&quot;$$&quot;</span>)<br>	p.log.Debugf(<span class="hljs-string">&quot;message fields: %v&quot;</span>, fieldsVaule)<br>	<span class="hljs-comment">// 为了保证不会出现数组越界需要判断一下(万一弄出个格式不正常的日志过来保证不崩)</span><br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(fieldsValue) &lt; <span class="hljs-built_in">len</span>(p.fields) &#123;<br>		p.log.Errorf(<span class="hljs-string">&quot;incorrect field length: %d, expected length: %d&quot;</span>, <span class="hljs-built_in">len</span>(fieldsValue), <span class="hljs-built_in">len</span>(p.fields))<br>		<span class="hljs-keyword">return</span> event, <span class="hljs-literal">nil</span><br>	&#125;<br><br>	<span class="hljs-comment">// 这里遍历然后赛会到 event 既可</span><br>	data := common.MapStr&#123;&#125;<br>	<span class="hljs-keyword">for</span> i, k := <span class="hljs-keyword">range</span> p.fields &#123;<br>		_, _ = event.PutValue(k, strings.TrimSpace(fieldsValue[i]))<br>	&#125;<br>	event.Fields.DeepUpdate(data)<br><br>	<span class="hljs-keyword">return</span> event, <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(p *cdm)</span></span> String() <span class="hljs-type">string</span> &#123;<br>	<span class="hljs-keyword">return</span> processorName<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>写好代码以后就可以编译一个自己的 filebeat 了(开心ing)</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sh"><span class="hljs-built_in">cd</span> filebeat<br><span class="hljs-comment"># 如果想交叉编译 linux 需要增加 GOOS=linux 变量 </span><br>GO111MODULE=off make<br></code></pre></td></tr></table></figure>
+
+<p>然后编写配置文件进行测试，日志相关字段已经成功塞到了 event 中，这样我直接发到 es 或者 logstash 就行了。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">filebeat.inputs:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">type:</span> <span class="hljs-string">log</span><br>  <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span><br>  <span class="hljs-attr">paths:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">/Users/natural/tmp/cdm.log</span><br>  <span class="hljs-attr">processors:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">cdm:</span> <span class="hljs-string">~</span><br>  <span class="hljs-attr">multiline.pattern:</span> <span class="hljs-string">^\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125;</span><br>  <span class="hljs-attr">multiline.match:</span> <span class="hljs-string">after</span><br>  <span class="hljs-attr">multiline.negate:</span> <span class="hljs-literal">true</span><br>  <span class="hljs-attr">multiline.timeout:</span> <span class="hljs-string">5s</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="五、script-processor"><a href="#五、script-processor" class="headerlink" title="五、script processor"></a>五、script processor</h2><p>在我折腾完源码以后，反思一下其实这种方式需要自己编译 filebeat，而且每次规则修改也很不方便，唯一的好处真的就是用代码可以 “为所欲为”；反过来一想 “filebeat 有没有 processor 的扩展呢？脚本热加载那种？” 答案是使用 script processor，<strong>script processor 虽然名字上是个 processor，实际上其包含了完整的 ECMA 5.1 js 规范实现；结论就是我们可以写一些 js 脚本来处理日志，然后 filebeat 每次启动后加载这些脚本既可。</strong></p>
+<p>script processor 的使用方式很简单，js 文件中只需要包含一个 <code>function process(event)</code> 方法既可，与自己用 go 实现的 processor 类似，每行日志也会形成一个 event 对象然后调用这个方法进行处理；目前 event 对象可用的 api 需要参考<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/beats/filebeat/current/processor-script.html#_event_api">官方文档</a>；**需要注意的是 script processor 目前只支持 ECMA 5.1 语法规范，超过这个范围的语法是不被支持；**实际上其根本是借助了 <a target="_blank" rel="noopener" href="https://github.com/dop251/goja">https://github.com/dop251/goja</a> 这个库来实现的。同时为了方便开发调试，script processor 也增加了一些 nodejs 的兼容 module，比如 <code>console.log</code> 等方法是可用的；以下为 js 处理上面日志的逻辑:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> <span class="hljs-variable language_">console</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;console&#x27;</span>);<br><span class="hljs-keyword">var</span> fileds = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Array</span>(<span class="hljs-string">&quot;timestamp&quot;</span>, <span class="hljs-string">&quot;hostname&quot;</span>, <span class="hljs-string">&quot;thread&quot;</span>, <span class="hljs-string">&quot;level&quot;</span>, <span class="hljs-string">&quot;logger&quot;</span>, <span class="hljs-string">&quot;file&quot;</span>, <span class="hljs-string">&quot;line&quot;</span>, <span class="hljs-string">&quot;serviceName&quot;</span>, <span class="hljs-string">&quot;traceId&quot;</span>, <span class="hljs-string">&quot;feTraceId&quot;</span>, <span class="hljs-string">&quot;msg&quot;</span>, <span class="hljs-string">&quot;exception&quot;</span>)<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">process</span>(<span class="hljs-params">event</span>) &#123;<br>    <span class="hljs-keyword">var</span> message = event.<span class="hljs-title class_">Get</span>(<span class="hljs-string">&quot;message&quot;</span>);<br>    <span class="hljs-keyword">if</span> (message == <span class="hljs-literal">null</span> || message == <span class="hljs-literal">undefined</span> || message == <span class="hljs-string">&#x27;&#x27;</span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;failed to get message&quot;</span>);<br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    <span class="hljs-keyword">var</span> fieldValues = message.<span class="hljs-title function_">split</span>(<span class="hljs-string">&quot;$$&quot;</span>);<br>    <span class="hljs-keyword">if</span> (fieldValues.<span class="hljs-property">length</span>&lt;fileds.<span class="hljs-property">length</span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;incorrect field length&quot;</span>);<br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; fileds.<span class="hljs-property">length</span>; ++i) &#123;<br>        event.<span class="hljs-title class_">Put</span>(fileds[i],fieldValues[i].<span class="hljs-title function_">trim</span>())<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>写好脚本后调整配置测试既可，如果 js 编写有问题，可以通过 <code>console.log</code> 来打印日志进行不断的调试</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">filebeat.inputs:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">type:</span> <span class="hljs-string">log</span><br>  <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span><br>  <span class="hljs-attr">paths:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">/Users/natural/tmp/cdm.log</span><br>  <span class="hljs-attr">processors:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">script:</span><br>        <span class="hljs-attr">lang:</span> <span class="hljs-string">js</span><br>        <span class="hljs-attr">id:</span> <span class="hljs-string">cdm</span><br>        <span class="hljs-attr">file:</span> <span class="hljs-string">cdm.js</span><br>  <span class="hljs-attr">multiline.pattern:</span> <span class="hljs-string">^\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125;</span><br>  <span class="hljs-attr">multiline.match:</span> <span class="hljs-string">after</span><br>  <span class="hljs-attr">multiline.negate:</span> <span class="hljs-literal">true</span><br>  <span class="hljs-attr">multiline.timeout:</span> <span class="hljs-string">5s</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>需要注意的是目前 <code>lang</code> 的值只能为 <code>javascript</code> 和 <code>js</code>(官方文档写的只能是 <code>javascript</code>)；根据代码来看后续 script processor 有可能支持其他脚本语言，个人认为主要取决于其他脚本语言有没有纯 go 实现的 runtime，如果有的话未来很有可能被整合到 script processor 中。</strong></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gegg80j1gmj31nc0u0wpa.jpg" srcset="/img/loading.gif" lazyload alt="script processor"></p>
+<h2 id="六、其他-processor"><a href="#六、其他-processor" class="headerlink" title="六、其他 processor"></a>六、其他 processor</h2><p>研究完 script processor 后我顿时对其他 processor 也产生了兴趣，随着更多的查看processor 文档，我发现其实大部份过滤分割能力已经有很多 processor 进行了实现，**其完善程度外加可扩展的 script processor 实际能力已经足矣替换掉 logstash 的日志分割过滤处理了。**比如上面的日志切割其实使用 dissect processor 实现更加简单(这个配置并不完善，只是样例):</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">processors:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-attr">dissect:</span><br>      <span class="hljs-attr">field:</span> <span class="hljs-string">&quot;message&quot;</span><br>      <span class="hljs-attr">tokenizer:</span> <span class="hljs-string">&quot;<span class="hljs-template-variable">%&#123;timestamp&#125;</span>$$<span class="hljs-template-variable">%&#123;hostname&#125;</span>$$<span class="hljs-template-variable">%&#123;thread&#125;</span>$$<span class="hljs-template-variable">%&#123;level&#125;</span>$$<span class="hljs-template-variable">%&#123;logger&#125;</span>$$<span class="hljs-template-variable">%&#123;file&#125;</span>$$<span class="hljs-template-variable">%&#123;line&#125;</span>$$<span class="hljs-template-variable">%&#123;serviceName&#125;</span>$$<span class="hljs-template-variable">%&#123;traceId&#125;</span>$$<span class="hljs-template-variable">%&#123;feTraceId&#125;</span>$$<span class="hljs-template-variable">%&#123;msg&#125;</span>$$<span class="hljs-template-variable">%&#123;exception&#125;</span>$$&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>除此之外还有很多 processor，例如 <code>drop_event</code>、<code>drop_fields</code>、<code>timestamp</code> 等等，感兴趣的可以自行研究。</p>
+<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p>基本上折腾完以后做了一个总结:</p>
+<ul>
+<li><strong>filebeat module</strong>: 这就是个华而不实的东西，每次修改需要重新编译且扩展能力几近于零，最蛋疼的是实际逻辑通过 es 来完成；我能想到的是唯一应用场景就是官方给我们弄一些 demo 来炫耀用的，比如 nginx module；实际生产中 nginx 日志格式保持原封不动的人我相信少之又少。</li>
+<li><strong>filebeat custom processor</strong>: 每次修改也需要重新编译且需要会 go 语言还有相关工具链，但是好处就是完全通过代码实现真正的为所欲为；扩展性取决于外部是否对特定位置做了可配置化，比如预留可以配置切割用正则表达式的变量等，最终取决于代码编写者(怎么为所欲为的问题)。</li>
+<li><strong>filebeat script processor</strong>: 完整 ECMA 5.1 js 规范支持，代码化对日志进行为所欲为，修改不需要重新编译；普通用户我个人觉得是首选，当然同时会写 go 和 js 的就看你想用哪个了。</li>
+<li><strong>filebeat other processor</strong>: 基本上实现了很多 logstash 的功能，简单用用很舒服，复杂场景还是得撸代码；但是一些特定的 processor 很实用，比如加入宿主机信息的 add_host_metadata processor 等。</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/golang/" class="category-chain-item">Golang</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/kubernetes/" class="print-no-link">#Kubernetes</a>
+      
+        <a href="/tags/golang/" class="print-no-link">#Golang</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>如何在 Filebeat 端进行日志处理</div>
+      <div>https://mritd.com/2020/08/19/how-to-modify-filebeat-source-code-to-processing-logs/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2020年8月19日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/08/19/make-a-custom-manjaro-image-for-rpi4/" title="树莓派4 Manjaro 系统定制">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">树莓派4 Manjaro 系统定制</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/03/31/how-to-download-docker-image-without-docker/" title="如何不通过 docker 下载 docker image">
+                        <span class="hidden-mobile">如何不通过 docker 下载 docker image</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2020/08/19/how-to-modify-filebeat-source-code-to-processing-logs/';
+          this.page.identifier = '/2020/08/19/how-to-modify-filebeat-source-code-to-processing-logs/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

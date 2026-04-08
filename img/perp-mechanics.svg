@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2332"/>
+      <stop offset="100%" style="stop-color:#2d3e50"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="420" fill="url(#bg)"/>
+
+  <!-- Candlesticks - larger -->
+  <g transform="translate(400, 155)">
+    <rect x="-120" y="-50" width="30" height="80" fill="#26a69a" rx="3"/>
+    <line x1="-105" y1="-70" x2="-105" y2="45" stroke="#26a69a" stroke-width="3"/>
+
+    <rect x="-60" y="-25" width="30" height="70" fill="#ef5350" rx="3"/>
+    <line x1="-45" y1="-50" x2="-45" y2="65" stroke="#ef5350" stroke-width="3"/>
+
+    <rect x="0" y="-75" width="30" height="65" fill="#26a69a" rx="3"/>
+    <line x1="15" y1="-95" x2="15" y2="5" stroke="#26a69a" stroke-width="3"/>
+
+    <rect x="60" y="-40" width="30" height="75" fill="#ef5350" rx="3"/>
+    <line x1="75" y1="-65" x2="75" y2="55" stroke="#ef5350" stroke-width="3"/>
+
+    <rect x="120" y="-60" width="30" height="55" fill="#26a69a" rx="3"/>
+    <line x1="135" y1="-80" x2="135" y2="10" stroke="#26a69a" stroke-width="3"/>
+  </g>
+
+  <!-- Funding rate curve -->
+  <path d="M200,250 Q300,220 400,250 T600,250" fill="none" stroke="#546e7a" stroke-width="2" stroke-dasharray="6,4"/>
+
+  <!-- Title -->
+  <text x="400" y="320" text-anchor="middle" fill="#e8eaed" font-family="'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="700">Perpetual Contracts</text>
+  <text x="400" y="360" text-anchor="middle" fill="#8899a6" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="400">Mechanics &amp; Fundamentals</text>
+
+  <rect x="340" y="380" width="120" height="3" rx="1.5" fill="#26a69a"/>
+</svg>

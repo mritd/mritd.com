@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#121e36"/>
+      <stop offset="100%" style="stop-color:#1e3a5f"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+
+  <!-- Oracle price feed icon -->
+  <g transform="translate(400, 145)">
+    <!-- Outer ring -->
+    <circle cx="0" cy="0" r="65" fill="none" stroke="#64b5f6" stroke-width="2.5"/>
+    <!-- Inner ring -->
+    <circle cx="0" cy="0" r="40" fill="none" stroke="#64b5f6" stroke-width="1.5" opacity="0.6"/>
+    <!-- Center dot -->
+    <circle cx="0" cy="0" r="8" fill="#64b5f6"/>
+    <!-- Price feed rays -->
+    <line x1="0" y1="-72" x2="0" y2="-85" stroke="#64b5f6" stroke-width="2.5"/>
+    <line x1="0" y1="72" x2="0" y2="85" stroke="#64b5f6" stroke-width="2.5"/>
+    <line x1="-72" y1="0" x2="-85" y2="0" stroke="#64b5f6" stroke-width="2.5"/>
+    <line x1="72" y1="0" x2="85" y2="0" stroke="#64b5f6" stroke-width="2.5"/>
+    <!-- Diagonal rays -->
+    <line x1="-51" y1="-51" x2="-60" y2="-60" stroke="#64b5f6" stroke-width="2" opacity="0.6"/>
+    <line x1="51" y1="-51" x2="60" y2="-60" stroke="#64b5f6" stroke-width="2" opacity="0.6"/>
+    <line x1="-51" y1="51" x2="-60" y2="60" stroke="#64b5f6" stroke-width="2" opacity="0.6"/>
+    <line x1="51" y1="51" x2="60" y2="60" stroke="#64b5f6" stroke-width="2" opacity="0.6"/>
+  </g>
+
+  <text x="400" y="310" text-anchor="middle" fill="#e8eaed" font-family="'Helvetica Neue', Arial, sans-serif" font-size="48" font-weight="700">GMX</text>
+  <text x="400" y="350" text-anchor="middle" fill="#64b5f6" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="400">Oracle-Type Perpetuals</text>
+  <rect x="340" y="370" width="120" height="3" rx="1.5" fill="#64b5f6"/>
+</svg>

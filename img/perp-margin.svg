@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a1a2e"/>
+      <stop offset="100%" style="stop-color:#3d2244"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+
+  <!-- Margin water level gauge -->
+  <rect x="340" y="60" width="120" height="200" rx="8" fill="none" stroke="#e57373" stroke-width="2.5"/>
+  <!-- Fill level -->
+  <rect x="344" y="140" width="112" height="116" rx="5" fill="#e57373" opacity="0.3"/>
+  <!-- Liquidation line -->
+  <line x1="320" y1="200" x2="480" y2="200" stroke="#ff8a80" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="490" y="205" fill="#ff8a80" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="500">LIQUIDATION</text>
+  <!-- Margin level markers -->
+  <line x1="330" y1="100" x2="345" y2="100" stroke="#a5d6a7" stroke-width="2"/>
+  <line x1="330" y1="140" x2="345" y2="140" stroke="#fff176" stroke-width="2"/>
+  <line x1="330" y1="200" x2="345" y2="200" stroke="#ff8a80" stroke-width="2"/>
+
+  <text x="400" y="320" text-anchor="middle" fill="#e8eaed" font-family="'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="700">Margin &amp; Liquidation</text>
+  <text x="400" y="358" text-anchor="middle" fill="#e57373" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="400">Risk Management Engine</text>
+  <rect x="340" y="375" width="120" height="3" rx="1.5" fill="#e57373"/>
+</svg>

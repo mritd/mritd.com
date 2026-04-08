@@ -1,0 +1,2203 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="Web3,永续合约,Hyperliquid,L1,HyperBFT,HYPE">
+  
+    <meta name="description" content="本文介绍 Hyperliquid 的自建 L1 架构, 包括 HyperBFT 共识, 200ms 出块的链上订单簿, HLP 做市机制, 以及 HIP-1&#x2F;HIP-2 代币标准等核心设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="永续合约 06 - Hyperliquid 深度解析">
+<meta property="og:url" content="https://mritd.com/2025/09/20/perp-hyperliquid/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="本文介绍 Hyperliquid 的自建 L1 架构, 包括 HyperBFT 共识, 200ms 出块的链上订单簿, HLP 做市机制, 以及 HIP-1&#x2F;HIP-2 代币标准等核心设计">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/perp-hyperliquid.svg">
+<meta property="article:published_time" content="2025-09-20T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-20T02:00:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="Hyperliquid">
+<meta property="article:tag" content="Web3">
+<meta property="article:tag" content="永续合约">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/perp-hyperliquid.svg">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>永续合约 06 - Hyperliquid 深度解析 - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="永续合约 06 - Hyperliquid 深度解析"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-09-20 10:00" pubdate>
+          2025年9月20日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          17k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          144 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">永续合约 06 - Hyperliquid 深度解析</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>Hyperliquid 没有基于以太坊或 Cosmos, 而是从共识层 (HyperBFT) 到撮合引擎全部用 Rust 自研了一条 L1, 200ms 出块, 在链上跑订单簿. 本文介绍其 L1 架构, 链上订单簿机制, HLP Vault 做市模式, 保证金清算流程, 以及 JELLY 事件暴露出的一些问题.</p>
+<h2 id="一、术语表"><a href="#一、术语表" class="headerlink" title="一、术语表"></a>一、术语表</h2><h3 id="1-1-架构"><a href="#1-1-架构" class="headerlink" title="1.1 架构"></a>1.1 架构</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>应用链</td>
+<td>Appchain</td>
+<td>专为单一应用构建的区块链, 不与其他 dApp 共享资源</td>
+</tr>
+<tr>
+<td>共识</td>
+<td>Consensus</td>
+<td>验证者节点对交易排序&#x2F;确认达成一致的协议</td>
+</tr>
+<tr>
+<td>HyperBFT</td>
+<td>HyperBFT</td>
+<td>Hyperliquid 自研 BFT 共识, 基于 HotStuff 优化</td>
+</tr>
+<tr>
+<td>验证者</td>
+<td>Validator</td>
+<td>运行共识 + 撮合引擎的节点</td>
+</tr>
+<tr>
+<td>区块时间</td>
+<td>Block Time</td>
+<td>出块间隔, Hyperliquid ~200ms</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-2-交易"><a href="#1-2-交易" class="headerlink" title="1.2 交易"></a>1.2 交易</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>链上订单簿</td>
+<td>On-chain Order Book</td>
+<td>每个订单作为交易提交到链上, 撮合在共识层完成</td>
+</tr>
+<tr>
+<td>撮合引擎</td>
+<td>Matching Engine</td>
+<td>按 price-time priority 配对买卖订单</td>
+</tr>
+<tr>
+<td>做市</td>
+<td>Market Making</td>
+<td>在买卖两侧同时挂单, 赚取 bid-ask spread</td>
+</tr>
+<tr>
+<td>HLP</td>
+<td>Hyperliquid LP Vault</td>
+<td>协议原生做市 vault, 用户存 USDC 参与做市</td>
+</tr>
+<tr>
+<td>ADL</td>
+<td>Auto-Deleveraging</td>
+<td>保险基金不足时, 强制让盈利方减仓</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-3-代币"><a href="#1-3-代币" class="headerlink" title="1.3 代币"></a>1.3 代币</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>HYPE</td>
+<td>HYPE Token</td>
+<td>Hyperliquid 原生代币, 用于 staking + 手续费折扣</td>
+</tr>
+<tr>
+<td>HIP-1</td>
+<td>Hyperliquid Improvement Proposal 1</td>
+<td>代币标准 + Spot 上币规则: 定义如何在 L1 上发行代币, 通过荷兰拍卖竞拍 ticker 上线交易对</td>
+</tr>
+<tr>
+<td>HIP-2</td>
+<td>Hyperliquid Improvement Proposal 2</td>
+<td>协议自动做市: 新 token 上线后协议自动在订单簿两侧挂单, 解决冷启动流动性问题, 不依赖外部做市商</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="二、Hyperliquid-概述"><a href="#二、Hyperliquid-概述" class="headerlink" title="二、Hyperliquid 概述"></a>二、Hyperliquid 概述</h2><h3 id="2-1-为什么需要-Hyperliquid"><a href="#2-1-为什么需要-Hyperliquid" class="headerlink" title="2.1 为什么需要 Hyperliquid?"></a>2.1 为什么需要 Hyperliquid?</h3><p>现有链上永续协议的问题:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>协议</th>
+<th>问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GMX (Oracle 型)</td>
+<td>零滑点但 OI 受限, LP 被动承担对手方风险</td>
+</tr>
+<tr>
+<td>dYdX v3 (StarkEx)</td>
+<td>订单簿在 StarkEx 链下, 依赖中心化 sequencer</td>
+</tr>
+<tr>
+<td>dYdX v4 (Cosmos)</td>
+<td>订单簿在内存中 (off-chain), 只有撮合结果上链</td>
+</tr>
+<tr>
+<td>vAMM (Perp Protocol)</td>
+<td>虚拟流动性, 滑点大, 易被操纵</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>Hyperliquid 的目标: <strong>把完整的订单簿和撮合引擎搬到链上</strong>, 同时保持 CEX 级别的性能.</p>
+<h3 id="2-2-当前规模-量级参考"><a href="#2-2-当前规模-量级参考" class="headerlink" title="2.2 当前规模 (量级参考)"></a>2.2 当前规模 (量级参考)</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值 (约)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>日均交易量</td>
+<td>$1B ~ $10B</td>
+</tr>
+<tr>
+<td>总 OI (Open Interest)</td>
+<td>$1B ~ $5B</td>
+</tr>
+<tr>
+<td>上线交易对</td>
+<td>100+</td>
+</tr>
+<tr>
+<td>最大杠杆</td>
+<td>50x</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>注: 具体数据随市场波动, 以上为 2025 年 Q1 的量级参考. 请以 <a target="_blank" rel="noopener" href="https://stats.hyperliquid.xyz/">Hyperliquid Stats</a> 为准.</p>
+</blockquote>
+<hr>
+<h2 id="三、架构-自研-L1"><a href="#三、架构-自研-L1" class="headerlink" title="三、架构: 自研 L1"></a>三、架构: 自研 L1</h2><p><strong>Q: Hyperliquid L1 到底是什么? 跟 Ethereum L2, Cosmos 链, EVM 链是什么关系?</strong></p>
+<p>Hyperliquid L1 是完全自建的独立 L1, 不是 Ethereum L2, 不是 Cosmos 链, 也不是 EVM 链. 用 Rust 从零写的, 不基于任何现有框架 (不用 OP Stack, 不用 Cosmos SDK, 不用 Substrate). 共识协议是 HyperBFT, 基于学术界的 HotStuff 改进而来.</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>GMX (Arbitrum L2)</th>
+<th>dYdX v4 (Cosmos appchain)</th>
+<th>Hyperliquid (自建 L1)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基础框架</td>
+<td>Ethereum L2 (OP Stack)</td>
+<td>Cosmos SDK (Go)</td>
+<td>自研 (Rust)</td>
+</tr>
+<tr>
+<td>安全性继承</td>
+<td>Ethereum</td>
+<td>自身验证者</td>
+<td>自身验证者</td>
+</tr>
+<tr>
+<td>定制性</td>
+<td>低</td>
+<td>高</td>
+<td>极高</td>
+</tr>
+<tr>
+<td>EVM 兼容</td>
+<td>完全</td>
+<td>不兼容</td>
+<td>后期加了 HyperEVM</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="420" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Hyperliquid 架构</text>
+  <!-- User layer -->
+  <rect x="220" y="45" width="280" height="40" rx="6" fill="#818cf8" fill-opacity="0.12" stroke="#818cf8" stroke-width="1"/>
+  <text x="360" y="70" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="10">用户 (API / Web UI)</text>
+  <line x1="360" y1="85" x2="360" y2="108" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- API Gateway -->
+  <rect x="220" y="115" width="280" height="40" rx="6" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="1"/>
+  <text x="360" y="140" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10">API Gateway (REST / WebSocket)</text>
+  <line x1="360" y1="155" x2="360" y2="178" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Consensus layer -->
+  <rect x="60" y="185" width="600" height="100" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="360" y="205" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">HyperBFT 共识层</text>
+  <!-- Validator nodes -->
+  <rect x="90" y="218" width="120" height="50" rx="5" fill="#5eead4" fill-opacity="0.15" stroke="#5eead4" stroke-width="1"/>
+  <text x="150" y="238" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Validator 1</text>
+  <text x="150" y="252" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">撮合引擎</text>
+  <rect x="240" y="218" width="120" height="50" rx="5" fill="#5eead4" fill-opacity="0.15" stroke="#5eead4" stroke-width="1"/>
+  <text x="300" y="238" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Validator 2</text>
+  <text x="300" y="252" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">撮合引擎</text>
+  <rect x="390" y="218" width="120" height="50" rx="5" fill="#5eead4" fill-opacity="0.15" stroke="#5eead4" stroke-width="1"/>
+  <text x="450" y="238" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Validator 3</text>
+  <text x="450" y="252" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">撮合引擎</text>
+  <rect x="540" y="218" width="90" height="50" rx="5" fill="#9ca3af" fill-opacity="0.15" stroke="#9ca3af" stroke-width="1"/>
+  <text x="585" y="243" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">...</text>
+  <!-- State layer -->
+  <line x1="360" y1="285" x2="360" y2="308" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <rect x="100" y="315" width="220" height="80" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="210" y="335" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">Perp Order Book</text>
+  <text x="210" y="352" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">100+ 交易对</text>
+  <text x="210" y="365" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">保证金 / 清算 / Funding</text>
+  <text x="210" y="378" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">HLP Vault</text>
+  <rect x="400" y="315" width="220" height="80" rx="6" fill="#34d399" fill-opacity="0.08" stroke="#34d399" stroke-width="1"/>
+  <text x="510" y="335" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">Spot Order Book</text>
+  <text x="510" y="352" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">HIP-1 代币标准</text>
+  <text x="510" y="365" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">HIP-2 协议做市</text>
+  <text x="510" y="378" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Bridge</text>
+</svg>
+</div>
+
+<h3 id="3-1-HyperBFT-共识"><a href="#3-1-HyperBFT-共识" class="headerlink" title="3.1 HyperBFT 共识"></a>3.1 HyperBFT 共识</h3><p>HyperBFT 基于学术界的 <strong>HotStuff</strong> 协议优化:</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext">HotStuff (学术论文, Facebook/Meta Libra 使用)<br>    ↓ 优化<br>HyperBFT (Hyperliquid 自研)<br>    <span class="hljs-bullet">-</span> <span class="hljs-string">降低通信轮次</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">针对订单簿场景优化</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">~200ms 区块时间</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">100k+ orders/sec 吞吐</span><br></code></pre></td></tr></table></figure>
+
+<p>关键特性:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>区块时间</td>
+<td>~200ms (vs Ethereum ~12s, vs Cosmos ~6s)</td>
+</tr>
+<tr>
+<td>吞吐量</td>
+<td>100k+ orders&#x2F;sec</td>
+</tr>
+<tr>
+<td>确认</td>
+<td>单次共识即最终确认 (no reorg)</td>
+</tr>
+<tr>
+<td>容错</td>
+<td>BFT: 容忍 &lt; 1&#x2F;3 恶意节点</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="3-2-vs-dYdX-v4-同为-Appchain-路径不同"><a href="#3-2-vs-dYdX-v4-同为-Appchain-路径不同" class="headerlink" title="3.2 vs dYdX v4: 同为 Appchain, 路径不同"></a>3.2 vs dYdX v4: 同为 Appchain, 路径不同</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300">
+  <rect width="720" height="300" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">dYdX v4 vs Hyperliquid: 架构对比</text>
+  <!-- dYdX side -->
+  <rect x="30" y="45" width="320" height="240" rx="6" fill="#f472b6" fill-opacity="0.06" stroke="#f472b6" stroke-width="1"/>
+  <text x="190" y="65" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">dYdX v4</text>
+  <rect x="60" y="80" width="260" height="30" rx="4" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="190" y="100" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Cosmos SDK + CometBFT</text>
+  <rect x="60" y="120" width="260" height="30" rx="4" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="0.5"/>
+  <text x="190" y="140" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">订单簿: 内存中 (off-chain)</text>
+  <rect x="60" y="160" width="260" height="30" rx="4" fill="#9ca3af" fill-opacity="0.12" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="190" y="180" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">只有撮合结果上链</text>
+  <rect x="60" y="200" width="260" height="30" rx="4" fill="#9ca3af" fill-opacity="0.12" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="190" y="220" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Go 实现, 开源</text>
+  <text x="190" y="265" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">路线: 站在 Cosmos 肩上, 复用生态</text>
+  <!-- Hyperliquid side -->
+  <rect x="370" y="45" width="320" height="240" rx="6" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="1"/>
+  <text x="530" y="65" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">Hyperliquid</text>
+  <rect x="400" y="80" width="260" height="30" rx="4" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="530" y="100" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">自研 L1 + HyperBFT</text>
+  <rect x="400" y="120" width="260" height="30" rx="4" fill="#34d399" fill-opacity="0.12" stroke="#34d399" stroke-width="0.5"/>
+  <text x="530" y="140" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">订单簿: 完全链上 (on-chain)</text>
+  <rect x="400" y="160" width="260" height="30" rx="4" fill="#9ca3af" fill-opacity="0.12" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="530" y="180" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">每个订单都是链上交易</text>
+  <rect x="400" y="200" width="260" height="30" rx="4" fill="#9ca3af" fill-opacity="0.12" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="530" y="220" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Rust 实现, 未开源</text>
+  <text x="530" y="265" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">路线: 从零自建, 最大灵活性</text>
+</svg>
+</div>
+
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>dYdX v4</th>
+<th>Hyperliquid</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基础框架</td>
+<td>Cosmos SDK</td>
+<td>自研</td>
+</tr>
+<tr>
+<td>共识</td>
+<td>CometBFT</td>
+<td>HyperBFT (HotStuff)</td>
+</tr>
+<tr>
+<td>订单簿位置</td>
+<td>内存 (off-chain)</td>
+<td>链上 (on-chain)</td>
+</tr>
+<tr>
+<td>上链内容</td>
+<td>撮合结果</td>
+<td>每个订单</td>
+</tr>
+<tr>
+<td>透明性</td>
+<td>中 (撮合过程不可验证)</td>
+<td>高 (全链路可验证)</td>
+</tr>
+<tr>
+<td>语言</td>
+<td>Go (开源)</td>
+<td>Rust (未开源)</td>
+</tr>
+<tr>
+<td>IBC 互操作</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>核心区别</strong>: dYdX 的订单簿在验证者内存中, 用户无法验证撮合过程是否公平.<br>Hyperliquid 每个订单都上链, 撮合过程完全可审计, 但代价是对共识层性能要求极高.</p>
+</blockquote>
+<hr>
+<h2 id="四、链上订单簿"><a href="#四、链上订单簿" class="headerlink" title="四、链上订单簿"></a>四、链上订单簿</h2><h3 id="4-1-工作原理"><a href="#4-1-工作原理" class="headerlink" title="4.1 工作原理"></a>4.1 工作原理</h3><p>Hyperliquid 的每个操作都是一笔链上交易:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="440" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Hyperliquid Order Execution Flow</text>
+  <!-- Step 1: User submits order -->
+  <rect x="160" y="42" width="400" height="36" rx="6" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1"/>
+  <text x="360" y="65" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9">用户提交 limit buy ETH @ 3000 USDC</text>
+  <!-- Arrow 1 -->
+  <line x1="360" y1="78" x2="360" y2="98" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 2: HyperBFT consensus -->
+  <rect x="200" y="105" width="320" height="36" rx="6" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1"/>
+  <text x="360" y="128" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9">交易进入 HyperBFT 共识</text>
+  <!-- Arrow 2 -->
+  <line x1="360" y1="141" x2="360" y2="161" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 3: Validators order and execute -->
+  <rect x="220" y="168" width="280" height="36" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="360" y="191" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9">验证者排序并执行</text>
+  <!-- Arrow 3 -->
+  <line x1="360" y1="204" x2="360" y2="224" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 4: Matching engine check -->
+  <rect x="130" y="231" width="460" height="36" rx="6" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <text x="360" y="254" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">撮合引擎检查: 有没有 sell @ ≤ 3000?</text>
+  <!-- Branch arrows -->
+  <line x1="260" y1="267" x2="260" y2="308" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="460" y1="267" x2="460" y2="308" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Branch labels -->
+  <text x="240" y="290" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">有匹配</text>
+  <text x="480" y="290" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">无匹配</text>
+  <!-- Branch A: Match found -->
+  <rect x="110" y="316" width="300" height="50" rx="6" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-width="1"/>
+  <text x="260" y="338" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">立即成交</text>
+  <text x="260" y="354" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">更新双方余额</text>
+  <!-- Branch B: No match -->
+  <rect x="310" y="376" width="300" height="50" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="460" y="398" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9">挂到订单簿</text>
+  <text x="460" y="414" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">等待匹配</text>
+  <!-- Connect no-match arrow to box B -->
+  <line x1="460" y1="316" x2="460" y2="371" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+</svg>
+</div>
+
+<h3 id="4-2-订单类型"><a href="#4-2-订单类型" class="headerlink" title="4.2 订单类型"></a>4.2 订单类型</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>订单类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Limit Order</td>
+<td>指定价格, 到价成交</td>
+</tr>
+<tr>
+<td>Market Order</td>
+<td>按当前最优价格立即成交</td>
+</tr>
+<tr>
+<td>Stop Loss</td>
+<td>价格跌到触发价 → 自动卖出</td>
+</tr>
+<tr>
+<td>Take Profit</td>
+<td>价格涨到触发价 → 自动卖出</td>
+</tr>
+<tr>
+<td>TWAP</td>
+<td>时间加权均价, 大单拆分为小单分时段执行</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="4-3-撮合规则-Price-Time-Priority"><a href="#4-3-撮合规则-Price-Time-Priority" class="headerlink" title="4.3 撮合规则: Price-Time Priority"></a>4.3 撮合规则: Price-Time Priority</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 280">
+  <rect width="780" height="280" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="22" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">订单簿 (ETH-USDC): Price-Time Priority</text>
+  <!-- Asks table -->
+  <rect x="30" y="38" width="340" height="130" rx="5" fill="#f472b6" fill-opacity="0.06" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="200" y="56" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">Asks (卖单, 价格从低到高)</text>
+  <line x1="45" y1="62" x2="355" y2="62" stroke="#f472b6" stroke-width="0.5" stroke-opacity="0.4"/>
+  <text x="90" y="76" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">价格</text>
+  <text x="200" y="76" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">数量</text>
+  <text x="310" y="76" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">时间戳</text>
+  <line x1="45" y1="82" x2="355" y2="82" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <rect x="40" y="86" width="320" height="16" rx="2" fill="#f472b6" fill-opacity="0.1"/>
+  <text x="90" y="98" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">3001.5</text>
+  <text x="200" y="98" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">2.0 ETH</text>
+  <text x="310" y="98" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">T+1</text>
+  <text x="90" y="118" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">3002.0</text>
+  <text x="200" y="118" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">5.0 ETH</text>
+  <text x="310" y="118" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">T+0 ← 先挂</text>
+  <text x="90" y="138" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">3002.0</text>
+  <text x="200" y="138" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">3.0 ETH</text>
+  <text x="310" y="138" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">T+2 ← 后挂</text>
+  <!-- Bids table -->
+  <rect x="410" y="38" width="340" height="130" rx="5" fill="#34d399" fill-opacity="0.06" stroke="#34d399" stroke-width="0.8"/>
+  <text x="580" y="56" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">Bids (买单, 价格从高到低)</text>
+  <line x1="425" y1="62" x2="735" y2="62" stroke="#34d399" stroke-width="0.5" stroke-opacity="0.4"/>
+  <text x="470" y="76" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">价格</text>
+  <text x="580" y="76" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">数量</text>
+  <text x="690" y="76" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">时间戳</text>
+  <line x1="425" y1="82" x2="735" y2="82" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <rect x="420" y="86" width="320" height="16" rx="2" fill="#34d399" fill-opacity="0.1"/>
+  <text x="470" y="98" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8" font-weight="bold">3000.0</text>
+  <text x="580" y="98" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">10.0 ETH</text>
+  <text x="690" y="98" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">T+0</text>
+  <text x="470" y="118" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">2999.5</text>
+  <text x="580" y="118" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">4.0 ETH</text>
+  <text x="690" y="118" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">T+1</text>
+  <!-- Rules -->
+  <rect x="30" y="185" width="720" height="85" rx="5" fill="#5eead4" fill-opacity="0.05" stroke="#5eead4" stroke-width="0.6"/>
+  <text x="390" y="205" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">撮合规则</text>
+  <circle cx="60" cy="228" r="9" fill="#fbbf24" fill-opacity="0.2" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="60" y="232" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">1</text>
+  <text x="78" y="232" fill="#cbd5e1" font-family="monospace" font-size="8">价格优先: 买方出价高的先成交, 卖方要价低的先成交</text>
+  <circle cx="60" cy="252" r="9" fill="#fbbf24" fill-opacity="0.2" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="60" y="256" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">2</text>
+  <text x="78" y="256" fill="#cbd5e1" font-family="monospace" font-size="8">时间优先: 同价格下, 先挂的订单先成交</text>
+</svg>
+</div>
+
+<h3 id="4-4-vs-dYdX-订单簿的关键区别"><a href="#4-4-vs-dYdX-订单簿的关键区别" class="headerlink" title="4.4 vs dYdX: 订单簿的关键区别"></a>4.4 vs dYdX: 订单簿的关键区别</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>dYdX v4</th>
+<th>Hyperliquid</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>订单存储</td>
+<td>验证者内存</td>
+<td>链上状态</td>
+</tr>
+<tr>
+<td>挂单</td>
+<td>gossip 到验证者内存</td>
+<td>作为交易上链</td>
+</tr>
+<tr>
+<td>撮合</td>
+<td>内存中完成, 结果打包上链</td>
+<td>共识层执行, 结果写入链上状态</td>
+</tr>
+<tr>
+<td>可审计性</td>
+<td>只能验证最终结果</td>
+<td>每笔订单可追溯</td>
+</tr>
+<tr>
+<td>取消订单</td>
+<td>从内存删除 (免费)</td>
+<td>需要上链 (消耗资源)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>类比: dYdX 像一个公证处: 你看不到内部审批过程, 但可以看到公证结果.<br>Hyperliquid 像法庭公开审理: 每个环节都公开记录.</p>
+</blockquote>
+<hr>
+<h2 id="五、HLP-Vault"><a href="#五、HLP-Vault" class="headerlink" title="五、HLP Vault"></a>五、HLP Vault</h2><p>HLP (Hyperliquid LP) 是 Hyperliquid 最独特的设计之一: 一个协议原生的做市 vault.</p>
+<h3 id="5-1-工作原理"><a href="#5-1-工作原理" class="headerlink" title="5.1 工作原理"></a>5.1 工作原理</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 350">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="350" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">HLP Vault 做市机制</text>
+  <!-- Users deposit -->
+  <rect x="50" y="50" width="140" height="50" rx="6" fill="#818cf8" fill-opacity="0.12" stroke="#818cf8" stroke-width="1"/>
+  <text x="120" y="72" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9">用户存入 USDC</text>
+  <text x="120" y="88" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">获得 vault 份额</text>
+  <line x1="190" y1="75" x2="258" y2="75" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- HLP Vault -->
+  <rect x="265" y="40" width="190" height="70" rx="6" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="1.5"/>
+  <text x="360" y="65" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">HLP Vault</text>
+  <text x="360" y="82" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">协议控制的做市策略</text>
+  <line x1="455" y1="75" x2="523" y2="75" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Order Book -->
+  <rect x="530" y="50" width="140" height="50" rx="6" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="1"/>
+  <text x="600" y="72" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">订单簿</text>
+  <text x="600" y="88" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">买卖两侧挂单</text>
+  <!-- Revenue sources -->
+  <rect x="80" y="140" width="560" height="185" rx="6" fill="#ffffff" fill-opacity="0.03" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="360" y="162" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="bold">HLP 收益来源</text>
+  <!-- Source 1 -->
+  <rect x="110" y="178" width="160" height="55" rx="5" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-width="0.8"/>
+  <text x="190" y="198" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">做市利润</text>
+  <text x="190" y="214" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">bid-ask spread</text>
+  <text x="190" y="226" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">买低卖高赚差价</text>
+  <!-- Source 2 -->
+  <rect x="280" y="178" width="160" height="55" rx="5" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="360" y="198" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9">清算利润</text>
+  <text x="360" y="214" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">接管被清算头寸</text>
+  <text x="360" y="226" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">以折价获得仓位</text>
+  <!-- Source 3 -->
+  <rect x="450" y="178" width="160" height="55" rx="5" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="0.8"/>
+  <text x="530" y="198" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9">Funding 收入</text>
+  <text x="530" y="214" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">持仓方向有利时</text>
+  <text x="530" y="226" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">收取 funding</text>
+  <!-- Risk -->
+  <rect x="200" y="248" width="320" height="55" rx="5" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="360" y="268" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">风险: 做市亏损</text>
+  <text x="360" y="284" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">单边行情下库存偏斜 → 持有大量亏损方向的头寸</text>
+  <text x="360" y="296" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">极端情况: JELLY 事件暴露 HLP 做市风险, 团队紧急干预 (见第 11 节)</text>
+</svg>
+</div>
+
+<h3 id="5-2-HLP-vs-GMX-GLP-本质区别"><a href="#5-2-HLP-vs-GMX-GLP-本质区别" class="headerlink" title="5.2 HLP vs GMX GLP: 本质区别"></a>5.2 HLP vs GMX GLP: 本质区别</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>GMX GLP</th>
+<th>Hyperliquid HLP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>角色</td>
+<td>被动对手方</td>
+<td>主动做市</td>
+</tr>
+<tr>
+<td>策略</td>
+<td>无策略, 交易者赚 &#x3D; GLP 亏</td>
+<td>协议运行做市策略, 赚 spread</td>
+</tr>
+<tr>
+<td>风险来源</td>
+<td>交易者的盈亏 (零和)</td>
+<td>做市策略的库存风险</td>
+</tr>
+<tr>
+<td>收益模式</td>
+<td>手续费 + 交易者亏损</td>
+<td>手续费 + spread + 清算利润</td>
+</tr>
+<tr>
+<td>资产</td>
+<td>多种 (ETH, BTC, USDC…)</td>
+<td>仅 USDC</td>
+</tr>
+<tr>
+<td>赎回</td>
+<td>随时 (有冷却期)</td>
+<td>随时 (有冷却期)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>GLP</strong>: “你存钱进来, 交易者赢了你就亏, 交易者亏了你就赢.”<br><strong>HLP</strong>: “你存钱进来, 协议帮你做市赚差价, 但行情剧烈时可能亏.”</p>
+</blockquote>
+<h3 id="5-3-HLP-的子策略"><a href="#5-3-HLP-的子策略" class="headerlink" title="5.3 HLP 的子策略"></a>5.3 HLP 的子策略</h3><p>HLP vault 内部运行多个策略组件:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hyperliquidity</td>
+<td>在多个交易对提供流动性 (挂 bid&#x2F;ask)</td>
+</tr>
+<tr>
+<td>Liquidator</td>
+<td>接管被清算的仓位</td>
+</tr>
+<tr>
+<td>Clearinghouse</td>
+<td>处理 ADL 和风险管理</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>用户存入 USDC 后, 资金按比例分配到各策略, 收益也按比例分配.</p>
+<hr>
+<h2 id="六、保证金与清算"><a href="#六、保证金与清算" class="headerlink" title="六、保证金与清算"></a>六、保证金与清算</h2><blockquote>
+<p>详细的保证金&#x2F;清算机制见保证金管理与清算引擎. 这里只记录 Hyperliquid 的特殊实现.</p>
+</blockquote>
+<h3 id="6-1-保证金模式"><a href="#6-1-保证金模式" class="headerlink" title="6.1 保证金模式"></a>6.1 保证金模式</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cross Margin (默认)</td>
+<td>所有头寸共享保证金, 一个赚的可以 cover 另一个亏的</td>
+</tr>
+<tr>
+<td>Isolated Margin</td>
+<td>每个头寸独立保证金, 亏完就清算, 不影响其他头寸</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="6-2-Mark-Price"><a href="#6-2-Mark-Price" class="headerlink" title="6.2 Mark Price"></a>6.2 Mark Price</h3><figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs erlang"><span class="hljs-function"><span class="hljs-title">mark_price</span> <span class="hljs-params">(标记价格)</span> = <span class="hljs-title">median</span> <span class="hljs-params">(中位数)</span><span class="hljs-params">(binance_price, okx_price, bybit_price, ...)</span></span><br></code></pre></td></tr></table></figure>
+
+<p>Hyperliquid 的 mark price 由验证者节点从多个 CEX 拉取价格, 取 <strong>中位数</strong> (median).</p>
+<p>为什么用中位数而不是加权平均?</p>
+<ul>
+<li>中位数天然抗单个数据源异常 (一个 CEX 宕机或被操纵, 中位数不受影响)</li>
+<li>加权平均会被极端值拉偏</li>
+</ul>
+<h3 id="6-3-清算流程"><a href="#6-3-清算流程" class="headerlink" title="6.3 清算流程"></a>6.3 清算流程</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f472b6"/>
+    </marker>
+  </defs>
+  <rect width="720" height="280" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Hyperliquid 清算流程</text>
+  <!-- Step 1 -->
+  <rect x="40" y="50" width="140" height="50" rx="6" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="1"/>
+  <text x="110" y="72" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">保证金率 &lt; MM</text>
+  <text x="110" y="88" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">mark price 触发</text>
+  <line x1="180" y1="75" x2="218" y2="75" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 2 -->
+  <rect x="225" y="50" width="140" height="50" rx="6" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="1"/>
+  <text x="295" y="72" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9">协议自动清算</text>
+  <text x="295" y="88" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">无需外部 keeper</text>
+  <line x1="365" y1="75" x2="403" y2="75" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 3 -->
+  <rect x="410" y="50" width="140" height="50" rx="6" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="1"/>
+  <text x="480" y="72" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9">HLP 接管头寸</text>
+  <text x="480" y="88" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">或市场平仓</text>
+  <line x1="550" y1="75" x2="588" y2="75" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 4 -->
+  <rect x="595" y="50" width="100" height="50" rx="6" fill="#34d399" fill-opacity="0.12" stroke="#34d399" stroke-width="1"/>
+  <text x="645" y="72" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">结算</text>
+  <text x="645" y="88" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">盈余 → 保险基金</text>
+  <!-- Insurance Fund path -->
+  <rect x="200" y="130" width="320" height="50" rx="6" fill="#34d399" fill-opacity="0.08" stroke="#34d399" stroke-width="1"/>
+  <text x="360" y="152" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">Insurance Fund (保险基金)</text>
+  <text x="360" y="168" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">清算盈余存入, 清算亏损消耗</text>
+  <!-- ADL path -->
+  <line x1="360" y1="180" x2="360" y2="203" stroke="#f472b6" stroke-width="1" marker-end="url(#arr1)"/>
+  <text x="420" y="198" fill="#f472b6" font-family="monospace" font-size="7">保险基金不足时</text>
+  <rect x="230" y="210" width="260" height="45" rx="6" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="1"/>
+  <text x="360" y="232" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">ADL (自动减仓)</text>
+  <text x="360" y="248" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">强制让盈利最多的对手方减仓, 分摊损失</text>
+</svg>
+</div>
+
+<p><strong>Hyperliquid vs 其他协议的清算区别:</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>协议</th>
+<th>清算执行者</th>
+<th>清算激励</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GMX</td>
+<td>Keeper 网络 (外部)</td>
+<td>清算奖励</td>
+</tr>
+<tr>
+<td>dYdX v4</td>
+<td>任意链上交易 (外部)</td>
+<td>清算利润</td>
+</tr>
+<tr>
+<td><strong>Hyperliquid</strong></td>
+<td><strong>协议自动</strong> (内部)</td>
+<td><strong>无需外部激励</strong></td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>Hyperliquid 的清算由验证者节点自动执行, 不需要外部 keeper.<br>这降低了清算延迟, 但也意味着清算逻辑完全由协议控制 (不像 GMX&#x2F;dYdX 由竞争性 keeper 执行).</p>
+</blockquote>
+<hr>
+<h2 id="七、Funding-Rate"><a href="#七、Funding-Rate" class="headerlink" title="七、Funding Rate"></a>七、Funding Rate</h2><h3 id="7-1-结算频率"><a href="#7-1-结算频率" class="headerlink" title="7.1 结算频率"></a>7.1 结算频率</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>协议</th>
+<th>Funding 频率</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Binance &#x2F; OKX</td>
+<td>8h 离散结算</td>
+<td>每 8 小时结算一次</td>
+</tr>
+<tr>
+<td>dYdX v3</td>
+<td>8h 离散结算</td>
+<td>每 8 小时结算一次</td>
+</tr>
+<tr>
+<td>dYdX v4</td>
+<td>连续累积, 费率&#x2F;8h</td>
+<td>每个区块连续累积</td>
+</tr>
+<tr>
+<td><strong>Hyperliquid</strong></td>
+<td><strong>连续累积, 费率&#x2F;1h</strong></td>
+<td><strong>每个区块连续累积</strong></td>
+</tr>
+<tr>
+<td>GMX</td>
+<td>连续累积, 费率&#x2F;1h</td>
+<td>每个区块连续累积</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>Hyperliquid 每个区块连续累积 funding, 费率以 1h 为单位标注. 连续累积意味着:</p>
+<ul>
+<li>价格偏离被更快纠正</li>
+<li>不存在 “结算前抢跑” 的套利窗口</li>
+<li>套利者有更多机会参与</li>
+</ul>
+<h3 id="7-2-计算逻辑"><a href="#7-2-计算逻辑" class="headerlink" title="7.2 计算逻辑"></a>7.2 计算逻辑</h3><figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs mel">premium (溢价) = (mark_price (标记价格) - oracle_price (预言机价格)) / oracle_price<br><br>funding_rate (资金费率) = <span class="hljs-keyword">clamp</span>(premium, <span class="hljs-number">-0.05</span>%, +<span class="hljs-number">0.05</span>%)<br>               <span class="hljs-comment">// 每小时上限 ±0.05% (年化 ±438%)</span><br><br>funding_payment (资金支付) = position_size (头寸规模) × funding_rate<br><br><span class="hljs-comment">// 正 funding_rate: 多头付给空头</span><br><span class="hljs-comment">// 负 funding_rate: 空头付给多头</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="7-3-为什么连续累积比离散结算好"><a href="#7-3-为什么连续累积比离散结算好" class="headerlink" title="7.3 为什么连续累积比离散结算好?"></a>7.3 为什么连续累积比离散结算好?</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240">
+  <rect width="720" height="240" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Funding 累积频率对比</text>
+  <!-- 8h settlement -->
+  <rect x="30" y="45" width="320" height="80" rx="6" fill="#f472b6" fill-opacity="0.06" stroke="#f472b6" stroke-width="1"/>
+  <text x="190" y="62" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">8h 离散结算 (CEX / dYdX v3)</text>
+  <line x1="60" y1="100" x2="320" y2="100" stroke="#9ca3af" stroke-width="0.5"/>
+  <circle cx="60" cy="100" r="4" fill="#fbbf24"/>
+  <circle cx="190" cy="100" r="4" fill="#fbbf24"/>
+  <circle cx="320" cy="100" r="4" fill="#fbbf24"/>
+  <text x="60" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">0h</text>
+  <text x="190" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">8h</text>
+  <text x="320" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">16h</text>
+  <!-- 1h settlement -->
+  <rect x="370" y="45" width="320" height="80" rx="6" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="1"/>
+  <text x="530" y="62" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">连续累积, 费率/1h (Hyperliquid)</text>
+  <line x1="400" y1="100" x2="660" y2="100" stroke="#9ca3af" stroke-width="0.5"/>
+  <circle cx="400" cy="100" r="3" fill="#fbbf24"/>
+  <circle cx="432" cy="100" r="3" fill="#fbbf24"/>
+  <circle cx="464" cy="100" r="3" fill="#fbbf24"/>
+  <circle cx="496" cy="100" r="3" fill="#fbbf24"/>
+  <circle cx="528" cy="100" r="3" fill="#fbbf24"/>
+  <circle cx="560" cy="100" r="3" fill="#fbbf24"/>
+  <circle cx="592" cy="100" r="3" fill="#fbbf24"/>
+  <circle cx="624" cy="100" r="3" fill="#fbbf24"/>
+  <circle cx="656" cy="100" r="3" fill="#fbbf24"/>
+  <text x="400" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">0</text>
+  <text x="528" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">4h</text>
+  <text x="656" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">8h</text>
+  <!-- Explanation -->
+  <rect x="80" y="145" width="560" height="70" rx="6" fill="#ffffff" fill-opacity="0.03" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="360" y="168" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">8h 离散结算: 偏离可以累积 8 小时才被修正, 偏离幅度可能很大</text>
+  <text x="360" y="185" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">连续累积: 每个区块都修正, 价格锚定更紧密, 无结算前抢跑窗口</text>
+  <text x="360" y="202" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">trade-off: 更频繁的结算 = 更高的计算开销 (但 Hyperliquid 的 L1 性能足够支撑)</text>
+</svg>
+</div>
+
+<hr>
+<h2 id="八、Spot-交易"><a href="#八、Spot-交易" class="headerlink" title="八、Spot 交易"></a>八、Spot 交易</h2><p>Hyperliquid 不只做永续, 它也在链上运行了完整的 Spot 订单簿.</p>
+<h3 id="8-1-HIP-1-链上-Spot-Order-Book"><a href="#8-1-HIP-1-链上-Spot-Order-Book" class="headerlink" title="8.1 HIP-1: 链上 Spot Order Book"></a>8.1 HIP-1: 链上 Spot Order Book</h3><p>HIP-1 定义了 Hyperliquid L1 上的代币标准和 spot 交易规则:</p>
+<ul>
+<li>代币在 Hyperliquid L1 上原生发行</li>
+<li>交易通过链上订单簿完成 (与 perp 相同的撮合引擎)</li>
+<li>通过 bridge 与 Arbitrum 互通 (USDC 桥接)</li>
+</ul>
+<h3 id="8-2-HIP-2-Hyperliquidity-协议自有做市"><a href="#8-2-HIP-2-Hyperliquidity-协议自有做市" class="headerlink" title="8.2 HIP-2: Hyperliquidity (协议自有做市)"></a>8.2 HIP-2: Hyperliquidity (协议自有做市)</h3><p>HIP-2 是 Hyperliquid 的创新: <strong>协议自动为 spot 市场做市</strong>, 不依赖外部做市商.</p>
+<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs gauss">传统 spot DEX:<br>  新 <span class="hljs-built_in">token</span> 上线 → 需要找做市商 → 没人做市 → 流动性差 → 没人交易<br>  (冷启动问题)<br><br>Hyperliquid HIP<span class="hljs-number">-2</span>:<br>  新 <span class="hljs-built_in">token</span> 上线 → 协议自动做市 (protocol-owned liquidity)<br>  → 立即有流动性 → 用户可以交易<br></code></pre></td></tr></table></figure>
+
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Uniswap (AMM)</th>
+<th>Hyperliquid HIP-2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>模型</td>
+<td>x * y &#x3D; k</td>
+<td>订单簿 + 协议做市</td>
+</tr>
+<tr>
+<td>流动性来源</td>
+<td>LP 提供</td>
+<td>协议自有</td>
+</tr>
+<tr>
+<td>冷启动</td>
+<td>需要 LP 注入</td>
+<td>自动启动</td>
+</tr>
+<tr>
+<td>价格发现</td>
+<td>AMM 曲线</td>
+<td>订单簿 (更高效)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="8-3-Bridge"><a href="#8-3-Bridge" class="headerlink" title="8.3 Bridge"></a>8.3 Bridge</h3><p>Hyperliquid 通过 bridge 连接 Arbitrum:</p>
+<ul>
+<li>用户将 USDC 从 Arbitrum 桥接到 Hyperliquid L1</li>
+<li>提款时从 Hyperliquid L1 桥回 Arbitrum</li>
+<li>bridge 由验证者集合维护 (多签)</li>
+</ul>
+<p><strong>Q: Hyperliquid 上的 USDC 是 Circle 原生发行的吗?</strong></p>
+<p>不是. Hyperliquid 上的 USDC 是从 Arbitrum 桥接过来的, 不是 Circle 在 Hyperliquid 上原生发行的. bridge 安全性由 Hyperliquid 验证者集合保障 (多签), 不是 trustless 的. dYdX 也是类似情况, USDC 通过 Noble chain 经 IBC 转入, 也不是 Circle 直接发行.</p>
+<p>Circle 是否在某条链上原生发行 USDC, 本质上是对该链的信任背书. 目前 Circle 原生支持的链包括 Ethereum, Arbitrum, Base, Solana, Avalanche 等, 但不包括 Hyperliquid 和 dYdX chain.</p>
+<h3 id="8-4-代币的三种上线方式"><a href="#8-4-代币的三种上线方式" class="headerlink" title="8.4 代币的三种上线方式"></a>8.4 代币的三种上线方式</h3><p><strong>Q: Hyperliquid 上的代币有几种来源?</strong></p>
+<p>Hyperliquid 上的代币有三种来源:</p>
+<ol>
+<li><strong>跨链桥接 (Bridge)</strong>: 从 Arbitrum 桥接 USDC 到 Hyperliquid, 目前只支持 USDC 一种资产</li>
+<li><strong>原生层 HIP-1 代币</strong>: 通过荷兰拍卖 (Dutch Auction) 机制上币, 无需审批, 任何人出价竞拍 ticker 即可上线 spot 交易对</li>
+<li><strong>HyperEVM ERC20</strong>: 任何人都可以在 HyperEVM 上部署 Solidity 合约, 发行标准 ERC20 代币</li>
+</ol>
+<p>这三种方式对应 Hyperliquid 的双层架构:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 240">
+  <rect width="520" height="240" rx="8" fill="#1a1a2e"/>
+  <text x="260" y="22" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Hyperliquid 双层架构</text>
+  <!-- HyperEVM layer (top) -->
+  <rect x="30" y="38" width="460" height="85" rx="6" fill="#a78bfa" fill-opacity="0.08" stroke="#a78bfa" stroke-width="1"/>
+  <text x="260" y="58" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="10" font-weight="bold">HyperEVM (通用智能合约层)</text>
+  <text x="50" y="78" fill="#cbd5e1" font-family="monospace" font-size="8">- 任何人部署 Solidity 合约</text>
+  <text x="50" y="93" fill="#cbd5e1" font-family="monospace" font-size="8">- ERC20 代币</text>
+  <text x="50" y="108" fill="#cbd5e1" font-family="monospace" font-size="8">- DeFi 协议 (借贷, DEX 等)</text>
+  <text x="310" y="78" fill="#9ca3af" font-family="monospace" font-size="7">灵活 (任意 Solidity)</text>
+  <text x="310" y="93" fill="#9ca3af" font-family="monospace" font-size="7">性能受限于 EVM 执行开销</text>
+  <!-- Interop arrow -->
+  <line x1="230" y1="123" x2="230" y2="140" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3"/>
+  <line x1="290" y1="140" x2="290" y2="123" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3"/>
+  <text x="260" y="135" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">互操作</text>
+  <!-- Native layer (bottom) -->
+  <rect x="30" y="143" width="460" height="85" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="260" y="163" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">Hyperliquid Native (核心交易引擎)</text>
+  <text x="50" y="183" fill="#cbd5e1" font-family="monospace" font-size="8">- Perp 订单簿</text>
+  <text x="50" y="198" fill="#cbd5e1" font-family="monospace" font-size="8">- Spot 订单簿 (HIP-1)</text>
+  <text x="250" y="183" fill="#cbd5e1" font-family="monospace" font-size="8">- 协议做市 (HIP-2)</text>
+  <text x="250" y="198" fill="#cbd5e1" font-family="monospace" font-size="8">- Bridge (USDC)</text>
+  <text x="50" y="218" fill="#34d399" font-family="monospace" font-size="7">200ms 区块 | 100k+ orders/sec | 只运行预定义逻辑</text>
+</svg>
+</div>
+
+<p>Native 层性能极高 (200ms 区块, 100k+ orders&#x2F;sec), 但只能运行 Hyperliquid 预定义的逻辑. HyperEVM 层更灵活 (任意 Solidity), 但性能受限于 EVM 执行开销. 两层之间可以互操作.</p>
+<hr>
+<h2 id="九、HYPE-Token"><a href="#九、HYPE-Token" class="headerlink" title="九、HYPE Token"></a>九、HYPE Token</h2><h3 id="9-1-用途"><a href="#9-1-用途" class="headerlink" title="9.1 用途"></a>9.1 用途</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>用途</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Staking</td>
+<td>质押 HYPE 参与网络验证, 获得 staking 收益</td>
+</tr>
+<tr>
+<td>手续费折扣</td>
+<td>持有&#x2F;质押 HYPE 降低交易手续费</td>
+</tr>
+<tr>
+<td>治理</td>
+<td>未来可能用于协议治理 (目前治理权集中)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="9-2-空投"><a href="#9-2-空投" class="headerlink" title="9.2 空投"></a>9.2 空投</h3><p>2024 年 11 月, Hyperliquid 进行了大规模空投:</p>
+<ul>
+<li>基于历史交易量和协议使用情况</li>
+<li>总供应量 31% 分配给社区</li>
+<li>无 VC 轮次, 无 lockup (社区空投部分)</li>
+<li>被认为是 2024 年最大规模的空投之一</li>
+</ul>
+<hr>
+<h2 id="十、费率结构"><a href="#十、费率结构" class="headerlink" title="十、费率结构"></a>十、费率结构</h2><h3 id="10-1-Maker-Taker-分层费率"><a href="#10-1-Maker-Taker-分层费率" class="headerlink" title="10.1 Maker&#x2F;Taker 分层费率"></a>10.1 Maker&#x2F;Taker 分层费率</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>30d 交易量</th>
+<th>Maker</th>
+<th>Taker</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基础</td>
+<td>&lt; $5M</td>
+<td>0.01%</td>
+<td>0.035%</td>
+</tr>
+<tr>
+<td>VIP 1</td>
+<td>$5M ~ $25M</td>
+<td>0.008%</td>
+<td>0.03%</td>
+</tr>
+<tr>
+<td>VIP 2</td>
+<td>$25M ~ $100M</td>
+<td>0.006%</td>
+<td>0.025%</td>
+</tr>
+<tr>
+<td>VIP 3</td>
+<td>$100M ~ $500M</td>
+<td>0.004%</td>
+<td>0.02%</td>
+</tr>
+<tr>
+<td>VIP 4</td>
+<td>&gt; $500M</td>
+<td>0.002%</td>
+<td>0.015%</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>注: 费率随协议更新可能调整, 以上为参考值.</p>
+</blockquote>
+<p>特点:</p>
+<ul>
+<li>Maker 费率极低 (鼓励挂单提供流动性)</li>
+<li>与 CEX 相比, 整体费率有竞争力 (Binance maker 0.02%, taker 0.04%)</li>
+<li>HYPE staking 可获得额外折扣</li>
+</ul>
+<h3 id="10-2-Referral-System"><a href="#10-2-Referral-System" class="headerlink" title="10.2 Referral System"></a>10.2 Referral System</h3><ul>
+<li>推荐人获得被推荐人手续费的一定比例 (通常 ~10%)</li>
+<li>被推荐人获得手续费折扣 (~5%)</li>
+<li>referral code 绑定在地址上</li>
+</ul>
+<hr>
+<h2 id="十一、Go-与-Hyperliquid-API-交互"><a href="#十一、Go-与-Hyperliquid-API-交互" class="headerlink" title="十一、Go: 与 Hyperliquid API 交互"></a>十一、Go: 与 Hyperliquid API 交互</h2><p>Hyperliquid 提供 REST + WebSocket API. 以下用 Go 演示常见操作.</p>
+<h3 id="11-1-基础设置"><a href="#11-1-基础设置" class="headerlink" title="11.1 基础设置"></a>11.1 基础设置</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;bytes&quot;</span><br>	<span class="hljs-string">&quot;context&quot;</span><br>	<span class="hljs-string">&quot;encoding/json&quot;</span><br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;io&quot;</span><br>	<span class="hljs-string">&quot;log&quot;</span><br>	<span class="hljs-string">&quot;net/http&quot;</span><br>	<span class="hljs-string">&quot;time&quot;</span><br>)<br><br><span class="hljs-keyword">const</span> (<br>	baseURL = <span class="hljs-string">&quot;https://api.hyperliquid.xyz&quot;</span><br>	infoURL = baseURL + <span class="hljs-string">&quot;/info&quot;</span><br>)<br><br><span class="hljs-comment">// Client wraps HTTP client for Hyperliquid API.</span><br><span class="hljs-keyword">type</span> Client <span class="hljs-keyword">struct</span> &#123;<br>	http *http.Client<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewClient</span><span class="hljs-params">()</span></span> *Client &#123;<br>	<span class="hljs-keyword">return</span> &amp;Client&#123;<br>		http: &amp;http.Client&#123;Timeout: <span class="hljs-number">10</span> * time.Second&#125;,<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// post sends a POST request with JSON body to the info endpoint.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Client)</span></span> post(ctx context.Context, payload any) ([]<span class="hljs-type">byte</span>, <span class="hljs-type">error</span>) &#123;<br>	body, err := json.Marshal(payload)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;marshal payload: %w&quot;</span>, err)<br>	&#125;<br><br>	req, err := http.NewRequestWithContext(ctx, http.MethodPost, infoURL, bytes.NewReader(body))<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;create request: %w&quot;</span>, err)<br>	&#125;<br>	req.Header.Set(<span class="hljs-string">&quot;Content-Type&quot;</span>, <span class="hljs-string">&quot;application/json&quot;</span>)<br><br>	resp, err := c.http.Do(req)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;do request: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123; _ = resp.Body.Close() &#125;()<br><br>	data, err := io.ReadAll(resp.Body)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;read response: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">if</span> resp.StatusCode != http.StatusOK &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;unexpected status %d: %s&quot;</span>, resp.StatusCode, <span class="hljs-type">string</span>(data))<br>	&#125;<br>	<span class="hljs-keyword">return</span> data, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="11-2-读取-Order-Book-L2"><a href="#11-2-读取-Order-Book-L2" class="headerlink" title="11.2 读取 Order Book (L2)"></a>11.2 读取 Order Book (L2)</h3><blockquote>
+<p><strong>L2 &#x3D; Level 2 (二档行情)</strong>, 不是 Layer 2 (二层网络). 这是交易所 API 的通用术语:</p>
+<ul>
+<li><strong>L1 (Level 1)</strong>: 只返回最优买卖价 (best bid&#x2F;ask)</li>
+<li><strong>L2 (Level 2)</strong>: 返回多档聚合报价 (同一价格的订单合并, 显示总量和档数)</li>
+<li><strong>L3 (Level 3)</strong>: 返回每笔订单明细 (不聚合)</li>
+</ul>
+<p>CEX (Binance, OKX) 的 API 也用同样的 L1&#x2F;L2&#x2F;L3 命名.</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// L2Book represents the order book snapshot.</span><br><span class="hljs-keyword">type</span> L2Book <span class="hljs-keyword">struct</span> &#123;<br>	Levels [][]PriceLevel <span class="hljs-string">`json:&quot;levels&quot;`</span> <span class="hljs-comment">// [0]=bids, [1]=asks</span><br>&#125;<br><br><span class="hljs-keyword">type</span> PriceLevel <span class="hljs-keyword">struct</span> &#123;<br>	Px <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;px&quot;`</span> <span class="hljs-comment">// price</span><br>	Sz <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;sz&quot;`</span> <span class="hljs-comment">// size</span><br>	N  <span class="hljs-type">int</span>    <span class="hljs-string">`json:&quot;n&quot;`</span>  <span class="hljs-comment">// number of orders</span><br>&#125;<br><br><span class="hljs-comment">// GetL2Book fetches L2 order book for a given coin.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Client)</span></span> GetL2Book(ctx context.Context, coin <span class="hljs-type">string</span>) (*L2Book, <span class="hljs-type">error</span>) &#123;<br>	payload := <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]any&#123;<br>		<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;l2Book&quot;</span>,<br>		<span class="hljs-string">&quot;coin&quot;</span>: coin,<br>	&#125;<br>	data, err := c.post(ctx, payload)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;get l2 book: %w&quot;</span>, err)<br>	&#125;<br><br>	<span class="hljs-keyword">var</span> book L2Book<br>	<span class="hljs-keyword">if</span> err := json.Unmarshal(data, &amp;book); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;unmarshal l2 book: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">return</span> &amp;book, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="11-3-读取-Open-Interest-和-Funding-Rate"><a href="#11-3-读取-Open-Interest-和-Funding-Rate" class="headerlink" title="11.3 读取 Open Interest 和 Funding Rate"></a>11.3 读取 Open Interest 和 Funding Rate</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// Meta contains perpetual market metadata.</span><br><span class="hljs-keyword">type</span> Meta <span class="hljs-keyword">struct</span> &#123;<br>	Universe []AssetMeta <span class="hljs-string">`json:&quot;universe&quot;`</span><br>&#125;<br><br><span class="hljs-keyword">type</span> AssetMeta <span class="hljs-keyword">struct</span> &#123;<br>	Name          <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;name&quot;`</span><br>	SzDecimals    <span class="hljs-type">int</span>    <span class="hljs-string">`json:&quot;szDecimals&quot;`</span><br>	MaxLeverage   <span class="hljs-type">int</span>    <span class="hljs-string">`json:&quot;maxLeverage&quot;`</span><br>	OnlyIsolated  <span class="hljs-type">bool</span>   <span class="hljs-string">`json:&quot;onlyIsolated&quot;`</span><br>&#125;<br><br><span class="hljs-comment">// AssetCtx contains real-time context for an asset.</span><br><span class="hljs-keyword">type</span> AssetCtx <span class="hljs-keyword">struct</span> &#123;<br>	Funding    <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;funding&quot;`</span>    <span class="hljs-comment">// current funding rate</span><br>	OpenInterest <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;openInterest&quot;`</span> <span class="hljs-comment">// total OI in contracts</span><br>	PrevDayPx  <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;prevDayPx&quot;`</span><br>	DayNtlVlm  <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;dayNtlVlm&quot;`</span> <span class="hljs-comment">// 24h notional volume</span><br>	MarkPx     <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;markPx&quot;`</span><br>	MidPx      <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;midPx&quot;`</span><br>	OraclePx   <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;oraclePx&quot;`</span><br>&#125;<br><br><span class="hljs-comment">// MetaAndAssetCtx is the response from metaAndAssetCtxs.</span><br><span class="hljs-keyword">type</span> MetaAndAssetCtx <span class="hljs-keyword">struct</span> &#123;<br>	Meta      Meta       <span class="hljs-string">`json:&quot;-&quot;`</span><br>	AssetCtxs []AssetCtx <span class="hljs-string">`json:&quot;-&quot;`</span><br>&#125;<br><br><span class="hljs-comment">// GetMetaAndAssetCtxs fetches market metadata + real-time context.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Client)</span></span> GetMetaAndAssetCtxs(ctx context.Context) (*MetaAndAssetCtx, <span class="hljs-type">error</span>) &#123;<br>	payload := <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]any&#123;<br>		<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;metaAndAssetCtxs&quot;</span>,<br>	&#125;<br>	data, err := c.post(ctx, payload)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;get meta: %w&quot;</span>, err)<br>	&#125;<br><br>	<span class="hljs-comment">// Response is a JSON array: [meta, [assetCtx, ...]]</span><br>	<span class="hljs-keyword">var</span> raw []json.RawMessage<br>	<span class="hljs-keyword">if</span> err := json.Unmarshal(data, &amp;raw); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;unmarshal outer: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(raw) != <span class="hljs-number">2</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;expected 2 elements, got %d&quot;</span>, <span class="hljs-built_in">len</span>(raw))<br>	&#125;<br><br>	result := &amp;MetaAndAssetCtx&#123;&#125;<br>	<span class="hljs-keyword">if</span> err := json.Unmarshal(raw[<span class="hljs-number">0</span>], &amp;result.Meta); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;unmarshal meta: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">if</span> err := json.Unmarshal(raw[<span class="hljs-number">1</span>], &amp;result.AssetCtxs); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;unmarshal asset ctxs: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">return</span> result, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="11-4-查询用户持仓"><a href="#11-4-查询用户持仓" class="headerlink" title="11.4 查询用户持仓"></a>11.4 查询用户持仓</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// UserState contains a user&#x27;s account and positions.</span><br><span class="hljs-keyword">type</span> UserState <span class="hljs-keyword">struct</span> &#123;<br>	AssetPositions []AssetPosition <span class="hljs-string">`json:&quot;assetPositions&quot;`</span><br>	CrossMarginSummary MarginSummary <span class="hljs-string">`json:&quot;crossMarginSummary&quot;`</span><br>&#125;<br><br><span class="hljs-keyword">type</span> AssetPosition <span class="hljs-keyword">struct</span> &#123;<br>	Position Position <span class="hljs-string">`json:&quot;position&quot;`</span><br>	Type     <span class="hljs-type">string</span>   <span class="hljs-string">`json:&quot;type&quot;`</span><br>&#125;<br><br><span class="hljs-keyword">type</span> Position <span class="hljs-keyword">struct</span> &#123;<br>	Coin           <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;coin&quot;`</span><br>	Szi            <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;szi&quot;`</span>            <span class="hljs-comment">// signed size (negative = short)</span><br>	EntryPx        <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;entryPx&quot;`</span><br>	PositionValue  <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;positionValue&quot;`</span><br>	UnrealizedPnl  <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;unrealizedPnl&quot;`</span><br>	Leverage       Leverage <span class="hljs-string">`json:&quot;leverage&quot;`</span><br>&#125;<br><br><span class="hljs-keyword">type</span> Leverage <span class="hljs-keyword">struct</span> &#123;<br>	Type  <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;type&quot;`</span>  <span class="hljs-comment">// &quot;cross&quot; or &quot;isolated&quot;</span><br>	Value <span class="hljs-type">int</span>    <span class="hljs-string">`json:&quot;value&quot;`</span> <span class="hljs-comment">// leverage multiplier</span><br>&#125;<br><br><span class="hljs-keyword">type</span> MarginSummary <span class="hljs-keyword">struct</span> &#123;<br>	AccountValue    <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;accountValue&quot;`</span><br>	TotalMarginUsed <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;totalMarginUsed&quot;`</span><br>	TotalNtlPos     <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;totalNtlPos&quot;`</span><br>&#125;<br><br><span class="hljs-comment">// GetUserState fetches positions and margin info for an address.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Client)</span></span> GetUserState(ctx context.Context, address <span class="hljs-type">string</span>) (*UserState, <span class="hljs-type">error</span>) &#123;<br>	payload := <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]any&#123;<br>		<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;clearinghouseState&quot;</span>,<br>		<span class="hljs-string">&quot;user&quot;</span>: address,<br>	&#125;<br>	data, err := c.post(ctx, payload)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;get user state: %w&quot;</span>, err)<br>	&#125;<br><br>	<span class="hljs-keyword">var</span> state UserState<br>	<span class="hljs-keyword">if</span> err := json.Unmarshal(data, &amp;state); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;unmarshal user state: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">return</span> &amp;state, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="11-5-使用示例"><a href="#11-5-使用示例" class="headerlink" title="11.5 使用示例"></a>11.5 使用示例</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	client := NewClient()<br>	ctx := context.Background()<br><br>	<span class="hljs-comment">// 1. 读取 ETH order book</span><br>	book, err := client.GetL2Book(ctx, <span class="hljs-string">&quot;ETH&quot;</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatalf(<span class="hljs-string">&quot;get order book: %v&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(book.Levels) == <span class="hljs-number">2</span> &amp;&amp; <span class="hljs-built_in">len</span>(book.Levels[<span class="hljs-number">0</span>]) &gt; <span class="hljs-number">0</span> &#123;<br>		fmt.Printf(<span class="hljs-string">&quot;ETH best bid: %s, best ask: %s\n&quot;</span>,<br>			book.Levels[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>].Px, book.Levels[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>].Px)<br>	&#125;<br><br>	<span class="hljs-comment">// 2. 读取所有市场的 funding rate 和 OI</span><br>	meta, err := client.GetMetaAndAssetCtxs(ctx)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatalf(<span class="hljs-string">&quot;get meta: %v&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">for</span> i, asset := <span class="hljs-keyword">range</span> meta.Meta.Universe &#123;<br>		<span class="hljs-keyword">if</span> i &gt;= <span class="hljs-built_in">len</span>(meta.AssetCtxs) &#123;<br>			<span class="hljs-keyword">break</span><br>		&#125;<br>		actx := meta.AssetCtxs[i]<br>		fmt.Printf(<span class="hljs-string">&quot;%-8s  funding: %s  OI: %s  mark: %s\n&quot;</span>,<br>			asset.Name, actx.Funding, actx.OpenInterest, actx.MarkPx)<br>	&#125;<br><br>	<span class="hljs-comment">// 3. 查询用户持仓</span><br>	state, err := client.GetUserState(ctx, <span class="hljs-string">&quot;0x...&quot;</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatalf(<span class="hljs-string">&quot;get user state: %v&quot;</span>, err)<br>	&#125;<br>	fmt.Printf(<span class="hljs-string">&quot;Account value: %s\n&quot;</span>, state.CrossMarginSummary.AccountValue)<br>	<span class="hljs-keyword">for</span> _, ap := <span class="hljs-keyword">range</span> state.AssetPositions &#123;<br>		p := ap.Position<br>		fmt.Printf(<span class="hljs-string">&quot;  %s: size=%s entry=%s pnl=%s\n&quot;</span>,<br>			p.Coin, p.Szi, p.EntryPx, p.UnrealizedPnl)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="11-6-WebSocket-订阅"><a href="#11-6-WebSocket-订阅" class="headerlink" title="11.6 WebSocket 订阅"></a>11.6 WebSocket 订阅</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// WebSocket endpoint</span><br><span class="hljs-keyword">const</span> wsURL = <span class="hljs-string">&quot;wss://api.hyperliquid.xyz/ws&quot;</span><br><br><span class="hljs-comment">// Subscribe message format:</span><br><span class="hljs-comment">// &#123;&quot;method&quot;: &quot;subscribe&quot;, &quot;subscription&quot;: &#123;&quot;type&quot;: &quot;l2Book&quot;, &quot;coin&quot;: &quot;ETH&quot;&#125;&#125;</span><br><span class="hljs-comment">// &#123;&quot;method&quot;: &quot;subscribe&quot;, &quot;subscription&quot;: &#123;&quot;type&quot;: &quot;trades&quot;, &quot;coin&quot;: &quot;ETH&quot;&#125;&#125;</span><br><span class="hljs-comment">// &#123;&quot;method&quot;: &quot;subscribe&quot;, &quot;subscription&quot;: &#123;&quot;type&quot;: &quot;userEvents&quot;, &quot;user&quot;: &quot;0x...&quot;&#125;&#125;</span><br><br><span class="hljs-comment">// Example subscription payload:</span><br><span class="hljs-keyword">type</span> WSSubscription <span class="hljs-keyword">struct</span> &#123;<br>	Method       <span class="hljs-type">string</span>            <span class="hljs-string">`json:&quot;method&quot;`</span><br>	Subscription <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;subscription&quot;`</span><br>&#125;<br><br><span class="hljs-comment">// 实际使用时, 推荐用 gorilla/websocket 或 nhooyr.io/websocket 库连接.</span><br><span class="hljs-comment">// 伪代码:</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">//   conn, _, err := websocket.Dial(ctx, wsURL, nil)</span><br><span class="hljs-comment">//   sub := WSSubscription&#123;</span><br><span class="hljs-comment">//       Method: &quot;subscribe&quot;,</span><br><span class="hljs-comment">//       Subscription: map[string]string&#123;</span><br><span class="hljs-comment">//           &quot;type&quot;: &quot;l2Book&quot;,</span><br><span class="hljs-comment">//           &quot;coin&quot;: &quot;ETH&quot;,</span><br><span class="hljs-comment">//       &#125;,</span><br><span class="hljs-comment">//   &#125;</span><br><span class="hljs-comment">//   _ = wsjson.Write(ctx, conn, sub)</span><br><span class="hljs-comment">//   for &#123;</span><br><span class="hljs-comment">//       var msg json.RawMessage</span><br><span class="hljs-comment">//       _ = wsjson.Read(ctx, conn, &amp;msg)</span><br><span class="hljs-comment">//       // process msg...</span><br><span class="hljs-comment">//   &#125;</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十二、风险与争议"><a href="#十二、风险与争议" class="headerlink" title="十二、风险与争议"></a>十二、风险与争议</h2><h3 id="12-1-中心化程度"><a href="#12-1-中心化程度" class="headerlink" title="12.1 中心化程度"></a>12.1 中心化程度</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>现状</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>验证者数量</td>
+<td>有限 (远少于 Ethereum 的数千节点)</td>
+</tr>
+<tr>
+<td>代码</td>
+<td>未开源 (Rust 实现, 不可审计)</td>
+</tr>
+<tr>
+<td>治理</td>
+<td>团队主导, 无链上治理</td>
+</tr>
+<tr>
+<td>Bridge</td>
+<td>验证者多签, 非 trustless</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>虽然 Hyperliquid 声称 “链上透明”, 但核心代码未开源, 用户无法验证撮合引擎是否真的公平.<br>这是一个 <strong>信任假设</strong>: 你信任验证者集合不会作恶.</p>
+</blockquote>
+<h3 id="12-2-JELLY-事件-2025-年-3-月"><a href="#12-2-JELLY-事件-2025-年-3-月" class="headerlink" title="12.2 JELLY 事件 (2025 年 3 月)"></a>12.2 JELLY 事件 (2025 年 3 月)</h3><p>2025 年 3 月发生的 JELLY 事件是 Hyperliquid 迄今最大的争议, 也是典型的 “市场操纵 + 强制清算转嫁” 攻击.</p>
+<p><strong>攻击对象</strong>: JELLY (JellyJelly), 一个极小市值的 meme token, 流动性极差, 价格容易被操纵.</p>
+<p><strong>攻击步骤:</strong></p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">第 1 步</span><span class="hljs-punctuation">:</span> <span class="hljs-string">建立巨额空头</span><br>  <span class="hljs-attribute">在 Hyperliquid 上做空 JELLY, 仓位远超正常水平</span><br><span class="hljs-attribute">  例</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$5M 保证金, 10x 杠杆, 做空 $50M 的 JELLY</span><br><br><span class="hljs-attribute">第 2 步</span><span class="hljs-punctuation">:</span> <span class="hljs-string">拉盘</span><br>  <span class="hljs-attribute">自己在现货市场 (链上 DEX) 大量买入 JELLY</span><br><span class="hljs-attribute">  JELLY 市值本来就小, 几百万美元就能把价格拉起来</span><br><span class="hljs-attribute">  → 攻击者在现货端赚了</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">第 3 步</span><span class="hljs-punctuation">:</span> <span class="hljs-string">等空头被清算</span><br>  <span class="hljs-attribute">价格被拉高 → 攻击者自己的空头仓位爆仓</span><br><span class="hljs-attribute">  但攻击者根本不在乎, 他故意让自己被清算</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">  关键</span><span class="hljs-punctuation">:</span> <span class="hljs-string">清算后这个巨额空头仓位去哪了?</span><br>  <span class="hljs-attribute">→ HLP (协议做市 vault) 自动接盘! 被迫持有这个巨额空头</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">结果</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">JELLY 价格还在高位 → HLP 持有的空头巨亏</span><br><span class="hljs-attribute">  攻击者</span><span class="hljs-punctuation">:</span> <span class="hljs-string">现货端赚的钱 &gt; 空头保证金的损失 → 净赚</span><br>  HLP 用户 (存 USDC 的普通人) → 承担亏损<br></code></pre></td></tr></table></figure>
+
+<p><strong>攻击成功的三个条件 (缺一不可):</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>条件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>小市值 token 上了永续合约</td>
+<td>现货流动性差, 容易操纵价格</td>
+</tr>
+<tr>
+<td>OI 上限 (Open Interest Cap) 设置过高</td>
+<td>允许建立与市值不匹配的巨额仓位 (如市值 $10M 却允许 $50M 空头)</td>
+</tr>
+<tr>
+<td>HLP 自动接管清算仓位</td>
+<td>攻击者利用此机制把 “毒仓位” 转移给 HLP</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>团队应对 (争议核心):</strong></p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs markdown">团队做了什么:<br><span class="hljs-bullet">  1.</span> 紧急下架 JELLY 永续合约<br><span class="hljs-bullet">  2.</span> 以 &quot;团队认为合理的价格&quot; 强制结算所有 JELLY 仓位<br><span class="hljs-bullet">  3.</span> HLP 的亏损被部分挽回<br><br>为什么有争议:<br><span class="hljs-bullet">  -</span> &quot;合理价格&quot; 由团队单方面决定, 非市场价格<br><span class="hljs-bullet">  -</span> 链上交易的不可篡改性被绕过: 直接改了结算价格<br><span class="hljs-bullet">  -</span> 本质上与 CEX &quot;拔网线&quot; 无异<br></code></pre></td></tr></table></figure>
+
+<p><strong>问题:</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>市场操纵</td>
+<td>攻击者利用小市值 token 的低流动性, 联动现货和永续两个市场</td>
+</tr>
+<tr>
+<td>HLP 风险暴露</td>
+<td>HLP 作为清算接收方, 被迫持有高风险头寸, 成为定向攻击目标</td>
+</tr>
+<tr>
+<td>中心化干预</td>
+<td>团队单方面下架 token 并以自定价格强制结算, 违背去中心化原则</td>
+</tr>
+<tr>
+<td>信任危机</td>
+<td>“链上透明” 的叙事被动摇: 关键时刻团队可以直接干预</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>教训:</strong></p>
+<ul>
+<li>链上订单簿不等于去中心化: 如果运营方能单方面干预, 本质上与 CEX 无异</li>
+<li>HLP 的风险不只是做市亏损: 作为清算接收方, 面临被定向攻击的风险</li>
+<li>小市值 token 的 OI 上限需要严格控制, 应与现货市值挂钩</li>
+</ul>
+<p><strong>vs GMX</strong>: GMX 的 Oracle 模型 (Chainlink 多源聚合) 不容易被单个 DEX 的价格操纵影响; Hyperliquid 的链上订单簿直接反映市场价格, 被操纵了就是被操纵了</p>
+<h3 id="12-3-审计状况"><a href="#12-3-审计状况" class="headerlink" title="12.3 审计状况"></a>12.3 审计状况</h3><ul>
+<li>核心代码未开源, 难以进行完整审计</li>
+<li>团队声称内部有安全审计流程, 但缺乏第三方独立审计报告</li>
+<li>智能合约 (bridge 等) 部分有审计</li>
+</ul>
+<hr>
+<h2 id="十三、小结"><a href="#十三、小结" class="headerlink" title="十三、小结"></a>十三、小结</h2><h3 id="13-1-Hyperliquid-的定位"><a href="#13-1-Hyperliquid-的定位" class="headerlink" title="13.1 Hyperliquid 的定位"></a>13.1 Hyperliquid 的定位</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 350" fill="none">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+  <rect width="580" height="350" rx="8" fill="#1a1a2e"/>
+  <!-- Dashed regions (draw first, behind everything) -->
+  <rect x="100" y="42" width="370" height="65" rx="8" stroke="#f59e0b" stroke-width="0.8" stroke-dasharray="4 3" fill="#f59e0b" fill-opacity="0.05"/>
+  <text x="285" y="100" text-anchor="middle" fill="#f59e0b" font-family="monospace" font-size="7" fill-opacity="0.6">订单簿 + 高性能区</text>
+  <rect x="230" y="175" width="270" height="110" rx="8" stroke="#f472b6" stroke-width="0.8" stroke-dasharray="4 3" fill="#f472b6" fill-opacity="0.05"/>
+  <text x="365" y="278" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7" fill-opacity="0.6">DeFi 原生区</text>
+  <!-- Axes -->
+  <line x1="80" y1="310" x2="518" y2="310" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="80" y1="310" x2="80" y2="32" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- Axis labels -->
+  <text x="530" y="314" fill="#9ca3af" font-family="monospace" font-size="10">去中心化</text>
+  <text x="30" y="28" fill="#9ca3af" font-family="monospace" font-size="10">性能</text>
+  <!-- CEX (Binance) - high perf, low decentralization -->
+  <circle cx="130" cy="53" r="5" fill="#f59e0b"/>
+  <text x="143" y="56" fill="#f59e0b" font-family="monospace" font-size="10" font-weight="bold">CEX (Binance)</text>
+  <text x="143" y="70" fill="#6b7280" font-family="monospace" font-size="8">最快, 但完全中心化</text>
+  <!-- Hyperliquid - high perf, medium decentralization -->
+  <circle cx="300" cy="65" r="5" fill="#5eead4"/>
+  <text x="313" y="68" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">Hyperliquid</text>
+  <text x="313" y="82" fill="#6b7280" font-family="monospace" font-size="8">~200ms, 少量验证者</text>
+  <!-- dYdX v4 - medium-high perf, medium-high decentralization -->
+  <circle cx="350" cy="133" r="5" fill="#818cf8"/>
+  <text x="363" y="136" fill="#818cf8" font-family="monospace" font-size="10" font-weight="bold">dYdX v4</text>
+  <text x="363" y="150" fill="#6b7280" font-family="monospace" font-size="8">Cosmos 验证者网络</text>
+  <!-- GMX - low perf, high decentralization -->
+  <circle cx="260" cy="193" r="5" fill="#f472b6"/>
+  <text x="273" y="196" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">GMX</text>
+  <text x="273" y="210" fill="#6b7280" font-family="monospace" font-size="8">Arbitrum L2, Oracle 定价</text>
+  <!-- vAMM - lowest perf, medium decentralization -->
+  <circle cx="300" cy="241" r="5" fill="#a78bfa"/>
+  <text x="313" y="244" fill="#a78bfa" font-family="monospace" font-size="10" font-weight="bold">vAMM</text>
+  <text x="313" y="258" fill="#6b7280" font-family="monospace" font-size="8">L1 上链, 受 gas 限制</text>
+</svg>
+</div>
+
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>优势</th>
+<th>劣势</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CEX 级别性能 (~200ms)</td>
+<td>验证者数量有限, 偏中心化</td>
+</tr>
+<tr>
+<td>完全链上订单簿, 可审计</td>
+<td>代码未开源</td>
+</tr>
+<tr>
+<td>HLP vault 创新做市模式</td>
+<td>HLP 面临被定向攻击风险 (JELLY)</td>
+</tr>
+<tr>
+<td>连续累积 funding (费率&#x2F;1h), 价格锚定更紧</td>
+<td>Bridge 依赖验证者多签</td>
+</tr>
+<tr>
+<td>大规模社区空投</td>
+<td>关键时刻团队可单方面干预</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="13-2-核心问题"><a href="#13-2-核心问题" class="headerlink" title="13.2 核心问题"></a>13.2 核心问题</h3><blockquote>
+<p>Hyperliquid 本质上是一个 <strong>“由少数验证者运行的高性能订单簿”</strong>.<br>它比传统 DeFi 更快, 比 CEX 更透明, 但它真的去中心化吗?<br>JELLY 事件表明, 当危机发生时, 它的行为与中心化交易所并无二致.</p>
+</blockquote>
+<hr>
+<p><strong>下一步</strong>: → <a href="/2025/10/05/perp-mev/">永续合约中的 MEV</a> - 清算 MEV, Oracle 抢跑, 跨市场套利.</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/web3/" class="category-chain-item">Web3</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/web3/" class="print-no-link">#Web3</a>
+      
+        <a href="/tags/%E6%B0%B8%E7%BB%AD%E5%90%88%E7%BA%A6/" class="print-no-link">#永续合约</a>
+      
+        <a href="/tags/hyperliquid/" class="print-no-link">#Hyperliquid</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>永续合约 06 - Hyperliquid 深度解析</div>
+      <div>https://mritd.com/2025/09/20/perp-hyperliquid/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年9月20日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/10/05/perp-mev/" title="永续合约 07 - 永续合约中的 MEV">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">永续合约 07 - 永续合约中的 MEV</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/09/06/perp-vamm/" title="永续合约 05 - vAMM 永续合约演进史">
+                        <span class="hidden-mobile">永续合约 05 - vAMM 永续合约演进史</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2025/09/20/perp-hyperliquid/';
+          this.page.identifier = '/2025/09/20/perp-hyperliquid/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

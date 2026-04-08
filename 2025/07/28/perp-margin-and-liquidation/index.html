@@ -1,0 +1,1639 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="Web3,永续合约,保证金,清算,ADL,保险基金">
+  
+    <meta name="description" content="本文介绍永续合约保证金管理以及清算引擎相关实现, 包括全仓逐仓选择, 仓位清算时机以及后续的 ADL 保险基金等问题, 搞清楚 &quot;爆仓&quot; 背后的完整链路">
+<meta property="og:type" content="article">
+<meta property="og:title" content="永续合约 02 - 保证金管理与清算引擎">
+<meta property="og:url" content="https://mritd.com/2025/07/28/perp-margin-and-liquidation/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="本文介绍永续合约保证金管理以及清算引擎相关实现, 包括全仓逐仓选择, 仓位清算时机以及后续的 ADL 保险基金等问题, 搞清楚 &quot;爆仓&quot; 背后的完整链路">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/perp-margin.svg">
+<meta property="article:published_time" content="2025-07-28T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-07-28T02:00:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="Web3">
+<meta property="article:tag" content="保证金">
+<meta property="article:tag" content="永续合约">
+<meta property="article:tag" content="清算">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/perp-margin.svg">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>永续合约 02 - 保证金管理与清算引擎 - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="永续合约 02 - 保证金管理与清算引擎"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-07-28 10:00" pubdate>
+          2025年7月28日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          19k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          158 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">永续合约 02 - 保证金管理与清算引擎</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>本文介绍永续合约的保证金管理和清算机制. 从全仓与逐仓保证金的区别讲起, 推导清算价格公式, 然后介绍保险基金不够赔付时 ADL (Auto-Deleveraging) 的介入流程, 附 Solidity 和 Go 的实现示例.</p>
+<h2 id="一、术语表"><a href="#一、术语表" class="headerlink" title="一、术语表"></a>一、术语表</h2><h3 id="1-1-保证金"><a href="#1-1-保证金" class="headerlink" title="1.1 保证金"></a>1.1 保证金</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>保证金</td>
+<td>Margin &#x2F; Collateral</td>
+<td>开仓时抵押的资金, 作为履约担保</td>
+</tr>
+<tr>
+<td>初始保证金</td>
+<td>Initial Margin (IM)</td>
+<td>开仓所需的最低保证金, <code>IM = position_size / leverage</code></td>
+</tr>
+<tr>
+<td>维持保证金</td>
+<td>Maintenance Margin (MM)</td>
+<td>持仓所需的最低保证金, <code>MM = position_size × MMR</code></td>
+</tr>
+<tr>
+<td>维持保证金率</td>
+<td>Maintenance Margin Rate (MMR)</td>
+<td>协议规定的最低保证金比例, 通常 0.5%~5%</td>
+</tr>
+<tr>
+<td>保证金率</td>
+<td>Margin Ratio</td>
+<td><code>margin / position_size</code>, 低于 MMR 时触发清算</td>
+</tr>
+<tr>
+<td>全仓保证金</td>
+<td>Cross Margin</td>
+<td>账户所有可用余额共同担保所有仓位</td>
+</tr>
+<tr>
+<td>逐仓保证金</td>
+<td>Isolated Margin</td>
+<td>每个仓位独立分配保证金, 亏损不影响其他仓位</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-2-清算"><a href="#1-2-清算" class="headerlink" title="1.2 清算"></a>1.2 清算</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>清算</td>
+<td>Liquidation</td>
+<td>保证金率跌至 MMR 时, 协议强制平仓</td>
+</tr>
+<tr>
+<td>清算价格</td>
+<td>Liquidation Price</td>
+<td>触发清算的标记价格</td>
+</tr>
+<tr>
+<td>穿仓</td>
+<td>Bankruptcy &#x2F; Negative Equity</td>
+<td>清算后仍然亏损, 保证金不足以覆盖损失</td>
+</tr>
+<tr>
+<td>清算人</td>
+<td>Liquidator &#x2F; Keeper</td>
+<td>执行清算操作的链上角色, 任何人都可以做</td>
+</tr>
+<tr>
+<td>清算罚金</td>
+<td>Liquidation Penalty &#x2F; Fee</td>
+<td>被清算者支付的额外费用, 作为 Keeper 奖励</td>
+</tr>
+<tr>
+<td>部分清算</td>
+<td>Partial Liquidation</td>
+<td>只平掉一部分仓位, 使保证金率恢复到安全水平</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-3-ADL-与保险基金"><a href="#1-3-ADL-与保险基金" class="headerlink" title="1.3 ADL 与保险基金"></a>1.3 ADL 与保险基金</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>自动减仓</td>
+<td>Auto-Deleveraging (ADL)</td>
+<td>保险基金不足时, 强制减少盈利方的仓位来覆盖穿仓损失</td>
+</tr>
+<tr>
+<td>保险基金</td>
+<td>Insurance Fund</td>
+<td>协议储备金, 用于覆盖穿仓损失</td>
+</tr>
+<tr>
+<td>社会化亏损</td>
+<td>Socialized Loss</td>
+<td>穿仓损失由所有交易者按比例分摊 (ADL 的替代方案, 体验更差)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-4-易混淆-“维持保证金率”-vs-“资金费率”"><a href="#1-4-易混淆-“维持保证金率”-vs-“资金费率”" class="headerlink" title="1.4 易混淆: “维持保证金率” vs “资金费率”"></a>1.4 易混淆: “维持保证金率” vs “资金费率”</h3><p>这两个名词都带 “率”, 但完全不是一回事:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>维持保证金率 (MMR)</th>
+<th>资金费率 (Funding Rate)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>英文</td>
+<td>Maintenance Margin Rate</td>
+<td>Funding Rate</td>
+</tr>
+<tr>
+<td>是什么</td>
+<td>协议规定的<strong>最低保证金比例</strong></td>
+<td>多空双方之间的<strong>周期性费用</strong></td>
+</tr>
+<tr>
+<td>谁定的</td>
+<td>协议固定 (0.5%~5%), 和行情无关</td>
+<td>市场动态计算, 随多空比例变化</td>
+</tr>
+<tr>
+<td>作用</td>
+<td>决定<strong>何时被清算</strong></td>
+<td>让合约价格<strong>锚定</strong>现货价格</td>
+</tr>
+<tr>
+<td>触发时机</td>
+<td>每次标记价格变动时持续检查</td>
+<td>按固定周期结算 (CEX 8h, HL&#x2F;dYdX 1h)</td>
+</tr>
+<tr>
+<td>方向</td>
+<td>无方向, 是一个阈值</td>
+<td>有方向: 正&#x3D;多头付空头, 负&#x3D;空头付多头</td>
+</tr>
+<tr>
+<td>对保证金的影响</td>
+<td>跌破 → 强制清算</td>
+<td>扣减或增加保证金余额</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>一句话区分: <strong>MMR 决定你 “什么时候爆仓”, Funding Rate 决定你 “持仓要付多少钱”</strong>.</p>
+<p>资金费率的计算公式和验证代码见<strong>永续合约机制详解 §7.3</strong>, 链上数据获取见<strong>永续合约数据解析实战</strong>.</p>
+</blockquote>
+<hr>
+<h2 id="二、保证金类型"><a href="#二、保证金类型" class="headerlink" title="二、保证金类型"></a>二、保证金类型</h2><h3 id="2-1-Cross-Margin-vs-Isolated-Margin"><a href="#2-1-Cross-Margin-vs-Isolated-Margin" class="headerlink" title="2.1 Cross Margin vs Isolated Margin"></a>2.1 Cross Margin vs Isolated Margin</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#818cf8"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f472b6"/>
+    </marker>
+  </defs>
+  <rect width="720" height="380" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Cross Margin vs Isolated Margin</text>
+  <!-- Cross Margin -->
+  <rect x="30" y="45" width="320" height="310" rx="6" fill="#818cf8" fill-opacity="0.08" stroke="#818cf8" stroke-width="1"/>
+  <text x="190" y="68" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="10" font-weight="bold">Cross Margin (全仓)</text>
+  <!-- Account balance pool -->
+  <rect x="50" y="82" width="280" height="40" rx="5" fill="#818cf8" fill-opacity="0.12" stroke="#818cf8" stroke-width="1"/>
+  <text x="190" y="106" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">Account Balance: $10,000</text>
+  <!-- Arrows from pool to positions -->
+  <line x1="120" y1="122" x2="120" y2="143" stroke="#818cf8" stroke-width="1" marker-end="url(#arr0)"/>
+  <line x1="260" y1="122" x2="260" y2="143" stroke="#818cf8" stroke-width="1" marker-end="url(#arr0)"/>
+  <text x="190" y="138" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">共享保证金池</text>
+  <!-- Position A -->
+  <rect x="50" y="150" width="130" height="60" rx="5" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1"/>
+  <text x="115" y="170" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">ETH Long 10x</text>
+  <text x="115" y="185" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Size: $5,000</text>
+  <text x="115" y="198" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">PnL: -$800</text>
+  <!-- Position B -->
+  <rect x="200" y="150" width="130" height="60" rx="5" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="265" y="170" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">BTC Short 5x</text>
+  <text x="265" y="185" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Size: $3,000</text>
+  <text x="265" y="198" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="7">PnL: +$500</text>
+  <!-- Pro/Con -->
+  <text x="50" y="235" fill="#34d399" font-family="monospace" font-size="7">+ 资金利用率高, 盈利仓保护亏损仓</text>
+  <text x="50" y="250" fill="#34d399" font-family="monospace" font-size="7">+ 清算价更远, 不易被清算</text>
+  <text x="50" y="270" fill="#f472b6" font-family="monospace" font-size="7">- 一个仓位爆仓可能拖垮整个账户</text>
+  <text x="50" y="285" fill="#f472b6" font-family="monospace" font-size="7">- 风险隔离差</text>
+  <text x="190" y="315" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="7">effective_margin = balance + Σ(unrealized_pnl)</text>
+  <text x="190" y="330" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">= $10,000 + (-$800) + $500 = $9,700</text>
+  <text x="190" y="345" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">BTC 的盈利帮 ETH 的亏损 "扛" 着</text>
+  <!-- Isolated Margin -->
+  <rect x="370" y="45" width="320" height="310" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="530" y="68" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">Isolated Margin (逐仓)</text>
+  <!-- Account balance -->
+  <rect x="390" y="82" width="280" height="40" rx="5" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="1"/>
+  <text x="530" y="106" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">Account Balance: $10,000</text>
+  <!-- Split arrows -->
+  <line x1="460" y1="122" x2="460" y2="143" stroke="#f472b6" stroke-width="1" stroke-dasharray="3" marker-end="url(#arr1)"/>
+  <line x1="600" y1="122" x2="600" y2="143" stroke="#f472b6" stroke-width="1" stroke-dasharray="3" marker-end="url(#arr1)"/>
+  <text x="530" y="138" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">独立分配</text>
+  <!-- Position A -->
+  <rect x="390" y="150" width="130" height="60" rx="5" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1"/>
+  <text x="455" y="170" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">ETH Long 10x</text>
+  <text x="455" y="185" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Margin: $500</text>
+  <text x="455" y="198" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">最多亏 $500</text>
+  <!-- Position B -->
+  <rect x="540" y="150" width="130" height="60" rx="5" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="605" y="170" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">BTC Short 5x</text>
+  <text x="605" y="185" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Margin: $600</text>
+  <text x="605" y="198" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="7">最多亏 $600</text>
+  <!-- Remaining -->
+  <rect x="390" y="225" width="280" height="30" rx="5" fill="#ffffff" fill-opacity="0.03" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="530" y="244" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">剩余可用: $10,000 - $500 - $600 = $8,900</text>
+  <!-- Pro/Con -->
+  <text x="390" y="275" fill="#34d399" font-family="monospace" font-size="7">+ 风险隔离, 最多亏掉该仓位的 margin</text>
+  <text x="390" y="290" fill="#34d399" font-family="monospace" font-size="7">+ 适合高风险交易 (限制最大亏损)</text>
+  <text x="390" y="310" fill="#f472b6" font-family="monospace" font-size="7">- 资金利用率低, 盈利仓不能帮亏损仓</text>
+  <text x="390" y="325" fill="#f472b6" font-family="monospace" font-size="7">- 清算价更近, 容易被清算</text>
+  <text x="530" y="345" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">ETH 被清算 → 亏 $500, BTC 和剩余 $8,900 不受影响</text>
+</svg>
+</div>
+
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Cross Margin (全仓)</th>
+<th>Isolated Margin (逐仓)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>保证金来源</td>
+<td>账户全部可用余额</td>
+<td>仅该仓位分配的保证金</td>
+</tr>
+<tr>
+<td>最大亏损</td>
+<td>整个账户余额</td>
+<td>该仓位的 margin</td>
+</tr>
+<tr>
+<td>清算价距离</td>
+<td>远 (余额越多越远)</td>
+<td>近 (margin 固定)</td>
+</tr>
+<tr>
+<td>风险隔离</td>
+<td>无, 一个仓爆全账户遭殃</td>
+<td>有, 互不影响</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>对冲组合, 低杠杆长持</td>
+<td>高杠杆投机, 控制最大亏损</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="2-2-保证金数学"><a href="#2-2-保证金数学" class="headerlink" title="2.2 保证金数学"></a>2.2 保证金数学</h3><p>三个核心公式:</p>
+<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs mel">Initial Margin (初始保证金):<br>  IM = position_size (仓位名义价值) / leverage (杠杆倍数)<br>  例: <span class="hljs-number">10</span>x 杠杆, $5000 仓位 → IM = $5000 / <span class="hljs-number">10</span> = $500<br><br>Maintenance Margin (维持保证金):<br>  MM = position_size × MMR (维持保证金率)<br>  例: MMR = <span class="hljs-number">0.5</span>%, $5000 仓位 → MM = $5000 × <span class="hljs-number">0.005</span> = $25<br><br>Maintenance Margin Rate (维持保证金率, MMR):        ← 固定阈值, 协议规定<br>  例: MMR = <span class="hljs-number">0.5</span>%, 不随价格变化<br><br>Margin Ratio (保证金率):                          ← 动态值, 随价格实时变化<br>  margin_ratio = margin (当前保证金) / position_size<br>  例: $500 margin, $5000 仓位 → ratio = <span class="hljs-number">500</span> / <span class="hljs-number">5000</span> = <span class="hljs-number">10</span>%<br><br>清算条件: margin &lt;= MM<br>  即: 当前保证金 &lt;= 维持保证金 → 触发清算<br>  等价于 margin_ratio &lt;= MMR, 但工程上用绝对值比较, 避免除法精度损失<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>保证金率 vs 维持保证金率</strong>: 名字只差两个字, 但本质不同.<br>保证金率 (Margin Ratio) 是仓位的 “体温”, 实时变化;<br>维持保证金率 (MMR) 是 “发烧标准”, 协议固定.<br>体温降到标准以下 → 清算.</p>
+<p><strong>IM vs MM 的关系</strong>: IM 是 “开仓门槛”, MM 是 “清算门槛”.<br>IM 总是 &gt; MM, 中间的差额就是你的 “安全缓冲区”.<br>例: 10x 杠杆, IM &#x3D; 10%, MM &#x3D; 0.5% → 从开仓到清算, 你有 9.5% 的缓冲.</p>
+</blockquote>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"/>
+    </marker>
+  </defs>
+  <rect width="720" height="200" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">保证金层级: IM → MM → 清算</text>
+  <!-- Bar background -->
+  <rect x="50" y="55" width="620" height="40" rx="4" fill="#ffffff" fill-opacity="0.03" stroke="#9ca3af" stroke-width="0.5"/>
+  <!-- IM zone (full bar) -->
+  <rect x="50" y="55" width="620" height="40" rx="4" fill="#5eead4" fill-opacity="0.08"/>
+  <!-- MM zone (left 31px = 0.5% of 620px bar) -->
+  <rect x="50" y="55" width="31" height="40" rx="4" fill="#f472b6" fill-opacity="0.15"/>
+  <!-- IM label: centered in IM-only zone (81~670), center = 375 -->
+  <text x="375" y="80" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9">Initial Margin = 10% (开仓时)</text>
+  <!-- MM label: placed outside the narrow bar to avoid overflow -->
+  <text x="66" y="48" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">MM 0.5%</text>
+  <line x1="66" y1="50" x2="66" y2="55" stroke="#f472b6" stroke-width="0.5"/>
+  <!-- Arrow showing buffer: contained within bar (81~670) -->
+  <line x1="87" y1="110" x2="662" y2="110" stroke="#fbbf24" stroke-width="1" marker-end="url(#arr)"/>
+  <text x="375" y="125" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">安全缓冲区 = IM - MM = 9.5%</text>
+  <text x="375" y="140" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">价格不利变动 9.5% 后触发清算</text>
+  <!-- Legend: centered as a group, total width = 3 × 90 + 2 × 20 = 310, start = (720-310)/2 = 205 -->
+  <rect x="205" y="160" width="90" height="22" rx="3" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="250" y="174" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">LIQUIDATION</text>
+  <rect x="315" y="160" width="90" height="22" rx="3" fill="#fbbf24" fill-opacity="0.15" stroke="#fbbf24" stroke-width="0.5"/>
+  <text x="360" y="174" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">WARNING ZONE</text>
+  <rect x="425" y="160" width="90" height="22" rx="3" fill="#5eead4" fill-opacity="0.15" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="470" y="174" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">SAFE</text>
+</svg>
+</div>
+
+<hr>
+<h2 id="三、清算机制详解"><a href="#三、清算机制详解" class="headerlink" title="三、清算机制详解"></a>三、清算机制详解</h2><h3 id="3-1-清算触发条件"><a href="#3-1-清算触发条件" class="headerlink" title="3.1 清算触发条件"></a>3.1 清算触发条件</h3><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">清算触发:</span><br>  margin (当前保证金) &lt;= MM (维持保证金)<br><br><span class="hljs-section">其中:</span><br>  margin = initial_margin (初始保证金) + unrealized_pnl (未实现盈亏)<br>  MM     = position_size (仓位名义价值) × MMR (维持保证金率)<br><br><span class="hljs-section">展开:</span><br>  initial_margin + unrealized_pnl &lt;= position_size × MMR<br><br><span class="hljs-section">注: 数学上等价于 margin_ratio &lt;= MMR (两边同除 position_size),</span><br>    但实际引擎中用 margin &lt;= MM (只有乘法, 无除法精度损失).<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-2-清算价格公式推导"><a href="#3-2-清算价格公式推导" class="headerlink" title="3.2 清算价格公式推导"></a>3.2 清算价格公式推导</h3><p><strong>Long Position (做多) 清算价格推导:</strong></p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">已知</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">entry_price (开仓价格)</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">margin (初始保证金)</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">position_size (仓位名义价值, 以 USD 计)</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">MM (维持保证金) = position_size × MMR (维持保证金率)</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">quantity (持仓数量, 以 token 计) = position_size / entry_price</span><br><br><span class="hljs-attribute">注</span><span class="hljs-punctuation">:</span> <span class="hljs-string">这里用 USDT 本位 (linear) 合约推导. 大多数协议的 PnL (盈亏) 公式:</span><br>  <span class="hljs-attribute">PnL = (exit_price (平仓价格) - entry_price) × quantity</span><br><span class="hljs-attribute">      = (exit_price - entry_price) × (position_size / entry_price)</span><br><span class="hljs-attribute">      = (exit_price - entry_price) / entry_price × position_size</span><br><span class="hljs-attribute">  两种写法等价, 下面使用后者 (方便用 position_size 直接计算).</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">当 mark_price (标记价格) 跌到 liq_price (清算价格) 时</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">unrealized_pnl (未实现盈亏) = (liq_price - entry_price) / entry_price × position_size</span><br><span class="hljs-attribute">                                 ↑ 做多, 价格跌了亏钱 (负数)</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">触发条件</span><span class="hljs-punctuation">:</span> <span class="hljs-string">margin + unrealized_pnl = MM</span><br><br><span class="hljs-attribute">代入</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">margin + (liq_price - entry_price) / entry_price × position_size = MM</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">解 liq_price</span><span class="hljs-punctuation">:</span><br>  (liq_price - entry_price) / entry_price × position_size = MM - margin<br>  liq_price - entry_price = (MM - margin) × entry_price / position_size<br>  liq_price = entry_price + (MM - margin) × entry_price / position_size<br>  liq_price = entry_price × (1 + (MM - margin) / position_size)<br>  liq_price = entry_price × (1 - (margin - MM) / position_size)<br></code></pre></td></tr></table></figure>
+
+<p><strong>Short Position (做空) 清算价格推导:</strong></p>
+<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs gauss">当 <span class="hljs-built_in">mark_price</span> (标记价格) 涨到 <span class="hljs-built_in">liq_price</span> (清算价格) 时:<br>  <span class="hljs-built_in">unrealized_pnl</span> (未实现盈亏) = (<span class="hljs-built_in">entry_price</span> (开仓价格) - liq_price) / entry_price × <span class="hljs-built_in">position_size</span> (仓位名义价值)<br>                                                            ↑ 做空, 价格涨了亏钱 (负数)<br><br>触发条件: <span class="hljs-built_in">margin</span> (当前保证金) + unrealized_pnl = <span class="hljs-built_in">MM</span> (维持保证金)<br><br>代入:<br>  <span class="hljs-built_in">margin</span> + (entry_price - liq_price) / entry_price × position_size = MM<br><br>解 liq_price:<br>  (entry_price - liq_price) / entry_price × position_size = MM - <span class="hljs-built_in">margin</span><br>  entry_price - liq_price = (MM - <span class="hljs-built_in">margin</span>) × entry_price / position_size<br>  liq_price = entry_price - (MM - <span class="hljs-built_in">margin</span>) × entry_price / position_size<br>  liq_price = entry_price × (<span class="hljs-number">1</span> - (MM - <span class="hljs-built_in">margin</span>) / position_size)<br>  liq_price = entry_price × (<span class="hljs-number">1</span> + (<span class="hljs-built_in">margin</span> - MM) / position_size)<br></code></pre></td></tr></table></figure>
+
+<p><strong>总结:</strong></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">Long</span>:  liq_price (清算价) = entry_price (开仓价) × (<span class="hljs-number">1</span> - (margin (保证金) - MM (维持保证金)) / position_size (仓位名义价值))<br><span class="hljs-attribute">Short</span>: liq_price = entry_price × (<span class="hljs-number">1</span> + (margin - MM) / position_size)<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-3-实际数字例子"><a href="#3-3-实际数字例子" class="headerlink" title="3.3 实际数字例子"></a>3.3 实际数字例子</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"/>
+    </marker>
+  </defs>
+  <rect width="720" height="420" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">清算价格计算实例: ETH Long 10x</text>
+  <!-- Parameters -->
+  <rect x="40" y="42" width="640" height="75" rx="6" fill="#ffffff" fill-opacity="0.03" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="60" y="62" fill="#818cf8" font-family="monospace" font-size="9" font-weight="bold">开仓参数</text>
+  <text x="60" y="80" fill="#cbd5e1" font-family="monospace" font-size="8">entry_price = $3,000  |  leverage = 10x  |  margin = $3,000  |  position_size = $30,000</text>
+  <text x="60" y="96" fill="#cbd5e1" font-family="monospace" font-size="8">MMR = 0.5%  |  MM = $30,000 × 0.005 = $150</text>
+  <!-- Formula -->
+  <rect x="40" y="128" width="640" height="55" rx="6" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="60" y="148" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">Long 清算价</text>
+  <text x="60" y="166" fill="#cbd5e1" font-family="monospace" font-size="8">liq_price = $3,000 × (1 - ($3,000 - $150) / $30,000) = $3,000 × (1 - 0.095) = $3,000 × 0.905 = $2,715</text>
+  <!-- Price axis -->
+  <line x1="80" y1="220" x2="660" y2="220" stroke="#9ca3af" stroke-width="1"/>
+  <text x="370" y="212" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Price →</text>
+  <!-- Liq price marker -->
+  <line x1="180" y1="205" x2="180" y2="235" stroke="#f472b6" stroke-width="2"/>
+  <text x="180" y="250" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">$2,715</text>
+  <text x="180" y="262" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">LIQUIDATION</text>
+  <!-- Entry price marker -->
+  <line x1="500" y1="205" x2="500" y2="235" stroke="#5eead4" stroke-width="2"/>
+  <text x="500" y="250" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8" font-weight="bold">$3,000</text>
+  <text x="500" y="262" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">ENTRY</text>
+  <!-- Distance -->
+  <line x1="180" y1="275" x2="498" y2="275" stroke="#fbbf24" stroke-width="1" marker-end="url(#arr)"/>
+  <text x="340" y="290" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">$285 = 9.5% 下跌空间</text>
+  <!-- Short example -->
+  <rect x="40" y="310" width="640" height="95" rx="6" fill="#f472b6" fill-opacity="0.06" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="60" y="330" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">同样参数, Short 清算价</text>
+  <text x="60" y="350" fill="#cbd5e1" font-family="monospace" font-size="8">liq_price = $3,000 × (1 + ($3,000 - $150) / $30,000) = $3,000 × 1.095 = $3,285</text>
+  <text x="60" y="372" fill="#9ca3af" font-family="monospace" font-size="8">做空时, 价格涨 9.5% 到 $3,285 触发清算</text>
+  <text x="60" y="392" fill="#fbbf24" font-family="monospace" font-size="8">注意: 9.5% ≈ (1/leverage - MMR) = (1/10 - 0.5%) = 9.5%  ← 杠杆越高, 缓冲越小</text>
+</svg>
+</div>
+
+<p><strong>不同杠杆下的清算距离 (MMR &#x3D; 0.5%):</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>杠杆</th>
+<th>IM Rate</th>
+<th>缓冲 &#x3D; IM - MM</th>
+<th>Long 清算价 (entry&#x3D;$3000)</th>
+<th>Short 清算价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2x</td>
+<td>50%</td>
+<td>49.5%</td>
+<td>$1,515</td>
+<td>$4,485</td>
+</tr>
+<tr>
+<td>5x</td>
+<td>20%</td>
+<td>19.5%</td>
+<td>$2,415</td>
+<td>$3,585</td>
+</tr>
+<tr>
+<td>10x</td>
+<td>10%</td>
+<td>9.5%</td>
+<td>$2,715</td>
+<td>$3,285</td>
+</tr>
+<tr>
+<td>20x</td>
+<td>5%</td>
+<td>4.5%</td>
+<td>$2,865</td>
+<td>$3,135</td>
+</tr>
+<tr>
+<td>50x</td>
+<td>2%</td>
+<td>1.5%</td>
+<td>$2,955</td>
+<td>$3,045</td>
+</tr>
+<tr>
+<td>100x</td>
+<td>1%</td>
+<td>0.5%</td>
+<td>$2,985</td>
+<td>$3,015</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>100x 杠杆</strong>: 价格只要反向波动 0.5% 就会被清算. ETH 的日内波动通常 3%~10%, 100x 基本是送钱.</p>
+</blockquote>
+<h3 id="3-4-部分清算-vs-全部清算"><a href="#3-4-部分清算-vs-全部清算" class="headerlink" title="3.4 部分清算 vs 全部清算"></a>3.4 部分清算 vs 全部清算</h3><p>大多数 DeFi 协议采用 <strong>部分清算</strong> (Partial Liquidation) 策略:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260">
+  <rect width="720" height="260" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">部分清算 vs 全部清算</text>
+  <!-- Partial Liquidation -->
+  <rect x="30" y="45" width="320" height="195" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="190" y="68" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">Partial Liquidation (部分清算)</text>
+  <text x="50" y="92" fill="#cbd5e1" font-family="monospace" font-size="8">原始仓位: $30,000 (margin $3,000)</text>
+  <text x="50" y="110" fill="#f472b6" font-family="monospace" font-size="8">触发清算 → 平掉 25%~50%</text>
+  <text x="50" y="128" fill="#cbd5e1" font-family="monospace" font-size="8">剩余仓位: $15,000 (margin 恢复安全)</text>
+  <text x="50" y="155" fill="#34d399" font-family="monospace" font-size="7">+ 减少市场冲击 (不用一次性卖出全部)</text>
+  <text x="50" y="170" fill="#34d399" font-family="monospace" font-size="7">+ 交易者保留部分仓位</text>
+  <text x="50" y="185" fill="#34d399" font-family="monospace" font-size="7">+ 降低连环清算风险</text>
+  <text x="50" y="210" fill="#9ca3af" font-family="monospace" font-size="7">代表: dYdX, GMX v2, Hyperliquid</text>
+  <text x="50" y="225" fill="#9ca3af" font-family="monospace" font-size="7">通常分多步清算, 每次 25%~50%</text>
+  <!-- Full Liquidation -->
+  <rect x="370" y="45" width="320" height="195" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="530" y="68" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">Full Liquidation (全部清算)</text>
+  <text x="390" y="92" fill="#cbd5e1" font-family="monospace" font-size="8">原始仓位: $30,000 (margin $3,000)</text>
+  <text x="390" y="110" fill="#f472b6" font-family="monospace" font-size="8">触发清算 → 全部平仓</text>
+  <text x="390" y="128" fill="#cbd5e1" font-family="monospace" font-size="8">剩余仓位: $0 (margin 全部没收)</text>
+  <text x="390" y="155" fill="#34d399" font-family="monospace" font-size="7">+ 实现简单, 一步到位</text>
+  <text x="390" y="175" fill="#f472b6" font-family="monospace" font-size="7">- 市场冲击大</text>
+  <text x="390" y="190" fill="#f472b6" font-family="monospace" font-size="7">- 大仓位清算容易引发连锁反应</text>
+  <text x="390" y="205" fill="#f472b6" font-family="monospace" font-size="7">- 对交易者不友好</text>
+  <text x="390" y="225" fill="#9ca3af" font-family="monospace" font-size="7">代表: 早期 CEX, 部分简单 DeFi 协议</text>
+</svg>
+</div>
+
+<h3 id="3-5-清算人-Liquidator-Keeper"><a href="#3-5-清算人-Liquidator-Keeper" class="headerlink" title="3.5 清算人 (Liquidator &#x2F; Keeper)"></a>3.5 清算人 (Liquidator &#x2F; Keeper)</h3><p>链上清算不是协议自动执行的, 需要外部参与者 (Keeper) 主动调用清算函数:</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs markdown">清算流程:<br><span class="hljs-bullet">  1.</span> Keeper (清算人) 监控所有 position (仓位) 的保证金水平<br><span class="hljs-bullet">  2.</span> 发现 margin (当前保证金) &lt;= MM (维持保证金) 的仓位<br><span class="hljs-bullet">  3.</span> 调用协议的 liquidate() 函数<br><span class="hljs-bullet">  4.</span> 协议验证该仓位确实满足清算条件<br><span class="hljs-bullet">  5.</span> 强制平仓, 扣除 liquidation fee (清算罚金)<br><span class="hljs-bullet">  6.</span> Keeper 获得 liquidation reward (清算奖励, 一部分 fee)<br><span class="hljs-bullet">  7.</span> 剩余保证金 (如果有) 归入 insurance fund (保险基金)<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>为什么用 Keeper 而不是协议自动清算?</strong><br>链上合约不能 “主动” 执行, 需要有人发交易触发. Keeper 网络是 “anyone can liquidate” 的设计, 经济激励驱动.</p>
+</blockquote>
+<hr>
+<h2 id="四、ADL-Auto-Deleveraging-自动减仓"><a href="#四、ADL-Auto-Deleveraging-自动减仓" class="headerlink" title="四、ADL (Auto-Deleveraging, 自动减仓)"></a>四、ADL (Auto-Deleveraging, 自动减仓)</h2><h3 id="4-1-什么时候需要-ADL"><a href="#4-1-什么时候需要-ADL" class="headerlink" title="4.1 什么时候需要 ADL?"></a>4.1 什么时候需要 ADL?</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f472b6"/>
+    </marker>
+  </defs>
+  <rect width="800" height="340" rx="8" fill="#1a1a2e"/>
+  <text x="400" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">穿仓 → 保险基金 → ADL 触发链</text>
+  <!-- Step 1: Normal liquidation -->
+  <rect x="20" y="50" width="210" height="80" rx="6" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1"/>
+  <text x="125" y="72" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">正常清算</text>
+  <text x="125" y="90" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">margin_ratio &lt;= MMR</text>
+  <text x="125" y="104" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">Keeper 清算, 保证金足够</text>
+  <text x="125" y="118" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="7">剩余 margin → Insurance Fund</text>
+  <line x1="230" y1="90" x2="268" y2="90" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 2: Bankruptcy -->
+  <rect x="275" y="50" width="210" height="80" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="380" y="72" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">穿仓 (Bankruptcy)</text>
+  <text x="380" y="90" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">价格剧烈波动, 清算不及时</text>
+  <text x="380" y="104" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">保证金不够覆盖亏损</text>
+  <text x="380" y="118" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">negative equity (负资产)</text>
+  <line x1="485" y1="90" x2="523" y2="90" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 3: Insurance Fund -->
+  <rect x="530" y="50" width="240" height="80" rx="6" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1"/>
+  <text x="650" y="72" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9" font-weight="bold">保险基金介入</text>
+  <text x="650" y="90" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">Insurance Fund 补亏</text>
+  <text x="650" y="104" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="7">基金充足 → 问题解决 ✓</text>
+  <text x="650" y="118" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">基金不足 → 触发 ADL ↓</text>
+  <!-- Arrow down to ADL -->
+  <line x1="650" y1="130" x2="650" y2="163" stroke="#f472b6" stroke-width="1" marker-end="url(#arr1)"/>
+  <!-- Alternative: Socialized Loss (left panel) -->
+  <rect x="20" y="170" width="370" height="150" rx="6" fill="#9ca3af" fill-opacity="0.08" stroke="#9ca3af" stroke-width="1"/>
+  <text x="205" y="192" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="10" font-weight="bold">替代方案: 社会化亏损</text>
+  <text x="40" y="215" fill="#9ca3af" font-family="monospace" font-size="8">穿仓损失由所有持仓者按比例分摊</text>
+  <text x="40" y="235" fill="#f472b6" font-family="monospace" font-size="7">- 所有人都受损, 体验极差</text>
+  <text x="40" y="250" fill="#f472b6" font-family="monospace" font-size="7">- 大户可以故意穿仓薅散户</text>
+  <text x="40" y="265" fill="#f472b6" font-family="monospace" font-size="7">- 几乎没有协议还在用</text>
+  <text x="40" y="285" fill="#9ca3af" font-family="monospace" font-size="7">ADL 比社会化亏损更公平:</text>
+  <text x="40" y="300" fill="#9ca3af" font-family="monospace" font-size="7">只减仓 "赚得最多+杠杆最高" 的人</text>
+  <!-- Step 4: ADL (right panel, same width) -->
+  <rect x="410" y="170" width="370" height="150" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="595" y="192" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">ADL (自动减仓)</text>
+  <text x="430" y="215" fill="#cbd5e1" font-family="monospace" font-size="8">1. 按 "盈利率 × 杠杆" 排序所有对手方</text>
+  <text x="430" y="233" fill="#cbd5e1" font-family="monospace" font-size="8">2. 盈利最多 + 杠杆最高的先被减仓</text>
+  <text x="430" y="251" fill="#cbd5e1" font-family="monospace" font-size="8">3. 减仓量 = 穿仓仓位的 size</text>
+  <text x="430" y="269" fill="#cbd5e1" font-family="monospace" font-size="8">4. 对手方按 mark price 强制减仓</text>
+  <text x="430" y="287" fill="#cbd5e1" font-family="monospace" font-size="8">   已实现盈利部分得以保留</text>
+  <text x="595" y="310" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">ADL 是 "最后手段", 对盈利方不友好, 但好过社会化亏损</text>
+</svg>
+</div>
+
+<h3 id="4-2-ADL-排序算法"><a href="#4-2-ADL-排序算法" class="headerlink" title="4.2 ADL 排序算法"></a>4.2 ADL 排序算法</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs routeros">ADL Priority Score (ADL 优先级分数) = PnL_percentage (盈亏百分比) × leverage (杠杆倍数)<br><br>其中:<br>  PnL_percentage = unrealized_pnl (未实现盈亏) / margin (保证金)<br>  leverage = position_size (仓位名义价值) / margin<br><br>例: 两个 long 对手方<br>  A: <span class="hljs-attribute">margin</span>=<span class="hljs-variable">$1000</span>, <span class="hljs-attribute">PnL</span>=+$500, <span class="hljs-attribute">size</span>=<span class="hljs-variable">$10000</span> → score = (500/1000) × (10000/1000) = 0.5 × 10 = 5.0<br>  B: <span class="hljs-attribute">margin</span>=<span class="hljs-variable">$2000</span>, <span class="hljs-attribute">PnL</span>=+$300, <span class="hljs-attribute">size</span>=<span class="hljs-variable">$6000</span>  → score = (300/2000) × (6000/2000)  = 0.15 × 3 = 0.45<br><br>A 的 priority score = 5.0 &gt;&gt; B 的 0.45, 所以 A 先被 ADL.<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>为什么 ADL 瞄准高盈利+高杠杆?</strong><br>高盈利说明这个人赚了很多 (有 “余粮” 可以减), 高杠杆说明风险偏好高.<br>直觉上: 你赚得多且冒的险大, 在极端行情下 “让” 一部分利润给系统是合理的.</p>
+</blockquote>
+<hr>
+<h2 id="五、保险基金-Insurance-Fund"><a href="#五、保险基金-Insurance-Fund" class="headerlink" title="五、保险基金 (Insurance Fund)"></a>五、保险基金 (Insurance Fund)</h2><h3 id="5-1-资金来源"><a href="#5-1-资金来源" class="headerlink" title="5.1 资金来源"></a>5.1 资金来源</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs routeros">Insurance Fund (保险基金) 资金流入:<br>  1. 清算剩余保证金<br>     → 被清算仓位的 margin (保证金) 扣除亏损和 liquidation fee (清算罚金) 后, 剩余部分归入 fund<br>     → 例: <span class="hljs-attribute">margin</span>=<span class="hljs-variable">$500</span>, <span class="hljs-attribute">loss</span>=<span class="hljs-variable">$400</span>, <span class="hljs-attribute">liq_fee</span>=<span class="hljs-variable">$50</span> → fund += <span class="hljs-variable">$50</span><br><br>  2. 协议手续费注入<br>     → 部分交易手续费 (如 10%~50%) 定期注入 insurance fund<br>     → 例: daily trading fee = <span class="hljs-variable">$100k</span>, 20% → <span class="hljs-variable">$20k</span>/day 注入<br><br>  3. 初始注资<br>     → 协议上线时, 团队/DAO 注入初始资金<br>     → 例: GMX v1 insurance fund 初始注入 <span class="hljs-variable">$2M</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="5-2-资金用途"><a href="#5-2-资金用途" class="headerlink" title="5.2 资金用途"></a>5.2 资金用途</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs markdown">Insurance Fund (保险基金) 资金流出:<br><span class="hljs-bullet">  1.</span> 覆盖穿仓损失<br><span class="hljs-code">     → 被清算仓位的保证金不足以覆盖亏损</span><br><span class="hljs-code">     → deficit (亏空) = abs(remaining_margin (剩余保证金))  // negative = 穿仓</span><br><span class="hljs-code">     → fund -= deficit</span><br><span class="hljs-code"></span><br><span class="hljs-bullet">  2.</span> 如果 fund 耗尽<br><span class="hljs-code">     → 触发 ADL (详见上节)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="5-3-链上实现"><a href="#5-3-链上实现" class="headerlink" title="5.3 链上实现"></a>5.3 链上实现</h3><p>保险基金通常是一个独立的合约地址, 持有 USDC&#x2F;USDT:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs solidity">// SPDX-License-Identifier: MIT<br>pragma solidity ^0.8.20;<br><br>import &quot;@openzeppelin/contracts/token/ERC20/IERC20.sol&quot;;<br>import &quot;@openzeppelin/contracts/access/Ownable.sol&quot;;<br><br>/// @title InsuranceFund - 保险基金合约<br>/// @notice 接收清算剩余保证金, 覆盖穿仓损失<br>contract InsuranceFund is Ownable &#123;<br>    IERC20 public immutable usdc;<br><br>    // 授权的清算引擎合约<br>    mapping(address =&gt; bool) public isLiquidationEngine;<br><br>    event Deposit(address indexed from, uint256 amount, string reason);<br>    event Withdraw(address indexed to, uint256 amount, string reason);<br><br>    constructor(address _usdc) Ownable(msg.sender) &#123;<br>        usdc = IERC20(_usdc);<br>    &#125;<br><br>    modifier onlyLiquidationEngine() &#123;<br>        require(isLiquidationEngine[msg.sender], &quot;not authorized&quot;);<br>        _;<br>    &#125;<br><br>    /// @notice 清算引擎存入剩余保证金<br>    function depositFromLiquidation(uint256 amount) external onlyLiquidationEngine &#123;<br>        usdc.transferFrom(msg.sender, address(this), amount);<br>        emit Deposit(msg.sender, amount, &quot;liquidation_surplus&quot;);<br>    &#125;<br><br>    /// @notice 清算引擎提取资金覆盖穿仓<br>    function coverBankruptcy(uint256 deficit) external onlyLiquidationEngine returns (bool covered) &#123;<br>        uint256 balance = usdc.balanceOf(address(this));<br>        if (balance &gt;= deficit) &#123;<br>            usdc.transfer(msg.sender, deficit);<br>            emit Withdraw(msg.sender, deficit, &quot;bankruptcy_coverage&quot;);<br>            return true; // 完全覆盖<br>        &#125;<br>        // 基金不足, 全部转出, 剩余需要 ADL<br>        if (balance &gt; 0) &#123;<br>            usdc.transfer(msg.sender, balance);<br>            emit Withdraw(msg.sender, balance, &quot;partial_bankruptcy_coverage&quot;);<br>        &#125;<br>        return false; // 未完全覆盖 → 触发 ADL<br>    &#125;<br><br>    function setLiquidationEngine(address engine, bool authorized) external onlyOwner &#123;<br>        isLiquidationEngine[engine] = authorized;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、链上清算的实现"><a href="#六、链上清算的实现" class="headerlink" title="六、链上清算的实现"></a>六、链上清算的实现</h2><h3 id="6-1-Solidity-清算函数"><a href="#6-1-Solidity-清算函数" class="headerlink" title="6.1 Solidity: 清算函数"></a>6.1 Solidity: 清算函数</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><code class="hljs solidity">// SPDX-License-Identifier: MIT<br>pragma solidity ^0.8.20;<br><br>/// @title PerpLiquidation - 清算引擎伪代码<br>/// @notice 演示链上清算的核心逻辑<br>contract PerpLiquidation &#123;<br>    struct Position &#123;<br>        address trader;<br>        bool isLong;<br>        uint256 size;         // position size (仓位名义价值) in USD (6 decimals)<br>        uint256 entryPrice;   // entry price (开仓价格) (6 decimals)<br>        uint256 margin;       // collateral amount (保证金) (6 decimals)<br>    &#125;<br><br>    uint256 public constant MMR = 50;           // 0.5% = 50 basis points (维持保证金率)<br>    uint256 public constant BPS = 10_000;       // basis points denominator (基点分母)<br>    uint256 public constant LIQ_FEE_BPS = 100;  // 1% liquidation fee (清算罚金率)<br>    uint256 public constant PRICE_DECIMALS = 1e6;<br><br>    mapping(bytes32 =&gt; Position) public positions;<br>    address public insuranceFund; // 保险基金合约地址<br>    address public oracle;        // 预言机合约地址<br><br>    event PositionLiquidated(<br>        bytes32 indexed positionId,<br>        address indexed trader,<br>        address indexed liquidator,  // 清算人<br>        uint256 markPrice,           // 标记价格<br>        uint256 marginRemaining,     // 剩余保证金<br>        uint256 liquidatorReward     // 清算人奖励<br>    );<br><br>    /// @notice 任何人都可以调用清算函数 (Keeper)<br>    /// @param positionId 被清算仓位的 ID<br>    function liquidate(bytes32 positionId) external &#123;<br>        Position storage pos = positions[positionId];<br>        require(pos.size &gt; 0, &quot;position does not exist&quot;);<br><br>        uint256 markPrice = getMarkPrice(); // 标记价格<br><br>        // 1. 计算未实现盈亏 (unrealized PnL)<br>        int256 pnl = _calcUnrealizedPnL(pos, markPrice);<br><br>        // 2. 判断是否可清算: margin &lt;= MM (用乘法避免除法精度损失)<br>        int256 currentMargin = int256(pos.margin) + pnl; // 当前保证金 = 初始保证金 + 未实现盈亏<br>        uint256 maintenanceMargin = (pos.size * MMR) / BPS; // MM = size × MMR<br>        require(currentMargin &lt;= 0 || uint256(currentMargin) &lt;= maintenanceMargin,<br>                &quot;position is healthy&quot;);<br><br>        // 3. 计算清算费用 (liquidation fee)<br>        uint256 liqFee = (pos.size * LIQ_FEE_BPS) / BPS;          // 清算罚金<br>        uint256 liquidatorReward = liqFee / 2;                     // 清算人奖励, 一半给 Keeper<br>        uint256 protocolFee = liqFee - liquidatorReward;           // 协议收入<br><br>        // 4. 结算 (settlement)<br>        uint256 marginRemaining = 0; // 剩余保证金<br>        if (currentMargin &gt; int256(liqFee)) &#123;<br>            marginRemaining = uint256(currentMargin) - liqFee;<br>            // 剩余保证金 → 保险基金<br>            _transferToInsuranceFund(marginRemaining);<br>        &#125; else if (currentMargin &lt; 0) &#123;<br>            // 穿仓 → 从保险基金提取<br>            _coverFromInsuranceFund(uint256(-currentMargin));<br>        &#125; else &#123;<br>            // 0 &lt;= currentMargin &lt;= liqFee: margin 不足以支付全部罚金<br>            // 剩余 margin 全部作为清算奖励, 保险基金不收不付<br>        &#125;<br><br>        // 5. 支付 Keeper 奖励<br>        _transferToLiquidator(msg.sender, liquidatorReward);<br><br>        // 6. 删除仓位<br>        emit PositionLiquidated(positionId, pos.trader, msg.sender, markPrice, marginRemaining, liquidatorReward);<br>        delete positions[positionId];<br>    &#125;<br><br>    function _calcUnrealizedPnL(Position storage pos, uint256 markPrice) internal view returns (int256) &#123;<br>        if (pos.isLong) &#123;<br>            // Long PnL = (markPrice - entryPrice) / entryPrice * size<br>            return int256(pos.size) * (int256(markPrice) - int256(pos.entryPrice)) / int256(pos.entryPrice);<br>        &#125; else &#123;<br>            // Short PnL = (entryPrice - markPrice) / entryPrice * size<br>            return int256(pos.size) * (int256(pos.entryPrice) - int256(markPrice)) / int256(pos.entryPrice);<br>        &#125;<br>    &#125;<br><br>    function _maintenanceMargin(uint256 size) internal pure returns (uint256) &#123;<br>        return (size * MMR) / BPS; // MM = size × MMR, 只有乘法和一次整除<br>    &#125;<br><br>    function getMarkPrice() public view returns (uint256) &#123;<br>        // 从 Oracle 获取价格 (简化)<br>        // 实际使用 Chainlink / Pyth / 自建 Oracle<br>        return 0; // placeholder<br>    &#125;<br><br>    function _transferToInsuranceFund(uint256 amount) internal &#123; /* 转入保险基金 */ &#125;<br>    function _coverFromInsuranceFund(uint256 deficit) internal &#123; /* 从保险基金覆盖亏空 */ &#125;<br>    function _transferToLiquidator(address liquidator, uint256 reward) internal &#123; /* 支付清算人奖励 */ &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="6-2-Go-清算监控-Bot-Keeper"><a href="#6-2-Go-清算监控-Bot-Keeper" class="headerlink" title="6.2 Go: 清算监控 Bot (Keeper)"></a>6.2 Go: 清算监控 Bot (Keeper)</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;math&quot;</span><br>)<br><br><span class="hljs-comment">// Position represents an on-chain perpetual position (链上永续合约仓位).</span><br><span class="hljs-keyword">type</span> Position <span class="hljs-keyword">struct</span> &#123;<br>	ID         <span class="hljs-type">string</span><br>	Trader     <span class="hljs-type">string</span><br>	IsLong     <span class="hljs-type">bool</span><br>	Size       <span class="hljs-type">float64</span> <span class="hljs-comment">// position size in USD (仓位名义价值)</span><br>	EntryPrice <span class="hljs-type">float64</span> <span class="hljs-comment">// entry price (开仓价格)</span><br>	Margin     <span class="hljs-type">float64</span> <span class="hljs-comment">// collateral (保证金)</span><br>&#125;<br><br><span class="hljs-comment">// LiquidationParams holds protocol-level liquidation parameters (清算参数).</span><br><span class="hljs-keyword">type</span> LiquidationParams <span class="hljs-keyword">struct</span> &#123;<br>	MMR           <span class="hljs-type">float64</span> <span class="hljs-comment">// maintenance margin rate (维持保证金率, e.g. 0.005 = 0.5%)</span><br>	LiqFeeRate    <span class="hljs-type">float64</span> <span class="hljs-comment">// liquidation fee rate (清算罚金率, e.g. 0.01 = 1%)</span><br>	KeeperReward  <span class="hljs-type">float64</span> <span class="hljs-comment">// keeper&#x27;s share of liq fee (清算人奖励比例, e.g. 0.5 = 50%)</span><br>&#125;<br><br><span class="hljs-comment">// CalcUnrealizedPnL computes unrealized PnL (未实现盈亏) at the given mark price (标记价格).</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CalcUnrealizedPnL</span><span class="hljs-params">(pos Position, markPrice <span class="hljs-type">float64</span>)</span></span> <span class="hljs-type">float64</span> &#123;<br>	<span class="hljs-keyword">if</span> pos.IsLong &#123;<br>		<span class="hljs-keyword">return</span> pos.Size * (markPrice - pos.EntryPrice) / pos.EntryPrice<br>	&#125;<br>	<span class="hljs-keyword">return</span> pos.Size * (pos.EntryPrice - markPrice) / pos.EntryPrice<br>&#125;<br><br><span class="hljs-comment">// CalcMarginRatio returns current margin ratio (当前保证金率).</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CalcMarginRatio</span><span class="hljs-params">(pos Position, markPrice <span class="hljs-type">float64</span>)</span></span> <span class="hljs-type">float64</span> &#123;<br>	pnl := CalcUnrealizedPnL(pos, markPrice)<br>	currentMargin := pos.Margin + pnl <span class="hljs-comment">// 当前保证金 = 初始保证金 + 未实现盈亏</span><br>	<span class="hljs-keyword">if</span> currentMargin &lt;= <span class="hljs-number">0</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br>	&#125;<br>	<span class="hljs-keyword">return</span> currentMargin / pos.Size<br>&#125;<br><br><span class="hljs-comment">// CalcLiquidationPrice derives the liquidation price (清算价格) for a position.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CalcLiquidationPrice</span><span class="hljs-params">(pos Position, mmr <span class="hljs-type">float64</span>)</span></span> <span class="hljs-type">float64</span> &#123;<br>	mm := pos.Size * mmr                  <span class="hljs-comment">// mm: 维持保证金</span><br>	buffer := (pos.Margin - mm) / pos.Size <span class="hljs-comment">// buffer: 安全缓冲比例</span><br>	<span class="hljs-keyword">if</span> pos.IsLong &#123;<br>		<span class="hljs-keyword">return</span> pos.EntryPrice * (<span class="hljs-number">1</span> - buffer)<br>	&#125;<br>	<span class="hljs-keyword">return</span> pos.EntryPrice * (<span class="hljs-number">1</span> + buffer)<br>&#125;<br><br><span class="hljs-comment">// IsLiquidatable checks if a position should be liquidated (是否应被清算).</span><br><span class="hljs-comment">// 用 margin &lt;= MM (乘法) 而非 margin_ratio &lt;= MMR (除法), 避免精度损失.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">IsLiquidatable</span><span class="hljs-params">(pos Position, markPrice <span class="hljs-type">float64</span>, params LiquidationParams)</span></span> <span class="hljs-type">bool</span> &#123;<br>	currentMargin := pos.Margin + CalcUnrealizedPnL(pos, markPrice) <span class="hljs-comment">// 当前保证金</span><br>	mm := pos.Size * params.MMR                                     <span class="hljs-comment">// 维持保证金</span><br>	<span class="hljs-keyword">return</span> currentMargin &lt;= mm<br>&#125;<br><br><span class="hljs-comment">// CalcADLPriority computes the ADL priority score (ADL 优先级分数).</span><br><span class="hljs-comment">// Higher score = gets ADL&#x27;d first (分数越高, 越先被自动减仓).</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CalcADLPriority</span><span class="hljs-params">(pos Position, markPrice <span class="hljs-type">float64</span>)</span></span> <span class="hljs-type">float64</span> &#123;<br>	pnl := CalcUnrealizedPnL(pos, markPrice)<br>	<span class="hljs-keyword">if</span> pnl &lt;= <span class="hljs-number">0</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span> <span class="hljs-comment">// 亏损仓位不会被 ADL</span><br>	&#125;<br>	pnlPct := pnl / pos.Margin       <span class="hljs-comment">// 盈亏百分比</span><br>	leverage := pos.Size / pos.Margin <span class="hljs-comment">// 杠杆倍数</span><br>	<span class="hljs-keyword">return</span> pnlPct * leverage<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	params := LiquidationParams&#123;<br>		MMR:          <span class="hljs-number">0.005</span>,  <span class="hljs-comment">// 0.5%</span><br>		LiqFeeRate:   <span class="hljs-number">0.01</span>,   <span class="hljs-comment">// 1%</span><br>		KeeperReward: <span class="hljs-number">0.5</span>,    <span class="hljs-comment">// 50%</span><br>	&#125;<br><br>	pos := Position&#123;<br>		ID:         <span class="hljs-string">&quot;pos-001&quot;</span>,<br>		Trader:     <span class="hljs-string">&quot;0xAlice&quot;</span>,<br>		IsLong:     <span class="hljs-literal">true</span>,<br>		Size:       <span class="hljs-number">30</span>_000, <span class="hljs-comment">// $30,000 position</span><br>		EntryPrice: <span class="hljs-number">3</span>_000,  <span class="hljs-comment">// ETH @ $3,000</span><br>		Margin:     <span class="hljs-number">3</span>_000,  <span class="hljs-comment">// $3,000 margin (10x leverage)</span><br>	&#125;<br><br>	<span class="hljs-comment">// 计算清算价格</span><br>	liqPrice := CalcLiquidationPrice(pos, params.MMR)<br>	fmt.Printf(<span class="hljs-string">&quot;=== Position: %s ===\n&quot;</span>, pos.ID)<br>	fmt.Printf(<span class="hljs-string">&quot;Direction:       %s\n&quot;</span>, <span class="hljs-keyword">map</span>[<span class="hljs-type">bool</span>]<span class="hljs-type">string</span>&#123;<span class="hljs-literal">true</span>: <span class="hljs-string">&quot;Long&quot;</span>, <span class="hljs-literal">false</span>: <span class="hljs-string">&quot;Short&quot;</span>&#125;[pos.IsLong])<br>	fmt.Printf(<span class="hljs-string">&quot;Size:            $%.0f\n&quot;</span>, pos.Size)<br>	fmt.Printf(<span class="hljs-string">&quot;Entry Price:     $%.0f\n&quot;</span>, pos.EntryPrice)<br>	fmt.Printf(<span class="hljs-string">&quot;Margin:          $%.0f (%.0fx leverage)\n&quot;</span>, pos.Margin, pos.Size/pos.Margin)<br>	fmt.Printf(<span class="hljs-string">&quot;Liquidation Price: $%.2f\n&quot;</span>, liqPrice)<br>	fmt.Printf(<span class="hljs-string">&quot;Buffer:          %.2f%%\n\n&quot;</span>, math.Abs(liqPrice-pos.EntryPrice)/pos.EntryPrice*<span class="hljs-number">100</span>)<br><br>	<span class="hljs-comment">// 模拟不同价格下的 margin ratio</span><br>	testPrices := []<span class="hljs-type">float64</span>&#123;<span class="hljs-number">3000</span>, <span class="hljs-number">2900</span>, <span class="hljs-number">2800</span>, <span class="hljs-number">2750</span>, <span class="hljs-number">2715</span>, <span class="hljs-number">2700</span>&#125;<br>	fmt.Println(<span class="hljs-string">&quot;Mark Price | Margin Ratio | Liquidatable?&quot;</span>)<br>	fmt.Println(<span class="hljs-string">&quot;-----------|-------------|---------------&quot;</span>)<br>	<span class="hljs-keyword">for</span> _, price := <span class="hljs-keyword">range</span> testPrices &#123;<br>		ratio := CalcMarginRatio(pos, price)<br>		liquidatable := IsLiquidatable(pos, price, params)<br>		status := <span class="hljs-string">&quot;Safe&quot;</span><br>		<span class="hljs-keyword">if</span> liquidatable &#123;<br>			status = <span class="hljs-string">&quot;** LIQUIDATE **&quot;</span><br>		&#125;<br>		fmt.Printf(<span class="hljs-string">&quot;$%-9.0f | %10.2f%% | %s\n&quot;</span>, price, ratio*<span class="hljs-number">100</span>, status)<br>	&#125;<br><br>	<span class="hljs-comment">// ADL priority 示例</span><br>	fmt.Println(<span class="hljs-string">&quot;\n=== ADL Priority Ranking ===&quot;</span>)<br>	counterparties := []Position&#123;<br>		&#123;ID: <span class="hljs-string">&quot;cp-A&quot;</span>, IsLong: <span class="hljs-literal">false</span>, Size: <span class="hljs-number">10</span>_000, EntryPrice: <span class="hljs-number">2</span>_800, Margin: <span class="hljs-number">1</span>_000&#125;,<br>		&#123;ID: <span class="hljs-string">&quot;cp-B&quot;</span>, IsLong: <span class="hljs-literal">false</span>, Size: <span class="hljs-number">6</span>_000, EntryPrice: <span class="hljs-number">2</span>_900, Margin: <span class="hljs-number">2</span>_000&#125;,<br>		&#123;ID: <span class="hljs-string">&quot;cp-C&quot;</span>, IsLong: <span class="hljs-literal">false</span>, Size: <span class="hljs-number">20</span>_000, EntryPrice: <span class="hljs-number">2</span>_700, Margin: <span class="hljs-number">5</span>_000&#125;,<br>	&#125;<br>	adlPrice := <span class="hljs-number">2</span>_600<span class="hljs-number">.0</span> <span class="hljs-comment">// 价格跌了, short 方盈利</span><br>	fmt.Printf(<span class="hljs-string">&quot;Mark Price: $%.0f\n&quot;</span>, adlPrice)<br>	fmt.Println(<span class="hljs-string">&quot;ID    | PnL       | Leverage | ADL Score&quot;</span>)<br>	fmt.Println(<span class="hljs-string">&quot;------|-----------|----------|----------&quot;</span>)<br>	<span class="hljs-keyword">for</span> _, cp := <span class="hljs-keyword">range</span> counterparties &#123;<br>		pnl := CalcUnrealizedPnL(cp, adlPrice)<br>		lev := cp.Size / cp.Margin<br>		score := CalcADLPriority(cp, adlPrice)<br>		fmt.Printf(<span class="hljs-string">&quot;%-5s | $%7.0f | %6.1fx  | %.2f\n&quot;</span>, cp.ID, pnl, lev, score)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>运行输出:</strong></p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">=== Position: pos-001 ===<br>Direction:       Long<br>Size:            $30000<br>Entry Price:     $3000<br>Margin:          $3000 (10x leverage)<br>Liquidation Price: $2715.00<br>Buffer:          9.50%<br><br>Mark Price |<span class="hljs-string"> Margin Ratio </span>|<span class="hljs-string"> Liquidatable?</span><br><span class="hljs-string">-----------</span>|<span class="hljs-string">-------------</span>|<span class="hljs-string">---------------</span><br><span class="hljs-string">$3000      </span>|<span class="hljs-string">      10.00% </span>|<span class="hljs-string"> Safe</span><br><span class="hljs-string">$2900      </span>|<span class="hljs-string">       6.67% </span>|<span class="hljs-string"> Safe</span><br><span class="hljs-string">$2800      </span>|<span class="hljs-string">       3.33% </span>|<span class="hljs-string"> Safe</span><br><span class="hljs-string">$2750      </span>|<span class="hljs-string">       1.67% </span>|<span class="hljs-string"> Safe</span><br><span class="hljs-string">$2715      </span>|<span class="hljs-string">       0.50% </span>|<span class="hljs-string"> ** LIQUIDATE **</span><br><span class="hljs-string">$2700      </span>|<span class="hljs-string">       0.00% </span>|<span class="hljs-string"> ** LIQUIDATE **</span><br><span class="hljs-string"></span><br><span class="hljs-string">=== ADL Priority Ranking ===</span><br><span class="hljs-string">Mark Price: $2600</span><br><span class="hljs-string">ID    </span>|<span class="hljs-string"> PnL       </span>|<span class="hljs-string"> Leverage </span>|<span class="hljs-string"> ADL Score</span><br><span class="hljs-string">------</span>|<span class="hljs-string">-----------</span>|<span class="hljs-string">----------</span>|<span class="hljs-string">----------</span><br><span class="hljs-string">cp-A  </span>|<span class="hljs-string"> $    714 </span>|<span class="hljs-string">     10.0x  </span>|<span class="hljs-string"> 7.14</span><br><span class="hljs-string">cp-B  </span>|<span class="hljs-string"> $    621 </span>|<span class="hljs-string">      3.0x  </span>|<span class="hljs-string"> 0.93</span><br><span class="hljs-string">cp-C  </span>|<span class="hljs-string"> $    741 </span>|<span class="hljs-string">      4.0x  </span>|<span class="hljs-string"> 0.59</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="6-3-MEV-与清算"><a href="#6-3-MEV-与清算" class="headerlink" title="6.3 MEV 与清算"></a>6.3 MEV 与清算</h3><p>清算在链上是公开的, 存在 MEV 问题:</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs markdown">清算 MEV 攻击路径:<br><span class="hljs-bullet">  1.</span> Keeper A 发现可清算仓位, 提交 liquidate() tx<br><span class="hljs-bullet">  2.</span> MEV searcher 在 mempool 看到这笔 tx<br><span class="hljs-bullet">  3.</span> Searcher 提交更高 gas 的 liquidate() tx (front-running)<br><span class="hljs-bullet">  4.</span> Searcher 获得 liquidator reward (清算人奖励), 原始 Keeper A 被抢<br><br>对策:<br><span class="hljs-bullet">  -</span> 私有 mempool (Flashbots Protect): tx 不经过公共 mempool<br><span class="hljs-bullet">  -</span> 链上分配机制: 多个 Keeper 按轮次/随机分配清算权<br><span class="hljs-bullet">  -</span> 时间窗口: 给第一个提交者优先权 (first-come-first-served + 时间锁)<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>详见永续合约中的 MEV</strong>: 清算 MEV 是永续协议 MEV 的主要来源之一, 与 sandwich attack, oracle extraction 并列.</p>
+</blockquote>
+<hr>
+<h2 id="七、各协议保证金对比"><a href="#七、各协议保证金对比" class="headerlink" title="七、各协议保证金对比"></a>七、各协议保证金对比</h2><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>GMX (v2)</th>
+<th>dYdX (v4)</th>
+<th>Hyperliquid</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>保证金模式</td>
+<td>Isolated only</td>
+<td>Cross margin</td>
+<td>Cross + Isolated</td>
+</tr>
+<tr>
+<td>清算类型</td>
+<td>全部清算</td>
+<td>部分清算</td>
+<td>部分清算</td>
+</tr>
+<tr>
+<td>Mark Price</td>
+<td>Chainlink oracle</td>
+<td>自建 oracle (验证者共识)</td>
+<td>验证者中位数 oracle</td>
+</tr>
+<tr>
+<td>MMR</td>
+<td>1% (大部分币对)</td>
+<td>3%~5% (按层级)</td>
+<td>动态, 按仓位大小递增</td>
+</tr>
+<tr>
+<td>清算费</td>
+<td>~1% position size</td>
+<td>~1% position size</td>
+<td>~0.5%~1%</td>
+</tr>
+<tr>
+<td>保险基金</td>
+<td>GLP 池兜底 + protocol fee</td>
+<td>独立 insurance fund</td>
+<td>独立 insurance fund</td>
+</tr>
+<tr>
+<td>ADL</td>
+<td>有, GLP 池亏损时触发</td>
+<td>有, insurance fund 耗尽时触发</td>
+<td>有, 按 priority score 排序</td>
+</tr>
+<tr>
+<td>Keeper</td>
+<td>Chainlink Keepers</td>
+<td>验证者内置</td>
+<td>验证者内置</td>
+</tr>
+<tr>
+<td>特点</td>
+<td>简单直观, oracle 依赖强</td>
+<td>专业级, 支持组合保证金</td>
+<td>速度快, 支持两种模式切换</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>GMX 的特殊之处</strong>: GMX 没有传统的保险基金, 而是用 GLP&#x2F;GM 流动性池作为对手方.<br>当交易者亏损, 钱流入池子 (LP 赚钱); 当交易者盈利, 钱从池子流出 (LP 亏钱).<br>极端情况下, 池子亏损过大 &#x3D; 变相的 “社会化亏损” 给 LP.</p>
+</blockquote>
+<hr>
+<h2 id="八、小结"><a href="#八、小结" class="headerlink" title="八、小结"></a>八、小结</h2><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>一句话</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Initial Margin (IM)</td>
+<td>开仓门槛, <code>IM = size / leverage</code></td>
+</tr>
+<tr>
+<td>Maintenance Margin (MM)</td>
+<td>清算门槛, <code>MM = size × MMR</code></td>
+</tr>
+<tr>
+<td>Cross Margin</td>
+<td>全仓共享余额, 资金效率高但风险不隔离</td>
+</tr>
+<tr>
+<td>Isolated Margin</td>
+<td>逐仓独立保证金, 最大亏损可控</td>
+</tr>
+<tr>
+<td>清算</td>
+<td><code>margin &lt;= MM</code> 时 Keeper 强制平仓</td>
+</tr>
+<tr>
+<td>清算价</td>
+<td>Long: <code>entry × (1 - (margin - MM) / size)</code>, Short 反过来</td>
+</tr>
+<tr>
+<td>ADL</td>
+<td>保险基金不足时, 减仓盈利最多+杠杆最高的对手方</td>
+</tr>
+<tr>
+<td>Insurance Fund</td>
+<td>清算剩余 + 手续费注入, 覆盖穿仓损失</td>
+</tr>
+<tr>
+<td>清算 MEV</td>
+<td>front-running 清算交易, 抢夺 Keeper 奖励</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="8-1-下一步"><a href="#8-1-下一步" class="headerlink" title="8.1 下一步"></a>8.1 下一步</h3><ul>
+<li><strong>GMX 协议深度解析</strong>: Oracle 型永续的具体实现, GM 池运作, LP 的风险与收益</li>
+<li><strong>永续合约中的 MEV</strong>: 清算 MEV, oracle extraction, 公平排序</li>
+</ul>
+<hr>
+<h2 id="九、参考"><a href="#九、参考" class="headerlink" title="九、参考"></a>九、参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.binance.com/en/support/faq/360033525031">Binance Margin &amp; Liquidation</a> - CEX 保证金和清算标准</li>
+<li><a target="_blank" rel="noopener" href="https://docs.gmx.io/">GMX Docs - Liquidation</a> - Oracle 型清算实现</li>
+<li><a target="_blank" rel="noopener" href="https://docs.dydx.exchange/">dYdX v4 Docs - Liquidation</a> - 订单簿型清算和 ADL</li>
+<li><a target="_blank" rel="noopener" href="https://hyperliquid.gitbook.io/">Hyperliquid Docs</a> - 双模式保证金和清算</li>
+<li><a target="_blank" rel="noopener" href="https://www.paradigm.xyz/">Paradigm - An Analysis of Liquidation Mechanisms</a> - 清算机制学术分析</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/web3/" class="category-chain-item">Web3</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/web3/" class="print-no-link">#Web3</a>
+      
+        <a href="/tags/%E6%B0%B8%E7%BB%AD%E5%90%88%E7%BA%A6/" class="print-no-link">#永续合约</a>
+      
+        <a href="/tags/%E6%B8%85%E7%AE%97/" class="print-no-link">#清算</a>
+      
+        <a href="/tags/%E4%BF%9D%E8%AF%81%E9%87%91/" class="print-no-link">#保证金</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>永续合约 02 - 保证金管理与清算引擎</div>
+      <div>https://mritd.com/2025/07/28/perp-margin-and-liquidation/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年7月28日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/08/10/perp-gmx/" title="永续合约 03 - GMX 协议深度解析">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">永续合约 03 - GMX 协议深度解析</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/07/15/perp-mechanics/" title="永续合约 01 - 永续合约机制详解">
+                        <span class="hidden-mobile">永续合约 01 - 永续合约机制详解</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2025/07/28/perp-margin-and-liquidation/';
+          this.page.identifier = '/2025/07/28/perp-margin-and-liquidation/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

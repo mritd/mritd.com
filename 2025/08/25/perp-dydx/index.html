@@ -1,0 +1,2172 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="Web3,永续合约,dYdX,订单簿,Cosmos,StarkEx">
+  
+    <meta name="description" content="本文梳理 dYdX 从以太坊 L1 到 StarkEx 再到 Cosmos 应用链的四个版本演进, 分析每次迁移背后的技术和商业考量, 以及 v4 链上订单簿的撮合机制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="永续合约 04 - dYdX 演进之路">
+<meta property="og:url" content="https://mritd.com/2025/08/25/perp-dydx/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="本文梳理 dYdX 从以太坊 L1 到 StarkEx 再到 Cosmos 应用链的四个版本演进, 分析每次迁移背后的技术和商业考量, 以及 v4 链上订单簿的撮合机制">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/perp-dydx.svg">
+<meta property="article:published_time" content="2025-08-25T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-08-25T02:00:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="Web3">
+<meta property="article:tag" content="dYdX">
+<meta property="article:tag" content="永续合约">
+<meta property="article:tag" content="订单簿">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/perp-dydx.svg">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>永续合约 04 - dYdX 演进之路 - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="永续合约 04 - dYdX 演进之路"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-08-25 10:00" pubdate>
+          2025年8月25日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          19k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          155 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">永续合约 04 - dYdX 演进之路</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>dYdX 是链上永续合约里订单簿方向的代表, 从以太坊 L1 到 StarkEx 再到自建 Cosmos appchain, 经历了四个大版本. 本文梳理 v1 到 v4 的演进路径和每次迁移的技术取舍, 重点介绍 v4 的链上订单簿撮合机制和保证金清算设计.</p>
+<h2 id="一、术语表"><a href="#一、术语表" class="headerlink" title="一、术语表"></a>一、术语表</h2><h3 id="1-1-订单簿核心"><a href="#1-1-订单簿核心" class="headerlink" title="1.1 订单簿核心"></a>1.1 订单簿核心</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>订单簿</td>
+<td>Order Book</td>
+<td>买卖订单的集合, 按价格排列, 买方出价 (bid) 和卖方要价 (ask)</td>
+</tr>
+<tr>
+<td>限价单</td>
+<td>Limit Order</td>
+<td>指定价格和数量的订单, 只在达到指定价格时成交</td>
+</tr>
+<tr>
+<td>市价单</td>
+<td>Market Order</td>
+<td>以当前最优价格立即成交的订单</td>
+</tr>
+<tr>
+<td>止损单</td>
+<td>Stop Order</td>
+<td>价格触达某个阈值后触发的订单 (止损&#x2F;止盈)</td>
+</tr>
+<tr>
+<td>做市商</td>
+<td>Market Maker</td>
+<td>同时挂买单和卖单, 提供流动性, 赚取 bid-ask spread</td>
+</tr>
+<tr>
+<td>挂单方</td>
+<td>Maker</td>
+<td>提供流动性的一方, 挂出的订单在 order book 中等待成交</td>
+</tr>
+<tr>
+<td>吃单方</td>
+<td>Taker</td>
+<td>消耗流动性的一方, 下单立即与 order book 中已有订单成交</td>
+</tr>
+<tr>
+<td>买卖价差</td>
+<td>Bid-Ask Spread</td>
+<td>最高买价 (best bid) 和最低卖价 (best ask) 之间的差距</td>
+</tr>
+<tr>
+<td>深度</td>
+<td>Depth</td>
+<td>订单簿中各价位累积的订单量, 深度越大, 大单滑点越小</td>
+</tr>
+<tr>
+<td>滑点</td>
+<td>Slippage</td>
+<td>实际成交均价与预期价格的偏差, 由 depth 不足导致</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-2-dYdX-特有"><a href="#1-2-dYdX-特有" class="headerlink" title="1.2 dYdX 特有"></a>1.2 dYdX 特有</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>应用链</td>
+<td>Appchain</td>
+<td>为单一应用定制的独立区块链 (dYdX v4 用 Cosmos SDK 构建)</td>
+</tr>
+<tr>
+<td>验证者</td>
+<td>Validator</td>
+<td>运行 dYdX 节点的实体, 同时维护链上状态和内存中的 order book</td>
+</tr>
+<tr>
+<td>撮合引擎</td>
+<td>Matching Engine</td>
+<td>将买卖订单按价格-时间优先级配对的核心组件</td>
+</tr>
+<tr>
+<td>区块提案者</td>
+<td>Block Proposer</td>
+<td>每轮共识中负责打包交易、撮合订单的验证者</td>
+</tr>
+<tr>
+<td>去杠杆</td>
+<td>Deleveraging (ADL)</td>
+<td>保险基金耗尽后, 强制盈利方减仓来覆盖亏损方的穿仓损失</td>
+</tr>
+<tr>
+<td>Maker Rebate</td>
+<td>Maker Rebate</td>
+<td>给 maker 的返佣 (负手续费), 激励做市商提供流动性</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="二、dYdX-发展历程"><a href="#二、dYdX-发展历程" class="headerlink" title="二、dYdX 发展历程"></a>二、dYdX 发展历程</h2><p>dYdX 经历了四个大版本, 每次迁移都是为了解决上一版的核心瓶颈:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 420">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="780" height="420" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">dYdX 版本演进: v1 → v2/v3 → v4</text>
+  <!-- v1 -->
+  <rect x="30" y="50" width="220" height="120" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="140" y="70" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">v1 (2019)</text>
+  <text x="140" y="88" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Ethereum L1</text>
+  <text x="140" y="104" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Margin trading (非永续)</text>
+  <text x="140" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">所有操作在 L1 上</text>
+  <text x="140" y="132" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Gas 费极高, 速度极慢</text>
+  <rect x="50" y="144" width="180" height="16" rx="3" fill="#f472b6" fill-opacity="0.15"/>
+  <text x="140" y="155" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">瓶颈: L1 吞吐量完全不够</text>
+  <!-- Arrow v1 → v2/v3 -->
+  <line x1="250" y1="110" x2="278" y2="110" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- v2/v3 -->
+  <rect x="283" y="50" width="220" height="120" rx="6" fill="#818cf8" fill-opacity="0.08" stroke="#818cf8" stroke-width="1"/>
+  <text x="393" y="70" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="10" font-weight="bold">v2/v3 (2021)</text>
+  <text x="393" y="88" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">StarkEx (zk-rollup)</text>
+  <text x="393" y="104" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">链下撮合 + 链上结算</text>
+  <text x="393" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">StarkWare 提供 zk-proof</text>
+  <text x="393" y="132" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">10 TPS → 1000+ TPS</text>
+  <rect x="303" y="144" width="180" height="16" rx="3" fill="#818cf8" fill-opacity="0.15"/>
+  <text x="393" y="155" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="7">瓶颈: 中心化撮合 + StarkEx 受限</text>
+  <!-- Arrow v2/v3 → v4 -->
+  <line x1="503" y1="110" x2="531" y2="110" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- v4 -->
+  <rect x="536" y="50" width="220" height="120" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="646" y="70" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">v4 (2023)</text>
+  <text x="646" y="88" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Cosmos Appchain</text>
+  <text x="646" y="104" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">完全去中心化订单簿</text>
+  <text x="646" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">验证者运行撮合引擎</text>
+  <text x="646" y="132" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">无中心化组件, 自主定制</text>
+  <rect x="556" y="144" width="180" height="16" rx="3" fill="#5eead4" fill-opacity="0.15"/>
+  <text x="646" y="155" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">当前版本: 完全去中心化</text>
+  <!-- Why migrate section -->
+  <rect x="30" y="195" width="726" height="210" rx="6" fill="#fbbf24" fill-opacity="0.05" stroke="#fbbf24" stroke-width="0.5"/>
+  <text x="393" y="218" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="bold">为什么从 StarkEx 迁移到 Cosmos?</text>
+  <text x="50" y="242" fill="#cbd5e1" font-family="monospace" font-size="8">1. 去中心化: v3 的撮合引擎由 dYdX Trading Inc 中心化运行, 单点故障 + 监管风险</text>
+  <text x="50" y="260" fill="#cbd5e1" font-family="monospace" font-size="8">2. 性能自主: StarkEx 是共享基础设施, 无法为 dYdX 单独优化 (如自定义 block time)</text>
+  <text x="50" y="278" fill="#cbd5e1" font-family="monospace" font-size="8">3. 费用归属: v3 的交易费进了 dYdX Trading 口袋, v4 费用分配给验证者和 staker</text>
+  <text x="50" y="296" fill="#cbd5e1" font-family="monospace" font-size="8">4. 协议主权: Cosmos appchain = 自己的链, 自己的共识, 自己的治理, 不受 L1/L2 限制</text>
+  <text x="50" y="314" fill="#cbd5e1" font-family="monospace" font-size="8">5. 定制化: 可以在共识层面做订单撮合, 而不是受限于 EVM 的 gas 模型</text>
+  <rect x="50" y="330" width="706" height="60" rx="4" fill="#5eead4" fill-opacity="0.08"/>
+  <text x="393" y="350" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">核心洞察: 永续合约 DEX 需要极高的吞吐量和极低的延迟</text>
+  <text x="393" y="368" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">通用 L1/L2 无法同时满足, 所以 dYdX 选择了 "造一条专用链"</text>
+  <text x="393" y="386" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">(Hyperliquid 也走了类似路线, 但选择了自研 L1 而非 Cosmos)</text>
+</svg>
+</div>
+
+<h3 id="2-1-v1-Ethereum-L1-尝试"><a href="#2-1-v1-Ethereum-L1-尝试" class="headerlink" title="2.1 v1: Ethereum L1 尝试"></a>2.1 v1: Ethereum L1 尝试</h3><p>2019 年, dYdX 在 Ethereum L1 上做 margin trading:</p>
+<ul>
+<li>保证金交易 (不是永续合约)</li>
+<li>每笔订单提交&#x2F;取消都是一笔 L1 交易</li>
+<li>Gas 费高, 成交慢, 体验极差</li>
+</ul>
+<p><strong>教训</strong>: L1 根本不适合做高频交易场景.</p>
+<h3 id="2-2-v2-v3-StarkEx-混合架构"><a href="#2-2-v2-v3-StarkEx-混合架构" class="headerlink" title="2.2 v2&#x2F;v3: StarkEx 混合架构"></a>2.2 v2&#x2F;v3: StarkEx 混合架构</h3><p>2021 年, dYdX 迁移到 StarkEx (StarkWare 提供的 zk-rollup):</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 420">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="780" height="420" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">dYdX v3 StarkEx 架构: 链下撮合 + 链上结算</text>
+  <!-- Layer 1: Off-chain -->
+  <rect x="140" y="50" width="500" height="105" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="390" y="72" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">Off-chain (dYdX Trading Inc)</text>
+  <text x="660" y="72" fill="#9ca3af" font-family="monospace" font-size="7">← 中心化运行</text>
+  <rect x="175" y="85" width="180" height="50" rx="4" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="265" y="107" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">Order Book</text>
+  <text x="265" y="122" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">订单簿</text>
+  <line x1="355" y1="110" x2="393" y2="110" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <rect x="405" y="85" width="200" height="50" rx="4" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="505" y="107" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">Matching Engine</text>
+  <text x="505" y="122" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">撮合引擎</text>
+  <!-- Arrow down -->
+  <line x1="390" y1="155" x2="390" y2="183" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Layer 2: StarkEx -->
+  <rect x="140" y="190" width="500" height="80" rx="6" fill="#818cf8" fill-opacity="0.08" stroke="#818cf8" stroke-width="1"/>
+  <text x="390" y="212" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="10" font-weight="bold">StarkEx (zk-rollup)</text>
+  <text x="660" y="212" fill="#9ca3af" font-family="monospace" font-size="7">← 验证撮合正确性</text>
+  <rect x="265" y="222" width="250" height="35" rx="4" fill="#818cf8" fill-opacity="0.12" stroke="#818cf8" stroke-width="0.8"/>
+  <text x="390" y="244" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">zk-STARK Proof 生成</text>
+  <!-- Arrow down -->
+  <line x1="390" y1="270" x2="390" y2="298" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Layer 3: Ethereum L1 -->
+  <rect x="140" y="305" width="500" height="90" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="390" y="327" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">Ethereum L1</text>
+  <text x="660" y="327" fill="#9ca3af" font-family="monospace" font-size="7">← 最终结算</text>
+  <rect x="240" y="340" width="300" height="40" rx="4" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="390" y="357" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">Settlement + Proof Verification</text>
+  <text x="390" y="372" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">结算 + 证明验证</text>
+</svg>
+</div>
+
+<p><strong>优点</strong>: 性能大幅提升 (1000+ TPS), gas 费大幅降低<br><strong>缺点</strong>: 撮合引擎是中心化的, dYdX Trading Inc 可以:</p>
+<ul>
+<li>审查订单 (censor)</li>
+<li>宕机导致整个协议停止</li>
+<li>被监管机构要求关停</li>
+</ul>
+<p><strong>什么是 ZK-Rollup?</strong></p>
+<p>dYdX v3 用的 StarkEx 就是一种 ZK-Rollup. 两种 Rollup 都在链下执行交易, 把数据提交到 Ethereum, 区别在于 L1 怎么确认结果:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Optimistic Rollup (如 Arbitrum)</th>
+<th>ZK-Rollup (如 StarkEx)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>验证方式</td>
+<td>有人挑战才验证 (fraud proof)</td>
+<td>每次都验证 (validity proof)</td>
+</tr>
+<tr>
+<td>最终确认</td>
+<td>~7 天 (挑战期)</td>
+<td>几分钟 (proof 生成+验证)</td>
+</tr>
+<tr>
+<td>提款到 L1</td>
+<td>7 天等待</td>
+<td>几分钟~几小时</td>
+</tr>
+<tr>
+<td>EVM 兼容</td>
+<td>完全兼容 (容易)</td>
+<td>困难 (ZK 电路不天然兼容 EVM)</td>
+</tr>
+<tr>
+<td>proof 成本</td>
+<td>无 (只在被挑战时验证)</td>
+<td>高 (每批都要生成 proof, 需 GPU 集群)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">Optimistic</span>: <span class="hljs-string">&quot;先信你, 出了问题再查&quot;</span> → <span class="hljs-number">7</span> 天后确认<br><span class="hljs-attribute">ZK</span>:         <span class="hljs-string">&quot;每次交卷附上解题过程&quot;</span>  → 当场批改确认<br><br><span class="hljs-attribute">dYdX</span> v3 选 ZK-Rollup: 提款快, 不用等 <span class="hljs-number">7</span> 天<br><span class="hljs-attribute">dYdX</span> v4 放弃 ZK-Rollup: StarkEx 是 StarkWare 的闭源产品, 想自主 → 改用 Cosmos<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-3-v4-Cosmos-Appchain-当前版本"><a href="#2-3-v4-Cosmos-Appchain-当前版本" class="headerlink" title="2.3 v4: Cosmos Appchain (当前版本)"></a>2.3 v4: Cosmos Appchain (当前版本)</h3><p>2023 年 10 月, dYdX v4 在自己的 Cosmos appchain 上线:</p>
+<ul>
+<li><strong>完全去中心化</strong>: 没有任何中心化组件</li>
+<li><strong>验证者运行 order book</strong>: 撮合发生在共识层面</li>
+<li><strong>费用归协议</strong>: 交易费分配给验证者和 DYDX staker</li>
+<li><strong>协议主权</strong>: 独立链, 自主升级, 自主治理</li>
+</ul>
+<hr>
+<h2 id="三、dYdX-v4-架构"><a href="#三、dYdX-v4-架构" class="headerlink" title="三、dYdX v4 架构"></a>三、dYdX v4 架构</h2><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 520">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="780" height="520" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">dYdX v4 Cosmos Appchain 架构</text>
+  <!-- User layer -->
+  <rect x="270" y="45" width="240" height="40" rx="6" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <text x="390" y="70" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">交易者 (Frontend / API client)</text>
+  <line x1="390" y1="85" x2="390" y2="103" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Indexer -->
+  <rect x="540" y="105" width="200" height="80" rx="6" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="1"/>
+  <text x="640" y="125" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">Indexer</text>
+  <text x="640" y="142" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">读取链上数据, 构建</text>
+  <text x="640" y="155" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">REST/WebSocket API</text>
+  <text x="640" y="168" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">供前端查询 (只读)</text>
+  <!-- Validator cluster -->
+  <rect x="40" y="105" width="470" height="260" rx="6" fill="#5eead4" fill-opacity="0.05" stroke="#5eead4" stroke-width="1"/>
+  <text x="275" y="125" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">验证者集群 (60 个活跃验证者)</text>
+  <!-- Single validator detail -->
+  <rect x="60" y="140" width="200" height="210" rx="5" fill="#818cf8" fill-opacity="0.08" stroke="#818cf8" stroke-width="0.8"/>
+  <text x="160" y="160" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9" font-weight="bold">单个验证者节点</text>
+  <!-- In-memory order book -->
+  <rect x="75" y="172" width="170" height="40" rx="4" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="160" y="188" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">In-Memory Order Book</text>
+  <text x="160" y="200" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">不上链, 不进共识, 在内存中维护</text>
+  <!-- Matching engine -->
+  <rect x="75" y="220" width="170" height="35" rx="4" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="160" y="234" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">Matching Engine</text>
+  <text x="160" y="246" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">价格-时间优先撮合</text>
+  <!-- CometBFT -->
+  <rect x="75" y="263" width="170" height="35" rx="4" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="160" y="277" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">CometBFT Consensus</text>
+  <text x="160" y="289" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">2/3+ 验证者签名 = 最终确认</text>
+  <!-- State store -->
+  <rect x="75" y="306" width="170" height="35" rx="4" fill="#34d399" fill-opacity="0.12" stroke="#34d399" stroke-width="0.8"/>
+  <text x="160" y="320" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">On-Chain State</text>
+  <text x="160" y="332" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">持仓, 余额, 成交记录</text>
+  <!-- Other validators -->
+  <rect x="290" y="165" width="90" height="55" rx="5" fill="#818cf8" fill-opacity="0.06" stroke="#818cf8" stroke-width="0.5"/>
+  <text x="335" y="188" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="8">V2</text>
+  <text x="335" y="200" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">(同样结构)</text>
+  <rect x="400" y="165" width="90" height="55" rx="5" fill="#818cf8" fill-opacity="0.06" stroke="#818cf8" stroke-width="0.5"/>
+  <text x="445" y="188" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="8">V3</text>
+  <text x="445" y="200" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">(同样结构)</text>
+  <text x="375" y="240" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">...</text>
+  <rect x="290" y="255" width="90" height="55" rx="5" fill="#818cf8" fill-opacity="0.06" stroke="#818cf8" stroke-width="0.5"/>
+  <text x="335" y="278" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="8">V59</text>
+  <rect x="400" y="255" width="90" height="55" rx="5" fill="#818cf8" fill-opacity="0.06" stroke="#818cf8" stroke-width="0.5"/>
+  <text x="445" y="278" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="8">V60</text>
+  <!-- P2P gossip arrows -->
+  <line x1="260" y1="190" x2="290" y2="190" stroke="#5eead4" stroke-width="0.8" stroke-dasharray="3"/>
+  <line x1="380" y1="190" x2="400" y2="190" stroke="#5eead4" stroke-width="0.8" stroke-dasharray="3"/>
+  <text x="375" y="155" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">P2P gossip 传播订单</text>
+  <!-- Arrow to indexer -->
+  <line x1="510" y1="200" x2="540" y2="155" stroke="#fbbf24" stroke-width="0.8" stroke-dasharray="3"/>
+  <!-- Flow description -->
+  <rect x="40" y="385" width="700" height="120" rx="6" fill="#ffffff" fill-opacity="0.03" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="390" y="405" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9" font-weight="bold">一笔交易的生命周期</text>
+  <text x="60" y="425" fill="#f472b6" font-family="monospace" font-size="8">1. 用户提交订单 → 发送到最近的验证者节点</text>
+  <text x="60" y="443" fill="#5eead4" font-family="monospace" font-size="8">2. 验证者通过 P2P gossip 将订单广播给所有其他验证者</text>
+  <text x="60" y="461" fill="#818cf8" font-family="monospace" font-size="8">3. 每个验证者将订单加入自己的 in-memory order book</text>
+  <text x="60" y="479" fill="#fbbf24" font-family="monospace" font-size="8">4. 轮到某个验证者做 block proposer 时, 它撮合订单, 将成交结果打包进区块</text>
+  <text x="60" y="497" fill="#34d399" font-family="monospace" font-size="8">5. 其他验证者验证成交结果, 2/3+ 签名后区块确认, 状态更新 (持仓/余额变动)</text>
+</svg>
+</div>
+
+<h3 id="3-1-核心设计-链下-Order-Book-链上结算"><a href="#3-1-核心设计-链下-Order-Book-链上结算" class="headerlink" title="3.1 核心设计: 链下 Order Book + 链上结算"></a>3.1 核心设计: 链下 Order Book + 链上结算</h3><p>dYdX v4 最精妙的设计是: <strong>order book 不上链</strong>.</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 260">
+  <rect width="780" height="260" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">关键区分: 链下 vs 链上</text>
+  <!-- Left box: Off-chain -->
+  <rect x="30" y="50" width="350" height="190" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="205" y="75" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">不进共识 (内存)</text>
+  <text x="60" y="105" fill="#cbd5e1" font-family="monospace" font-size="9">- 未成交的订单</text>
+  <text x="60" y="127" fill="#cbd5e1" font-family="monospace" font-size="9">- 订单的提交/取消</text>
+  <text x="60" y="149" fill="#cbd5e1" font-family="monospace" font-size="9">- order book 状态</text>
+  <line x1="50" y1="170" x2="360" y2="170" stroke="#f472b6" stroke-width="0.5" stroke-opacity="0.4"/>
+  <text x="205" y="195" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">→ 在内存中, 极快</text>
+  <text x="205" y="215" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">不占区块空间, 不需要共识</text>
+  <!-- Right box: On-chain -->
+  <rect x="400" y="50" width="350" height="190" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="575" y="75" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">进入共识 (上链)</text>
+  <text x="430" y="105" fill="#cbd5e1" font-family="monospace" font-size="9">- 成交结果 (match)</text>
+  <text x="430" y="127" fill="#cbd5e1" font-family="monospace" font-size="9">- 持仓变动</text>
+  <text x="430" y="149" fill="#cbd5e1" font-family="monospace" font-size="9">- 余额变动</text>
+  <text x="430" y="171" fill="#cbd5e1" font-family="monospace" font-size="9">- 清算记录</text>
+  <line x1="420" y1="186" x2="730" y2="186" stroke="#5eead4" stroke-width="0.5" stroke-opacity="0.4"/>
+  <text x="575" y="210" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9">→ 在区块中, 有共识保证</text>
+  <text x="575" y="230" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">2/3+ 验证者确认, 不可篡改</text>
+</svg>
+</div>
+
+<p><strong>为什么订单不上链?</strong></p>
+<ul>
+<li>一个活跃市场, 每秒可能有 100+ 笔订单提交和取消</li>
+<li>如果每笔都要上链走共识, 吞吐量远远不够</li>
+<li>CEX 的核心竞争力就是 “内存中的订单簿 + 极速撮合”</li>
+<li>dYdX v4 把这个模式搬到了验证者节点里</li>
+</ul>
+<h3 id="3-1-1-两类订单-短期-vs-长期"><a href="#3-1-1-两类订单-短期-vs-长期" class="headerlink" title="3.1.1 两类订单: 短期 vs 长期"></a>3.1.1 两类订单: 短期 vs 长期</h3><p>并非所有订单都只在内存中. dYdX 按订单生命周期分为两类:</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span> Short-Term Order (短期订单)<br><span class="hljs-bullet">   -</span> 默认类型, 类似 CEX 的普通限价单 / 市价单<br><span class="hljs-bullet">   -</span> 只存在验证者内存中, 有效期极短 (最多 20 个区块 ≈ 几十秒)<br><span class="hljs-bullet">   -</span> 不上链, 不付 gas<br><span class="hljs-bullet">   -</span> 适合: 做市商高频报价, 普通用户市价单<br><br><span class="hljs-bullet">2.</span> Stateful Order (长期订单 / 条件单)<br><span class="hljs-bullet">   -</span> 止损单, GTC (Good-Till-Cancel, 撤销前有效) 等<br><span class="hljs-bullet">   -</span> 提交时上链 (写入区块, 付 gas), 取消时也上链<br><span class="hljs-bullet">   -</span> 即使没有成交, 也在链上状态中持久保存<br><span class="hljs-bullet">   -</span> 适合: 设好止损后关电脑走人的场景<br><br>为什么长期订单必须上链:<br>  止损单可能挂几天甚至几周<br>  如果只在内存中, 节点重启 → 止损丢失 → 用户不知道 → 爆仓<br>  这个风险不可接受, 所以宁可付 gas 也要上链<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-1-2-节点间同步-Gossip-协议-弱同步"><a href="#3-1-2-节点间同步-Gossip-协议-弱同步" class="headerlink" title="3.1.2 节点间同步: Gossip 协议 (弱同步)"></a>3.1.2 节点间同步: Gossip 协议 (弱同步)</h3><p>短期订单在验证者之间通过 P2P gossip (八卦协议) 传播:</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">传播过程:<br>  用户提交订单 → 发到最近的验证者 A<br>  验证者 A → gossip 给 <span class="hljs-keyword">B, </span>C, D...<br>  <span class="hljs-keyword">B </span>收到后 → gossip 给 E, F...<br>  通常几百 ms 内所有验证者都收到<br><br>这是弱同步 (最终一致性), 不是强同步:<br>  - 没有 <span class="hljs-string">&quot;所有人确认收到&quot;</span> 的机制<br>  - 不同验证者在同一瞬间可能看到不同的 <span class="hljs-keyword">order </span><span class="hljs-keyword">book</span><br><span class="hljs-keyword"></span>  - 谁当 <span class="hljs-keyword">block </span>proposer, 就用自己内存里的版本来撮合<br></code></pre></td></tr></table></figure>
+
+<p><strong>节点重启时会发生什么?</strong></p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">场景 <span class="hljs-number">1</span>: 节点 A 收到订单, 还没 gossip 出去就挂了<br>  → 订单丢失, 用户需要重新提交<br><br>场景 <span class="hljs-number">2</span>: 订单已广播到其他节点, A 挂了<br>  → 没影响, 其他节点继续撮合<br><br>场景 <span class="hljs-number">3</span>: 所有节点同时重启 (极端)<br>  → <span class="hljs-keyword">Short-Term </span><span class="hljs-keyword">Orders </span>全丢, 需要用户重发<br>  → Stateful <span class="hljs-keyword">Orders </span>从链上状态恢复, 不丢<br></code></pre></td></tr></table></figure>
+
+<p>实际影响很小: 短期订单有效期只有几十秒, 做市商每秒都在更新报价会自动重发, 普通用户的市价单几百 ms 内就该成交了.</p>
+<p><strong>vs Hyperliquid: 架构取舍对比</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>dYdX v4 (订单不上链)</th>
+<th>Hyperliquid (订单全上链)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>短期订单持久性</td>
+<td>可能丢 (内存 + gossip)</td>
+<td>不丢 (链上有记录)</td>
+</tr>
+<tr>
+<td>吞吐量</td>
+<td>高 (内存操作, 无共识开销)</td>
+<td>受限于共识速度 (需 HyperBFT)</td>
+</tr>
+<tr>
+<td>一致性</td>
+<td>弱 (最终一致, 各节点瞬时可能不同)</td>
+<td>强 (每个订单经过共识)</td>
+</tr>
+<tr>
+<td>可审计性</td>
+<td>中 (撮合过程不可验证)</td>
+<td>高 (全链路可验证)</td>
+</tr>
+<tr>
+<td>对共识层要求</td>
+<td>低 (只处理成交结果)</td>
+<td>极高 (处理每个订单)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>dYdX 选择 “订单不上链” 换来高吞吐, 代价是弱一致性和可能丢单;<br>Hyperliquid 选择 “每个订单上链” 保证不丢单和可审计, 代价是需要自研超高性能共识才扛得住.</p>
+</blockquote>
+<h3 id="3-2-CometBFT-共识"><a href="#3-2-CometBFT-共识" class="headerlink" title="3.2 CometBFT 共识"></a>3.2 CometBFT 共识</h3><p>dYdX v4 使用 CometBFT (原 Tendermint) 作为共识引擎:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>共识类型</td>
+<td>BFT (Byzantine Fault Tolerant)</td>
+</tr>
+<tr>
+<td>最终性</td>
+<td>即时最终性: 区块确认后不会回滚 (无 reorg)</td>
+</tr>
+<tr>
+<td>出块时间</td>
+<td>~1-2 秒</td>
+</tr>
+<tr>
+<td>验证者数量</td>
+<td>60 个活跃验证者</td>
+</tr>
+<tr>
+<td>容错</td>
+<td>最多 1&#x2F;3 验证者作恶仍能正常运行</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>vs Ethereum</strong>: Ethereum 有 reorg 风险, 需要等多个 block confirmation.<br>CometBFT 一旦出块就是最终的, 这对交易所至关重要, 因为你不希望 “成交了的交易” 被回滚.</p>
+</blockquote>
+<h3 id="3-3-为什么选-Cosmos-SDK"><a href="#3-3-为什么选-Cosmos-SDK" class="headerlink" title="3.3 为什么选 Cosmos SDK?"></a>3.3 为什么选 Cosmos SDK?</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>需求</th>
+<th>Cosmos 如何满足</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>自定义共识逻辑</td>
+<td>ABCI 接口允许在共识过程中插入自定义逻辑 (如订单撮合)</td>
+</tr>
+<tr>
+<td>独立出块节奏</td>
+<td>appchain 独立运行, 不受其他链拥堵影响</td>
+</tr>
+<tr>
+<td>无 gas 竞争</td>
+<td>不与其他 DApp 争抢 block space</td>
+</tr>
+<tr>
+<td>协议级定制</td>
+<td>可以在应用层实现 order book, oracle, liquidation 等</td>
+</tr>
+<tr>
+<td>主权治理</td>
+<td>DYDX token holder 投票决定协议升级</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>Cosmos appchain (应用链) 是什么?</strong></p>
+<p>Cosmos 不是一条链, 而是一套造链工具包:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs makefile">Cosmos SDK  = 造链框架 (Go 语言)<br>CometBFT    = 共识引擎 (原名 Tendermint)<br>IBC         = 跨链通信协议 (Inter-Blockchain Communication)<br><br>用 Cosmos SDK 造出来的链 = appchain (应用链)<br>每条 appchain 都是独立的 L1, 有自己的验证者集合<br><br><span class="hljs-section">类比:</span><br>  在 Arbitrum 部署合约 = 在商场里租铺位 (共享设施, 受商场规则限制)<br>  Cosmos appchain     = 自己盖一栋楼 (完全自主, 但要自己招保安)<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">Cosmos 生态知名链</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">Cosmos Hub (ATOM), Osmosis (DEX), dYdX Chain, Celestia (DA 层),</span><br><span class="hljs-attribute">  Injective (交易链), Noble (USDC 发行链)</span><br><span class="hljs-attribute">  总计 70+ 条 appchain, 通过 IBC 互联</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">dYdX 用户存 USDC 的路径</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">Ethereum USDC → Noble chain (Circle 在 Cosmos 的官方链) → IBC → dYdX</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">IBC 特点</span><span class="hljs-punctuation">:</span><br>  不需要信任第三方桥 (不像 Hyperliquid 的 bridge)<br>  安全性由两条链的验证者共同保障<br>  标准化协议, 所有 Cosmos 链原生支持<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、订单簿机制"><a href="#四、订单簿机制" class="headerlink" title="四、订单簿机制"></a>四、订单簿机制</h2><h3 id="4-1-订单类型"><a href="#4-1-订单类型" class="headerlink" title="4.1 订单类型"></a>4.1 订单类型</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 300">
+  <rect width="780" height="300" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">dYdX v4 订单类型</text>
+  <!-- Limit Order -->
+  <rect x="30" y="45" width="230" height="110" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="145" y="65" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">Limit Order (限价单)</text>
+  <text x="145" y="83" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">"以 $3000 买入 1 ETH"</text>
+  <text x="145" y="100" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">指定价格, 只在该价格或更优</text>
+  <text x="145" y="113" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">价格成交. 挂在 book 上等待.</text>
+  <text x="145" y="132" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">→ 通常作为 Maker 单</text>
+  <text x="145" y="145" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">支持 GTC / IOC / FOK / GTT</text>
+  <!-- Market Order -->
+  <rect x="275" y="45" width="230" height="110" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="390" y="65" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">Market Order (市价单)</text>
+  <text x="390" y="83" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">"立即买入 1 ETH"</text>
+  <text x="390" y="100" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">以当前最优价格立即成交</text>
+  <text x="390" y="113" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">不指定价格, 优先确保成交</text>
+  <text x="390" y="132" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">→ 一定是 Taker 单</text>
+  <text x="390" y="145" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">有滑点风险 (depth 不足时)</text>
+  <!-- Stop Order -->
+  <rect x="520" y="45" width="230" height="110" rx="6" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="1"/>
+  <text x="635" y="65" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="bold">Stop Order (止损/止盈)</text>
+  <text x="635" y="83" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">"ETH 跌到 $2800 时卖出"</text>
+  <text x="635" y="100" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">价格到达触发条件后</text>
+  <text x="635" y="113" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">自动变成 market/limit order</text>
+  <text x="635" y="132" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">→ Stop-Loss / Take-Profit</text>
+  <text x="635" y="145" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">由验证者监控触发条件</text>
+  <!-- Time in Force -->
+  <rect x="30" y="175" width="720" height="110" rx="6" fill="#ffffff" fill-opacity="0.03" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="390" y="195" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9" font-weight="bold">Time in Force (订单有效期)</text>
+  <text x="60" y="218" fill="#5eead4" font-family="monospace" font-size="8">GTC (Good-Til-Cancel)</text>
+  <text x="260" y="218" fill="#9ca3af" font-family="monospace" font-size="7">一直挂着, 直到成交或手动取消</text>
+  <text x="60" y="238" fill="#f472b6" font-family="monospace" font-size="8">IOC (Immediate-Or-Cancel)</text>
+  <text x="260" y="238" fill="#9ca3af" font-family="monospace" font-size="7">立即成交能成交的部分, 剩余取消</text>
+  <text x="60" y="258" fill="#fbbf24" font-family="monospace" font-size="8">FOK (Fill-Or-Kill)</text>
+  <text x="260" y="258" fill="#9ca3af" font-family="monospace" font-size="7">全部成交或全部取消, 不接受部分成交</text>
+  <text x="60" y="278" fill="#818cf8" font-family="monospace" font-size="8">GTT (Good-Til-Time)</text>
+  <text x="260" y="278" fill="#9ca3af" font-family="monospace" font-size="7">在指定时间之前有效, 过期自动取消</text>
+</svg>
+</div>
+
+<h3 id="4-2-Maker-vs-Taker"><a href="#4-2-Maker-vs-Taker" class="headerlink" title="4.2 Maker vs Taker"></a>4.2 Maker vs Taker</h3><p>这是理解订单簿的核心概念:</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">Maker (提供流动性)</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">挂出限价单, 放进 order book 等待</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">增加了 order book 的深度 → 对市场有益</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">通常享受更低手续费, 甚至 rebate (负手续费)</span><br><br><span class="hljs-attribute">Taker (消耗流动性)</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">下单立即与 book 中已有的订单成交</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">消耗了 order book 的深度</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">手续费较高</span><br><br><span class="hljs-attribute">判定规则</span><span class="hljs-punctuation">:</span> <span class="hljs-string">不是看订单类型, 而是看是否立即成交</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">限价单如果刚提交就能与 book 中已有订单匹配 → 这笔限价单是 Taker</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">限价单如果挂在 book 上等待 → 它是 Maker</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">市价单一定是 Taker (它总是立即成交)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-Price-Time-Priority-价格-时间优先"><a href="#4-3-Price-Time-Priority-价格-时间优先" class="headerlink" title="4.3 Price-Time Priority (价格-时间优先)"></a>4.3 Price-Time Priority (价格-时间优先)</h3><p>dYdX v4 使用经典的 <strong>价格-时间优先 (Price-Time Priority)</strong> 撮合算法, 和 CEX 完全一致:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 420">
+  <rect width="780" height="420" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="22" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Price-Time Priority 撮合示例 (ETH-USD)</text>
+  <!-- Rules -->
+  <text x="30" y="44" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">撮合规则:</text>
+  <text x="30" y="58" fill="#cbd5e1" font-family="monospace" font-size="8">1. 价格优先: 买单出价最高先成交, 卖单要价最低先成交</text>
+  <text x="30" y="71" fill="#cbd5e1" font-family="monospace" font-size="8">2. 时间优先: 同价格的订单, 先到的先成交</text>
+  <!-- Asks table -->
+  <rect x="30" y="85" width="340" height="150" rx="5" fill="#f472b6" fill-opacity="0.06" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="200" y="103" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">Asks (卖单, 价格从低到高)</text>
+  <line x1="50" y1="110" x2="350" y2="110" stroke="#f472b6" stroke-width="0.5" stroke-opacity="0.4"/>
+  <text x="90" y="123" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">Price</text>
+  <text x="200" y="123" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">Size</text>
+  <text x="300" y="123" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">Time</text>
+  <line x1="50" y1="128" x2="350" y2="128" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <!-- Ask rows -->
+  <rect x="40" y="132" width="320" height="16" rx="2" fill="#f472b6" fill-opacity="0.12"/>
+  <text x="90" y="144" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">$3001</text>
+  <text x="200" y="144" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">7 ETH</text>
+  <text x="300" y="144" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">14:00 ← Best Ask</text>
+  <rect x="40" y="150" width="320" height="16" rx="2" fill="#f472b6" fill-opacity="0.06"/>
+  <text x="90" y="162" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">$3001</text>
+  <text x="200" y="162" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">2 ETH</text>
+  <text x="300" y="162" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">14:02</text>
+  <text x="90" y="180" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">$3003</text>
+  <text x="200" y="180" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">3 ETH</text>
+  <text x="300" y="180" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">14:03</text>
+  <text x="90" y="198" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">$3005</text>
+  <text x="200" y="198" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">10 ETH</text>
+  <text x="300" y="198" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">14:01</text>
+  <!-- Bids table -->
+  <rect x="410" y="85" width="340" height="150" rx="5" fill="#34d399" fill-opacity="0.06" stroke="#34d399" stroke-width="0.8"/>
+  <text x="580" y="103" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">Bids (买单, 价格从高到低)</text>
+  <line x1="430" y1="110" x2="730" y2="110" stroke="#34d399" stroke-width="0.5" stroke-opacity="0.4"/>
+  <text x="470" y="123" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">Price</text>
+  <text x="580" y="123" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">Size</text>
+  <text x="680" y="123" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">Time</text>
+  <line x1="430" y1="128" x2="730" y2="128" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <rect x="420" y="132" width="320" height="16" rx="2" fill="#34d399" fill-opacity="0.12"/>
+  <text x="470" y="144" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8" font-weight="bold">$2998</text>
+  <text x="580" y="144" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">5 ETH</text>
+  <text x="680" y="144" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">14:00 ← Best Bid</text>
+  <text x="470" y="162" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">$2997</text>
+  <text x="580" y="162" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">8 ETH</text>
+  <text x="680" y="162" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">13:58</text>
+  <text x="470" y="180" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">$2995</text>
+  <text x="580" y="180" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">15 ETH</text>
+  <text x="680" y="180" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">14:02</text>
+  <text x="470" y="198" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">$2990</text>
+  <text x="580" y="198" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">20 ETH</text>
+  <text x="680" y="198" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">13:55</text>
+  <!-- Spread annotation -->
+  <line x1="200" y1="240" x2="580" y2="240" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4"/>
+  <text x="390" y="254" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">Spread = $3001 - $2998 = $3</text>
+  <!-- Match example -->
+  <rect x="30" y="270" width="720" height="140" rx="5" fill="#5eead4" fill-opacity="0.05" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="390" y="290" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">Taker 提交 "Market Buy 10 ETH": 撮合过程</text>
+  <!-- Step 1 -->
+  <circle cx="55" cy="314" r="9" fill="#f472b6" fill-opacity="0.2" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="55" y="317" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">1</text>
+  <text x="72" y="317" fill="#cbd5e1" font-family="monospace" font-size="8">吃 $3001 × 7 ETH (14:00 先到, 时间优先)</text>
+  <!-- Step 2 -->
+  <circle cx="55" cy="336" r="9" fill="#f472b6" fill-opacity="0.2" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="55" y="339" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">2</text>
+  <text x="72" y="339" fill="#cbd5e1" font-family="monospace" font-size="8">吃 $3001 × 2 ETH (14:02 后到)</text>
+  <!-- Step 3 -->
+  <circle cx="55" cy="358" r="9" fill="#f472b6" fill-opacity="0.2" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="55" y="361" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">3</text>
+  <text x="72" y="361" fill="#cbd5e1" font-family="monospace" font-size="8">还差 1 ETH, 吃 $3003 × 1 ETH (价格上升一档)</text>
+  <!-- Result -->
+  <line x1="50" y1="374" x2="730" y2="374" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <text x="390" y="392" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">avg_price (成交均价) = (7×3001 + 2×3001 + 1×3003) / 10 = $3001.2</text>
+  <text x="390" y="406" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">slippage (滑点) = $3001.2 - $3001 = $0.2</text>
+</svg>
+</div>
+
+<h3 id="4-4-订单簿深度与滑点"><a href="#4-4-订单簿深度与滑点" class="headerlink" title="4.4 订单簿深度与滑点"></a>4.4 订单簿深度与滑点</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 280">
+  <rect width="780" height="280" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Order Book Depth 可视化</text>
+  <!-- Axes -->
+  <line x1="80" y1="240" x2="700" y2="240" stroke="#9ca3af" stroke-width="0.8"/>
+  <line x1="390" y1="50" x2="390" y2="240" stroke="#9ca3af" stroke-width="0.8" stroke-dasharray="4"/>
+  <text x="390" y="258" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Mid Price</text>
+  <text x="80" y="258" fill="#9ca3af" font-family="monospace" font-size="7">← 低价</text>
+  <text x="670" y="258" fill="#9ca3af" font-family="monospace" font-size="7">高价 →</text>
+  <!-- Bid side (green, left) -->
+  <rect x="340" y="200" width="50" height="40" fill="#34d399" fill-opacity="0.4"/>
+  <rect x="290" y="180" width="100" height="60" fill="#34d399" fill-opacity="0.25"/>
+  <rect x="230" y="160" width="160" height="80" fill="#34d399" fill-opacity="0.15"/>
+  <rect x="160" y="130" width="230" height="110" fill="#34d399" fill-opacity="0.08"/>
+  <text x="260" y="80" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">Bids (买单)</text>
+  <!-- Ask side (red/pink, right) -->
+  <rect x="390" y="200" width="50" height="40" fill="#f472b6" fill-opacity="0.4"/>
+  <rect x="390" y="180" width="100" height="60" fill="#f472b6" fill-opacity="0.25"/>
+  <rect x="390" y="160" width="170" height="80" fill="#f472b6" fill-opacity="0.15"/>
+  <rect x="390" y="130" width="250" height="110" fill="#f472b6" fill-opacity="0.08"/>
+  <text x="520" y="80" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">Asks (卖单)</text>
+  <!-- Spread annotation -->
+  <line x1="340" y1="195" x2="340" y2="175" stroke="#fbbf24" stroke-width="0.8"/>
+  <line x1="440" y1="195" x2="440" y2="175" stroke="#fbbf24" stroke-width="0.8"/>
+  <line x1="340" y1="180" x2="440" y2="180" stroke="#fbbf24" stroke-width="1"/>
+  <text x="390" y="173" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">Spread</text>
+  <!-- Depth note -->
+  <text x="390" y="270" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">深度越大 (越宽越高), 大单滑点越小, 这就是为什么做市商如此重要</text>
+</svg>
+</div>
+
+<p><strong>深度决定滑点</strong>: 如果 order book 在 best ask 附近只有 5 ETH, 而你要买 50 ETH, 就需要往上 “吃” 很多层, 成交均价会远高于 best ask. 这就是 slippage.</p>
+<blockquote>
+<p><strong>vs GMX</strong>: GMX 用 oracle 定价, 理论上零滑点 (不管你买 1 ETH 还是 100 ETH, 价格一样).<br>但 GMX 有 open interest 上限, 大单可能根本无法成交.<br>Order book 模式没有硬上限, 但大单会有滑点.</p>
+</blockquote>
+<hr>
+<h2 id="五、做市商-Market-Maker"><a href="#五、做市商-Market-Maker" class="headerlink" title="五、做市商 (Market Maker)"></a>五、做市商 (Market Maker)</h2><p>做市商是订单簿型 DEX 的 “生命线”. 没有做市商, order book 就是空的, 没有人能交易.</p>
+<h3 id="5-1-做市商的角色"><a href="#5-1-做市商的角色" class="headerlink" title="5.1 做市商的角色"></a>5.1 做市商的角色</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">做市商的核心工作: 同时在 bid 和 ask 两侧挂单<br><br>  例: ETH 当前价格 <span class="hljs-variable">$3000</span><br><br>  做市商挂出:<br>    Buy  (Bid): 100 ETH @ <span class="hljs-variable">$2999</span>   ← <span class="hljs-string">&quot;我愿意以 <span class="hljs-variable">$2999</span> 买入&quot;</span><br>    Sell (Ask): 100 ETH @ <span class="hljs-variable">$3001</span>   ← <span class="hljs-string">&quot;我愿意以 <span class="hljs-variable">$3001</span> 卖出&quot;</span><br><br>  如果有人 market buy → 成交 <span class="hljs-variable">$3001</span><br>  如果有人 market sell → 成交 <span class="hljs-variable">$2999</span><br><br>  做市商赚取 spread (价差) = <span class="hljs-variable">$3001</span> - <span class="hljs-variable">$2999</span> = <span class="hljs-variable">$2</span><br>  每成交一对, 赚 <span class="hljs-variable">$2</span> / ETH<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-2-做市商的风险"><a href="#5-2-做市商的风险" class="headerlink" title="5.2 做市商的风险"></a>5.2 做市商的风险</h3><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs autoit">主要风险: Adverse Selection (逆向选择)<br><br>  做市商挂了 Sell <span class="hljs-number">100</span> ETH @ $3001<br>  突然 ETH 暴涨到 $3100<br><br>  知情交易者 (知道要涨) 立刻买走做市商的便宜货:<br>    买入 <span class="hljs-number">100</span> ETH @ $3001<br>    真实价值已经 $3100<br>    做市商亏了 <span class="hljs-number">100</span> × ($3100 - $3001) = $9,<span class="hljs-number">900</span><br><br>  做市商的 spread 收入远不够覆盖这笔亏损<br><br>  → 这就是为什么做市商需要:<br>    <span class="hljs-number">1.</span> 极快的速度 (在价格变动时迅速撤单/更新报价)<br>    <span class="hljs-number">2.</span> 足够大的 spread (覆盖逆向选择风险)<br>    <span class="hljs-number">3.</span> 协议给的 maker rebate (降低成本)<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-3-dYdX-的做市商激励"><a href="#5-3-dYdX-的做市商激励" class="headerlink" title="5.3 dYdX 的做市商激励"></a>5.3 dYdX 的做市商激励</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>激励机制</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Maker Rebate</td>
+<td>maker 成交不收手续费, 反而获得 rebate (如 -0.011%)</td>
+</tr>
+<tr>
+<td>低延迟</td>
+<td>验证者间 P2P gossip 传播快, 做市商可以快速更新报价</td>
+</tr>
+<tr>
+<td>Trading Rewards</td>
+<td>DYDX token 奖励, 按交易量分配</td>
+</tr>
+<tr>
+<td>API 支持</td>
+<td>完善的 gRPC&#x2F;REST&#x2F;WebSocket API, 方便程序化做市</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="5-4-为什么-DEX-订单簿特别需要做市商"><a href="#5-4-为什么-DEX-订单簿特别需要做市商" class="headerlink" title="5.4 为什么 DEX 订单簿特别需要做市商?"></a>5.4 为什么 DEX 订单簿特别需要做市商?</h3><p>CEX 和 DEX 的订单簿结构相同, 但流动性来源完全不同:</p>
+<p><strong>CEX 的流动性来源 (多层叠加):</strong></p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span> 散户挂限价单 (大量)<br><span class="hljs-bullet">   -</span> 用户习惯: &quot;我想 $2950 买 ETH&quot; → 挂单等着<br><span class="hljs-bullet">   -</span> CEX 界面鼓励挂单, 几百万用户自然形成深度<br><br><span class="hljs-bullet">2.</span> 量化团队 / 高频交易<br><span class="hljs-bullet">   -</span> 部署做市机器人, 延迟 &lt; 1ms<br><br><span class="hljs-bullet">3.</span> 专业做市商 (Jump, Wintermute 等)<br><span class="hljs-bullet">   -</span> 提供核心流动性, 尤其在新币和小币上<br></code></pre></td></tr></table></figure>
+
+<p><strong>DEX 订单簿的致命问题:</strong></p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span> 用户习惯不同<br><span class="hljs-bullet">   -</span> DeFi 用户被 Uniswap &quot;一键 swap&quot; 教育过<br><span class="hljs-bullet">   -</span> 很少有人去 DEX 手动挂限价单<br><br><span class="hljs-bullet">2.</span> 链上挂单有成本<br><span class="hljs-bullet">   -</span> 每次挂单/撤单 = 一笔交易 = gas fee<br><span class="hljs-bullet">   -</span> 做市商每秒可能调整几十次报价<br><span class="hljs-bullet">   -</span> CEX: 免费  vs  链上: 每次付 gas → 成本不可接受<br><br><span class="hljs-bullet">3.</span> 延迟问题<br><span class="hljs-bullet">   -</span> CEX 挂单生效 &lt; 1ms, 链上等区块确认 几百 ms ~ 几秒<br><span class="hljs-bullet">   -</span> 做市商需要在价格变动时瞬间撤单/更新报价<br><span class="hljs-bullet">   -</span> 延迟太大 → 被套利者的 &quot;毒流量&quot; (toxic flow) 吃掉<br><br><span class="hljs-bullet">4.</span> 死亡螺旋<br><span class="hljs-bullet">   -</span> 没有散户挂单 → order book 空 → 滑点巨大 → 没人用 → 更没人挂单<br></code></pre></td></tr></table></figure>
+
+<p><strong>CEX vs DEX 订单簿对比:</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>CEX 订单簿</th>
+<th>DEX 订单簿</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>散户挂单量</td>
+<td>大量 (免费, 习惯)</td>
+<td>几乎没有 (付 gas, 不习惯)</td>
+</tr>
+<tr>
+<td>做市商调整成本</td>
+<td>免费, &lt; 1ms</td>
+<td>每次付 gas, 几百 ms</td>
+</tr>
+<tr>
+<td>自然深度</td>
+<td>有 (百万级用户)</td>
+<td>无 (用户都用 swap)</td>
+</tr>
+<tr>
+<td>没有做市商会怎样</td>
+<td>深度变薄, 但还能用</td>
+<td>基本不可用, book 是空的</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>各协议的解决方案:</strong></p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>协议</th>
+<th>方案</th>
+<th>本质</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>dYdX v4</td>
+<td>order book 放内存 (不付 gas) + Maker Rebate + DYDX token 奖励</td>
+<td>花钱请做市商来填满 order book</td>
+</tr>
+<tr>
+<td>Hyperliquid</td>
+<td>自研高性能 L1 (~200ms) + HLP Vault (协议自己跑做市策略) + HIP-2 (新 token 自动做市)</td>
+<td>做市商不来? 那协议自己当做市商</td>
+</tr>
+<tr>
+<td>GMX</td>
+<td>不用订单簿, Oracle 定价, LP 池当对手方</td>
+<td>绕开了订单簿流动性问题, 代价是 LP 承担对手方风险</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="六、保证金与清算"><a href="#六、保证金与清算" class="headerlink" title="六、保证金与清算"></a>六、保证金与清算</h2><blockquote>
+<p>保证金基础概念详见保证金管理与清算引擎. 这里只讲 dYdX v4 的特有实现.</p>
+</blockquote>
+<h3 id="6-1-Cross-Margin-全仓保证金"><a href="#6-1-Cross-Margin-全仓保证金" class="headerlink" title="6.1 Cross Margin (全仓保证金)"></a>6.1 Cross Margin (全仓保证金)</h3><p>dYdX v4 默认使用 <strong>cross margin</strong> 模式:</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">Cross Margin (全仓)</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">所有持仓共享同一个保证金池</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">任何一个持仓的未实现利润可以作为其他持仓的保证金</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">好处: 资金效率高, 不容易被清算</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">风险: 一个持仓大亏可能连带其他持仓一起被清算</span><br><br>  <span class="hljs-attribute">例</span><span class="hljs-punctuation">:</span> <span class="hljs-string">账户 10,000 USDC</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">ETH Long: +$500 未实现利润</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">BTC Short: -$300 未实现亏损</span><br>    <span class="hljs-attribute">available margin (可用保证金) = 10,000 + 500 - 300 = $10,200</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">Isolated Margin (逐仓, 也支持)</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">每个持仓单独分配保证金</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">一个持仓爆仓不影响其他持仓</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">资金效率较低</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="6-2-验证者执行清算"><a href="#6-2-验证者执行清算" class="headerlink" title="6.2 验证者执行清算"></a>6.2 验证者执行清算</h3><p>dYdX v4 的清算机制与 GMX 有本质区别:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 250">
+  <rect width="780" height="250" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">清算执行: dYdX vs GMX</text>
+  <!-- dYdX -->
+  <rect x="30" y="45" width="350" height="180" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="205" y="65" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">dYdX v4: 验证者清算</text>
+  <text x="205" y="88" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">验证者在每个区块中检查所有持仓</text>
+  <text x="205" y="106" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">发现保证金不足 → 自动在区块中执行清算</text>
+  <text x="205" y="130" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">优点: 无需外部 keeper, 无 MEV 竞争</text>
+  <text x="205" y="148" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">清算是协议内置逻辑, 不是外部激励</text>
+  <text x="205" y="172" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">清算订单直接放入 order book 成交</text>
+  <text x="205" y="188" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">如果 order book 流动性不足 → 走 ADL (自动减仓)</text>
+  <!-- GMX -->
+  <rect x="400" y="45" width="350" height="180" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="575" y="65" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">GMX: Keeper 清算</text>
+  <text x="575" y="88" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">外部 keeper 监控所有持仓</text>
+  <text x="575" y="106" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">发现可清算 → 提交清算交易, 赚取奖励</text>
+  <text x="575" y="130" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">依赖外部激励, 可能有延迟</text>
+  <text x="575" y="148" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">Keeper 之间有 MEV 竞争</text>
+  <text x="575" y="172" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">清算价格由 oracle 决定</text>
+  <text x="575" y="188" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">穿仓部分由 GLP 池承担</text>
+  <text x="390" y="240" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">dYdX 的清算更像 CEX (内置引擎), GMX 更像传统 DeFi (外部 keeper 激励)</text>
+</svg>
+</div>
+
+<h3 id="6-3-Insurance-Fund-保险基金-ADL-自动减仓"><a href="#6-3-Insurance-Fund-保险基金-ADL-自动减仓" class="headerlink" title="6.3 Insurance Fund (保险基金) &amp; ADL (自动减仓)"></a>6.3 Insurance Fund (保险基金) &amp; ADL (自动减仓)</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 310">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="780" height="310" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="22" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">dYdX v4 清算流程</text>
+  <!-- Step 1 -->
+  <circle cx="50" cy="55" r="13" fill="#f472b6" fill-opacity="0.2" stroke="#f472b6" stroke-width="1"/>
+  <text x="50" y="59" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">1</text>
+  <text x="75" y="59" fill="#cbd5e1" font-family="monospace" font-size="8">持仓保证金 &lt; 维持保证金 (maintenance margin) → 触发清算</text>
+  <!-- Arrow -->
+  <line x1="50" y1="68" x2="50" y2="80" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr)"/>
+  <!-- Step 2 -->
+  <circle cx="50" cy="100" r="13" fill="#fbbf24" fill-opacity="0.2" stroke="#fbbf24" stroke-width="1"/>
+  <text x="50" y="104" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="bold">2</text>
+  <text x="75" y="104" fill="#cbd5e1" font-family="monospace" font-size="8">验证者将该持仓作为清算订单放入 order book (订单簿)</text>
+  <!-- Arrow -->
+  <line x1="50" y1="113" x2="50" y2="125" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr)"/>
+  <!-- Step 3 - branch -->
+  <circle cx="50" cy="145" r="13" fill="#34d399" fill-opacity="0.2" stroke="#34d399" stroke-width="1"/>
+  <text x="50" y="149" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="10" font-weight="bold">3</text>
+  <text x="75" y="149" fill="#34d399" font-family="monospace" font-size="8">order book 流动性充足 → 正常清算, 剩余保证金进入 Insurance Fund (保险基金)</text>
+  <!-- Arrow to step 4 (failure path) -->
+  <line x1="50" y1="158" x2="50" y2="170" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr)"/>
+  <!-- Step 4 -->
+  <circle cx="50" cy="190" r="13" fill="#fbbf24" fill-opacity="0.2" stroke="#fbbf24" stroke-width="1"/>
+  <text x="50" y="194" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="bold">4</text>
+  <text x="75" y="194" fill="#fbbf24" font-family="monospace" font-size="8">清算后亏损 (穿仓) → Insurance Fund 兜底</text>
+  <!-- Arrow to step 5 -->
+  <line x1="50" y1="203" x2="50" y2="215" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr)"/>
+  <!-- Step 5 -->
+  <circle cx="50" cy="235" r="13" fill="#f472b6" fill-opacity="0.2" stroke="#f472b6" stroke-width="1"/>
+  <text x="50" y="239" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">5</text>
+  <text x="75" y="239" fill="#f472b6" font-family="monospace" font-size="8">Insurance Fund 也不够 → 触发 ADL (Auto-Deleveraging, 自动减仓)</text>
+  <!-- ADL detail box -->
+  <rect x="100" y="260" width="580" height="40" rx="5" fill="#f472b6" fill-opacity="0.06" stroke="#f472b6" stroke-width="0.6"/>
+  <text x="110" y="276" fill="#9ca3af" font-family="monospace" font-size="7">ADL: 按 "盈利比例 × 杠杆倍数" 排名, 从最高的对手方开始强制平仓, 用对手方的盈利覆盖穿仓损失</text>
+  <text x="110" y="292" fill="#9ca3af" font-family="monospace" font-size="7">这是最后手段, 极端行情才会触发</text>
+</svg>
+</div>
+
+<hr>
+<h2 id="七、Funding-Rate"><a href="#七、Funding-Rate" class="headerlink" title="七、Funding Rate"></a>七、Funding Rate</h2><p>dYdX v4 的 funding rate 机制与 CEX 标准一致 (详见永续合约机制详解 section 3):</p>
+<h3 id="7-1-计算方式"><a href="#7-1-计算方式" class="headerlink" title="7.1 计算方式"></a>7.1 计算方式</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">funding_rate (资金费率) = premium_component (溢价分量) + interest_component (利息分量)<br>// v4 中 interest_component = <span class="hljs-number">0</span> (已移除, v3 遗留), 实际 funding_rate = premium_component<br><br>premium (溢价) = (mark_price (标记价格) - index_price (指数价格)) / index_price<br><br>其中:<br>  mark_price  = <span class="hljs-keyword">order</span> <span class="hljs-title">book</span> 的 mid-price (中间价) = (best_bid (最高买价) + best_ask (最低卖价)) / <span class="hljs-number">2</span><br>  index_price = 验证者从多个 CEX 获取的加权价格<br><br>  注意 vs GMX: GMX 没有 <span class="hljs-keyword">order</span> <span class="hljs-title">book</span>, 所以用不同的 premium 计算方式.<br>  dYdX 和 CEX 一样, 直接用 <span class="hljs-keyword">order</span> <span class="hljs-title">book</span> mid-price 和 index price 的偏差.<br></code></pre></td></tr></table></figure>
+
+<h3 id="7-2-结算周期"><a href="#7-2-结算周期" class="headerlink" title="7.2 结算周期"></a>7.2 结算周期</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>dYdX v4</th>
+<th>dYdX v3 &#x2F; CEX (Binance)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>结算频率</td>
+<td>每个区块连续累积</td>
+<td>每 8 小时离散结算</td>
+</tr>
+<tr>
+<td>结算时间</td>
+<td>无固定时间点 (持续生效)</td>
+<td>0:00, 8:00, 16:00 UTC</td>
+</tr>
+<tr>
+<td>费率显示</td>
+<td>以 8h 为单位显示 (方便对比)</td>
+<td>以 8h 为单位</td>
+</tr>
+<tr>
+<td>Premium 采样</td>
+<td>每分钟采样, 取 8h 加权平均</td>
+<td>类似</td>
+</tr>
+<tr>
+<td>上限</td>
+<td>有 clamp, 防止极端值</td>
+<td>有 clamp</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>v4 vs v3 区别</strong>: v3 和 CEX 一样, 在固定时间点 (每 8h) 离散结算 funding.<br>v4 改为每个区块连续累积, 持仓者的 funding 每个区块都在更新.<br>费率仍以 “8h” 为单位显示, 便于和 CEX 对比, 但实际按区块时间等比例累计.</p>
+</blockquote>
+<blockquote>
+<p><strong>核心机制回顾</strong> (详见永续合约机制详解):</p>
+<ul>
+<li>永续价格 &gt; 现货 → funding rate 正 → 多头付钱给空头 → 抑制做多, 拉回价格</li>
+<li>永续价格 &lt; 现货 → funding rate 负 → 空头付钱给多头 → 抑制做空, 拉回价格</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="八、Oracle"><a href="#八、Oracle" class="headerlink" title="八、Oracle"></a>八、Oracle</h2><p>dYdX v4 的 oracle 设计是完全去中心化的:</p>
+<h3 id="8-1-价格获取流程"><a href="#8-1-价格获取流程" class="headerlink" title="8.1 价格获取流程"></a>8.1 价格获取流程</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 330">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"/>
+    </marker>
+  </defs>
+  <rect width="780" height="330" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">dYdX v4 Oracle 价格获取流程</text>
+  <!-- CEX sources -->
+  <rect x="100" y="50" width="140" height="45" rx="5" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="170" y="77" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">Binance</text>
+  <rect x="270" y="50" width="140" height="45" rx="5" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="340" y="77" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">OKX</text>
+  <rect x="440" y="50" width="140" height="45" rx="5" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="510" y="77" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">Coinbase</text>
+  <rect x="610" y="50" width="70" height="45" rx="5" fill="#fbbf24" fill-opacity="0.06" stroke="#fbbf24" stroke-width="0.6"/>
+  <text x="645" y="77" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">...</text>
+  <text x="710" y="77" fill="#9ca3af" font-family="monospace" font-size="7">多个 CEX</text>
+  <!-- Arrows down converge -->
+  <line x1="170" y1="95" x2="330" y2="143" stroke="#fbbf24" stroke-width="0.8" marker-end="url(#arr1)"/>
+  <line x1="340" y1="95" x2="380" y2="143" stroke="#fbbf24" stroke-width="0.8" marker-end="url(#arr1)"/>
+  <line x1="510" y1="95" x2="440" y2="143" stroke="#fbbf24" stroke-width="0.8" marker-end="url(#arr1)"/>
+  <line x1="645" y1="95" x2="500" y2="143" stroke="#fbbf24" stroke-width="0.8" stroke-dasharray="3" marker-end="url(#arr1)"/>
+  <!-- Validator fetch layer -->
+  <rect x="165" y="145" width="450" height="60" rx="6" fill="#818cf8" fill-opacity="0.08" stroke="#818cf8" stroke-width="1"/>
+  <text x="390" y="170" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9" font-weight="bold">每个验证者各自拉取价格</text>
+  <text x="390" y="190" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">独立运行, 无中心化服务 (Slinky sidecar)</text>
+  <!-- Arrow down -->
+  <line x1="390" y1="205" x2="390" y2="233" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Consensus median layer -->
+  <rect x="165" y="240" width="450" height="70" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="390" y="265" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">共识过程中确定最终价格</text>
+  <text x="390" y="285" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">验证者提交各自价格 → 取中位数 → 2/3+ 签名确认</text>
+  <text x="390" y="300" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="7">每个区块更新 (~1-2 秒), 无单点故障</text>
+</svg>
+</div>
+
+<h3 id="8-2-Skip-Protocol-Slinky"><a href="#8-2-Skip-Protocol-Slinky" class="headerlink" title="8.2 Skip Protocol (Slinky)"></a>8.2 Skip Protocol (Slinky)</h3><p>dYdX v4 集成了 Skip Protocol 的 Slinky oracle:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>集成方式</td>
+<td>作为验证者 sidecar 运行, 每个验证者节点旁边跑一个 Slinky 进程</td>
+</tr>
+<tr>
+<td>数据源</td>
+<td>多个 CEX (Binance, OKX, Coinbase, Kraken, etc.)</td>
+</tr>
+<tr>
+<td>更新频率</td>
+<td>每个区块都更新价格 (~1-2 秒)</td>
+</tr>
+<tr>
+<td>安全模型</td>
+<td>价格由 2&#x2F;3+ 验证者共识确认, 无单点故障</td>
+</tr>
+<tr>
+<td>vs Chainlink</td>
+<td>Chainlink 是外部 oracle network; Slinky 内置在验证者中, 延迟更低</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>为什么不用 Chainlink?</strong></p>
+<ol>
+<li>dYdX 是 Cosmos appchain, Chainlink 主要服务 EVM 链</li>
+<li>内置 oracle 延迟更低 (不需要等外部 oracle 更新)</li>
+<li>安全模型统一: oracle 和协议用同一套验证者, 不需要信任第三方</li>
+</ol>
+</blockquote>
+<hr>
+<h2 id="九、费率结构"><a href="#九、费率结构" class="headerlink" title="九、费率结构"></a>九、费率结构</h2><h3 id="9-1-Maker-Taker-费率分层"><a href="#9-1-Maker-Taker-费率分层" class="headerlink" title="9.1 Maker&#x2F;Taker 费率分层"></a>9.1 Maker&#x2F;Taker 费率分层</h3><p>dYdX v4 根据 30 天交易量分层收费:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>30d 交易量</th>
+<th>Maker Fee</th>
+<th>Taker Fee</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>&lt; $1M</td>
+<td>-0.011% (rebate)</td>
+<td>0.050%</td>
+</tr>
+<tr>
+<td>2</td>
+<td>$1M - $5M</td>
+<td>-0.011%</td>
+<td>0.045%</td>
+</tr>
+<tr>
+<td>3</td>
+<td>$5M - $25M</td>
+<td>-0.011%</td>
+<td>0.040%</td>
+</tr>
+<tr>
+<td>4</td>
+<td>$25M - $125M</td>
+<td>-0.011%</td>
+<td>0.035%</td>
+</tr>
+<tr>
+<td>5</td>
+<td>&gt; $125M</td>
+<td>-0.011%</td>
+<td>0.030%</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>注: 具体费率可能随治理提案调整, 以上为典型结构.</p>
+</blockquote>
+<p><strong>关键点</strong>:</p>
+<ul>
+<li>Maker 始终获得 <strong>rebate</strong> (负手续费 &#x3D; 协议倒贴钱给你)</li>
+<li>这是吸引做市商的核心手段</li>
+<li>协议的收入来源是 taker fee</li>
+</ul>
+<h3 id="9-2-Trading-Rewards"><a href="#9-2-Trading-Rewards" class="headerlink" title="9.2 Trading Rewards"></a>9.2 Trading Rewards</h3><figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">DYDX Token 奖励</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">按交易量分配 DYDX token</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">相当于额外降低了交易成本</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">激励早期用户和做市商</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">随时间递减 (类似流动性挖矿)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="9-3-费用去向"><a href="#9-3-费用去向" class="headerlink" title="9.3 费用去向"></a>9.3 费用去向</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 340">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="780" height="340" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">dYdX 费用分配: v3 vs v4</text>
+  <!-- v3 comparison -->
+  <rect x="30" y="45" width="340" height="45" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="50" y="65" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">v3:</text>
+  <text x="80" y="65" fill="#cbd5e1" font-family="monospace" font-size="9">交易费 → dYdX Trading Inc</text>
+  <text x="50" y="80" fill="#9ca3af" font-family="monospace" font-size="7">中心化, 有争议</text>
+  <!-- v4 comparison -->
+  <rect x="400" y="45" width="350" height="45" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="420" y="65" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">v4:</text>
+  <text x="450" y="65" fill="#cbd5e1" font-family="monospace" font-size="9">交易费 → 验证者 + DYDX staker</text>
+  <text x="420" y="80" fill="#9ca3af" font-family="monospace" font-size="7">去中心化, 社区受益</text>
+  <!-- v4 Fee flow title -->
+  <text x="390" y="120" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9" font-weight="bold">v4 费用分配流程</text>
+  <!-- Taker Fee source -->
+  <rect x="290" y="135" width="200" height="40" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="390" y="160" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="bold">Taker Fee</text>
+  <!-- Arrow down -->
+  <line x1="390" y1="175" x2="390" y2="198" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Three branches -->
+  <line x1="390" y1="203" x2="150" y2="230" stroke="#f472b6" stroke-width="0.8"/>
+  <line x1="390" y1="203" x2="390" y2="230" stroke="#818cf8" stroke-width="0.8"/>
+  <line x1="390" y1="203" x2="630" y2="230" stroke="#34d399" stroke-width="0.8"/>
+  <!-- Maker Rebate -->
+  <rect x="40" y="230" width="220" height="55" rx="5" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="150" y="253" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">Maker Rebate</text>
+  <text x="150" y="273" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">付给 maker (-0.011%)</text>
+  <!-- Validator + Staker -->
+  <rect x="280" y="230" width="220" height="55" rx="5" fill="#818cf8" fill-opacity="0.08" stroke="#818cf8" stroke-width="0.8"/>
+  <text x="390" y="253" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9" font-weight="bold">验证者 + Staker</text>
+  <text x="390" y="273" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">剩余费用的主要去向</text>
+  <!-- Community Pool -->
+  <rect x="520" y="230" width="220" height="55" rx="5" fill="#34d399" fill-opacity="0.08" stroke="#34d399" stroke-width="0.8"/>
+  <text x="630" y="253" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">Community Pool</text>
+  <text x="630" y="273" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">社区治理基金</text>
+  <!-- Summary -->
+  <rect x="120" y="300" width="540" height="25" rx="4" fill="#5eead4" fill-opacity="0.06"/>
+  <text x="390" y="317" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Taker Fee - Maker Rebate = 协议净收入 → 分配给验证者, staker, community pool</text>
+</svg>
+</div>
+
+<hr>
+<h2 id="十、vs-CEX-对比"><a href="#十、vs-CEX-对比" class="headerlink" title="十、vs CEX 对比"></a>十、vs CEX 对比</h2><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 350">
+  <rect width="780" height="350" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">dYdX v4 vs CEX (Binance Futures)</text>
+  <!-- Headers -->
+  <rect x="30" y="40" width="150" height="30" rx="4" fill="#9ca3af" fill-opacity="0.2"/>
+  <text x="105" y="60" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9" font-weight="bold">维度</text>
+  <rect x="190" y="40" width="270" height="30" rx="4" fill="#5eead4" fill-opacity="0.1"/>
+  <text x="325" y="60" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">dYdX v4</text>
+  <rect x="470" y="40" width="280" height="30" rx="4" fill="#f472b6" fill-opacity="0.1"/>
+  <text x="610" y="60" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">Binance Futures (CEX)</text>
+  <!-- Rows -->
+  <text x="50" y="95" fill="#cbd5e1" font-family="monospace" font-size="8">托管</text>
+  <text x="210" y="95" fill="#34d399" font-family="monospace" font-size="8">非托管 (自己控制私钥)</text>
+  <text x="490" y="95" fill="#fbbf24" font-family="monospace" font-size="8">托管 (资金存在交易所)</text>
+  <text x="50" y="120" fill="#cbd5e1" font-family="monospace" font-size="8">KYC</text>
+  <text x="210" y="120" fill="#34d399" font-family="monospace" font-size="8">无 KYC (任何人可用)</text>
+  <text x="490" y="120" fill="#fbbf24" font-family="monospace" font-size="8">强制 KYC, 部分地区封禁</text>
+  <text x="50" y="145" fill="#cbd5e1" font-family="monospace" font-size="8">透明度</text>
+  <text x="210" y="145" fill="#34d399" font-family="monospace" font-size="8">完全链上可验证</text>
+  <text x="490" y="145" fill="#fbbf24" font-family="monospace" font-size="8">黑箱, 需信任交易所</text>
+  <text x="50" y="170" fill="#cbd5e1" font-family="monospace" font-size="8">延迟</text>
+  <text x="210" y="170" fill="#fbbf24" font-family="monospace" font-size="8">~1-2 秒 (区块时间)</text>
+  <text x="490" y="170" fill="#34d399" font-family="monospace" font-size="8">~1-10 毫秒</text>
+  <text x="50" y="195" fill="#cbd5e1" font-family="monospace" font-size="8">深度</text>
+  <text x="210" y="195" fill="#fbbf24" font-family="monospace" font-size="8">较薄 (做市商有限)</text>
+  <text x="490" y="195" fill="#34d399" font-family="monospace" font-size="8">极深 (大量散户+做市商)</text>
+  <text x="50" y="220" fill="#cbd5e1" font-family="monospace" font-size="8">费率</text>
+  <text x="210" y="220" fill="#cbd5e1" font-family="monospace" font-size="8">Maker -0.011% / Taker 0.05%</text>
+  <text x="490" y="220" fill="#cbd5e1" font-family="monospace" font-size="8">Maker 0.02% / Taker 0.04%</text>
+  <text x="50" y="245" fill="#cbd5e1" font-family="monospace" font-size="8">交易对</text>
+  <text x="210" y="245" fill="#fbbf24" font-family="monospace" font-size="8">~180+ 交易对</text>
+  <text x="490" y="245" fill="#34d399" font-family="monospace" font-size="8">~300+ 交易对</text>
+  <text x="50" y="270" fill="#cbd5e1" font-family="monospace" font-size="8">单点故障</text>
+  <text x="210" y="270" fill="#34d399" font-family="monospace" font-size="8">无 (60 个验证者分布式)</text>
+  <text x="490" y="270" fill="#fbbf24" font-family="monospace" font-size="8">有 (服务器/监管/跑路)</text>
+  <!-- Summary -->
+  <rect x="30" y="290" width="720" height="45" rx="4" fill="#5eead4" fill-opacity="0.08"/>
+  <text x="390" y="310" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">dYdX 的真正优势不是 "比 CEX 更快更便宜", 而是 "非托管 + 无 KYC + 透明 + 抗审查"</text>
+  <text x="390" y="325" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">如果你只在乎速度和深度, CEX 永远赢. 但如果你在乎资产主权和无许可交易, dYdX 是更好的选择.</text>
+</svg>
+</div>
+
+<h3 id="10-1-dYdX-vs-GMX-定价与撮合方式对比"><a href="#10-1-dYdX-vs-GMX-定价与撮合方式对比" class="headerlink" title="10.1 dYdX vs GMX (定价与撮合方式对比)"></a>10.1 dYdX vs GMX (定价与撮合方式对比)</h3><p>“Oracle 型” vs “订单簿型” 指的是<strong>定价机制和成交方式</strong>的区别, 不是风控模型的区别, 两者都有 OI 限制等风控措施.</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>dYdX v4 (订单簿型)</th>
+<th>GMX (Oracle 型)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定价机制</td>
+<td>Order book 供需撮合</td>
+<td>Chainlink oracle 直接喂价</td>
+</tr>
+<tr>
+<td>滑点</td>
+<td>有 (取决于 depth)</td>
+<td>零滑点 (但有 price impact)</td>
+</tr>
+<tr>
+<td>对手方</td>
+<td>其他交易者 (P2P)</td>
+<td>GLP&#x2F;GM 池 (交易者 vs LP)</td>
+</tr>
+<tr>
+<td>做市商</td>
+<td>需要专业做市商</td>
+<td>不需要 (oracle 定价)</td>
+</tr>
+<tr>
+<td>大单支持</td>
+<td>取决于 depth</td>
+<td>受 OI 上限限制</td>
+</tr>
+<tr>
+<td>LP 角色</td>
+<td>做市商提供报价</td>
+<td>GLP holder 被动做对手方</td>
+</tr>
+<tr>
+<td>价格发现</td>
+<td>有 (自己的 order book)</td>
+<td>无 (跟随外部 oracle)</td>
+</tr>
+<tr>
+<td>复杂度</td>
+<td>高 (需要 appchain)</td>
+<td>低 (EVM 智能合约)</td>
+</tr>
+<tr>
+<td>OI 限制</td>
+<td>有, 治理参数设定每个市场的 OI Cap</td>
+<td>有, Reserve 机制 (池子资产决定上限)</td>
+</tr>
+<tr>
+<td>OI 调整方式</td>
+<td>DYDX 持有者链上治理投票</td>
+<td>由池子规模自动决定</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>关键洞察</strong>: 订单簿型 perp 有 <strong>价格发现</strong> 能力: 它可以反映市场供需, 甚至领先于现货市场.<br>Oracle 型 perp 只能跟随现货价格, 永远不会 “发现” 新价格.<br>这就是为什么 CEX 都用订单簿: 它不仅是交易场所, 也是价格发现场所.</p>
+</blockquote>
+<hr>
+<h2 id="十一、Go-与-dYdX-v4-交互"><a href="#十一、Go-与-dYdX-v4-交互" class="headerlink" title="十一、Go: 与 dYdX v4 交互"></a>十一、Go: 与 dYdX v4 交互</h2><p>dYdX v4 是 Cosmos appchain, 可以通过 gRPC 和 REST API 交互.</p>
+<h3 id="11-1-查询-Order-Book"><a href="#11-1-查询-Order-Book" class="headerlink" title="11.1 查询 Order Book"></a>11.1 查询 Order Book</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;context&quot;</span><br>	<span class="hljs-string">&quot;encoding/json&quot;</span><br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;io&quot;</span><br>	<span class="hljs-string">&quot;net/http&quot;</span><br>	<span class="hljs-string">&quot;time&quot;</span><br>)<br><br><span class="hljs-comment">// dYdX v4 REST API (Indexer)</span><br><span class="hljs-keyword">const</span> baseURL = <span class="hljs-string">&quot;https://indexer.dydx.trade/v4&quot;</span><br><br><span class="hljs-comment">// OrderBookResponse 表示 order book 查询结果</span><br><span class="hljs-keyword">type</span> OrderBookResponse <span class="hljs-keyword">struct</span> &#123;<br>	Bids []OrderBookEntry <span class="hljs-string">`json:&quot;bids&quot;`</span><br>	Asks []OrderBookEntry <span class="hljs-string">`json:&quot;asks&quot;`</span><br>&#125;<br><br><span class="hljs-keyword">type</span> OrderBookEntry <span class="hljs-keyword">struct</span> &#123;<br>	Price <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;price&quot;`</span><br>	Size  <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;size&quot;`</span><br>&#125;<br><br><span class="hljs-comment">// GetOrderBook 查询指定交易对的 order book</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">GetOrderBook</span><span class="hljs-params">(ctx context.Context, ticker <span class="hljs-type">string</span>)</span></span> (*OrderBookResponse, <span class="hljs-type">error</span>) &#123;<br>	url := fmt.Sprintf(<span class="hljs-string">&quot;%s/orderbooks/perpetualMarket/%s&quot;</span>, baseURL, ticker)<br><br>	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, <span class="hljs-literal">nil</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;create request: %w&quot;</span>, err)<br>	&#125;<br><br>	resp, err := http.DefaultClient.Do(req)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;do request: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123; _ = resp.Body.Close() &#125;()<br><br>	<span class="hljs-keyword">if</span> resp.StatusCode != http.StatusOK &#123;<br>		body, _ := io.ReadAll(resp.Body)<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;unexpected status %d: %s&quot;</span>, resp.StatusCode, body)<br>	&#125;<br><br>	<span class="hljs-keyword">var</span> book OrderBookResponse<br>	<span class="hljs-keyword">if</span> err := json.NewDecoder(resp.Body).Decode(&amp;book); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;decode response: %w&quot;</span>, err)<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> &amp;book, <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	ctx, cancel := context.WithTimeout(context.Background(), <span class="hljs-number">10</span>*time.Second)<br>	<span class="hljs-keyword">defer</span> cancel()<br><br>	book, err := GetOrderBook(ctx, <span class="hljs-string">&quot;ETH-USD&quot;</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Printf(<span class="hljs-string">&quot;Error: %v\n&quot;</span>, err)<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	fmt.Println(<span class="hljs-string">&quot;=== ETH-USD Order Book ===&quot;</span>)<br>	fmt.Printf(<span class="hljs-string">&quot;\nTop 5 Asks (卖单):\n&quot;</span>)<br>	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> min(<span class="hljs-number">5</span>, <span class="hljs-built_in">len</span>(book.Asks)) &#123;<br>		fmt.Printf(<span class="hljs-string">&quot;  %s @ %s\n&quot;</span>, book.Asks[i].Size, book.Asks[i].Price)<br>	&#125;<br><br>	fmt.Printf(<span class="hljs-string">&quot;\nTop 5 Bids (买单):\n&quot;</span>)<br>	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> min(<span class="hljs-number">5</span>, <span class="hljs-built_in">len</span>(book.Bids)) &#123;<br>		fmt.Printf(<span class="hljs-string">&quot;  %s @ %s\n&quot;</span>, book.Bids[i].Size, book.Bids[i].Price)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="11-2-查询持仓信息"><a href="#11-2-查询持仓信息" class="headerlink" title="11.2 查询持仓信息"></a>11.2 查询持仓信息</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// SubaccountResponse 表示子账户 (包含持仓和余额)</span><br><span class="hljs-keyword">type</span> SubaccountResponse <span class="hljs-keyword">struct</span> &#123;<br>	Subaccount <span class="hljs-keyword">struct</span> &#123;<br>		Address          <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;address&quot;`</span><br>		SubaccountNumber <span class="hljs-type">int</span>    <span class="hljs-string">`json:&quot;subaccountNumber&quot;`</span><br>		Equity           <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;equity&quot;`</span><br>		FreeCollateral   <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;freeCollateral&quot;`</span><br>		OpenPerpPositions []<span class="hljs-keyword">struct</span> &#123;<br>			Market       <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;market&quot;`</span><br>			Side         <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;side&quot;`</span>   <span class="hljs-comment">// &quot;LONG&quot; or &quot;SHORT&quot;</span><br>			Size         <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;size&quot;`</span><br>			EntryPrice   <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;entryPrice&quot;`</span><br>			UnrealizedPnl <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;unrealizedPnl&quot;`</span><br>		&#125; <span class="hljs-string">`json:&quot;openPerpetualPositions&quot;`</span><br>	&#125; <span class="hljs-string">`json:&quot;subaccount&quot;`</span><br>&#125;<br><br><span class="hljs-comment">// GetSubaccount 查询指定地址的持仓和余额</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">GetSubaccount</span><span class="hljs-params">(ctx context.Context, address <span class="hljs-type">string</span>, subaccountNum <span class="hljs-type">int</span>)</span></span> (*SubaccountResponse, <span class="hljs-type">error</span>) &#123;<br>	url := fmt.Sprintf(<span class="hljs-string">&quot;%s/addresses/%s/subaccountNumber/%d&quot;</span>, baseURL, address, subaccountNum)<br><br>	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, <span class="hljs-literal">nil</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;create request: %w&quot;</span>, err)<br>	&#125;<br><br>	resp, err := http.DefaultClient.Do(req)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;do request: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123; _ = resp.Body.Close() &#125;()<br><br>	<span class="hljs-keyword">if</span> resp.StatusCode != http.StatusOK &#123;<br>		body, _ := io.ReadAll(resp.Body)<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;unexpected status %d: %s&quot;</span>, resp.StatusCode, body)<br>	&#125;<br><br>	<span class="hljs-keyword">var</span> result SubaccountResponse<br>	<span class="hljs-keyword">if</span> err := json.NewDecoder(resp.Body).Decode(&amp;result); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;decode response: %w&quot;</span>, err)<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> &amp;result, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="11-3-查询-Funding-Rate"><a href="#11-3-查询-Funding-Rate" class="headerlink" title="11.3 查询 Funding Rate"></a>11.3 查询 Funding Rate</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// FundingRateResponse 表示历史 funding rate</span><br><span class="hljs-keyword">type</span> FundingRateResponse <span class="hljs-keyword">struct</span> &#123;<br>	HistoricalFunding []FundingEntry <span class="hljs-string">`json:&quot;historicalFunding&quot;`</span><br>&#125;<br><br><span class="hljs-keyword">type</span> FundingEntry <span class="hljs-keyword">struct</span> &#123;<br>	Ticker      <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;ticker&quot;`</span><br>	Rate        <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;rate&quot;`</span><br>	Price       <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;price&quot;`</span><br>	EffectiveAt <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;effectiveAt&quot;`</span><br>&#125;<br><br><span class="hljs-comment">// GetFundingRates 查询指定交易对的历史 funding rate</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">GetFundingRates</span><span class="hljs-params">(ctx context.Context, ticker <span class="hljs-type">string</span>, limit <span class="hljs-type">int</span>)</span></span> (*FundingRateResponse, <span class="hljs-type">error</span>) &#123;<br>	url := fmt.Sprintf(<span class="hljs-string">&quot;%s/historicalFunding/%s?limit=%d&quot;</span>, baseURL, ticker, limit)<br><br>	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, <span class="hljs-literal">nil</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;create request: %w&quot;</span>, err)<br>	&#125;<br><br>	resp, err := http.DefaultClient.Do(req)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;do request: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123; _ = resp.Body.Close() &#125;()<br><br>	<span class="hljs-keyword">if</span> resp.StatusCode != http.StatusOK &#123;<br>		body, _ := io.ReadAll(resp.Body)<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;unexpected status %d: %s&quot;</span>, resp.StatusCode, body)<br>	&#125;<br><br>	<span class="hljs-keyword">var</span> result FundingRateResponse<br>	<span class="hljs-keyword">if</span> err := json.NewDecoder(resp.Body).Decode(&amp;result); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;decode response: %w&quot;</span>, err)<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> &amp;result, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="11-4-通过-gRPC-查询链上数据"><a href="#11-4-通过-gRPC-查询链上数据" class="headerlink" title="11.4 通过 gRPC 查询链上数据"></a>11.4 通过 gRPC 查询链上数据</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// dYdX v4 是 Cosmos appchain, 也可以用 gRPC 直接查询链上状态</span><br><span class="hljs-comment">// 需要 dYdX 的 proto 定义: github.com/dydxprotocol/v4-chain</span><br><br><span class="hljs-comment">// 示例: 连接 gRPC endpoint</span><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;google.golang.org/grpc&quot;</span><br>	<span class="hljs-string">&quot;google.golang.org/grpc/credentials/insecure&quot;</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">connectGRPC</span><span class="hljs-params">()</span></span> (*grpc.ClientConn, <span class="hljs-type">error</span>) &#123;<br>	<span class="hljs-comment">// dYdX v4 公共 gRPC endpoint</span><br>	conn, err := grpc.NewClient(<br>		<span class="hljs-string">&quot;dydx-grpc.polkachu.com:23890&quot;</span>,<br>		grpc.WithTransportCredentials(insecure.NewCredentials()),<br>	)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;connect grpc: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">return</span> conn, <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">// 可查询的数据:</span><br><span class="hljs-comment">// - perpetuals.QueryAllPerpetualsRequest  → 所有永续市场信息</span><br><span class="hljs-comment">// - prices.QueryAllMarketPricesRequest    → 所有市场价格 (oracle)</span><br><span class="hljs-comment">// - subaccounts.QuerySubaccountRequest    → 子账户持仓/余额</span><br><span class="hljs-comment">// - clob.QueryClobPairRequest             → CLOB (订单簿) 配置</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十二、小结"><a href="#十二、小结" class="headerlink" title="十二、小结"></a>十二、小结</h2><h3 id="12-1-核心要点"><a href="#12-1-核心要点" class="headerlink" title="12.1 核心要点"></a>12.1 核心要点</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span> dYdX 选择 &quot;造自己的链&quot; 来解决永续 DEX 的性能问题<br><span class="hljs-bullet">   -</span> 通用 L1/L2 无法同时满足高吞吐 + 低延迟 + 自主定制<br><br><span class="hljs-bullet">2.</span> 订单簿模式 vs Oracle 模式是两种根本不同的设计哲学:<br><span class="hljs-bullet">   -</span> 订单簿: 价格由供需决定, 有价格发现, 需要做市商, 有滑点<br><span class="hljs-bullet">   -</span> Oracle:  价格由外部喂入, 无价格发现, 无需做市商, 零滑点但有上限<br><br><span class="hljs-bullet">3.</span> dYdX v4 的关键创新:<br><span class="hljs-bullet">   -</span> In-memory order book (不上链, 极快)<br><span class="hljs-bullet">   -</span> 验证者即撮合引擎 (完全去中心化)<br><span class="hljs-bullet">   -</span> 内置 oracle (Slinky, 无需外部依赖)<br><span class="hljs-bullet">   -</span> 费用归社区 (验证者 + staker)<br><br><span class="hljs-bullet">4.</span> 做市商是订单簿 DEX 的生命线:<br><span class="hljs-bullet">   -</span> 没有做市商 = 没有流动性 = 没有交易<br><span class="hljs-bullet">   -</span> 所以 dYdX 必须用 maker rebate + rewards 吸引做市商<br><br><span class="hljs-bullet">5.</span> dYdX 的真正优势不是 &quot;比 CEX 快&quot;:<br><span class="hljs-bullet">   -</span> 而是 非托管 + 无 KYC + 透明 + 抗审查<br></code></pre></td></tr></table></figure>
+
+<h3 id="12-2-下一步"><a href="#12-2-下一步" class="headerlink" title="12.2 下一步"></a>12.2 下一步</h3><ul>
+<li><strong>vAMM 永续合约演进史</strong>: 另一种 DEX 永续的实现方式, 用虚拟 AMM 替代 order book</li>
+<li>该篇会讲 Perpetual Protocol 的 vAMM 和 Drift Protocol, 以及 vAMM 模型的 squeeze 风险</li>
+<li>之后是 Hyperliquid 深度解析, 另一个订单簿型永续, 但走了自研 L1 而非 Cosmos 的路线</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong>思考题</strong>:</p>
+<ol>
+<li>dYdX v4 的 in-memory order book 在验证者之间通过 gossip 同步, 如果不同验证者看到的 order book 状态不一致怎么办?</li>
+<li>为什么 dYdX 选择 Cosmos 而不是自己从零写一条链 (像 Hyperliquid)?</li>
+<li>如果 dYdX 上没有足够的做市商, 和 GMX 相比, 哪个模式对普通交易者更友好?</li>
+</ol>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/web3/" class="category-chain-item">Web3</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/web3/" class="print-no-link">#Web3</a>
+      
+        <a href="/tags/%E6%B0%B8%E7%BB%AD%E5%90%88%E7%BA%A6/" class="print-no-link">#永续合约</a>
+      
+        <a href="/tags/dydx/" class="print-no-link">#dYdX</a>
+      
+        <a href="/tags/%E8%AE%A2%E5%8D%95%E7%B0%BF/" class="print-no-link">#订单簿</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>永续合约 04 - dYdX 演进之路</div>
+      <div>https://mritd.com/2025/08/25/perp-dydx/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年8月25日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/09/06/perp-vamm/" title="永续合约 05 - vAMM 永续合约演进史">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">永续合约 05 - vAMM 永续合约演进史</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/08/10/perp-gmx/" title="永续合约 03 - GMX 协议深度解析">
+                        <span class="hidden-mobile">永续合约 03 - GMX 协议深度解析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2025/08/25/perp-dydx/';
+          this.page.identifier = '/2025/08/25/perp-dydx/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

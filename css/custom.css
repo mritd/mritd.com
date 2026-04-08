@@ -1,0 +1,4 @@
+/* Soften the line-number gutter border in code blocks */
+figure.highlight td.gutter pre {
+  border-right-color: rgba(255, 255, 255, 0.1);
+}

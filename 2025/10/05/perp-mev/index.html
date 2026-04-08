@@ -1,0 +1,1702 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="Web3,永续合约,MEV,清算,Oracle,抢跑">
+  
+    <meta name="description" content="本文梳理永续合约中的六种 MEV 类型, 包括清算抢跑, Oracle 操纵, funding rate 套利等, 以及 GMX&#x2F;dYdX&#x2F;Hyperliquid 各自的防护方案对比">
+<meta property="og:type" content="article">
+<meta property="og:title" content="永续合约 07 - 永续合约中的 MEV">
+<meta property="og:url" content="https://mritd.com/2025/10/05/perp-mev/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="本文梳理永续合约中的六种 MEV 类型, 包括清算抢跑, Oracle 操纵, funding rate 套利等, 以及 GMX&#x2F;dYdX&#x2F;Hyperliquid 各自的防护方案对比">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/perp-mev.svg">
+<meta property="article:published_time" content="2025-10-05T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-10-05T02:00:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="MEV">
+<meta property="article:tag" content="Web3">
+<meta property="article:tag" content="永续合约">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/perp-mev.svg">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>永续合约 07 - 永续合约中的 MEV - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="永续合约 07 - 永续合约中的 MEV"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-10-05 10:00" pubdate>
+          2025年10月5日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          15k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          122 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">永续合约 07 - 永续合约中的 MEV</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>永续合约因为有杠杆和清算机制, MEV 的类型和收益都比现货 DeFi 多. 本文梳理永续合约特有的六类 MEV (清算抢跑, Oracle 抢跑, 三明治攻击, funding rate 套利, 跨市场套利, 清算级联), 对比 GMX&#x2F;dYdX&#x2F;Hyperliquid 各自的防护方案, 最后给出清算监控 Bot 的 Go 实现思路.</p>
+<h2 id="一、术语表"><a href="#一、术语表" class="headerlink" title="一、术语表"></a>一、术语表</h2><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>清算 MEV</td>
+<td>Liquidation MEV</td>
+<td>通过抢先执行清算交易获取的清算奖励</td>
+</tr>
+<tr>
+<td>清算人</td>
+<td>Liquidator &#x2F; Keeper</td>
+<td>监控并执行清算的链上参与者</td>
+</tr>
+<tr>
+<td>清算罚金</td>
+<td>Liquidation Penalty</td>
+<td>被清算者额外损失的保证金比例, 部分给清算人</td>
+</tr>
+<tr>
+<td>Oracle 抢跑</td>
+<td>Oracle Front-running</td>
+<td>在 oracle 价格更新前抢先交易, 利用已知的价格变动获利</td>
+</tr>
+<tr>
+<td>三明治攻击</td>
+<td>Sandwich Attack</td>
+<td>在目标交易前后各插一笔交易, 利用价格影响获利</td>
+</tr>
+<tr>
+<td>清算级联</td>
+<td>Liquidation Cascade</td>
+<td>大额清算引发价格下跌, 触发更多清算的连锁反应</td>
+</tr>
+<tr>
+<td>基差交易</td>
+<td>Basis Trade</td>
+<td>利用现货与永续价格差异的套利策略</td>
+</tr>
+<tr>
+<td>虚拟 AMM</td>
+<td>vAMM (Virtual AMM)</td>
+<td>不持有真实流动性, 用虚拟储备计算价格的永续 DEX 模型</td>
+</tr>
+<tr>
+<td>优先费</td>
+<td>Priority Fee &#x2F; Tip</td>
+<td>用户给验证者的小费, 决定交易在区块中的排序</td>
+</tr>
+<tr>
+<td>搜索者</td>
+<td>Searcher</td>
+<td>扫描 mempool&#x2F;链上状态, 寻找并提取 MEV 的角色</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="二、永续-MEV-概述"><a href="#二、永续-MEV-概述" class="headerlink" title="二、永续 MEV 概述"></a>二、永续 MEV 概述</h2><h3 id="2-1-Spot-MEV-vs-Perp-MEV"><a href="#2-1-Spot-MEV-vs-Perp-MEV" class="headerlink" title="2.1 Spot MEV vs Perp MEV"></a>2.1 Spot MEV vs Perp MEV</h3><p>现货 MEV 和永续 MEV 的来源和规模有本质区别:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360">
+  <rect width="720" height="360" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Spot MEV vs Perp MEV</text>
+  <!-- Spot MEV -->
+  <rect x="30" y="42" width="320" height="290" rx="6" fill="#818cf8" fill-opacity="0.08" stroke="#818cf8" stroke-width="1"/>
+  <text x="190" y="62" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="10" font-weight="bold">Spot MEV</text>
+  <text x="50" y="85" fill="#cbd5e1" font-family="monospace" font-size="9">主要类型:</text>
+  <text x="50" y="102" fill="#9ca3af" font-family="monospace" font-size="8">- DEX 套利 (价格差)</text>
+  <text x="50" y="117" fill="#9ca3af" font-family="monospace" font-size="8">- 三明治攻击 (swap 滑点)</text>
+  <text x="50" y="132" fill="#9ca3af" font-family="monospace" font-size="8">- 借贷清算 (Aave/Compound)</text>
+  <text x="50" y="160" fill="#cbd5e1" font-family="monospace" font-size="9">特点:</text>
+  <text x="50" y="177" fill="#9ca3af" font-family="monospace" font-size="8">- 1:1 资产交换, 无杠杆</text>
+  <text x="50" y="192" fill="#9ca3af" font-family="monospace" font-size="8">- 利润 = 价差 x 数量</text>
+  <text x="50" y="207" fill="#9ca3af" font-family="monospace" font-size="8">- 清算涉及实际资产转移</text>
+  <rect x="50" y="225" width="280" height="30" rx="4" fill="#818cf8" fill-opacity="0.1"/>
+  <text x="190" y="244" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="8">影响范围: 单笔交易本身</text>
+  <rect x="50" y="265" width="280" height="50" rx="4" fill="#818cf8" fill-opacity="0.06"/>
+  <text x="190" y="283" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">典型利润: $10 - $10K per tx</text>
+  <text x="190" y="300" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">受限于 swap 金额和价差</text>
+  <!-- Perp MEV -->
+  <rect x="370" y="42" width="320" height="290" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="530" y="62" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">Perp MEV</text>
+  <text x="390" y="85" fill="#cbd5e1" font-family="monospace" font-size="9">主要类型:</text>
+  <text x="390" y="102" fill="#9ca3af" font-family="monospace" font-size="8">- 清算 MEV (keeper 竞赛)</text>
+  <text x="390" y="117" fill="#9ca3af" font-family="monospace" font-size="8">- Oracle 抢跑</text>
+  <text x="390" y="132" fill="#9ca3af" font-family="monospace" font-size="8">- Funding rate 套利</text>
+  <text x="390" y="147" fill="#9ca3af" font-family="monospace" font-size="8">- 跨市场套利 (basis)</text>
+  <text x="390" y="170" fill="#cbd5e1" font-family="monospace" font-size="9">特点:</text>
+  <text x="390" y="187" fill="#9ca3af" font-family="monospace" font-size="8">- 杠杆放大一切 (10-50x)</text>
+  <text x="390" y="202" fill="#9ca3af" font-family="monospace" font-size="8">- 利润 = 价差 x 数量 x 杠杆</text>
+  <text x="390" y="217" fill="#9ca3af" font-family="monospace" font-size="8">- 可触发清算级联</text>
+  <rect x="390" y="235" width="280" height="30" rx="4" fill="#f472b6" fill-opacity="0.1"/>
+  <text x="530" y="254" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">影响范围: 可波及整个市场</text>
+  <rect x="390" y="275" width="280" height="40" rx="4" fill="#f472b6" fill-opacity="0.06"/>
+  <text x="530" y="293" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">典型利润: $100 - $1M+ per event</text>
+  <text x="530" y="308" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">杠杆 + 级联效应放大收益</text>
+</svg>
+</div>
+
+<h3 id="2-2-为什么永续-MEV-更复杂"><a href="#2-2-为什么永续-MEV-更复杂" class="headerlink" title="2.2 为什么永续 MEV 更复杂"></a>2.2 为什么永续 MEV 更复杂</h3><p>三个核心因素让永续 MEV 远比现货复杂:</p>
+<p><strong>杠杆放大效应</strong>: 10x 杠杆意味着 1% 的价格操纵可以造成 10% 的仓位盈亏. 搜索者可以用较小的资金撬动巨大的利润, 同时也能造成巨大的损害.</p>
+<p><strong>清算机制</strong>: 永续合约独有. 当保证金不足时必须强制平仓, 这创造了一个巨大的 MEV 市场: 清算人竞相抢夺清算奖励. 而清算的执行又会进一步影响市场价格.</p>
+<p><strong>Funding rate</strong>: 每 8h (或更频繁) 的资金费率结算创造了跨市场套利机会. 不同协议、CEX vs DEX 之间的 funding rate 差异, 是 searcher 持续关注的信号.</p>
+<h3 id="2-3-永续-MEV-的分类"><a href="#2-3-永续-MEV-的分类" class="headerlink" title="2.3 永续 MEV 的分类"></a>2.3 永续 MEV 的分类</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340">
+  <rect width="720" height="340" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">永续 MEV 分类</text>
+  <!-- Root node -->
+  <rect x="280" y="40" width="160" height="32" rx="6" fill="#5eead4" fill-opacity="0.15" stroke="#5eead4" stroke-width="1.5"/>
+  <text x="360" y="61" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">永续 MEV</text>
+  <!-- Trunk line -->
+  <line x1="360" y1="72" x2="360" y2="88" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="360" y1="88" x2="360" y2="310" stroke="#9ca3af" stroke-width="1" stroke-dasharray="0"/>
+  <!-- Card 1: 清算 MEV -->
+  <line x1="360" y1="102" x2="395" y2="102" stroke="#9ca3af" stroke-width="1"/>
+  <rect x="398" y="86" width="300" height="32" rx="5" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <text x="410" y="100" fill="#f472b6" font-family="monospace" font-size="9">清算 MEV</text>
+  <text x="410" y="112" fill="#9ca3af" font-family="monospace" font-size="7">最大来源, keeper 竞赛</text>
+  <!-- Card 2: Oracle 抢跑 -->
+  <line x1="360" y1="142" x2="395" y2="142" stroke="#9ca3af" stroke-width="1"/>
+  <rect x="398" y="126" width="300" height="32" rx="5" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="410" y="140" fill="#fbbf24" font-family="monospace" font-size="9">Oracle 抢跑</text>
+  <text x="410" y="152" fill="#9ca3af" font-family="monospace" font-size="7">利用 oracle 延迟, 适用于 GMX 等</text>
+  <!-- Card 3: 三明治攻击 -->
+  <line x1="360" y1="182" x2="395" y2="182" stroke="#9ca3af" stroke-width="1"/>
+  <rect x="398" y="166" width="300" height="32" rx="5" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1"/>
+  <text x="410" y="180" fill="#818cf8" font-family="monospace" font-size="9">三明治攻击</text>
+  <text x="410" y="192" fill="#9ca3af" font-family="monospace" font-size="7">适用于 vAMM 型协议</text>
+  <!-- Card 4: Funding rate 套利 -->
+  <line x1="360" y1="222" x2="395" y2="222" stroke="#9ca3af" stroke-width="1"/>
+  <rect x="398" y="206" width="300" height="32" rx="5" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-width="1"/>
+  <text x="410" y="220" fill="#34d399" font-family="monospace" font-size="9">Funding rate 套利</text>
+  <text x="410" y="232" fill="#9ca3af" font-family="monospace" font-size="7">跨交易所套利</text>
+  <!-- Card 5: 跨市场套利 -->
+  <line x1="360" y1="262" x2="395" y2="262" stroke="#9ca3af" stroke-width="1"/>
+  <rect x="398" y="246" width="300" height="32" rx="5" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1"/>
+  <text x="410" y="260" fill="#5eead4" font-family="monospace" font-size="9">跨市场套利</text>
+  <text x="410" y="272" fill="#9ca3af" font-family="monospace" font-size="7">basis trade, DEX-CEX 套利</text>
+  <!-- Card 6: 清算级联利用 -->
+  <line x1="360" y1="302" x2="395" y2="302" stroke="#9ca3af" stroke-width="1"/>
+  <rect x="398" y="286" width="300" height="32" rx="5" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <text x="410" y="300" fill="#f472b6" font-family="monospace" font-size="9">清算级联利用</text>
+  <text x="410" y="312" fill="#9ca3af" font-family="monospace" font-size="7">极端行情下的连锁反应</text>
+  <!-- Dot markers on trunk -->
+  <circle cx="360" cy="102" r="3" fill="#f472b6"/>
+  <circle cx="360" cy="142" r="3" fill="#fbbf24"/>
+  <circle cx="360" cy="182" r="3" fill="#818cf8"/>
+  <circle cx="360" cy="222" r="3" fill="#34d399"/>
+  <circle cx="360" cy="262" r="3" fill="#5eead4"/>
+  <circle cx="360" cy="302" r="3" fill="#f472b6"/>
+</svg>
+</div>
+
+<hr>
+<h2 id="三、清算-MEV-Liquidation-MEV"><a href="#三、清算-MEV-Liquidation-MEV" class="headerlink" title="三、清算 MEV (Liquidation MEV)"></a>三、清算 MEV (Liquidation MEV)</h2><h3 id="3-1-最大的永续-MEV-来源"><a href="#3-1-最大的永续-MEV-来源" class="headerlink" title="3.1 最大的永续 MEV 来源"></a>3.1 最大的永续 MEV 来源</h3><p>清算 MEV 是永续合约中最主要的 MEV 类型. 当交易者的保证金率低于维持保证金要求时, 任何人都可以调用 <code>liquidate()</code> 来强制平仓该头寸, 并获得一部分清算罚金作为奖励.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs csharp">清算奖励 = 被清算头寸的 <span class="hljs-function">liquidation <span class="hljs-title">penalty</span> (<span class="hljs-params">清算罚金</span>) 的一部分</span><br><span class="hljs-function"></span><br><span class="hljs-function">例: 100,000 USDC 的头寸, 5% liquidation penalty</span><br><span class="hljs-function">→ <span class="hljs-title">penalty</span> (<span class="hljs-params">罚金</span>)</span> = <span class="hljs-number">5</span>,<span class="hljs-number">000</span> USDC<br>→ keeper (清算人) 奖励 = <span class="hljs-number">2</span>,<span class="hljs-number">500</span> USDC (各协议比例不同)<br>→ <span class="hljs-function">insurance <span class="hljs-title">fund</span> (<span class="hljs-params">保险基金</span>)</span> = <span class="hljs-number">2</span>,<span class="hljs-number">500</span> USDC<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-2-Keeper-竞赛"><a href="#3-2-Keeper-竞赛" class="headerlink" title="3.2 Keeper 竞赛"></a>3.2 Keeper 竞赛</h3><p>清算 MEV 的核心是一场速度竞赛: <strong>谁先调用 <code>liquidate()</code> 谁拿到奖励</strong>:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f472b6"/>
+    </marker>
+  </defs>
+  <rect width="720" height="400" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Keeper 清算竞赛</text>
+  <!-- Price drops -->
+  <rect x="40" y="45" width="640" height="40" rx="6" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <text x="360" y="70" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10">ETH 价格下跌 → 某用户 margin ratio &lt; maintenance margin</text>
+  <line x1="360" y1="85" x2="360" y2="106" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <text x="375" y="102" fill="#fbbf24" font-family="monospace" font-size="8">可清算!</text>
+  <!-- Multiple keepers detect -->
+  <rect x="40" y="115" width="640" height="45" rx="6" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="1"/>
+  <text x="360" y="133" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10">多个 Keeper 同时检测到可清算头寸</text>
+  <text x="360" y="150" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">通过监控链上状态 / 订阅事件 / 模拟计算 margin ratio</text>
+  <line x1="180" y1="160" x2="180" y2="183" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <line x1="360" y1="160" x2="360" y2="183" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <line x1="540" y1="160" x2="540" y2="183" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Three keepers -->
+  <rect x="80" y="192" width="200" height="55" rx="6" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1"/>
+  <text x="180" y="212" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">Keeper A</text>
+  <text x="180" y="228" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">priority fee: 50 gwei</text>
+  <text x="180" y="240" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">latency: 120ms</text>
+  <rect x="260" y="192" width="200" height="55" rx="6" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <text x="360" y="212" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">Keeper B</text>
+  <text x="360" y="228" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">priority fee: 200 gwei</text>
+  <text x="360" y="240" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">latency: 80ms</text>
+  <rect x="440" y="192" width="200" height="55" rx="6" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1"/>
+  <text x="540" y="212" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9" font-weight="bold">Keeper C</text>
+  <text x="540" y="228" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">priority fee: 150 gwei</text>
+  <text x="540" y="240" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">latency: 200ms</text>
+  <line x1="360" y1="247" x2="360" y2="273" stroke="#f472b6" stroke-width="2" marker-end="url(#arr1)"/>
+  <!-- Winner -->
+  <rect x="160" y="283" width="400" height="50" rx="6" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1.5"/>
+  <text x="360" y="303" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">Keeper B 赢得清算</text>
+  <text x="360" y="320" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">最高 priority fee + 最低延迟 → 第一个被打包</text>
+  <!-- Result -->
+  <rect x="160" y="345" width="400" height="40" rx="6" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="1"/>
+  <text x="360" y="363" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">其他 keeper 的清算交易 revert (头寸已被清算), gas 白花</text>
+  <text x="360" y="377" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">这就是为什么清算竞赛会推高 gas: "赢者通吃"</text>
+</svg>
+</div>
+
+<p>竞赛的关键因素:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>因素</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Priority fee</td>
+<td>出价越高, 在区块中排序越靠前</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>离验证者&#x2F;builder 越近, 交易到达越快</td>
+</tr>
+<tr>
+<td>检测速度</td>
+<td>更快识别可清算头寸 (监控 + 计算)</td>
+</tr>
+<tr>
+<td>Gas 估算</td>
+<td>精确估算 gas limit, 避免失败</td>
+</tr>
+<tr>
+<td>利润计算</td>
+<td>确保 清算奖励 &gt; gas 成本, 否则亏本</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="3-3-各协议的清算机制"><a href="#3-3-各协议的清算机制" class="headerlink" title="3.3 各协议的清算机制"></a>3.3 各协议的清算机制</h3><p>不同协议对清算 MEV 的处理方式完全不同:</p>
+<h3 id="GMX-外部-Keeper"><a href="#GMX-外部-Keeper" class="headerlink" title="GMX: 外部 Keeper"></a>GMX: 外部 Keeper</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs markdown">GMX 清算流程:<br><span class="hljs-bullet">1.</span> 任何人都可以调用 liquidatePosition()<br><span class="hljs-bullet">2.</span> 链上检查: margin ratio (保证金率) &lt; maintenance margin (维持保证金)?<br><span class="hljs-bullet">3.</span> 是 → 强制平仓, 扣除 liquidation fee (清算费)<br><span class="hljs-bullet">4.</span> Keeper (清算人) 获得固定清算费 (如 5 USD)<br><span class="hljs-bullet">5.</span> 剩余 penalty (罚金) 进入保险基金 (fee reserve)<br><br>清算奖励相对固定 → MEV 竞争集中在 &quot;谁先提交&quot;<br></code></pre></td></tr></table></figure>
+
+<h3 id="dYdX-v4-验证者执行"><a href="#dYdX-v4-验证者执行" class="headerlink" title="dYdX v4: 验证者执行"></a>dYdX v4: 验证者执行</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs markdown">dYdX v4 (Cosmos appchain) 清算流程:<br><span class="hljs-bullet">1.</span> validator (验证者) 节点自动检测可清算头寸<br><span class="hljs-bullet">2.</span> 验证者在出块时将清算作为 protocol operation (协议操作) 执行<br><span class="hljs-bullet">3.</span> 无需外部 keeper (清算人) 提交交易<br><span class="hljs-bullet">4.</span> 没有 mempool (交易池) 竞争 → 没有传统意义的清算 MEV<br><br>关键: 验证者有动力执行清算 (维持系统健康)<br>但验证者本身可能优先清算对自己有利的头寸<br></code></pre></td></tr></table></figure>
+
+<h3 id="Hyperliquid-协议自动执行"><a href="#Hyperliquid-协议自动执行" class="headerlink" title="Hyperliquid: 协议自动执行"></a>Hyperliquid: 协议自动执行</h3><figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs gcode">Hyperliquid 清算流程:<br><span class="hljs-number">1.</span> validator <span class="hljs-comment">(验证者)</span> 自动检测并执行清算<br><span class="hljs-number">2.</span> 被清算头寸进入 <span class="hljs-string">&quot;liquidation auction (清算拍卖)&quot;</span><br><span class="hljs-number">3.</span> HLP vault <span class="hljs-comment">(协议 LP 金库)</span> 作为清算头寸的接收方<br><span class="hljs-number">4.</span> 清算的 profit/loss <span class="hljs-comment">(利润/损失)</span> 由 HLP vault 承担<br><br>没有外部 keeper <span class="hljs-comment">(清算人)</span> 竞赛, MEV 被内化到协议中<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、Oracle-抢跑-Oracle-Front-running"><a href="#四、Oracle-抢跑-Oracle-Front-running" class="headerlink" title="四、Oracle 抢跑 (Oracle Front-running)"></a>四、Oracle 抢跑 (Oracle Front-running)</h2><h3 id="4-1-攻击原理"><a href="#4-1-攻击原理" class="headerlink" title="4.1 攻击原理"></a>4.1 攻击原理</h3><p>Oracle 抢跑主要针对<strong>使用链外 Oracle 定价的协议</strong> (如 GMX). 核心思路: 在 oracle 价格更新上链之前, 利用已知的价格变动方向抢先开仓.</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="420" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Oracle 抢跑攻击 (针对 GMX)</text>
+  <!-- Step 1: Attacker sees price change -->
+  <rect x="40" y="45" width="640" height="50" rx="6" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1"/>
+  <circle cx="70" cy="70" r="14" fill="#818cf8" opacity="0.2"/>
+  <text x="70" y="75" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="12" font-weight="bold">1</text>
+  <text x="95" y="65" fill="#818cf8" font-family="monospace" font-size="9" font-weight="bold">攻击者监控 CEX 价格</text>
+  <text x="95" y="82" fill="#9ca3af" font-family="monospace" font-size="8">ETH 在 Binance 已经涨到 $2050, 但 GMX 的 Chainlink oracle 还是 $2000</text>
+  <line x1="360" y1="95" x2="360" y2="116" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <text x="400" y="112" fill="#fbbf24" font-family="monospace" font-size="8">价差 = 2.5%</text>
+  <!-- Step 2: Open position -->
+  <rect x="40" y="125" width="640" height="50" rx="6" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <circle cx="70" cy="150" r="14" fill="#f472b6" opacity="0.2"/>
+  <text x="70" y="155" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="12" font-weight="bold">2</text>
+  <text x="95" y="145" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">抢先在 GMX 开 10x long</text>
+  <text x="95" y="162" fill="#9ca3af" font-family="monospace" font-size="8">以旧 oracle 价格 $2000 开仓, 10x 杠杆, 成本: 入场费 + gas</text>
+  <line x1="360" y1="175" x2="360" y2="196" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 3: Oracle updates -->
+  <rect x="40" y="205" width="640" height="50" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <circle cx="70" cy="230" r="14" fill="#fbbf24" opacity="0.2"/>
+  <text x="70" y="235" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="12" font-weight="bold">3</text>
+  <text x="95" y="225" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">Chainlink oracle 更新价格到 $2050</text>
+  <text x="95" y="242" fill="#9ca3af" font-family="monospace" font-size="8">Oracle 有延迟 (heartbeat ~1s, deviation threshold ~0.5%)</text>
+  <line x1="360" y1="255" x2="360" y2="276" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 4: Close position -->
+  <rect x="40" y="285" width="640" height="50" rx="6" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1"/>
+  <circle cx="70" cy="310" r="14" fill="#5eead4" opacity="0.2"/>
+  <text x="70" y="315" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="12" font-weight="bold">4</text>
+  <text x="95" y="305" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">立即平仓获利</text>
+  <text x="95" y="322" fill="#9ca3af" font-family="monospace" font-size="8">PnL = 2.5% x 10x = 25% 利润 (减去手续费)</text>
+  <!-- Profit box -->
+  <rect x="160" y="350" width="400" height="50" rx="6" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-width="1.5"/>
+  <text x="360" y="370" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="10" font-weight="bold">几乎无风险利润</text>
+  <text x="360" y="388" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">因为攻击者已经知道价格要涨, 只需要在 oracle 更新前后完成一个来回</text>
+</svg>
+</div>
+
+<h3 id="4-2-GMX-的防御-Two-Step-Execution"><a href="#4-2-GMX-的防御-Two-Step-Execution" class="headerlink" title="4.2 GMX 的防御: Two-Step Execution"></a>4.2 GMX 的防御: Two-Step Execution</h3><p>GMX v2 引入了<strong>两步执行机制</strong>来对抗 oracle 抢跑:</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs autoit">传统 (v1, 易被抢跑):<br>  用户提交开仓交易 → 立即以当前 oracle price (预言机价格) 执行<br><br>两步执行 (v2, 抗抢跑):<br>  <span class="hljs-keyword">Step</span> <span class="hljs-number">1</span>: 用户提交 <span class="hljs-string">&quot;开仓请求&quot;</span> (createOrder)<br>     ↓  等待 keeper (执行者) 执行 (至少 <span class="hljs-number">1</span> 个 block delay (区块延迟))<br>  <span class="hljs-keyword">Step</span> <span class="hljs-number">2</span>: Keeper 调用 executeOrder(), 使用该时刻最新的 oracle price<br><br>  关键: execution price (执行价格) 是 <span class="hljs-keyword">Step</span> <span class="hljs-number">2</span> 时的价格, 不是 <span class="hljs-keyword">Step</span> <span class="hljs-number">1</span> 时的<br>  → 攻击者无法锁定旧价格<br></code></pre></td></tr></table></figure>
+
+<p>即使攻击者在 Step 1 看到 oracle 即将更新, 到 Step 2 执行时 oracle 已经更新了, 价格优势消失.</p>
+<p><strong>额外防护</strong>:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Execution fee</td>
+<td>用户预付 keeper 执行的 gas 费, 增加攻击成本</td>
+</tr>
+<tr>
+<td>Position fee</td>
+<td>开仓&#x2F;平仓手续费 (0.05-0.1%), 侵蚀套利空间</td>
+</tr>
+<tr>
+<td>Price impact</td>
+<td>大单有额外的价格影响, 模拟滑点</td>
+</tr>
+<tr>
+<td>Min block delay</td>
+<td>开仓请求和执行之间至少间隔 N 个区块</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="4-3-Chainlink-延迟利用"><a href="#4-3-Chainlink-延迟利用" class="headerlink" title="4.3 Chainlink 延迟利用"></a>4.3 Chainlink 延迟利用</h3><p>即使有 two-step execution, Chainlink oracle 本身也有延迟:</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs erlang">Chainlink oracle 更新条件 (两者满足其一):<br><span class="hljs-number">1</span>. Heartbeat (心跳): 每 T 秒强制更新一次 (如 ETH/USD heartbeat = <span class="hljs-number">3600</span>s)<br><span class="hljs-number">2</span>. Deviation (偏差): 价格偏离超过阈值时更新 (如 <span class="hljs-number">0.5</span><span class="hljs-comment">%)</span><br><br>在 heartbeat 间隔内, 如果价格缓慢移动且未触发 deviation threshold (偏差阈值),<br>oracle price (预言机价格) 可能落后于真实价格.<br><br>这个窗口虽然很小, 但高频交易者仍然可以利用.<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、三明治攻击-Sandwich-Attack-on-Perps"><a href="#五、三明治攻击-Sandwich-Attack-on-Perps" class="headerlink" title="五、三明治攻击 (Sandwich Attack on Perps)"></a>五、三明治攻击 (Sandwich Attack on Perps)</h2><h3 id="5-1-vAMM-三明治攻击"><a href="#5-1-vAMM-三明治攻击" class="headerlink" title="5.1 vAMM 三明治攻击"></a>5.1 vAMM 三明治攻击</h3><p>三明治攻击主要影响<strong>使用 vAMM 定价的永续协议</strong> (如早期 Perpetual Protocol). 原理与现货 AMM 三明治相同, 但因为涉及杠杆, 影响被放大:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="400" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">vAMM 永续三明治攻击</text>
+  <!-- vAMM pool -->
+  <rect x="40" y="45" width="640" height="35" rx="6" fill="#818cf8" fill-opacity="0.08" stroke="#818cf8" stroke-width="1"/>
+  <text x="360" y="67" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9">vAMM 虚拟池: vETH / vUSDC | 当前虚拟价格: $2000</text>
+  <!-- Step 1 -->
+  <rect x="40" y="95" width="640" height="50" rx="6" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <circle cx="70" cy="120" r="14" fill="#f472b6" opacity="0.2"/>
+  <text x="70" y="125" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="12" font-weight="bold">1</text>
+  <text x="95" y="113" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">攻击者抢先开多 (front-run)</text>
+  <text x="95" y="130" fill="#9ca3af" font-family="monospace" font-size="8">10x long, 大单推高 vAMM 虚拟价格: $2000 → $2020</text>
+  <line x1="360" y1="145" x2="360" y2="163" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 2 -->
+  <rect x="40" y="170" width="640" height="50" rx="6" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1"/>
+  <circle cx="70" cy="195" r="14" fill="#818cf8" opacity="0.2"/>
+  <text x="70" y="200" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="12" font-weight="bold">2</text>
+  <text x="95" y="188" fill="#818cf8" font-family="monospace" font-size="9" font-weight="bold">受害者交易执行</text>
+  <text x="95" y="205" fill="#9ca3af" font-family="monospace" font-size="8">以更高的虚拟价格 $2020 开多, 继续推高: $2020 → $2035</text>
+  <line x1="360" y1="220" x2="360" y2="238" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 3 -->
+  <rect x="40" y="245" width="640" height="50" rx="6" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <circle cx="70" cy="270" r="14" fill="#f472b6" opacity="0.2"/>
+  <text x="70" y="275" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="12" font-weight="bold">3</text>
+  <text x="95" y="263" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">攻击者平仓 (back-run)</text>
+  <text x="95" y="280" fill="#9ca3af" font-family="monospace" font-size="8">在 $2035 平仓, 虚拟价格回落到 $2015</text>
+  <!-- Profit/Loss -->
+  <rect x="80" y="315" width="260" height="60" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="210" y="335" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">攻击者利润</text>
+  <text x="210" y="352" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">入场 $2000, 出场 $2035</text>
+  <text x="210" y="366" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">10x leverage: +17.5% 利润</text>
+  <rect x="380" y="315" width="260" height="60" rx="6" fill="#818cf8" fill-opacity="0.08" stroke="#818cf8" stroke-width="1"/>
+  <text x="510" y="335" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="9" font-weight="bold">受害者损失</text>
+  <text x="510" y="352" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">以 $2020 开仓, 实际价值 ~$2015</text>
+  <text x="510" y="366" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">即时浮亏 -0.25% (杠杆放大)</text>
+</svg>
+</div>
+
+<h3 id="5-2-哪些协议容易被三明治"><a href="#5-2-哪些协议容易被三明治" class="headerlink" title="5.2 哪些协议容易被三明治?"></a>5.2 哪些协议容易被三明治?</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>协议类型</th>
+<th align="center">三明治风险</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>vAMM (Perpetual Protocol)</td>
+<td align="center">高</td>
+<td>交易直接影响虚拟价格, 和现货 AMM 一样</td>
+</tr>
+<tr>
+<td>Oracle 型 (GMX)</td>
+<td align="center">低</td>
+<td>价格由 oracle 决定, 交易不影响 oracle 价格</td>
+</tr>
+<tr>
+<td>订单簿 (dYdX, Hyperliquid)</td>
+<td align="center">低</td>
+<td>Maker&#x2F;taker 模型, 无 AMM 滑点曲线</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>Oracle 型协议对三明治免疫, 因为无论你交易量多大, GMX 的价格都来自 Chainlink, 不会被你的交易推动. 但 GMX v2 引入了 price impact 机制 (模拟滑点), 大单仍会有额外成本.</p>
+<p>订单簿型协议没有共享的流动性池, 每笔交易只和 maker 对手方成交, 没有可以被 “推动” 的价格曲线.</p>
+<hr>
+<h2 id="六、Funding-Rate-套利"><a href="#六、Funding-Rate-套利" class="headerlink" title="六、Funding Rate 套利"></a>六、Funding Rate 套利</h2><h3 id="6-1-跨交易所-Funding-Rate-差异"><a href="#6-1-跨交易所-Funding-Rate-差异" class="headerlink" title="6.1 跨交易所 Funding Rate 差异"></a>6.1 跨交易所 Funding Rate 差异</h3><p>不同交易所的 funding rate 几乎不可能完全一致, 因为每个市场的多空比例不同:</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs erlang">Binance ETH-PERP  funding rate (资金费率): +<span class="hljs-number">0.03</span><span class="hljs-comment">%  (多头付给空头)</span><br>dYdX    ETH-PERP  funding rate: +<span class="hljs-number">0.08</span><span class="hljs-comment">%  (多头付给空头)</span><br>GMX     ETH-PERP  funding rate: +<span class="hljs-number">0.01</span><span class="hljs-comment">%  (多头付给空头)</span><br><br>套利策略:<br>- 在 dYdX 开空 <span class="hljs-params">(收取 <span class="hljs-number">0.08</span><span class="hljs-comment">% funding)</span></span><br><span class="hljs-params">- 在 GMX 开多 (支付 <span class="hljs-number">0.01</span><span class="hljs-comment">% funding)</span></span><br><span class="hljs-params">- net profit (净收益)</span>: 0.<span class="hljs-number">08</span><span class="hljs-comment">% - 0.01% = 0.07% per funding interval (资金费率结算周期)</span><br>- 价格风险对冲 <span class="hljs-params">(一多一空)</span>, 只赚 funding spread <span class="hljs-params">(费率差)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="6-2-CEX-vs-DEX-Funding-Rate"><a href="#6-2-CEX-vs-DEX-Funding-Rate" class="headerlink" title="6.2 CEX vs DEX Funding Rate"></a>6.2 CEX vs DEX Funding Rate</h3><p>CEX (如 Binance) 和 DEX 的 funding rate 经常存在显著差异:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th align="center">CEX Funding</th>
+<th align="center">DEX Funding</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CEX 多头拥挤</td>
+<td align="center">+0.1%</td>
+<td align="center">+0.02%</td>
+<td>CEX 开空 (收 0.1%) + DEX 开多 (付 0.02%)</td>
+</tr>
+<tr>
+<td>DEX 空头拥挤</td>
+<td align="center">+0.01%</td>
+<td align="center">-0.05%</td>
+<td>DEX 开多 (收 0.05%) + CEX 开空 (收 0.01%)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>这种策略严格来说不是传统 MEV (不需要操纵交易排序), 但它利用了链上信息的可见性优势:</p>
+<ul>
+<li>DEX 的 funding rate 可以实时从链上计算</li>
+<li>CEX 的 funding rate 也是公开的</li>
+<li>Searcher 可以在 funding 结算前精确计算套利空间</li>
+</ul>
+<h3 id="6-3-风险"><a href="#6-3-风险" class="headerlink" title="6.3 风险"></a>6.3 风险</h3><p>Funding rate 套利不是无风险的:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>执行风险</td>
+<td>多空两侧交易不一定同时成交, 单侧成交期间暴露方向性风险</td>
+</tr>
+<tr>
+<td>Funding 反转</td>
+<td>Rate 可能在下次结算前改变方向</td>
+</tr>
+<tr>
+<td>清算风险</td>
+<td>价格剧烈波动时, 一侧可能被清算</td>
+</tr>
+<tr>
+<td>手续费</td>
+<td>开仓&#x2F;平仓手续费可能吃掉利润</td>
+</tr>
+<tr>
+<td>资金效率</td>
+<td>需要在多个协议分别质押保证金</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="七、跨市场套利"><a href="#七、跨市场套利" class="headerlink" title="七、跨市场套利"></a>七、跨市场套利</h2><h3 id="7-1-现货-永续套利-Basis-Trade"><a href="#7-1-现货-永续套利-Basis-Trade" class="headerlink" title="7.1 现货-永续套利 (Basis Trade)"></a>7.1 现货-永续套利 (Basis Trade)</h3><p>Basis trade 是利用现货与永续价格差 (基差) 的经典策略:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300">
+  <rect width="720" height="300" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Basis Trade (现货-永续套利)</text>
+  <!-- Scenario: positive basis -->
+  <text x="360" y="50" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9">场景: 正基差 (永续溢价, perp &gt; spot)</text>
+  <!-- Spot side -->
+  <rect x="40" y="65" width="300" height="80" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="190" y="85" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">现货市场</text>
+  <text x="190" y="105" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">买入 1 ETH @ $2000</text>
+  <text x="190" y="125" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">做多现货 (持有资产)</text>
+  <!-- Perp side -->
+  <rect x="380" y="65" width="300" height="80" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="530" y="85" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">永续市场</text>
+  <text x="530" y="105" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">开空 1 ETH @ $2050</text>
+  <text x="530" y="125" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8">做空永续 (对冲方向风险)</text>
+  <!-- Arrow: price converges -->
+  <line x1="190" y1="155" x2="360" y2="190" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="530" y1="155" x2="360" y2="190" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4"/>
+  <!-- Convergence -->
+  <rect x="200" y="185" width="320" height="40" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="360" y="205" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9">基差收敛: perp 价格 → spot 价格</text>
+  <text x="360" y="218" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Funding rate 会持续把溢价压回去</text>
+  <!-- Profit -->
+  <rect x="160" y="240" width="400" height="45" rx="6" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-width="1.5"/>
+  <text x="360" y="258" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">利润来源 (两部分)</text>
+  <text x="360" y="275" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">1. 基差收敛: $50/ETH | 2. 收取 funding payment (空头收钱)</text>
+</svg>
+</div>
+
+<h3 id="7-2-DEX-CEX-永续套利"><a href="#7-2-DEX-CEX-永续套利" class="headerlink" title="7.2 DEX-CEX 永续套利"></a>7.2 DEX-CEX 永续套利</h3><figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">dYdX ETH-PERP</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$2010</span><br><span class="hljs-attribute">Binance ETH-PERP</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$2000</span><br><span class="hljs-attribute">spread (价差) = $10</span><br><span class="hljs-attribute"></span><br><span class="hljs-attribute">套利</span><span class="hljs-punctuation">:</span><br><span class="hljs-bullet">-</span> <span class="hljs-string">Binance 开多 @ $2000</span><br><span class="hljs-bullet">-</span> <span class="hljs-string">dYdX 开空 @ $2010</span><br><span class="hljs-bullet">-</span> <span class="hljs-string">等 price convergence (价格收敛), 双边平仓</span><br><span class="hljs-bullet">-</span> <span class="hljs-string">profit (利润) ≈ $10/ETH (减 fee (手续费))</span><br><br><span class="hljs-attribute">链上优势</span><span class="hljs-punctuation">:</span> <span class="hljs-string">dYdX 的 order book (订单簿) 状态公开透明,</span><br>searcher (搜索者) 可以看到所有挂单, 精确计算套利空间.<br></code></pre></td></tr></table></figure>
+
+<h3 id="7-3-DEX-DEX-永续套利"><a href="#7-3-DEX-DEX-永续套利" class="headerlink" title="7.3 DEX-DEX 永续套利"></a>7.3 DEX-DEX 永续套利</h3><p>不同 DEX 永续协议之间也存在价差:</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">GMX  ETH-PERP (oracle price (预言机价格)): <span class="hljs-meta">$2000</span> (Chainlink)<br>dYdX ETH-PERP (<span class="hljs-keyword">order</span> book (订单簿)):   <span class="hljs-meta">$2015</span><br>basis (基差) = <span class="hljs-meta">$15</span><br><br>如果 GMX 还有 <span class="hljs-keyword">open</span> interest (未平仓量) 额度:<br>- GMX 开多 @ <span class="hljs-meta">$2000</span> (零 slippage (滑点), oracle 价)<br>- dYdX 开空 @ <span class="hljs-meta">$2015</span><br>- 锁定 <span class="hljs-meta">$15</span> 差价<br><br>注意: GMX 有 position fee (持仓费) 和 borrow fee (借贷费),<br>实际 profit (利润) = basis - GMX 费用 - dYdX 费用<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="八、清算级联-Liquidation-Cascade"><a href="#八、清算级联-Liquidation-Cascade" class="headerlink" title="八、清算级联 (Liquidation Cascade)"></a>八、清算级联 (Liquidation Cascade)</h2><h3 id="8-1-级联机制"><a href="#8-1-级联机制" class="headerlink" title="8.1 级联机制"></a>8.1 级联机制</h3><p>清算级联是永续合约市场最危险的现象之一: 一个大额清算可以触发连锁反应:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f472b6"/>
+    </marker>
+  </defs>
+  <rect width="720" height="440" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="11" font-weight="bold">清算级联 (Liquidation Cascade)</text>
+  <!-- Stage 1 -->
+  <rect x="40" y="45" width="640" height="50" rx="6" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1"/>
+  <text x="60" y="65" fill="#818cf8" font-family="monospace" font-size="9" font-weight="bold">触发事件</text>
+  <text x="60" y="82" fill="#9ca3af" font-family="monospace" font-size="8">ETH 从 $2000 跌到 $1950 (-2.5%)</text>
+  <line x1="360" y1="95" x2="360" y2="113" stroke="#f472b6" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- Stage 2 -->
+  <rect x="40" y="120" width="640" height="55" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="60" y="140" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">第一波清算</text>
+  <text x="60" y="155" fill="#9ca3af" font-family="monospace" font-size="8">高杠杆多头 (20-50x) 被清算, 头寸被市价平仓</text>
+  <text x="60" y="168" fill="#9ca3af" font-family="monospace" font-size="8">清算量: $50M 多头平仓 = 大量卖压</text>
+  <line x1="360" y1="175" x2="360" y2="193" stroke="#f472b6" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- Stage 3 -->
+  <rect x="40" y="200" width="640" height="55" rx="6" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="1.5"/>
+  <text x="60" y="220" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">价格进一步下跌</text>
+  <text x="60" y="235" fill="#9ca3af" font-family="monospace" font-size="8">清算卖压 → ETH 跌到 $1880 (-6%)</text>
+  <text x="60" y="248" fill="#9ca3af" font-family="monospace" font-size="8">原本安全的 10x 多头现在也到了清算线</text>
+  <line x1="360" y1="255" x2="360" y2="273" stroke="#f472b6" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- Stage 4 -->
+  <rect x="40" y="280" width="640" height="55" rx="6" fill="#f472b6" fill-opacity="0.18" stroke="#f472b6" stroke-width="2"/>
+  <text x="60" y="300" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">第二波清算</text>
+  <text x="60" y="315" fill="#9ca3af" font-family="monospace" font-size="8">10x 多头被清算, 更多卖压 → ETH 跌到 $1750 (-12.5%)</text>
+  <text x="60" y="328" fill="#9ca3af" font-family="monospace" font-size="8">连锁反应持续, 清算总量可达数亿美元</text>
+  <line x1="360" y1="335" x2="360" y2="353" stroke="#f472b6" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- MEV extraction -->
+  <rect x="80" y="360" width="560" height="60" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="360" y="380" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="bold">MEV Searcher 如何利用级联</text>
+  <text x="360" y="397" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">1. 监控即将被清算的头寸列表 | 2. 预判清算会导致的价格影响</text>
+  <text x="360" y="411" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">3. 提前开空获利 | 4. 同时竞争清算奖励 (双重收益)</text>
+</svg>
+</div>
+
+<h3 id="8-2-历史案例"><a href="#8-2-历史案例" class="headerlink" title="8.2 历史案例"></a>8.2 历史案例</h3><p><strong>2022 年 LUNA&#x2F;UST 崩盘</strong>: LUNA 价格螺旋下跌期间, 多个 DeFi 永续协议出现大规模清算级联. 部分协议的保险基金被完全耗尽, 导致系统性亏损 (socialized loss).</p>
+<p><strong>2023 年 3 月 SVB 事件</strong>: USDC 脱锚期间, 使用 USDC 作为保证金的永续协议出现异常. 保证金价值下降触发清算, 但被清算者并非因为交易方向错误, 而是因为抵押品贬值.</p>
+<p><strong>Hyperliquid 2025 年 3 月 JELLY 事件</strong>: 攻击者操纵 JELLY token 价格, 在 Hyperliquid 上开巨额空头后自我清算, 迫使 HLP vault 接管空头头寸. 随后在现货市场拉升 JELLY 价格, 使 HLP vault 面临巨额浮亏. 最终 Hyperliquid 验证者投票以有利价格强制平仓, 引发社区对去中心化的讨论.</p>
+<h3 id="8-3-协议的级联防护"><a href="#8-3-协议的级联防护" class="headerlink" title="8.3 协议的级联防护"></a>8.3 协议的级联防护</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>防护机制</th>
+<th>说明</th>
+<th>采用协议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>保险基金</td>
+<td>清算不足时由保险基金补贴, 避免穿仓</td>
+<td>标配: 所有永续合约平台</td>
+</tr>
+<tr>
+<td>OI 上限</td>
+<td>限制单边未平仓量, 降低清算冲击</td>
+<td>标配: 所有永续合约平台</td>
+</tr>
+<tr>
+<td>ADL (Auto-Deleveraging)</td>
+<td>保险基金耗尽时, 强制减仓盈利最多的对手方; 极端情况下可能失效 (无盈利对手方可减)</td>
+<td>标配: 所有永续合约平台</td>
+</tr>
+<tr>
+<td>动态维持保证金</td>
+<td>头寸越大, 要求的维持保证金率越高</td>
+<td>标配: 所有永续合约平台</td>
+</tr>
+<tr>
+<td>阶梯清算</td>
+<td>不一次性清算全部头寸, 分批清算减少价格冲击</td>
+<td>dYdX (每区块限制清算量), Hyperliquid, Binance</td>
+</tr>
+<tr>
+<td>最终兜底</td>
+<td>ADL 之外的额外安全网</td>
+<td>Hyperliquid: HLP vault 接管; GMX: GLP&#x2F;GM 池承担; dYdX: 坏账挂账 + 治理介入</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="九、各协议-MEV-防护措施对比"><a href="#九、各协议-MEV-防护措施对比" class="headerlink" title="九、各协议 MEV 防护措施对比"></a>九、各协议 MEV 防护措施对比</h2><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>MEV 类型</th>
+<th>GMX v2</th>
+<th>dYdX v4</th>
+<th>Hyperliquid</th>
+<th>vAMM (Perp Protocol)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>清算 MEV</td>
+<td>外部 keeper 执行, 赚执行费</td>
+<td>协议清算引擎生成订单匹配订单簿, 盈亏归保险基金</td>
+<td>协议清算引擎先匹配订单簿, 无人接则 HLP 兜底</td>
+<td>外部 keeper, 竞争奖励</td>
+</tr>
+<tr>
+<td>Oracle 抢跑</td>
+<td>Two-step execution + price impact</td>
+<td>Slinky sidecar + VoteExtensions 共识聚合, 每区块更新</td>
+<td>验证者从 8 个 CEX 加权中位数, 每 3s 更新</td>
+<td>依赖 Chainlink, 有延迟风险</td>
+</tr>
+<tr>
+<td>三明治</td>
+<td>免疫 (oracle 定价)</td>
+<td>低风险 (订单簿)</td>
+<td>低风险 (订单簿)</td>
+<td>高风险 (vAMM 价格曲线)</td>
+</tr>
+<tr>
+<td>Funding 套利</td>
+<td>存在 (rate 差异)</td>
+<td>存在 (rate 差异)</td>
+<td>存在 (rate 差异)</td>
+<td>存在 (rate 差异)</td>
+</tr>
+<tr>
+<td>跨市场套利</td>
+<td>存在 (oracle vs 市场价差)</td>
+<td>较少 (实时撮合)</td>
+<td>较少 (实时撮合)</td>
+<td>存在 (vAMM 偏移)</td>
+</tr>
+<tr>
+<td>清算级联防护</td>
+<td>保险基金 + ADL + OI 上限</td>
+<td>保险基金 + ADL + 每区块清算量限制</td>
+<td>保险基金 + ADL + HLP vault 兜底</td>
+<td>保险基金 (早期不足)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><strong>总结</strong>:</p>
+<ul>
+<li><strong>dYdX v4</strong> MEV 防护最强: 验证者内化了大部分 MEV (清算 + oracle), 但验证者本身的行为需要治理约束</li>
+<li><strong>GMX v2</strong> 通过 two-step execution 有效抵御 oracle 抢跑, 但清算仍是外部竞争</li>
+<li><strong>Hyperliquid</strong> 将清算内化到 HLP vault, 减少了 keeper 竞赛, 但 HLP 持有者承担风险</li>
+<li><strong>vAMM 协议</strong> MEV 暴露面最大, 这也是 vAMM 模型逐渐被淘汰的原因之一</li>
+</ul>
+<hr>
+<h2 id="十、Go-清算监控-Bot-架构"><a href="#十、Go-清算监控-Bot-架构" class="headerlink" title="十、Go: 清算监控 Bot 架构"></a>十、Go: 清算监控 Bot 架构</h2><p>一个基本的永续合约清算 Bot 需要: 监听链上头寸状态, 实时计算 margin ratio, 判断可清算, 提交清算交易.</p>
+<p>以下是核心模块的实现思路:</p>
+<h3 id="10-1-数据结构"><a href="#10-1-数据结构" class="headerlink" title="10.1 数据结构"></a>10.1 数据结构</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> liquidator<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;math/big&quot;</span><br>	<span class="hljs-string">&quot;sync&quot;</span><br>)<br><br><span class="hljs-comment">// Position 表示链上读取的永续头寸 (perpetual position)</span><br><span class="hljs-keyword">type</span> Position <span class="hljs-keyword">struct</span> &#123;<br>	Account     <span class="hljs-type">string</span>   <span class="hljs-comment">// 持仓者地址</span><br>	Market      <span class="hljs-type">string</span>   <span class="hljs-comment">// 交易对 (trading pair), 如 &quot;ETH-USD&quot;</span><br>	IsLong      <span class="hljs-type">bool</span>     <span class="hljs-comment">// true = long (多), false = short (空)</span><br>	Size        *big.Int <span class="hljs-comment">// 头寸大小 (position size, scaled, 如 1e30)</span><br>	Collateral  *big.Int <span class="hljs-comment">// 抵押品金额 (collateral amount, scaled)</span><br>	EntryPrice  *big.Int <span class="hljs-comment">// 开仓均价 (entry price, scaled)</span><br>	LastUpdated <span class="hljs-type">uint64</span>   <span class="hljs-comment">// 上次更新的区块号</span><br>&#125;<br><br><span class="hljs-comment">// MarketConfig 协议的市场参数</span><br><span class="hljs-keyword">type</span> MarketConfig <span class="hljs-keyword">struct</span> &#123;<br>	MaintenanceMarginRate *big.Int <span class="hljs-comment">// 维持保证金率 (maintenance margin rate), 如 0.005 = 0.5%</span><br>	LiquidationFee        *big.Int <span class="hljs-comment">// 清算费率 (liquidation fee rate)</span><br>	MaxLeverage           <span class="hljs-type">uint64</span>   <span class="hljs-comment">// 最大杠杆 (max leverage)</span><br>&#125;<br><br><span class="hljs-comment">// LiquidationCandidate 可清算的候选头寸</span><br><span class="hljs-keyword">type</span> LiquidationCandidate <span class="hljs-keyword">struct</span> &#123;<br>	Position    Position<br>	MarginRatio *big.Int <span class="hljs-comment">// 当前保证金率</span><br>	Profit      *big.Int <span class="hljs-comment">// 预估清算利润 (扣除 gas)</span><br>&#125;<br><br><span class="hljs-comment">// PositionStore 维护所有已知头寸的本地缓存</span><br><span class="hljs-keyword">type</span> PositionStore <span class="hljs-keyword">struct</span> &#123;<br>	mu        sync.RWMutex<br>	positions <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*Position <span class="hljs-comment">// key: account + market</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewPositionStore</span><span class="hljs-params">()</span></span> *PositionStore &#123;<br>	<span class="hljs-keyword">return</span> &amp;PositionStore&#123;<br>		positions: <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*Position),<br>	&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *PositionStore)</span></span> Upsert(p *Position) &#123;<br>	s.mu.Lock()<br>	<span class="hljs-keyword">defer</span> s.mu.Unlock()<br>	key := p.Account + <span class="hljs-string">&quot;:&quot;</span> + p.Market<br>	s.positions[key] = p<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *PositionStore)</span></span> All() []*Position &#123;<br>	s.mu.RLock()<br>	<span class="hljs-keyword">defer</span> s.mu.RUnlock()<br>	result := <span class="hljs-built_in">make</span>([]*Position, <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(s.positions))<br>	<span class="hljs-keyword">for</span> _, p := <span class="hljs-keyword">range</span> s.positions &#123;<br>		result = <span class="hljs-built_in">append</span>(result, p)<br>	&#125;<br>	<span class="hljs-keyword">return</span> result<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="10-2-保证金率计算"><a href="#10-2-保证金率计算" class="headerlink" title="10.2 保证金率计算"></a>10.2 保证金率计算</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> liquidator<br><br><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;math/big&quot;</span><br><br><span class="hljs-keyword">var</span> (<br>	precision = <span class="hljs-built_in">new</span>(big.Int).Exp(big.NewInt(<span class="hljs-number">10</span>), big.NewInt(<span class="hljs-number">30</span>), <span class="hljs-literal">nil</span>) <span class="hljs-comment">// 1e30</span><br>)<br><br><span class="hljs-comment">// CalcMarginRatio 计算头寸的当前保证金率</span><br><span class="hljs-comment">// marginRatio (保证金率) = (collateral (抵押品) + unrealizedPnL (未实现盈亏)) / positionValue (头寸价值)</span><br><span class="hljs-comment">// 返回值 scaled by 1e30</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CalcMarginRatio</span><span class="hljs-params">(pos *Position, markPrice *big.Int)</span></span> *big.Int &#123;<br>	<span class="hljs-comment">// positionValue = size * markPrice / precision</span><br>	positionValue := <span class="hljs-built_in">new</span>(big.Int).Mul(pos.Size, markPrice)<br>	positionValue.Div(positionValue, precision)<br><br>	<span class="hljs-keyword">if</span> positionValue.Sign() == <span class="hljs-number">0</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(big.Int) <span class="hljs-comment">// avoid division by zero</span><br>	&#125;<br><br>	<span class="hljs-comment">// unrealizedPnL (未实现盈亏) for long: (markPrice (标记价格) - entryPrice (开仓价)) * size (头寸规模) / precision</span><br>	<span class="hljs-comment">// unrealizedPnL for short: (entryPrice - markPrice) * size / precision</span><br>	priceDiff := <span class="hljs-built_in">new</span>(big.Int)<br>	<span class="hljs-keyword">if</span> pos.IsLong &#123;<br>		priceDiff.Sub(markPrice, pos.EntryPrice)<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		priceDiff.Sub(pos.EntryPrice, markPrice)<br>	&#125;<br>	unrealizedPnL := <span class="hljs-built_in">new</span>(big.Int).Mul(priceDiff, pos.Size)<br>	unrealizedPnL.Div(unrealizedPnL, precision)<br><br>	<span class="hljs-comment">// effectiveMargin (有效保证金) = collateral + unrealizedPnL</span><br>	effectiveMargin := <span class="hljs-built_in">new</span>(big.Int).Add(pos.Collateral, unrealizedPnL)<br><br>	<span class="hljs-comment">// marginRatio = effectiveMargin * precision / positionValue</span><br>	ratio := <span class="hljs-built_in">new</span>(big.Int).Mul(effectiveMargin, precision)<br>	ratio.Div(ratio, positionValue)<br><br>	<span class="hljs-keyword">return</span> ratio<br>&#125;<br><br><span class="hljs-comment">// IsLiquidatable 判断头寸是否可被清算</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">IsLiquidatable</span><span class="hljs-params">(pos *Position, markPrice *big.Int, config MarketConfig)</span></span> <span class="hljs-type">bool</span> &#123;<br>	ratio := CalcMarginRatio(pos, markPrice)<br>	<span class="hljs-keyword">return</span> ratio.Cmp(config.MaintenanceMarginRate) &lt; <span class="hljs-number">0</span><br>&#125;<br><br><span class="hljs-comment">// EstimateLiquidationProfit 预估清算利润</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">EstimateLiquidationProfit</span><span class="hljs-params">(pos *Position, config MarketConfig, gasCostUSD *big.Int)</span></span> *big.Int &#123;<br>	<span class="hljs-comment">// liquidationReward (清算奖励) = positionSize (头寸规模) * liquidationFee (清算费率) / precision</span><br>	reward := <span class="hljs-built_in">new</span>(big.Int).Mul(pos.Size, config.LiquidationFee)<br>	reward.Div(reward, precision)<br><br>	<span class="hljs-comment">// profit (利润) = reward - gasCost (gas 成本)</span><br>	profit := <span class="hljs-built_in">new</span>(big.Int).Sub(reward, gasCostUSD)<br>	<span class="hljs-keyword">return</span> profit<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="10-3-监控循环"><a href="#10-3-监控循环" class="headerlink" title="10.3 监控循环"></a>10.3 监控循环</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> liquidator<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;context&quot;</span><br>	<span class="hljs-string">&quot;log&quot;</span><br>	<span class="hljs-string">&quot;math/big&quot;</span><br>	<span class="hljs-string">&quot;time&quot;</span><br>)<br><br><span class="hljs-comment">// PriceOracle 获取最新标记价格的接口</span><br><span class="hljs-keyword">type</span> PriceOracle <span class="hljs-keyword">interface</span> &#123;<br>	GetMarkPrice(ctx context.Context, market <span class="hljs-type">string</span>) (*big.Int, <span class="hljs-type">error</span>)<br>&#125;<br><br><span class="hljs-comment">// LiquidationExecutor 提交清算交易的接口</span><br><span class="hljs-keyword">type</span> LiquidationExecutor <span class="hljs-keyword">interface</span> &#123;<br>	<span class="hljs-comment">// SubmitLiquidation 提交清算交易, 返回 tx hash</span><br>	SubmitLiquidation(ctx context.Context, pos *Position) (<span class="hljs-type">string</span>, <span class="hljs-type">error</span>)<br>	<span class="hljs-comment">// EstimateGas 估算清算交易的 gas 成本 (USD)</span><br>	EstimateGas(ctx context.Context, pos *Position) (*big.Int, <span class="hljs-type">error</span>)<br>&#125;<br><br><span class="hljs-comment">// Monitor 清算监控器</span><br><span class="hljs-keyword">type</span> Monitor <span class="hljs-keyword">struct</span> &#123;<br>	store    *PositionStore<br>	oracle   PriceOracle<br>	executor LiquidationExecutor<br>	configs  <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]MarketConfig <span class="hljs-comment">// market -&gt; config</span><br>	interval time.Duration<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewMonitor</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">	store *PositionStore,</span></span><br><span class="hljs-params"><span class="hljs-function">	oracle PriceOracle,</span></span><br><span class="hljs-params"><span class="hljs-function">	executor LiquidationExecutor,</span></span><br><span class="hljs-params"><span class="hljs-function">	configs <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]MarketConfig,</span></span><br><span class="hljs-params"><span class="hljs-function">	interval time.Duration,</span></span><br><span class="hljs-params"><span class="hljs-function">)</span></span> *Monitor &#123;<br>	<span class="hljs-keyword">return</span> &amp;Monitor&#123;<br>		store:    store,<br>		oracle:   oracle,<br>		executor: executor,<br>		configs:  configs,<br>		interval: interval,<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// Run 启动监控循环</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *Monitor)</span></span> Run(ctx context.Context) <span class="hljs-type">error</span> &#123;<br>	ticker := time.NewTicker(m.interval)<br>	<span class="hljs-keyword">defer</span> ticker.Stop()<br><br>	log.Printf(<span class="hljs-string">&quot;liquidation monitor started, interval=%v&quot;</span>, m.interval)<br><br>	<span class="hljs-keyword">for</span> &#123;<br>		<span class="hljs-keyword">select</span> &#123;<br>		<span class="hljs-keyword">case</span> &lt;-ctx.Done():<br>			<span class="hljs-keyword">return</span> ctx.Err()<br>		<span class="hljs-keyword">case</span> &lt;-ticker.C:<br>			m.scanAndLiquidate(ctx)<br>		&#125;<br>	&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *Monitor)</span></span> scanAndLiquidate(ctx context.Context) &#123;<br>	positions := m.store.All()<br>	candidates := <span class="hljs-built_in">make</span>([]LiquidationCandidate, <span class="hljs-number">0</span>)<br><br>	<span class="hljs-keyword">for</span> _, pos := <span class="hljs-keyword">range</span> positions &#123;<br>		config, ok := m.configs[pos.Market]<br>		<span class="hljs-keyword">if</span> !ok &#123;<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br><br>		markPrice, err := m.oracle.GetMarkPrice(ctx, pos.Market)<br>		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>			log.Printf(<span class="hljs-string">&quot;failed to get mark price for %s: %v&quot;</span>, pos.Market, err)<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br><br>		<span class="hljs-keyword">if</span> !IsLiquidatable(pos, markPrice, config) &#123;<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br><br>		gasCost, err := m.executor.EstimateGas(ctx, pos)<br>		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>			log.Printf(<span class="hljs-string">&quot;failed to estimate gas for %s: %v&quot;</span>, pos.Account, err)<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br><br>		profit := EstimateLiquidationProfit(pos, config, gasCost)<br>		<span class="hljs-keyword">if</span> profit.Sign() &lt;= <span class="hljs-number">0</span> &#123;<br>			log.Printf(<span class="hljs-string">&quot;skip %s: profit %v &lt;= 0 (gas too high)&quot;</span>, pos.Account, profit)<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br><br>		candidates = <span class="hljs-built_in">append</span>(candidates, LiquidationCandidate&#123;<br>			Position:    *pos,<br>			MarginRatio: CalcMarginRatio(pos, markPrice),<br>			Profit:      profit,<br>		&#125;)<br>	&#125;<br><br>	<span class="hljs-comment">// 按利润排序, 优先清算利润最高的</span><br>	<span class="hljs-comment">// (实际生产中应并发提交, 这里简化)</span><br>	<span class="hljs-keyword">for</span> _, c := <span class="hljs-keyword">range</span> candidates &#123;<br>		log.Printf(<span class="hljs-string">&quot;liquidating %s %s, margin ratio=%v, est profit=%v&quot;</span>,<br>			c.Position.Account, c.Position.Market, c.MarginRatio, c.Profit)<br><br>		txHash, err := m.executor.SubmitLiquidation(ctx, &amp;c.Position)<br>		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>			log.Printf(<span class="hljs-string">&quot;liquidation failed: %v&quot;</span>, err)<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br>		log.Printf(<span class="hljs-string">&quot;liquidation submitted: %s&quot;</span>, txHash)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="10-4-架构总结"><a href="#10-4-架构总结" class="headerlink" title="10.4 架构总结"></a>10.4 架构总结</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="520" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Liquidation Bot (清算机器人) 架构</text>
+  <!-- Position Store -->
+  <rect x="140" y="42" width="440" height="48" rx="6" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1.5"/>
+  <text x="360" y="62" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="10" font-weight="bold">Position Store (头寸缓存)</text>
+  <text x="360" y="78" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">本地缓存所有已知头寸, 通过事件监听实时更新</text>
+  <!-- Arrows from Position Store to 3 components -->
+  <line x1="240" y1="90" x2="240" y2="128" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="360" y1="90" x2="360" y2="128" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="480" y1="90" x2="480" y2="128" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Event Listener -->
+  <rect x="140" y="135" width="200" height="48" rx="6" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1"/>
+  <text x="240" y="155" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">Event Listener</text>
+  <text x="240" y="172" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">事件监听</text>
+  <!-- Price Oracle -->
+  <rect x="260" y="135" width="200" height="48" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="360" y="155" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9">Price Oracle</text>
+  <text x="360" y="172" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">价格预言机</text>
+  <!-- Margin Calculator -->
+  <rect x="380" y="135" width="200" height="48" rx="6" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-width="1"/>
+  <text x="480" y="155" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">Margin Calculator</text>
+  <text x="480" y="172" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">保证金计算</text>
+  <!-- Arrows from 3 components to Liquidation Engine -->
+  <line x1="240" y1="183" x2="240" y2="210" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="360" y1="183" x2="360" y2="210" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="480" y1="183" x2="480" y2="210" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="240" y1="210" x2="480" y2="210" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="360" y1="210" x2="360" y2="230" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Liquidation Engine -->
+  <rect x="230" y="237" width="260" height="68" rx="6" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1.5"/>
+  <text x="360" y="257" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">Liquidation Engine</text>
+  <text x="360" y="273" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">清算引擎</text>
+  <text x="360" y="289" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">profit > 0?  gas 够吗?</text>
+  <!-- Arrow to TX Sender -->
+  <line x1="360" y1="305" x2="360" y2="328" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- TX Sender -->
+  <rect x="230" y="335" width="260" height="72" rx="6" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="1.5"/>
+  <text x="360" y="355" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">TX Sender</text>
+  <text x="360" y="371" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">交易发送器</text>
+  <text x="360" y="387" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">动态 gas / nonce 管理 / 重试逻辑</text>
+  <!-- Production optimizations -->
+  <rect x="80" y="425" width="560" height="82" rx="6" fill="#fbbf24" fill-opacity="0.06" stroke="#fbbf24" stroke-width="0.5" stroke-dasharray="4"/>
+  <text x="360" y="443" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">生产级优化</text>
+  <text x="100" y="458" fill="#cbd5e1" font-family="monospace" font-size="7">1. 用 WebSocket 订阅新区块, 不用 polling</text>
+  <text x="100" y="470" fill="#cbd5e1" font-family="monospace" font-size="7">2. 批量读取头寸状态 (multicall)</text>
+  <text x="100" y="482" fill="#cbd5e1" font-family="monospace" font-size="7">3. 使用 Flashbots 提交, 避免 revert 浪费 gas</text>
+  <text x="400" y="458" fill="#cbd5e1" font-family="monospace" font-size="7">4. 预计算 "接近清算" 的头寸, 优先监控</text>
+  <text x="400" y="470" fill="#cbd5e1" font-family="monospace" font-size="7">5. 多链并行监控 (Arbitrum, Optimism, etc.)</text>
+</svg>
+</div>
+
+<hr>
+<h2 id="十一、小结"><a href="#十一、小结" class="headerlink" title="十一、小结"></a>十一、小结</h2><h3 id="核心要点"><a href="#核心要点" class="headerlink" title="核心要点"></a>核心要点</h3><ol>
+<li><strong>清算 MEV 是永续合约最大的 MEV 来源</strong>: keeper 竞赛推高 gas, 但也保障了系统安全</li>
+<li><strong>Oracle 抢跑</strong> 是 Oracle 型协议的核心挑战, two-step execution 是主要防御手段</li>
+<li><strong>三明治攻击</strong> 主要影响 vAMM 协议, Oracle 型和订单簿型天然免疫</li>
+<li><strong>清算级联</strong> 是系统性风险, ADL 和 OI 上限是主要防护</li>
+<li><strong>协议设计决定 MEV 暴露面</strong>: dYdX v4 通过验证者内化 MEV, GMX 通过 two-step execution 降低 MEV, vAMM 模型 MEV 暴露最大</li>
+</ol>
+<h3 id="MEV-的两面性"><a href="#MEV-的两面性" class="headerlink" title="MEV 的两面性"></a>MEV 的两面性</h3><ul>
+<li><strong>正面</strong>: 清算 MEV 激励 keeper 维持系统健康, 套利 MEV 促进价格一致</li>
+<li><strong>负面</strong>: 推高 gas 费, 增加用户成本, 清算级联可能加剧市场波动</li>
+</ul>
+<h3 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h3><p>《永续合约数据解析实战》将实现完整的链上交互:</p>
+<ul>
+<li>读取 GMX&#x2F;dYdX 的真实头寸数据</li>
+<li>计算实时 funding rate</li>
+<li>构建可运行的清算&#x2F;套利监控工具</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/web3/" class="category-chain-item">Web3</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/web3/" class="print-no-link">#Web3</a>
+      
+        <a href="/tags/%E6%B0%B8%E7%BB%AD%E5%90%88%E7%BA%A6/" class="print-no-link">#永续合约</a>
+      
+        <a href="/tags/mev/" class="print-no-link">#MEV</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>永续合约 07 - 永续合约中的 MEV</div>
+      <div>https://mritd.com/2025/10/05/perp-mev/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年10月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/10/22/perp-data/" title="永续合约 08 - 数据解析实战">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">永续合约 08 - 数据解析实战</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/09/20/perp-hyperliquid/" title="永续合约 06 - Hyperliquid 深度解析">
+                        <span class="hidden-mobile">永续合约 06 - Hyperliquid 深度解析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2025/10/05/perp-mev/';
+          this.page.identifier = '/2025/10/05/perp-mev/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

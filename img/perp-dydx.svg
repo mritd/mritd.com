@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a3e"/>
+      <stop offset="100%" style="stop-color:#2d2460"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+
+  <!-- Order book depth visualization -->
+  <g transform="translate(400, 140)">
+    <!-- Bid side (green, left) -->
+    <rect x="-140" y="-10" width="30" height="20" fill="#26a69a" opacity="0.9" rx="2"/>
+    <rect x="-140" y="-35" width="55" height="20" fill="#26a69a" opacity="0.7" rx="2"/>
+    <rect x="-140" y="-60" width="80" height="20" fill="#26a69a" opacity="0.5" rx="2"/>
+    <rect x="-140" y="-85" width="110" height="20" fill="#26a69a" opacity="0.3" rx="2"/>
+    <!-- Ask side (red, right) -->
+    <rect x="10" y="-10" width="30" height="20" fill="#ef5350" opacity="0.9" rx="2"/>
+    <rect x="10" y="-35" width="55" height="20" fill="#ef5350" opacity="0.7" rx="2"/>
+    <rect x="10" y="-60" width="80" height="20" fill="#ef5350" opacity="0.5" rx="2"/>
+    <rect x="10" y="-85" width="110" height="20" fill="#ef5350" opacity="0.3" rx="2"/>
+    <!-- Center spread line -->
+    <line x1="0" y1="-95" x2="0" y2="20" stroke="#b39ddb" stroke-width="1.5" stroke-dasharray="4,3"/>
+  </g>
+
+  <text x="400" y="310" text-anchor="middle" fill="#e8eaed" font-family="'Helvetica Neue', Arial, sans-serif" font-size="48" font-weight="700">dYdX</text>
+  <text x="400" y="350" text-anchor="middle" fill="#b39ddb" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="400">Order Book Perpetuals</text>
+  <rect x="340" y="370" width="120" height="3" rx="1.5" fill="#b39ddb"/>
+</svg>

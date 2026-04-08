@@ -1,0 +1,1695 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="Web3,清算引擎,ADL,保险基金,Keeper,Go">
+  
+    <meta name="description" content="本文介绍清算引擎的三种执行模式 (本地&#x2F;远程&#x2F;链上 Keeper), 包括部分清算策略, ADL 自动减仓, 保险基金管理, 附 Go 和 Solidity 实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="永续合约 10 - 清算引擎架构与实现">
+<meta property="og:url" content="https://mritd.com/2025/11/25/perp-liquidation-engine/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="本文介绍清算引擎的三种执行模式 (本地&#x2F;远程&#x2F;链上 Keeper), 包括部分清算策略, ADL 自动减仓, 保险基金管理, 附 Go 和 Solidity 实现">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/perp-liquidation.svg">
+<meta property="article:published_time" content="2025-11-25T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-11-25T02:00:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="Web3">
+<meta property="article:tag" content="清算">
+<meta property="article:tag" content="清算引擎">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/perp-liquidation.svg">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>永续合约 10 - 清算引擎架构与实现 - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="永续合约 10 - 清算引擎架构与实现"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-11-25 10:00" pubdate>
+          2025年11月25日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          27k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          224 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">永续合约 10 - 清算引擎架构与实现</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>本文介绍清算引擎的架构和实现. 覆盖三种执行模式 (本地, 远程 gRPC, 链上 Keeper), 通过 Executor 接口把清算逻辑和执行层解耦, 同时讨论部分清算策略, ADL 自动减仓和保险基金管理, 附 Go 和 Solidity 实现.</p>
+<hr>
+<h2 id="一、术语表"><a href="#一、术语表" class="headerlink" title="一、术语表"></a>一、术语表</h2><h3 id="1-1-清算核心"><a href="#1-1-清算核心" class="headerlink" title="1.1 清算核心"></a>1.1 清算核心</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>清算引擎</td>
+<td>Liquidation Engine</td>
+<td>监控所有仓位, 在保证金不足时触发强制平仓的组件</td>
+</tr>
+<tr>
+<td>清算价格</td>
+<td>Liquidation Price</td>
+<td>仓位保证金降至维持保证金时对应的标记价格, 预先计算</td>
+</tr>
+<tr>
+<td>破产价格</td>
+<td>Bankruptcy Price</td>
+<td>仓位保证金恰好归零时的价格, 清算订单以此价格挂单</td>
+</tr>
+<tr>
+<td>维持保证金率</td>
+<td>Maintenance Margin Rate</td>
+<td>仓位必须维持的最低保证金比例, 低于此触发清算</td>
+</tr>
+<tr>
+<td>保证金率</td>
+<td>Margin Ratio</td>
+<td>当前保证金 &#x2F; 仓位名义价值, 衡量仓位健康度</td>
+</tr>
+<tr>
+<td>逐仓保证金</td>
+<td>Isolated Margin</td>
+<td>每个仓位独立保证金, 清算不影响其他仓位</td>
+</tr>
+<tr>
+<td>全仓保证金</td>
+<td>Cross Margin</td>
+<td>账户所有仓位共享保证金池, 盈利仓位可以 “撑住” 亏损仓位</td>
+</tr>
+<tr>
+<td>保险基金</td>
+<td>Insurance Fund</td>
+<td>清算盈余积累的资金池, 用于覆盖清算亏损</td>
+</tr>
+<tr>
+<td>部分清算</td>
+<td>Partial Liquidation</td>
+<td>只平掉一部分仓位 (如 25%), 使保证金恢复健康, 避免全平</td>
+</tr>
+<tr>
+<td>自动减仓</td>
+<td>ADL (Auto-Deleveraging)</td>
+<td>保险基金不足时, 强制减少盈利方仓位以覆盖亏损</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-2-执行模式"><a href="#1-2-执行模式" class="headerlink" title="1.2 执行模式"></a>1.2 执行模式</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>进程内执行</td>
+<td>Local Execution</td>
+<td>清算引擎和撮合引擎在同一进程, 直接函数调用</td>
+</tr>
+<tr>
+<td>远程执行</td>
+<td>Remote Execution</td>
+<td>清算引擎作为独立服务, 通过 gRPC&#x2F;MQ 提交清算订单</td>
+</tr>
+<tr>
+<td>链上执行</td>
+<td>On-Chain Execution</td>
+<td>清算逻辑在智能合约中, 由 Keeper 调用触发</td>
+</tr>
+<tr>
+<td>Keeper</td>
+<td>Keeper</td>
+<td>监控链上仓位并调用清算合约的链下机器人, 赚取清算奖励</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="二、清算引擎-vs-撮合引擎"><a href="#二、清算引擎-vs-撮合引擎" class="headerlink" title="二、清算引擎 vs 撮合引擎"></a>二、清算引擎 vs 撮合引擎</h2><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>撮合引擎 (Matching Engine)</th>
+<th>清算引擎 (Liquidation Engine)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>触发方式</td>
+<td>被动: 用户提交订单</td>
+<td>主动: 价格变动触发扫描</td>
+</tr>
+<tr>
+<td>输入</td>
+<td>买卖订单</td>
+<td>所有持仓 + 实时标记价格</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>成交记录 (Trade)</td>
+<td>清算订单 (提交给撮合引擎或链上合约)</td>
+</tr>
+<tr>
+<td>频率</td>
+<td>有单就撮</td>
+<td>每次价格更新都要扫描</td>
+</tr>
+<tr>
+<td>现货需要吗</td>
+<td>需要</td>
+<td>不需要 (现货无杠杆, 不存在爆仓)</td>
+</tr>
+<tr>
+<td>故障影响</td>
+<td>无法交易</td>
+<td>坏账累积, 可能导致系统性风险</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>关键关系: <strong>清算引擎是撮合引擎的上游</strong>. 清算引擎判断 “谁该被清算”, 然后生成一个清算订单, 交给撮合引擎执行. 撮合引擎不关心这个订单是用户主动下的还是清算引擎生成的.</p>
+<h3 id="2-1-清算的本质-谁来接盘"><a href="#2-1-清算的本质-谁来接盘" class="headerlink" title="2.1 清算的本质: 谁来接盘?"></a>2.1 清算的本质: 谁来接盘?</h3><p>清算 &#x3D; 强制关闭仓位 &#x3D; 做一笔反向交易. 核心问题: <strong>谁来接这笔反向交易?</strong></p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs tap">被清算的<span class="hljs-number"> 1 </span>ETH Long 仓位<br>    ↓ 强制平仓 = 卖出<span class="hljs-number"> 1 </span>ETH<br>    ↓<br>谁来买这<span class="hljs-number"> 1 </span>ETH?<br>    ├─ 订单簿上的买单 → 撮合引擎配对<br>    ├─ AMM 池子 (Uniswap) → 直接 swap<br>    ├─ LP 池 (GMX GLP) → Oracle 定价, 池子接盘<br>    └─ 保险基金 → 自己吃下 (最后手段)<br></code></pre></td></tr></table></figure>
+
+<p><strong>撮合引擎不是清算的必要条件</strong>, 它只是 “找对手方” 的一种方式:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>对手方模式</th>
+<th>代表</th>
+<th>需要撮合引擎</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>订单簿撮合</td>
+<td>Binance, dYdX, Hyperliquid</td>
+<td>需要</td>
+<td>清算订单和普通订单竞争同一个流动性池, 深度越好滑点越小</td>
+</tr>
+<tr>
+<td>AMM Swap</td>
+<td>链下清算 + Uniswap 结算</td>
+<td>不需要</td>
+<td>清算订单路由到链上池子 swap, 受池子深度和滑点影响</td>
+</tr>
+<tr>
+<td>LP 池接盘</td>
+<td>GMX (GLP&#x2F;GM)</td>
+<td>不需要</td>
+<td>Oracle 定价, 零滑点, 但 LP 承担全部对手方风险</td>
+</tr>
+<tr>
+<td>保险基金直接吃</td>
+<td>紧急兜底</td>
+<td>不需要</td>
+<td>保险基金承担全部风险, 仅作为最后手段</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p>本文的 Executor 接口设计正是为了适配这些不同模式:<br>订单簿 → LocalExecutor &#x2F; GRPCExecutor, AMM → UniswapExecutor (swap 路由), LP 池 → 直接调用池合约.<br>清算引擎的核心逻辑 (扫描, 判断, 生成清算指令) 完全不变, 只替换 Executor 实现.</p>
+</blockquote>
+<hr>
+<h2 id="三、整体架构"><a href="#三、整体架构" class="headerlink" title="三、整体架构"></a>三、整体架构</h2><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 520">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#a78bfa"/>
+    </marker>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"/>
+    </marker>
+  </defs>
+  <rect width="880" height="520" rx="8" fill="#1a1a2e"/>
+  <text x="440" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="12" font-weight="bold">清算引擎架构 (Liquidation Engine Architecture)</text>
+  <!-- Price Feed -->
+  <rect x="30" y="50" width="160" height="55" rx="6" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="1"/>
+  <text x="110" y="72" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">Price Feed</text>
+  <text x="110" y="90" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Oracle / 撮合引擎</text>
+  <text x="110" y="100" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">推送 mark price</text>
+  <!-- Arrow Price Feed → Liquidation Engine -->
+  <line x1="190" y1="77" x2="238" y2="77" stroke="#fbbf24" stroke-width="1" marker-end="url(#arr2)"/>
+  <!-- Liquidation Engine -->
+  <rect x="245" y="42" width="390" height="150" rx="6" fill="#f472b6" fill-opacity="0.06" stroke="#f472b6" stroke-width="1"/>
+  <text x="440" y="62" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">清算引擎 (Liquidation Engine)</text>
+  <!-- Sub components (centered in 390px box: 2×115 + 15gap = 245, offset = (390-245)/2 = 72) -->
+  <rect x="318" y="75" width="115" height="45" rx="4" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="375" y="95" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">优先队列</text>
+  <text x="375" y="108" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">按清算价排序</text>
+  <rect x="448" y="75" width="115" height="45" rx="4" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="505" y="95" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">保证金计算</text>
+  <text x="505" y="108" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">margin <= MM</text>
+  <rect x="318" y="130" width="115" height="45" rx="4" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="375" y="150" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">保险基金</text>
+  <text x="375" y="163" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">盈余/亏损处理</text>
+  <rect x="448" y="130" width="115" height="45" rx="4" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="505" y="150" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">ADL 引擎</text>
+  <text x="505" y="163" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">保险基金不足时</text>
+  <!-- Position Store -->
+  <rect x="700" y="50" width="150" height="55" rx="6" fill="#a78bfa" fill-opacity="0.12" stroke="#a78bfa" stroke-width="1"/>
+  <text x="775" y="72" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="9" font-weight="bold">Position Store</text>
+  <text x="775" y="90" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">所有未平仓仓位</text>
+  <!-- Arrow Position Store → Liquidation Engine -->
+  <line x1="700" y1="77" x2="642" y2="77" stroke="#a78bfa" stroke-width="1" marker-end="url(#arr1)"/>
+  <!-- Executor Interface: arrow → text -->
+  <line x1="440" y1="192" x2="440" y2="206" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <text x="440" y="228" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">Executor 接口 (清算执行抽象)</text>
+  <!-- Category 1: 进程内 (green) -->
+  <rect x="20" y="248" width="260" height="130" rx="6" fill="#34d399" fill-opacity="0.06" stroke="#34d399" stroke-width="1"/>
+  <text x="150" y="267" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">进程内</text>
+  <rect x="40" y="280" width="120" height="20" rx="10" fill="#34d399" fill-opacity="0.15" stroke="#34d399" stroke-width="0.6"/>
+  <text x="100" y="294" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="7">LocalExecutor</text>
+  <text x="200" y="294" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">同进程撮合引擎</text>
+  <text x="150" y="320" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">engine.Submit(order)</text>
+  <text x="150" y="345" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">延迟: &lt; 1μs</text>
+  <text x="150" y="365" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">适用: 单体架构, 测试</text>
+  <!-- Category 2: 远程服务 (blue) -->
+  <rect x="310" y="248" width="260" height="130" rx="6" fill="#38bdf8" fill-opacity="0.06" stroke="#38bdf8" stroke-width="1"/>
+  <text x="440" y="267" text-anchor="middle" fill="#38bdf8" font-family="monospace" font-size="9" font-weight="bold">远程服务 (API/RPC)</text>
+  <rect x="330" y="278" width="110" height="20" rx="10" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="0.6"/>
+  <text x="385" y="292" text-anchor="middle" fill="#38bdf8" font-family="monospace" font-size="7">GRPCExecutor</text>
+  <text x="500" y="292" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">自建撮合服务</text>
+  <rect x="330" y="304" width="110" height="20" rx="10" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="0.6"/>
+  <text x="385" y="318" text-anchor="middle" fill="#38bdf8" font-family="monospace" font-size="7">BinanceExecutor</text>
+  <text x="500" y="318" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">Binance API</text>
+  <text x="440" y="345" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">延迟: ~1ms</text>
+  <text x="440" y="365" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">适用: 微服务, L2 清算, CEX 路由</text>
+  <!-- Category 3: 链上合约 (orange) -->
+  <rect x="600" y="248" width="260" height="130" rx="6" fill="#fb923c" fill-opacity="0.06" stroke="#fb923c" stroke-width="1"/>
+  <text x="730" y="267" text-anchor="middle" fill="#fb923c" font-family="monospace" font-size="9" font-weight="bold">链上合约</text>
+  <rect x="620" y="278" width="120" height="20" rx="10" fill="#fb923c" fill-opacity="0.15" stroke="#fb923c" stroke-width="0.6"/>
+  <text x="680" y="292" text-anchor="middle" fill="#fb923c" font-family="monospace" font-size="7">OnChainExecutor</text>
+  <text x="800" y="292" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">自建清算合约</text>
+  <rect x="620" y="304" width="120" height="20" rx="10" fill="#fb923c" fill-opacity="0.15" stroke="#fb923c" stroke-width="0.6"/>
+  <text x="680" y="318" text-anchor="middle" fill="#fb923c" font-family="monospace" font-size="7">UniswapExecutor</text>
+  <text x="800" y="318" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">AMM swap</text>
+  <rect x="620" y="330" width="120" height="20" rx="10" fill="#fb923c" fill-opacity="0.15" stroke="#fb923c" stroke-width="0.6"/>
+  <text x="680" y="344" text-anchor="middle" fill="#fb923c" font-family="monospace" font-size="7">GMXExecutor</text>
+  <text x="800" y="344" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">GLP 池接盘</text>
+  <text x="730" y="365" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">适用: DeFi, Keeper 网络</text>
+  <!-- Bottom: results flow back -->
+  <line x1="150" y1="378" x2="150" y2="398" stroke="#34d399" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <line x1="440" y1="378" x2="440" y2="398" stroke="#38bdf8" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <line x1="730" y1="378" x2="730" y2="398" stroke="#fb923c" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <rect x="100" y="400" width="680" height="60" rx="6" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="440" y="420" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">清算结果处理</text>
+  <!-- 3 sub-items centered in 680px box (x=100~780): 3×140 + 2×40 = 500, margin = (680-500)/2 = 90 -->
+  <rect x="190" y="432" width="140" height="20" rx="3" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="260" y="446" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">保险基金结算</text>
+  <rect x="370" y="432" width="140" height="20" rx="3" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="440" y="446" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">ADL (若保险基金不足)</text>
+  <rect x="550" y="432" width="140" height="20" rx="3" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="620" y="446" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">仓位更新 + 事件推送</text>
+  <text x="440" y="490" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">核心逻辑 (扫描 → 判断 → 生成清算订单) 完全复用, 只有 Executor 实现不同</text>
+</svg>
+</div>
+
+<hr>
+<h2 id="四、核心类型与接口"><a href="#四、核心类型与接口" class="headerlink" title="四、核心类型与接口"></a>四、核心类型与接口</h2><h3 id="4-1-基础类型"><a href="#4-1-基础类型" class="headerlink" title="4.1 基础类型"></a>4.1 基础类型</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> liquidation<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;context&quot;</span><br>	<span class="hljs-string">&quot;time&quot;</span><br><br>	<span class="hljs-string">&quot;github.com/shopspring/decimal&quot;</span> <span class="hljs-comment">// go get github.com/shopspring/decimal</span><br>)<br><br><span class="hljs-comment">// Side 表示仓位方向.</span><br><span class="hljs-keyword">type</span> Side <span class="hljs-type">int</span><br><br><span class="hljs-keyword">const</span> (<br>	Long  Side = <span class="hljs-literal">iota</span> <span class="hljs-comment">// 多头</span><br>	Short             <span class="hljs-comment">// 空头</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s Side)</span></span> String() <span class="hljs-type">string</span> &#123;<br>	<span class="hljs-keyword">if</span> s == Long &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Long&quot;</span><br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Short&quot;</span><br>&#125;<br><br><span class="hljs-comment">// MarginMode 保证金模式.</span><br><span class="hljs-keyword">type</span> MarginMode <span class="hljs-type">int</span><br><br><span class="hljs-keyword">const</span> (<br>	Isolated MarginMode = <span class="hljs-literal">iota</span> <span class="hljs-comment">// 逐仓: 每个仓位独立保证金, 亏损不影响其他仓位</span><br>	Cross                      <span class="hljs-comment">// 全仓: 账户所有仓位共享保证金池, 盈利仓位可以 &quot;救&quot; 亏损仓位</span><br>)<br><br><span class="hljs-comment">// Account 表示一个交易账户.</span><br><span class="hljs-comment">// 全仓模式下, 清算判断在账户级别进行: 账户总保证金率 &lt;= MMR 时触发清算.</span><br><span class="hljs-keyword">type</span> Account <span class="hljs-keyword">struct</span> &#123;<br>	ID        <span class="hljs-type">string</span>                     <span class="hljs-comment">// 账户地址或 ID</span><br>	Balance   decimal.Decimal            <span class="hljs-comment">// 可用余额 (未分配给逐仓仓位的部分)</span><br>	Positions <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*Position       <span class="hljs-comment">// positionID → Position (该账户下所有仓位)</span><br>&#125;<br><br><span class="hljs-comment">// TotalEquity 计算账户总权益 = 余额 + 所有全仓仓位的未实现盈亏.</span><br><span class="hljs-comment">// 逐仓仓位不参与, 因为它们的保证金已经从 Balance 中扣除.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(a *Account)</span></span> TotalEquity(markPrices <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]decimal.Decimal) decimal.Decimal &#123;<br>	equity := a.Balance<br>	<span class="hljs-keyword">for</span> _, pos := <span class="hljs-keyword">range</span> a.Positions &#123;<br>		<span class="hljs-keyword">if</span> pos.MarginMode != Cross &#123;<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br>		mp, ok := markPrices[pos.Symbol]<br>		<span class="hljs-keyword">if</span> !ok &#123;<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br>		equity = equity.Add(UnrealizedPnL(pos, mp))<br>	&#125;<br>	<span class="hljs-keyword">return</span> equity<br>&#125;<br><br><span class="hljs-comment">// TotalMaintenanceMargin 计算账户下所有全仓仓位的维持保证金之和.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(a *Account)</span></span> TotalMaintenanceMargin(markPrices <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]decimal.Decimal) decimal.Decimal &#123;<br>	total := decimal.Zero<br>	<span class="hljs-keyword">for</span> _, pos := <span class="hljs-keyword">range</span> a.Positions &#123;<br>		<span class="hljs-keyword">if</span> pos.MarginMode != Cross &#123;<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br>		mp, ok := markPrices[pos.Symbol]<br>		<span class="hljs-keyword">if</span> !ok &#123;<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br>		<span class="hljs-comment">// MM = markPrice × size × maintenanceRate</span><br>		total = total.Add(mp.Mul(pos.Size).Mul(pos.MaintenanceRate))<br>	&#125;<br>	<span class="hljs-keyword">return</span> total<br>&#125;<br><br><span class="hljs-comment">// Position 表示一个未平仓仓位.</span><br><span class="hljs-keyword">type</span> Position <span class="hljs-keyword">struct</span> &#123;<br>	ID               <span class="hljs-type">string</span>          <span class="hljs-comment">// 仓位唯一标识</span><br>	Account          <span class="hljs-type">string</span>          <span class="hljs-comment">// 账户地址或 ID</span><br>	Symbol           <span class="hljs-type">string</span>          <span class="hljs-comment">// 交易对, 如 &quot;ETH-USD&quot;</span><br>	Side             Side            <span class="hljs-comment">// Long 或 Short</span><br>	Size             decimal.Decimal <span class="hljs-comment">// 仓位数量, 如 1.5 (ETH)</span><br>	EntryPrice       decimal.Decimal <span class="hljs-comment">// 开仓均价, 如 3000 (USD)</span><br>	Margin           decimal.Decimal <span class="hljs-comment">// 当前保证金 (逐仓: 独立保证金, 全仓: 初始保证金仅做记录)</span><br>	MaintenanceRate  decimal.Decimal <span class="hljs-comment">// 维持保证金率, 如 0.005 (0.5%)</span><br>	MarginMode       MarginMode      <span class="hljs-comment">// 逐仓 or 全仓</span><br>	LiquidationPrice decimal.Decimal <span class="hljs-comment">// 预计算的清算价格 (仅逐仓有效)</span><br>	UpdatedAt        time.Time<br>&#125;<br><br><span class="hljs-comment">// UnrealizedPnL 计算仓位的未实现盈亏.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">UnrealizedPnL</span><span class="hljs-params">(pos *Position, markPrice decimal.Decimal)</span></span> decimal.Decimal &#123;<br>	<span class="hljs-keyword">if</span> pos.Side == Long &#123;<br>		<span class="hljs-keyword">return</span> markPrice.Sub(pos.EntryPrice).Mul(pos.Size)<br>	&#125;<br>	<span class="hljs-keyword">return</span> pos.EntryPrice.Sub(markPrice).Mul(pos.Size)<br>&#125;<br><br><span class="hljs-comment">// LiquidationOrder 清算引擎生成的清算指令.</span><br><span class="hljs-keyword">type</span> LiquidationOrder <span class="hljs-keyword">struct</span> &#123;<br>	PositionID      <span class="hljs-type">string</span>          <span class="hljs-comment">// 被清算的仓位 ID</span><br>	Account         <span class="hljs-type">string</span>          <span class="hljs-comment">// 被清算账户</span><br>	Symbol          <span class="hljs-type">string</span>          <span class="hljs-comment">// 交易对</span><br>	Side            Side            <span class="hljs-comment">// 清算方向 (与仓位方向相反)</span><br>	Size            decimal.Decimal <span class="hljs-comment">// 清算数量</span><br>	BankruptcyPrice decimal.Decimal <span class="hljs-comment">// 破产价格 (保证金归零的价格)</span><br>	MarkPrice       decimal.Decimal <span class="hljs-comment">// 触发清算时的标记价格</span><br>	Timestamp       time.Time<br>&#125;<br><br><span class="hljs-comment">// LiquidationResult 清算执行结果.</span><br><span class="hljs-keyword">type</span> LiquidationResult <span class="hljs-keyword">struct</span> &#123;<br>	PositionID <span class="hljs-type">string</span><br>	Executed   <span class="hljs-type">bool</span>            <span class="hljs-comment">// 是否成功执行</span><br>	FillPrice  decimal.Decimal <span class="hljs-comment">// 实际成交价格</span><br>	FillSize   decimal.Decimal <span class="hljs-comment">// 实际成交数量</span><br>	Surplus    decimal.Decimal <span class="hljs-comment">// 盈余 (&gt; 0 归保险基金) 或亏损 (&lt; 0 保险基金垫付)</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>为什么用 <code>decimal.Decimal</code> 而不是 <code>float64</code>?</strong><br>永续合约涉及大量资金计算, 浮点数的精度丢失在累积后会导致严重问题.<br><code>shopspring/decimal</code> 底层基于 <code>big.Int</code>, 但提供了人类可读的 API:<br><code>decimal.NewFromFloat(3000)</code> 而不是 <code>big.NewInt(3000_000_000)</code>.<br>到链上边界 (OnChainExecutor) 时再转为 <code>big.Int</code> 即可.</p>
+</blockquote>
+<h3 id="4-2-Executor-接口"><a href="#4-2-Executor-接口" class="headerlink" title="4.2 Executor 接口"></a>4.2 Executor 接口</h3><p>清算引擎的核心抽象: <strong>判断逻辑和执行逻辑分离</strong>.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// Executor 抽象清算指令的执行方式.</span><br><span class="hljs-comment">// 清算引擎只负责 &quot;谁该被清算&quot;, Executor 负责 &quot;怎么清算&quot;.</span><br><span class="hljs-keyword">type</span> Executor <span class="hljs-keyword">interface</span> &#123;<br>	<span class="hljs-comment">// Liquidate 执行单个清算指令, 返回执行结果.</span><br>	Liquidate(ctx context.Context, order LiquidationOrder) (*LiquidationResult, <span class="hljs-type">error</span>)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>三种实现对比:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>Executor</th>
+<th>适用场景</th>
+<th>延迟</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LocalExecutor</td>
+<td>单体架构, 测试</td>
+<td>&lt; 1μs</td>
+<td>直接调用撮合引擎函数</td>
+</tr>
+<tr>
+<td>GRPCExecutor</td>
+<td>微服务, L2</td>
+<td>~1ms</td>
+<td>独立部署, 可扩缩容</td>
+</tr>
+<tr>
+<td>OnChainExecutor</td>
+<td>DeFi 协议</td>
+<td>1~12s</td>
+<td>发送链上交易, Keeper 竞争</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="五、保证金计算"><a href="#五、保证金计算" class="headerlink" title="五、保证金计算"></a>五、保证金计算</h2><h3 id="5-1-清算价格公式"><a href="#5-1-清算价格公式" class="headerlink" title="5.1 清算价格公式"></a>5.1 清算价格公式</h3><blockquote>
+<p>以下公式适用于<strong>逐仓 (Isolated) 模式</strong>, 每个仓位有独立保证金.<br>全仓 (Cross) 模式没有单仓位清算价 — 清算判断在账户级别进行, 见 §4.4.</p>
+</blockquote>
+<p>清算价格是 “保证金刚好降到维持保证金” 时的标记价格. 提前算好, 避免每次价格更新都遍历全量仓位.</p>
+<p><strong>多头 (Long) 清算条件</strong>: 价格下跌导致亏损, 保证金不足:</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs arduino">margin + (markPrice - entryPrice) × size = maintenanceRate × markPrice × size<br><br>解出 markPrice:<br>liquidationPrice = (entryPrice × size - margin) / (size × (<span class="hljs-number">1</span> - maintenanceRate))<br></code></pre></td></tr></table></figure>
+
+<p><strong>空头 (Short) 清算条件</strong>: 价格上涨导致亏损:</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs arduino">margin + (entryPrice - markPrice) × size = maintenanceRate × markPrice × size<br><br>解出 markPrice:<br>liquidationPrice = (entryPrice × size + margin) / (size × (<span class="hljs-number">1</span> + maintenanceRate))<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-2-破产价格公式"><a href="#5-2-破产价格公式" class="headerlink" title="5.2 破产价格公式"></a>5.2 破产价格公式</h3><p>破产价格是 “保证金恰好归零” 的价格. 清算订单以此价格挂单, 成交价与破产价之间的差额归保险基金:</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-keyword">Long</span>:  bankruptcyPrice = entryPrice - margin / <span class="hljs-keyword">size</span><br><span class="hljs-keyword">Short</span>: bankruptcyPrice = entryPrice + margin / <span class="hljs-keyword">size</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="5-3-全仓-Cross-模式清算判断"><a href="#5-3-全仓-Cross-模式清算判断" class="headerlink" title="5.3 全仓 (Cross) 模式清算判断"></a>5.3 全仓 (Cross) 模式清算判断</h3><p>全仓模式没有单仓位的清算价格, 清算判断在<strong>账户级别</strong>:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs makefile">totalEquity = balance + Σ unrealizedPnL(position_i)   // 账户所有全仓仓位的 PnL 汇总<br>totalMM     = Σ (markPrice_i × size_i × MMR_i)         // 账户所有全仓仓位的维持保证金之和<br><br>accountMarginRatio = totalEquity / totalMM<br><br><span class="hljs-section">清算条件: accountMarginRatio &lt;= 1 (即总权益不足以覆盖总维持保证金)</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>逐仓 vs 全仓对比</strong>:</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs routeros">场景: Alice 账户余额 <span class="hljs-variable">$10</span>,000, 同时持有:<br>  ETH-USD Long  10 ETH @ <span class="hljs-variable">$3</span>,000 (浮亏 <span class="hljs-variable">$2</span>,000)  <span class="hljs-attribute">MMR</span>=0.5%<br>  BTC-USD Short 0.5 BTC @ <span class="hljs-variable">$60</span>,000 (浮盈 <span class="hljs-variable">$1</span>,500) <span class="hljs-attribute">MMR</span>=0.5%<br><br>逐仓模式: 两个仓位独立判断<br>  ETH 仓位保证金率 = (margin - 2000) / notional  ← 可能已触发清算<br>  BTC 仓位保证金率 = (margin + 1500) / notional  ← 非常健康<br><br>全仓模式: 账户级别判断<br>  totalEquity = 10000 + (-2000) + 1500 = <span class="hljs-variable">$9</span>,500<br>  totalMM     = (markPrice_ETH × 10 × 0.005) + (markPrice_BTC × 0.5 × 0.005)<br>  BTC 的盈利 <span class="hljs-string">&quot;撑住了&quot;</span> ETH 的亏损 → 账户整体安全<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-4-Go-实现"><a href="#5-4-Go-实现" class="headerlink" title="5.4 Go 实现"></a>5.4 Go 实现</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// CalcLiquidationPrice 计算清算价格.</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">//	Long:  (entryPrice * size - margin) / (size * (1 - maintenanceRate))</span><br><span class="hljs-comment">//	Short: (entryPrice * size + margin) / (size * (1 + maintenanceRate))</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CalcLiquidationPrice</span><span class="hljs-params">(pos *Position)</span></span> decimal.Decimal &#123;<br>	one := decimal.NewFromInt(<span class="hljs-number">1</span>)<br>	entryTimesSize := pos.EntryPrice.Mul(pos.Size)<br><br>	<span class="hljs-keyword">if</span> pos.Side == Long &#123;<br>		numerator := entryTimesSize.Sub(pos.Margin)<br>		denominator := pos.Size.Mul(one.Sub(pos.MaintenanceRate))<br>		<span class="hljs-keyword">return</span> numerator.Div(denominator)<br>	&#125;<br><br>	<span class="hljs-comment">// Short</span><br>	numerator := entryTimesSize.Add(pos.Margin)<br>	denominator := pos.Size.Mul(one.Add(pos.MaintenanceRate))<br>	<span class="hljs-keyword">return</span> numerator.Div(denominator)<br>&#125;<br><br><span class="hljs-comment">// CalcBankruptcyPrice 计算破产价格 (保证金归零).</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">//	Long:  entryPrice - margin / size</span><br><span class="hljs-comment">//	Short: entryPrice + margin / size</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CalcBankruptcyPrice</span><span class="hljs-params">(pos *Position)</span></span> decimal.Decimal &#123;<br>	marginPerUnit := pos.Margin.Div(pos.Size)<br>	<span class="hljs-keyword">if</span> pos.Side == Long &#123;<br>		<span class="hljs-keyword">return</span> pos.EntryPrice.Sub(marginPerUnit)<br>	&#125;<br>	<span class="hljs-keyword">return</span> pos.EntryPrice.Add(marginPerUnit)<br>&#125;<br><br><span class="hljs-comment">// IsPositionLiquidatable 判断逐仓仓位是否应被清算.</span><br><span class="hljs-comment">// 用 margin &lt;= MM (乘法) 而非 marginRatio &lt;= MMR (除法), 避免精度损失.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">IsPositionLiquidatable</span><span class="hljs-params">(pos *Position, markPrice decimal.Decimal)</span></span> <span class="hljs-type">bool</span> &#123;<br>	currentMargin := pos.Margin.Add(UnrealizedPnL(pos, markPrice))<br>	mm := markPrice.Mul(pos.Size).Mul(pos.MaintenanceRate) <span class="hljs-comment">// MM = notional × MMR</span><br>	<span class="hljs-keyword">return</span> !currentMargin.IsPositive() || currentMargin.LessThanOrEqual(mm)<br>&#125;<br><br><span class="hljs-comment">// IsAccountLiquidatable 判断全仓账户是否应被清算.</span><br><span class="hljs-comment">// 用 equity &lt;= totalMM (乘法) 而非 ratio &lt;= 1 (除法).</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">// 全仓模式下, 所有仓位的盈亏共享同一个保证金池:</span><br><span class="hljs-comment">//   - 一个仓位亏 $500, 另一个赚 $300 → 净亏 $200, 从账户余额扣</span><br><span class="hljs-comment">//   - 只要账户总权益 &gt; 总维持保证金, 就不会被清算</span><br><span class="hljs-comment">//   - 触发清算时, 引擎选择该账户下风险最高的仓位优先清算</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">IsAccountLiquidatable</span><span class="hljs-params">(account *Account, markPrices <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]decimal.Decimal)</span></span> <span class="hljs-type">bool</span> &#123;<br>	totalMM := account.TotalMaintenanceMargin(markPrices)<br>	<span class="hljs-keyword">if</span> totalMM.IsZero() &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-comment">// 无仓位</span><br>	&#125;<br>	equity := account.TotalEquity(markPrices)<br>	<span class="hljs-keyword">return</span> !equity.IsPositive() || equity.LessThanOrEqual(totalMM)<br>&#125;<br><br><span class="hljs-comment">// CalcMarginRatio 计算单仓位保证金率 (用于展示/日志, 非清算判断).</span><br><span class="hljs-comment">// 清算判断请用 IsPositionLiquidatable (纯乘法, 无精度损失).</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CalcMarginRatio</span><span class="hljs-params">(pos *Position, markPrice decimal.Decimal)</span></span> decimal.Decimal &#123;<br>	effectiveMargin := pos.Margin.Add(UnrealizedPnL(pos, markPrice))<br>	<span class="hljs-keyword">if</span> !effectiveMargin.IsPositive() &#123;<br>		<span class="hljs-keyword">return</span> decimal.Zero<br>	&#125;<br>	notional := markPrice.Mul(pos.Size)<br>	<span class="hljs-keyword">return</span> effectiveMargin.Div(notional)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、仓位优先队列"><a href="#六、仓位优先队列" class="headerlink" title="六、仓位优先队列"></a>六、仓位优先队列</h2><p>全量遍历在仓位多了之后太慢. 更好的做法: 按清算价格排序, 价格更新时只从队列头部开始检查.</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs routeros">ETH 当前价格: <span class="hljs-variable">$3</span>,000, 正在下跌<br><br>Long 优先队列 (按清算价从高到低):<br>  ┌──────────────────────────────────────────────────┐<br>  │ Alice  <span class="hljs-attribute">liqPrice</span>=<span class="hljs-variable">$2</span>,980  ← 最先被清算 (离当前价最近)  │<br>  │ Bob    <span class="hljs-attribute">liqPrice</span>=<span class="hljs-variable">$2</span>,850                            │<br>  │ Carol  <span class="hljs-attribute">liqPrice</span>=<span class="hljs-variable">$2</span>,500                            │<br>  │ <span class="hljs-built_in">..</span>.                                               │<br>  └──────────────────────────────────────────────────┘<br>  价格跌到 <span class="hljs-variable">$2</span>,980 → 扫 Alice → 清算<br>  价格继续跌到 <span class="hljs-variable">$2</span>,850 → 扫 Bob → 清算<br>  价格反弹到 <span class="hljs-variable">$2</span>,900 → 扫到 Carol (<span class="hljs-variable">$2</span>,500) 发现安全 → 停止<br><br>Short 优先队列 (按清算价从低到高):<br>  价格上涨时从头部开始扫, 逻辑对称<br></code></pre></td></tr></table></figure>
+
+<h3 id="6-1-Go-实现"><a href="#6-1-Go-实现" class="headerlink" title="6.1 Go 实现"></a>6.1 Go 实现</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;github.com/tidwall/btree&quot;</span><br><br><span class="hljs-comment">// positionItem 是优先队列中的元素, 按清算价排序.</span><br><span class="hljs-keyword">type</span> positionItem <span class="hljs-keyword">struct</span> &#123;<br>	LiquidationPrice decimal.Decimal<br>	PositionID       <span class="hljs-type">string</span><br>&#125;<br><br><span class="hljs-comment">// PositionQueue 维护按清算价排序的仓位优先队列.</span><br><span class="hljs-comment">// 使用 btree.BTreeG 泛型版本, 自定义 less 函数 (decimal.Decimal 不是 cmp.Ordered).</span><br><span class="hljs-keyword">type</span> PositionQueue <span class="hljs-keyword">struct</span> &#123;<br>	tree *btree.BTreeG[positionItem]<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewPositionQueue</span><span class="hljs-params">()</span></span> *PositionQueue &#123;<br>	<span class="hljs-keyword">return</span> &amp;PositionQueue&#123;<br>		tree: btree.NewBTreeG[positionItem](<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(a, b positionItem)</span></span> <span class="hljs-type">bool</span> &#123;<br>			<span class="hljs-keyword">return</span> a.LiquidationPrice.LessThan(b.LiquidationPrice)<br>		&#125;),<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// Insert 插入仓位到优先队列.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(pq *PositionQueue)</span></span> Insert(posID <span class="hljs-type">string</span>, liqPrice decimal.Decimal) &#123;<br>	pq.tree.Set(positionItem&#123;<br>		LiquidationPrice: liqPrice,<br>		PositionID:       posID,<br>	&#125;)<br>&#125;<br><br><span class="hljs-comment">// Remove 从优先队列移除仓位 (平仓或保证金变更后需要重新插入).</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(pq *PositionQueue)</span></span> Remove(posID <span class="hljs-type">string</span>, liqPrice decimal.Decimal) &#123;<br>	pq.tree.Delete(positionItem&#123;<br>		LiquidationPrice: liqPrice,<br>		PositionID:       posID,<br>	&#125;)<br>&#125;<br><br><span class="hljs-comment">// ScanLongsAt 从最高清算价开始, 返回所有清算价 &gt;= markPrice 的多头仓位 ID.</span><br><span class="hljs-comment">// 即: 这些仓位在当前 markPrice 下应该被清算.</span><br><span class="hljs-comment">// Reverse: 从树的最大值开始降序遍历, 无需构造 fake pivot.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(pq *PositionQueue)</span></span> ScanLongsAt(markPrice decimal.Decimal) []<span class="hljs-type">string</span> &#123;<br>	<span class="hljs-keyword">var</span> result []<span class="hljs-type">string</span><br>	pq.tree.Reverse(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(item positionItem)</span></span> <span class="hljs-type">bool</span> &#123;<br>		<span class="hljs-keyword">if</span> item.LiquidationPrice.GreaterThanOrEqual(markPrice) &#123;<br>			result = <span class="hljs-built_in">append</span>(result, item.PositionID)<br>			<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-comment">// 继续</span><br>		&#125;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-comment">// 安全了, 停止</span><br>	&#125;)<br>	<span class="hljs-keyword">return</span> result<br>&#125;<br><br><span class="hljs-comment">// ScanShortsAt 从最低清算价开始, 返回所有清算价 &lt;= markPrice 的空头仓位 ID.</span><br><span class="hljs-comment">// Scan: 从树的最小值开始升序遍历.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(pq *PositionQueue)</span></span> ScanShortsAt(markPrice decimal.Decimal) []<span class="hljs-type">string</span> &#123;<br>	<span class="hljs-keyword">var</span> result []<span class="hljs-type">string</span><br>	pq.tree.Scan(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(item positionItem)</span></span> <span class="hljs-type">bool</span> &#123;<br>		<span class="hljs-keyword">if</span> item.LiquidationPrice.LessThanOrEqual(markPrice) &#123;<br>			result = <span class="hljs-built_in">append</span>(result, item.PositionID)<br>			<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br>		&#125;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>	&#125;)<br>	<span class="hljs-keyword">return</span> result<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="七、清算引擎主循环"><a href="#七、清算引擎主循环" class="headerlink" title="七、清算引擎主循环"></a>七、清算引擎主循环</h2><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="880" height="480" rx="8" fill="#1a1a2e"/>
+  <text x="440" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="12" font-weight="bold">清算触发流程 (Liquidation Trigger Flow)</text>
+  <!-- Step 1: Price Feed -->
+  <rect x="30" y="50" width="160" height="50" rx="6" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="1"/>
+  <text x="110" y="72" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">Mark Price 更新</text>
+  <text x="110" y="88" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Oracle / 撮合引擎推送</text>
+  <!-- Arrow -->
+  <line x1="190" y1="75" x2="228" y2="75" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 2: OnPriceUpdate -->
+  <rect x="240" y="50" width="170" height="50" rx="6" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="1"/>
+  <text x="325" y="72" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">OnPriceUpdate()</text>
+  <text x="325" y="88" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">清算引擎核心入口</text>
+  <!-- Branch: two paths -->
+  <line x1="325" y1="100" x2="325" y2="120" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="325" y1="120" x2="180" y2="120" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="325" y1="120" x2="580" y2="120" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="180" y1="120" x2="180" y2="138" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="580" y1="120" x2="580" y2="138" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Left branch: Isolated -->
+  <rect x="50" y="148" width="260" height="145" rx="6" fill="#34d399" fill-opacity="0.06" stroke="#34d399" stroke-width="0.8"/>
+  <text x="180" y="168" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">逐仓模式 (Isolated)</text>
+  <rect x="70" y="180" width="220" height="30" rx="4" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-width="0.5"/>
+  <text x="180" y="200" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Long 队列: 从最高清算价扫描</text>
+  <rect x="70" y="218" width="220" height="30" rx="4" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="180" y="238" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Short 队列: 从最低清算价扫描</text>
+  <text x="180" y="270" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">liqPrice >= markPrice → 清算 Long</text>
+  <text x="180" y="284" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">liqPrice &lt;= markPrice → 清算 Short</text>
+  <!-- Right branch: Cross -->
+  <rect x="450" y="148" width="260" height="145" rx="6" fill="#a78bfa" fill-opacity="0.06" stroke="#a78bfa" stroke-width="0.8"/>
+  <text x="580" y="168" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="9" font-weight="bold">全仓模式 (Cross)</text>
+  <rect x="470" y="180" width="220" height="30" rx="4" fill="#a78bfa" fill-opacity="0.1" stroke="#a78bfa" stroke-width="0.5"/>
+  <text x="580" y="200" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">遍历持有该 symbol 的账户</text>
+  <rect x="470" y="218" width="220" height="30" rx="4" fill="#a78bfa" fill-opacity="0.1" stroke="#a78bfa" stroke-width="0.5"/>
+  <text x="580" y="238" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">equity &lt;= totalMM → 触发清算</text>
+  <text x="580" y="270" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">选亏损最大的仓位优先清算</text>
+  <text x="580" y="284" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">清算后重新检查, 直到恢复健康</text>
+  <!-- Merge: both paths converge -->
+  <line x1="180" y1="293" x2="180" y2="315" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="580" y1="293" x2="580" y2="315" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="180" y1="315" x2="580" y2="315" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="380" y1="315" x2="380" y2="333" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 3: Partial vs Full -->
+  <rect x="240" y="342" width="280" height="45" rx="6" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="380" y="362" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">部分清算 or 全部清算?</text>
+  <text x="380" y="378" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">名义价值 &lt; MinSize → 全平 | 否则按 PartialRatio 部分平</text>
+  <!-- Arrow down -->
+  <line x1="380" y1="387" x2="380" y2="403" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Step 4: Executor -->
+  <rect x="240" y="412" width="280" height="45" rx="6" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="1"/>
+  <text x="380" y="432" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">Executor.Liquidate(order)</text>
+  <text x="380" y="448" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Local / gRPC / OnChain → 生成清算订单提交执行</text>
+  <!-- Right side: result flow -->
+  <line x1="520" y1="434" x2="558" y2="434" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <rect x="570" y="412" width="170" height="45" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="655" y="430" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">结果处理</text>
+  <text x="655" y="444" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">盈余 → 保险基金</text>
+  <text x="655" y="456" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">不足 → 触发 ADL</text>
+  <!-- Legend -->
+  <text x="440" y="476" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">每次 mark price 更新都会触发此流程, 逐仓 O(k) 只扫描危险仓位, 全仓 O(n) 遍历有风险账户</text>
+</svg>
+</div>
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// LiquidationConfig 清算引擎配置.</span><br><span class="hljs-keyword">type</span> LiquidationConfig <span class="hljs-keyword">struct</span> &#123;<br>	<span class="hljs-comment">// PartialRatio 部分清算比例, 范围 (0, 1].</span><br>	<span class="hljs-comment">// 每次清算平掉仓位的这个比例. 例如 0.25 表示每次清算 25%.</span><br>	<span class="hljs-comment">// 部分清算后仓位仍不健康会在下一轮继续清算.</span><br>	<span class="hljs-comment">// 设为 1.0 则退化为全部清算.</span><br>	PartialRatio decimal.Decimal <span class="hljs-comment">// 建议 0.25 ~ 0.50</span><br><br>	<span class="hljs-comment">// MinPositionSize 最小仓位名义价值 (USD).</span><br>	<span class="hljs-comment">// 仓位名义价值低于此阈值时直接全部清算, 不做部分清算.</span><br>	<span class="hljs-comment">// 原因: 小仓位拆分清算不划算 (gas 成本 / 撮合开销 &gt; 收益).</span><br>	MinPositionSize decimal.Decimal <span class="hljs-comment">// 建议 $500 ~ $1,000</span><br>&#125;<br><br><span class="hljs-comment">// Engine 是清算引擎核心.</span><br><span class="hljs-comment">// 同时支持逐仓和全仓模式:</span><br><span class="hljs-comment">//   - 逐仓: 通过优先队列按单仓位清算价扫描 (O(log n))</span><br><span class="hljs-comment">//   - 全仓: 遍历有风险的账户, 计算账户级别保证金率</span><br><span class="hljs-keyword">type</span> Engine <span class="hljs-keyword">struct</span> &#123;<br>	config     LiquidationConfig<br>	positions  <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*Position  <span class="hljs-comment">// positionID → Position</span><br>	accounts   <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*Account   <span class="hljs-comment">// accountID → Account</span><br>	longQueue  *PositionQueue        <span class="hljs-comment">// 逐仓多头优先队列 (按清算价 DESC)</span><br>	shortQueue *PositionQueue        <span class="hljs-comment">// 逐仓空头优先队列 (按清算价 ASC)</span><br>	executor   Executor              <span class="hljs-comment">// 清算执行器 (可替换)</span><br>	insurance  *InsuranceFund        <span class="hljs-comment">// 保险基金</span><br>	adl        *ADLEngine            <span class="hljs-comment">// 自动减仓引擎</span><br>&#125;<br><br><span class="hljs-comment">// NewEngine 创建清算引擎.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewEngine</span><span class="hljs-params">(config LiquidationConfig, executor Executor, insuranceFund *InsuranceFund)</span></span> *Engine &#123;<br>	<span class="hljs-keyword">return</span> &amp;Engine&#123;<br>		config:     config,<br>		positions:  <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*Position),<br>		accounts:   <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*Account),<br>		longQueue:  NewPositionQueue(),<br>		shortQueue: NewPositionQueue(),<br>		executor:   executor,<br>		insurance:  insuranceFund,<br>		adl:        NewADLEngine(),<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// GetOrCreateAccount 获取或创建账户.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Engine)</span></span> GetOrCreateAccount(accountID <span class="hljs-type">string</span>) *Account &#123;<br>	<span class="hljs-keyword">if</span> acc, ok := e.accounts[accountID]; ok &#123;<br>		<span class="hljs-keyword">return</span> acc<br>	&#125;<br>	acc := &amp;Account&#123;<br>		ID:        accountID,<br>		Balance:   decimal.Zero,<br>		Positions: <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*Position),<br>	&#125;<br>	e.accounts[accountID] = acc<br>	<span class="hljs-keyword">return</span> acc<br>&#125;<br><br><span class="hljs-comment">// RegisterPosition 注册新仓位到清算引擎.</span><br><span class="hljs-comment">// 逐仓仓位进入优先队列, 全仓仓位只注册到账户.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Engine)</span></span> RegisterPosition(pos *Position) &#123;<br>	e.positions[pos.ID] = pos<br><br>	<span class="hljs-comment">// 注册到账户</span><br>	acc := e.GetOrCreateAccount(pos.Account)<br>	acc.Positions[pos.ID] = pos<br><br>	<span class="hljs-keyword">if</span> pos.MarginMode == Isolated &#123;<br>		<span class="hljs-comment">// 逐仓: 预计算清算价, 插入优先队列</span><br>		pos.LiquidationPrice = CalcLiquidationPrice(pos)<br>		<span class="hljs-keyword">if</span> pos.Side == Long &#123;<br>			e.longQueue.Insert(pos.ID, pos.LiquidationPrice)<br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			e.shortQueue.Insert(pos.ID, pos.LiquidationPrice)<br>		&#125;<br>	&#125;<br>	<span class="hljs-comment">// 全仓: 不进队列, 在 OnPriceUpdate 时按账户扫描</span><br>&#125;<br><br><span class="hljs-comment">// RemovePosition 从清算引擎移除仓位 (平仓时调用).</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Engine)</span></span> RemovePosition(posID <span class="hljs-type">string</span>) &#123;<br>	pos, ok := e.positions[posID]<br>	<span class="hljs-keyword">if</span> !ok &#123;<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	<span class="hljs-keyword">if</span> pos.MarginMode == Isolated &#123;<br>		<span class="hljs-keyword">if</span> pos.Side == Long &#123;<br>			e.longQueue.Remove(posID, pos.LiquidationPrice)<br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			e.shortQueue.Remove(posID, pos.LiquidationPrice)<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-comment">// 从账户中移除</span><br>	<span class="hljs-keyword">if</span> acc, ok := e.accounts[pos.Account]; ok &#123;<br>		<span class="hljs-built_in">delete</span>(acc.Positions, posID)<br>	&#125;<br><br>	<span class="hljs-built_in">delete</span>(e.positions, posID)<br>&#125;<br><br><span class="hljs-comment">// OnPriceUpdate 是清算引擎的核心入口.</span><br><span class="hljs-comment">// 每次 mark price 更新时调用, 分别扫描逐仓和全仓仓位.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Engine)</span></span> OnPriceUpdate(ctx context.Context, symbol <span class="hljs-type">string</span>, markPrice decimal.Decimal) <span class="hljs-type">error</span> &#123;<br>	markPrices := <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]decimal.Decimal&#123;symbol: markPrice&#125;<br><br>	<span class="hljs-comment">// ── 逐仓模式: 优先队列扫描 ──</span><br><br>	<span class="hljs-comment">// 1. 扫描需要清算的多头 (价格下跌, 清算价 &gt;= 当前价)</span><br>	<span class="hljs-keyword">for</span> _, posID := <span class="hljs-keyword">range</span> e.longQueue.ScanLongsAt(markPrice) &#123;<br>		<span class="hljs-keyword">if</span> err := e.liquidatePosition(ctx, posID, markPrice); err != <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;liquidate long %s: %w&quot;</span>, posID, err)<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-comment">// 2. 扫描需要清算的空头 (价格上涨, 清算价 &lt;= 当前价)</span><br>	<span class="hljs-keyword">for</span> _, posID := <span class="hljs-keyword">range</span> e.shortQueue.ScanShortsAt(markPrice) &#123;<br>		<span class="hljs-keyword">if</span> err := e.liquidatePosition(ctx, posID, markPrice); err != <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;liquidate short %s: %w&quot;</span>, posID, err)<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-comment">// ── 全仓模式: 账户级别扫描 ──</span><br><br>	<span class="hljs-keyword">for</span> _, acc := <span class="hljs-keyword">range</span> e.accounts &#123;<br>		<span class="hljs-keyword">if</span> !e.accountHasCrossPositions(acc, symbol) &#123;<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br>		<span class="hljs-keyword">if</span> IsAccountLiquidatable(acc, markPrices) &#123;<br>			<span class="hljs-keyword">if</span> err := e.liquidateCrossAccount(ctx, acc, markPrices); err != <span class="hljs-literal">nil</span> &#123;<br>				<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;liquidate cross account %s: %w&quot;</span>, acc.ID, err)<br>			&#125;<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">// accountHasCrossPositions 检查账户是否有指定 symbol 的全仓仓位.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Engine)</span></span> accountHasCrossPositions(acc *Account, symbol <span class="hljs-type">string</span>) <span class="hljs-type">bool</span> &#123;<br>	<span class="hljs-keyword">for</span> _, pos := <span class="hljs-keyword">range</span> acc.Positions &#123;<br>		<span class="hljs-keyword">if</span> pos.MarginMode == Cross &amp;&amp; pos.Symbol == symbol &#123;<br>			<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>&#125;<br><br><span class="hljs-comment">// liquidateCrossAccount 清算全仓账户: 选择亏损最大的仓位优先清算.</span><br><span class="hljs-comment">// 每次清算一个仓位后重新检查账户保证金率, 直到恢复健康或无仓位可清算.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Engine)</span></span> liquidateCrossAccount(ctx context.Context, acc *Account, markPrices <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]decimal.Decimal) <span class="hljs-type">error</span> &#123;<br>	<span class="hljs-keyword">for</span> &#123;<br>		<span class="hljs-comment">// 账户恢复健康则停止</span><br>		<span class="hljs-keyword">if</span> !IsAccountLiquidatable(acc, markPrices) &#123;<br>			<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>		&#125;<br><br>		<span class="hljs-comment">// 找亏损最大的全仓仓位</span><br>		<span class="hljs-keyword">var</span> worst *Position<br>		worstPnL := decimal.Zero<br>		<span class="hljs-keyword">for</span> _, pos := <span class="hljs-keyword">range</span> acc.Positions &#123;<br>			<span class="hljs-keyword">if</span> pos.MarginMode != Cross &#123;<br>				<span class="hljs-keyword">continue</span><br>			&#125;<br>			mp, ok := markPrices[pos.Symbol]<br>			<span class="hljs-keyword">if</span> !ok &#123;<br>				<span class="hljs-keyword">continue</span><br>			&#125;<br>			pnl := UnrealizedPnL(pos, mp)<br>			<span class="hljs-keyword">if</span> worst == <span class="hljs-literal">nil</span> || pnl.LessThan(worstPnL) &#123;<br>				worst = pos<br>				worstPnL = pnl<br>			&#125;<br>		&#125;<br><br>		<span class="hljs-keyword">if</span> worst == <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span> <span class="hljs-comment">// 无全仓仓位</span><br>		&#125;<br><br>		mp := markPrices[worst.Symbol]<br>		<span class="hljs-keyword">if</span> err := e.liquidatePosition(ctx, worst.ID, mp); err != <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">return</span> err<br>		&#125;<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// liquidatePosition 执行单个仓位的清算 (逐仓和全仓共用).</span><br><span class="hljs-comment">// 根据 config 决定部分清算还是全部清算:</span><br><span class="hljs-comment">//   - 仓位名义价值 &lt; MinPositionSize → 全部清算 (小仓位不值得拆分)</span><br><span class="hljs-comment">//   - 否则 → 部分清算 (按 PartialRatio 比例平仓)</span><br><span class="hljs-comment">//   - 部分清算后仍不健康 → 下一轮 OnPriceUpdate 继续清算</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Engine)</span></span> liquidatePosition(ctx context.Context, posID <span class="hljs-type">string</span>, markPrice decimal.Decimal) <span class="hljs-type">error</span> &#123;<br>	pos, ok := e.positions[posID]<br>	<span class="hljs-keyword">if</span> !ok &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span> <span class="hljs-comment">// 已被清算或平仓</span><br>	&#125;<br><br>	<span class="hljs-comment">// 决定清算数量: 部分 or 全部</span><br>	liqSize := e.calcLiquidationSize(pos, markPrice)<br><br>	<span class="hljs-comment">// 构建清算订单</span><br>	order := LiquidationOrder&#123;<br>		PositionID:      pos.ID,<br>		Account:         pos.Account,<br>		Symbol:          pos.Symbol,<br>		Side:            <span class="hljs-number">1</span> - pos.Side, <span class="hljs-comment">// 反向: Long 仓位 → 卖出清算</span><br>		Size:            liqSize,<br>		BankruptcyPrice: CalcBankruptcyPrice(pos),<br>		MarkPrice:       markPrice,<br>		Timestamp:       time.Now(),<br>	&#125;<br><br>	<span class="hljs-comment">// 通过 Executor 执行清算</span><br>	result, err := e.executor.Liquidate(ctx, order)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;executor.Liquidate: %w&quot;</span>, err)<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> !result.Executed &#123;<br>		<span class="hljs-keyword">return</span> e.adl.Execute(ctx, pos, e.positions, e.executor)<br>	&#125;<br><br>	<span class="hljs-comment">// 处理清算盈余/亏损</span><br>	e.insurance.Settle(result.Surplus)<br><br>	<span class="hljs-comment">// 保险基金为负 → 触发 ADL</span><br>	<span class="hljs-keyword">if</span> e.insurance.Balance().IsNegative() &#123;<br>		deficit := e.insurance.Balance().Neg()<br>		<span class="hljs-keyword">if</span> err := e.adl.CoverDeficit(ctx, pos.Symbol, pos.Side, deficit, e.positions, e.executor); err != <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;ADL cover deficit: %w&quot;</span>, err)<br>		&#125;<br>		e.insurance.Reset()<br>	&#125;<br><br>	isFullLiquidation := liqSize.Equal(pos.Size)<br><br>	<span class="hljs-keyword">if</span> isFullLiquidation &#123;<br>		e.RemovePosition(posID)<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-comment">// 部分清算: 按比例缩减仓位和保证金</span><br>		e.applyPartialLiquidation(pos, result, markPrice)<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">// calcLiquidationSize 计算本次清算的数量.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Engine)</span></span> calcLiquidationSize(pos *Position, markPrice decimal.Decimal) decimal.Decimal &#123;<br>	notional := markPrice.Mul(pos.Size)<br><br>	<span class="hljs-comment">// 小仓位 → 全部清算</span><br>	<span class="hljs-keyword">if</span> notional.LessThanOrEqual(e.config.MinPositionSize) &#123;<br>		<span class="hljs-keyword">return</span> pos.Size<br>	&#125;<br><br>	<span class="hljs-comment">// 部分清算: size × partialRatio</span><br>	liqSize := pos.Size.Mul(e.config.PartialRatio)<br><br>	<span class="hljs-comment">// 如果剩余仓位名义价值 &lt; MinPositionSize, 也全部清算</span><br>	remaining := pos.Size.Sub(liqSize)<br>	<span class="hljs-keyword">if</span> markPrice.Mul(remaining).LessThan(e.config.MinPositionSize) &#123;<br>		<span class="hljs-keyword">return</span> pos.Size<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> liqSize<br>&#125;<br><br><span class="hljs-comment">// applyPartialLiquidation 部分清算后更新仓位状态.</span><br><span class="hljs-comment">// 按清算比例缩减 size 和 margin, 重新计算清算价格.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Engine)</span></span> applyPartialLiquidation(pos *Position, result *LiquidationResult, markPrice decimal.Decimal) &#123;<br>	liqRatio := result.FillSize.Div(pos.Size) <span class="hljs-comment">// 实际清算比例</span><br>	remainRatio := decimal.NewFromInt(<span class="hljs-number">1</span>).Sub(liqRatio)<br><br>	<span class="hljs-comment">// 缩减保证金: 按比例扣除, 并扣除清算亏损 (如有)</span><br>	<span class="hljs-comment">// 清算盈余归保险基金 (已在 insurance.Settle 处理), 这里只扣 margin</span><br>	pos.Margin = pos.Margin.Mul(remainRatio)<br>	pos.Size = pos.Size.Sub(result.FillSize)<br>	pos.UpdatedAt = time.Now()<br><br>	<span class="hljs-comment">// 逐仓模式: 重新计算清算价格并更新优先队列</span><br>	<span class="hljs-keyword">if</span> pos.MarginMode == Isolated &#123;<br>		oldLiqPrice := pos.LiquidationPrice<br>		pos.LiquidationPrice = CalcLiquidationPrice(pos)<br><br>		<span class="hljs-keyword">if</span> pos.Side == Long &#123;<br>			e.longQueue.Remove(pos.ID, oldLiqPrice)<br>			e.longQueue.Insert(pos.ID, pos.LiquidationPrice)<br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			e.shortQueue.Remove(pos.ID, oldLiqPrice)<br>			e.shortQueue.Insert(pos.ID, pos.LiquidationPrice)<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="八、三种-Executor-实现"><a href="#八、三种-Executor-实现" class="headerlink" title="八、三种 Executor 实现"></a>八、三种 Executor 实现</h2><h3 id="8-1-LocalExecutor-进程内调用"><a href="#8-1-LocalExecutor-进程内调用" class="headerlink" title="8.1 LocalExecutor (进程内调用)"></a>8.1 LocalExecutor (进程内调用)</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// MatchingEngine 是撮合引擎的接口.</span><br><span class="hljs-comment">// 如果已有撮合引擎原理与 Go 实现的实现, 直接对接即可.</span><br><span class="hljs-keyword">type</span> MatchingEngine <span class="hljs-keyword">interface</span> &#123;<br>	SubmitOrder(symbol <span class="hljs-type">string</span>, side Side, price, size decimal.Decimal) ([]Trade, <span class="hljs-type">error</span>)<br>&#125;<br><br><span class="hljs-keyword">type</span> Trade <span class="hljs-keyword">struct</span> &#123;<br>	Price decimal.Decimal<br>	Size  decimal.Decimal<br>&#125;<br><br><span class="hljs-comment">// LocalExecutor 在同一进程内直接调用撮合引擎.</span><br><span class="hljs-keyword">type</span> LocalExecutor <span class="hljs-keyword">struct</span> &#123;<br>	engine MatchingEngine<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewLocalExecutor</span><span class="hljs-params">(engine MatchingEngine)</span></span> *LocalExecutor &#123;<br>	<span class="hljs-keyword">return</span> &amp;LocalExecutor&#123;engine: engine&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *LocalExecutor)</span></span> Liquidate(ctx context.Context, order LiquidationOrder) (*LiquidationResult, <span class="hljs-type">error</span>) &#123;<br>	trades, err := e.engine.SubmitOrder(order.Symbol, order.Side, order.BankruptcyPrice, order.Size)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(trades) == <span class="hljs-number">0</span> &#123;<br>		<span class="hljs-keyword">return</span> &amp;LiquidationResult&#123;PositionID: order.PositionID, Executed: <span class="hljs-literal">false</span>&#125;, <span class="hljs-literal">nil</span><br>	&#125;<br><br>	<span class="hljs-comment">// 计算加权平均成交价</span><br>	totalSize := decimal.Zero<br>	totalValue := decimal.Zero<br>	<span class="hljs-keyword">for</span> _, t := <span class="hljs-keyword">range</span> trades &#123;<br>		totalSize = totalSize.Add(t.Size)<br>		totalValue = totalValue.Add(t.Price.Mul(t.Size))<br>	&#125;<br>	avgPrice := totalValue.Div(totalSize)<br><br>	<span class="hljs-comment">// 计算盈余/亏损</span><br>	<span class="hljs-comment">// Long 清算 (卖出): surplus = (fillPrice - bankruptcyPrice) * size</span><br>	<span class="hljs-comment">// Short 清算 (买入): surplus = (bankruptcyPrice - fillPrice) * size</span><br>	<span class="hljs-keyword">var</span> surplus decimal.Decimal<br>	<span class="hljs-keyword">if</span> order.Side == Short &#123; <span class="hljs-comment">// 原仓位是 Long, 清算卖出</span><br>		surplus = avgPrice.Sub(order.BankruptcyPrice).Mul(totalSize)<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		surplus = order.BankruptcyPrice.Sub(avgPrice).Mul(totalSize)<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> &amp;LiquidationResult&#123;<br>		PositionID: order.PositionID,<br>		Executed:   <span class="hljs-literal">true</span>,<br>		FillPrice:  avgPrice,<br>		FillSize:   totalSize,<br>		Surplus:    surplus,<br>	&#125;, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="8-2-GRPCExecutor-远程调用"><a href="#8-2-GRPCExecutor-远程调用" class="headerlink" title="8.2 GRPCExecutor (远程调用)"></a>8.2 GRPCExecutor (远程调用)</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// GRPCExecutor 通过 gRPC 调用远程撮合服务.</span><br><span class="hljs-keyword">type</span> GRPCExecutor <span class="hljs-keyword">struct</span> &#123;<br>	client MatchingServiceClient <span class="hljs-comment">// protobuf 生成的 client</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewGRPCExecutor</span><span class="hljs-params">(addr <span class="hljs-type">string</span>)</span></span> (*GRPCExecutor, <span class="hljs-type">error</span>) &#123;<br>	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;dial matching service: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">return</span> &amp;GRPCExecutor&#123;client: NewMatchingServiceClient(conn)&#125;, <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *GRPCExecutor)</span></span> Liquidate(ctx context.Context, order LiquidationOrder) (*LiquidationResult, <span class="hljs-type">error</span>) &#123;<br>	resp, err := e.client.SubmitLiquidation(ctx, &amp;LiquidationRequest&#123;<br>		PositionId:      order.PositionID,<br>		Symbol:          order.Symbol,<br>		Side:            <span class="hljs-type">int32</span>(order.Side),<br>		Size:            order.Size.String(),<br>		BankruptcyPrice: order.BankruptcyPrice.String(),<br>	&#125;)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;grpc SubmitLiquidation: %w&quot;</span>, err)<br>	&#125;<br><br>	fillPrice, _ := decimal.NewFromString(resp.FillPrice)<br>	fillSize, _ := decimal.NewFromString(resp.FillSize)<br>	surplus, _ := decimal.NewFromString(resp.Surplus)<br><br>	<span class="hljs-keyword">return</span> &amp;LiquidationResult&#123;<br>		PositionID: order.PositionID,<br>		Executed:   resp.Executed,<br>		FillPrice:  fillPrice,<br>		FillSize:   fillSize,<br>		Surplus:    surplus,<br>	&#125;, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>对应的 protobuf 定义:</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs protobuf">syntax = <span class="hljs-string">&quot;proto3&quot;</span>;<br><span class="hljs-keyword">package</span> matching;<br><br><span class="hljs-keyword">service </span><span class="hljs-title class_">MatchingService</span> &#123;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> SubmitLiquidation(LiquidationRequest) <span class="hljs-keyword">returns</span> (LiquidationResponse)</span>;<br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">LiquidationRequest</span> &#123;<br>  <span class="hljs-type">string</span> position_id = <span class="hljs-number">1</span>;<br>  <span class="hljs-type">string</span> symbol = <span class="hljs-number">2</span>;<br>  <span class="hljs-type">int32</span>  side = <span class="hljs-number">3</span>;<br>  <span class="hljs-type">string</span> size = <span class="hljs-number">4</span>;             <span class="hljs-comment">// decimal 序列化为字符串</span><br>  <span class="hljs-type">string</span> bankruptcy_price = <span class="hljs-number">5</span>;<br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">LiquidationResponse</span> &#123;<br>  <span class="hljs-type">bool</span>   executed = <span class="hljs-number">1</span>;<br>  <span class="hljs-type">string</span> fill_price = <span class="hljs-number">2</span>;<br>  <span class="hljs-type">string</span> fill_size = <span class="hljs-number">3</span>;<br>  <span class="hljs-type">string</span> surplus = <span class="hljs-number">4</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="8-3-OnChainExecutor-链上合约调用"><a href="#8-3-OnChainExecutor-链上合约调用" class="headerlink" title="8.3 OnChainExecutor (链上合约调用)"></a>8.3 OnChainExecutor (链上合约调用)</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// OnChainExecutor 通过发送链上交易调用清算合约.</span><br><span class="hljs-comment">// 适用于 DeFi 协议, Keeper 模式.</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">// 注意: 链上交互需要 big.Int (EVM uint256), 在边界处转换:</span><br><span class="hljs-comment">//   decimal → big.Int: order.Size.Shift(18).BigInt() (乘以 1e18 转定点数)</span><br><span class="hljs-comment">//   big.Int → decimal: decimal.NewFromBigInt(val, -18)</span><br><span class="hljs-keyword">type</span> OnChainExecutor <span class="hljs-keyword">struct</span> &#123;<br>	client     *ethclient.Client<br>	contract   *LiquidationContract <span class="hljs-comment">// abigen 生成的合约绑定</span><br>	privateKey *ecdsa.PrivateKey<br>	chainID    *big.Int<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewOnChainExecutor</span><span class="hljs-params">(rpcURL <span class="hljs-type">string</span>, contractAddr common.Address, key *ecdsa.PrivateKey)</span></span> (*OnChainExecutor, <span class="hljs-type">error</span>) &#123;<br>	client, err := ethclient.Dial(rpcURL)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;dial rpc: %w&quot;</span>, err)<br>	&#125;<br>	contract, err := NewLiquidationContract(contractAddr, client)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;bind contract: %w&quot;</span>, err)<br>	&#125;<br>	chainID, err := client.ChainID(context.Background())<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;get chain id: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">return</span> &amp;OnChainExecutor&#123;<br>		client: client, contract: contract,<br>		privateKey: key, chainID: chainID,<br>	&#125;, <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *OnChainExecutor)</span></span> Liquidate(ctx context.Context, order LiquidationOrder) (*LiquidationResult, <span class="hljs-type">error</span>) &#123;<br>	auth, err := bind.NewKeyedTransactorWithChainID(e.privateKey, e.chainID)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;create transactor: %w&quot;</span>, err)<br>	&#125;<br><br>	tx, err := e.contract.Liquidate(auth, order.Account, order.Symbol)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;send liquidation tx: %w&quot;</span>, err)<br>	&#125;<br><br>	receipt, err := bind.WaitMined(ctx, e.client, tx)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;wait tx mined: %w&quot;</span>, err)<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> receipt.Status == <span class="hljs-number">0</span> &#123;<br>		<span class="hljs-keyword">return</span> &amp;LiquidationResult&#123;PositionID: order.PositionID, Executed: <span class="hljs-literal">false</span>&#125;, <span class="hljs-literal">nil</span><br>	&#125;<br><br>	result, err := e.parseLiquidationEvent(receipt)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;parse event: %w&quot;</span>, err)<br>	&#125;<br>	<span class="hljs-keyword">return</span> result, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="九、链上清算合约-Solidity"><a href="#九、链上清算合约-Solidity" class="headerlink" title="九、链上清算合约 (Solidity)"></a>九、链上清算合约 (Solidity)</h2><p>链上清算与链下清算的关键区别: <strong>任何人都能调用清算</strong>, 不需要信任单一的清算引擎.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><code class="hljs solidity">// SPDX-License-Identifier: MIT<br>pragma solidity ^0.8.20;<br><br>/// @title Liquidation - 链上清算合约<br>/// @notice 任何人都能调用 liquidate() 触发清算, 赚取清算奖励<br>contract Liquidation &#123;<br>    struct Position &#123;<br>        address account;<br>        bool    isLong;<br>        uint256 size;          // 仓位数量 (1e18 精度)<br>        uint256 entryPrice;    // 开仓均价 (1e6 精度)<br>        uint256 margin;        // 当前保证金 (1e6 精度)<br>    &#125;<br><br>    uint256 public constant MAINTENANCE_RATE = 5e15;    // 0.5%, 精度 1e18<br>    uint256 public constant LIQUIDATION_REWARD = 25e14; // 0.25%, 给 Keeper 的奖励<br>    uint256 public constant PRECISION = 1e18;<br><br>    mapping(bytes32 =&gt; Position) public positions;<br>    uint256 public insuranceFund;<br><br>    IPriceOracle public oracle;<br><br>    event PositionLiquidated(<br>        bytes32 indexed positionId,<br>        address indexed account,<br>        address indexed liquidator,<br>        uint256 markPrice,<br>        uint256 reward<br>    );<br><br>    /// @notice 清算指定仓位<br>    /// @param positionId 仓位标识<br>    /// @dev 任何人 (Keeper) 都可以调用, 成功后获得清算奖励<br>    function liquidate(bytes32 positionId) external &#123;<br>        Position storage pos = positions[positionId];<br>        require(pos.size &gt; 0, &quot;position not found&quot;);<br><br>        uint256 markPrice = oracle.getPrice(pos.isLong ? &quot;ETH-USD&quot; : &quot;ETH-USD&quot;);<br><br>        // 检查是否满足清算条件: margin &lt;= MM (纯乘法, 避免除法精度损失)<br>        require(_isLiquidatable(pos, markPrice), &quot;position is healthy&quot;);<br><br>        // 计算清算奖励 (从仓位保证金中扣除, 给 Keeper)<br>        uint256 notional = pos.size * markPrice / PRECISION;<br>        uint256 reward = notional * LIQUIDATION_REWARD / PRECISION;<br><br>        // 计算破产价格和盈余/亏损<br>        uint256 bankruptcyPrice = _calcBankruptcyPrice(pos);<br>        int256 surplus = _calcSurplus(pos, markPrice, bankruptcyPrice);<br><br>        // 处理保险基金<br>        if (surplus &gt; 0) &#123;<br>            insuranceFund += uint256(surplus);<br>        &#125; else if (surplus &lt; 0) &#123;<br>            uint256 deficit = uint256(-surplus);<br>            if (insuranceFund &gt;= deficit) &#123;<br>                insuranceFund -= deficit;<br>            &#125; else &#123;<br>                // 保险基金不足, 触发 ADL (此处简化)<br>                insuranceFund = 0;<br>            &#125;<br>        &#125;<br><br>        // 支付 Keeper 奖励 (实际实现中通过 USDC transfer)<br>        payable(msg.sender).transfer(reward);<br><br>        delete positions[positionId];<br>        emit PositionLiquidated(positionId, pos.account, msg.sender, markPrice, reward);<br>    &#125;<br><br>    // 用 margin &lt;= MM (乘法) 判断, 而非 marginRatio &lt;= MMR (除法)<br>    function _isLiquidatable(Position storage pos, uint256 markPrice)<br>        internal view returns (bool)<br>    &#123;<br>        int256 pnl;<br>        if (pos.isLong) &#123;<br>            pnl = int256(markPrice) - int256(pos.entryPrice);<br>        &#125; else &#123;<br>            pnl = int256(pos.entryPrice) - int256(markPrice);<br>        &#125;<br>        pnl = pnl * int256(pos.size) / int256(PRECISION);<br><br>        int256 currentMargin = int256(pos.margin) + pnl;<br>        if (currentMargin &lt;= 0) return true; // 已破产<br><br>        // MM = notional × MMR = size × markPrice × MAINTENANCE_RATE / PRECISION^2<br>        uint256 mm = pos.size * markPrice / PRECISION * MAINTENANCE_RATE / PRECISION;<br>        return uint256(currentMargin) &lt;= mm;<br>    &#125;<br><br>    function _calcBankruptcyPrice(Position storage pos)<br>        internal view returns (uint256)<br>    &#123;<br>        uint256 marginPerUnit = pos.margin * PRECISION / pos.size;<br>        if (pos.isLong) &#123;<br>            return pos.entryPrice &gt; marginPerUnit ? pos.entryPrice - marginPerUnit : 0;<br>        &#125; else &#123;<br>            return pos.entryPrice + marginPerUnit;<br>        &#125;<br>    &#125;<br><br>    function _calcSurplus(Position storage pos, uint256 markPrice, uint256 bankruptcyPrice)<br>        internal view returns (int256)<br>    &#123;<br>        int256 diff;<br>        if (pos.isLong) &#123;<br>            diff = int256(markPrice) - int256(bankruptcyPrice);<br>        &#125; else &#123;<br>            diff = int256(bankruptcyPrice) - int256(markPrice);<br>        &#125;<br>        return diff * int256(pos.size) / int256(PRECISION);<br>    &#125;<br>&#125;<br><br>interface IPriceOracle &#123;<br>    function getPrice(string calldata symbol) external view returns (uint256);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="9-1-链上-vs-链下清算对比"><a href="#9-1-链上-vs-链下清算对比" class="headerlink" title="9.1 链上 vs 链下清算对比"></a>9.1 链上 vs 链下清算对比</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>链下清算 (Go 服务)</th>
+<th>链上清算 (Solidity)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>谁能触发</td>
+<td>仅清算引擎服务</td>
+<td>任何人 (Keeper)</td>
+</tr>
+<tr>
+<td>信任模型</td>
+<td>信任运营方</td>
+<td>信任代码 (无需许可)</td>
+</tr>
+<tr>
+<td>Keeper 激励</td>
+<td>不需要</td>
+<td>需要 (否则没人调用)</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>μs ~ ms</td>
+<td>1~12s (出块)</td>
+</tr>
+<tr>
+<td>Gas 成本</td>
+<td>无</td>
+<td>每次清算消耗 gas</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>CEX, L2 永续</td>
+<td>DeFi 协议 (GMX, Aave)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="十、保险基金与-ADL"><a href="#十、保险基金与-ADL" class="headerlink" title="十、保险基金与 ADL"></a>十、保险基金与 ADL</h2><h3 id="10-1-保险基金"><a href="#10-1-保险基金" class="headerlink" title="10.1 保险基金"></a>10.1 保险基金</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 380">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#34d399"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f472b6"/>
+    </marker>
+    <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fb923c"/>
+    </marker>
+  </defs>
+  <rect width="880" height="380" rx="8" fill="#1a1a2e"/>
+  <text x="440" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="12" font-weight="bold">保险基金流转 (Insurance Fund Flow)</text>
+  <!-- Left: Sources (inflow) -->
+  <rect x="30" y="50" width="250" height="180" rx="6" fill="#34d399" fill-opacity="0.06" stroke="#34d399" stroke-width="0.8"/>
+  <text x="155" y="72" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="10" font-weight="bold">资金来源 (Inflow)</text>
+  <rect x="50" y="88" width="210" height="30" rx="4" fill="#34d399" fill-opacity="0.12" stroke="#34d399" stroke-width="0.5"/>
+  <text x="155" y="107" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">清算盈余 (fillPrice > bankruptcyPrice)</text>
+  <rect x="50" y="126" width="210" height="30" rx="4" fill="#34d399" fill-opacity="0.12" stroke="#34d399" stroke-width="0.5"/>
+  <text x="155" y="145" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">清算罚金 (liquidation fee)</text>
+  <rect x="50" y="164" width="210" height="30" rx="4" fill="#34d399" fill-opacity="0.12" stroke="#34d399" stroke-width="0.5"/>
+  <text x="155" y="183" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">平台注入 (初始资金 / 手续费分成)</text>
+  <text x="155" y="220" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">多数清算有盈余 → 基金持续增长</text>
+  <!-- Center: Insurance Fund -->
+  <rect x="330" y="80" width="220" height="120" rx="8" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="1.2"/>
+  <text x="440" y="115" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="11" font-weight="bold">保险基金</text>
+  <text x="440" y="135" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9">Insurance Fund</text>
+  <text x="440" y="160" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">Settle(surplus)</text>
+  <text x="440" y="178" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">surplus > 0: 存入 | surplus &lt; 0: 扣除</text>
+  <!-- Arrows: Sources → Fund (horizontal) -->
+  <line x1="260" y1="103" x2="324" y2="103" stroke="#34d399" stroke-width="1" marker-end="url(#arr0)"/>
+  <line x1="260" y1="141" x2="324" y2="141" stroke="#34d399" stroke-width="1" marker-end="url(#arr0)"/>
+  <line x1="260" y1="179" x2="324" y2="179" stroke="#34d399" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Right: Outflow -->
+  <rect x="600" y="50" width="250" height="180" rx="6" fill="#f472b6" fill-opacity="0.06" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="725" y="72" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">资金去向 (Outflow)</text>
+  <rect x="620" y="88" width="210" height="30" rx="4" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="725" y="107" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">清算亏损 (fillPrice &lt; bankruptcyPrice)</text>
+  <rect x="620" y="126" width="210" height="30" rx="4" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="725" y="145" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">对手方不足时兜底接盘</text>
+  <rect x="620" y="164" width="210" height="30" rx="4" fill="#fb923c" fill-opacity="0.12" stroke="#fb923c" stroke-width="0.5"/>
+  <text x="725" y="183" text-anchor="middle" fill="#fb923c" font-family="monospace" font-size="8">基金耗尽 → 触发 ADL</text>
+  <text x="725" y="220" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">极端行情下可能被耗尽</text>
+  <!-- Arrows: Fund → Outflow (horizontal) -->
+  <line x1="554" y1="103" x2="614" y2="103" stroke="#f472b6" stroke-width="1" marker-end="url(#arr2)"/>
+  <line x1="554" y1="141" x2="614" y2="141" stroke="#f472b6" stroke-width="1" marker-end="url(#arr2)"/>
+  <line x1="554" y1="179" x2="614" y2="179" stroke="#fb923c" stroke-width="1" marker-end="url(#arr3)"/>
+  <!-- Bottom: Timeline example -->
+  <rect x="50" y="255" width="780" height="100" rx="6" fill="#5eead4" fill-opacity="0.04" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="440" y="275" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">保险基金生命周期示例</text>
+  <text x="100" y="300" fill="#34d399" font-family="monospace" font-size="8">初始: $100K</text>
+  <line x1="175" y1="296" x2="208" y2="296" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr1)"/>
+  <text x="220" y="300" fill="#34d399" font-family="monospace" font-size="8">清算 A: +$500</text>
+  <line x1="340" y1="296" x2="373" y2="296" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr1)"/>
+  <text x="385" y="300" fill="#34d399" font-family="monospace" font-size="8">清算 B: +$200</text>
+  <line x1="510" y1="296" x2="543" y2="296" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr1)"/>
+  <text x="555" y="300" fill="#f472b6" font-family="monospace" font-size="8">清算 C: -$800</text>
+  <line x1="680" y1="296" x2="713" y2="296" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr1)"/>
+  <text x="725" y="300" fill="#fbbf24" font-family="monospace" font-size="8">= $99.9K</text>
+  <text x="440" y="330" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">正常市况下清算盈余 > 亏损, 基金缓慢增长; 极端行情 (如 LUNA 崩盘) 可能快速耗尽</text>
+  <text x="440" y="346" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Binance 保险基金 ~$1B | dYdX ~$13M | Hyperliquid ~$60M (2024 数据)</text>
+</svg>
+</div>
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// InsuranceFund 管理清算盈余和亏损.</span><br><span class="hljs-keyword">type</span> InsuranceFund <span class="hljs-keyword">struct</span> &#123;<br>	balance decimal.Decimal<br>	mu      sync.RWMutex<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewInsuranceFund</span><span class="hljs-params">(initial decimal.Decimal)</span></span> *InsuranceFund &#123;<br>	<span class="hljs-keyword">return</span> &amp;InsuranceFund&#123;balance: initial&#125;<br>&#125;<br><br><span class="hljs-comment">// Settle 结算清算盈余或亏损.</span><br><span class="hljs-comment">// surplus &gt; 0: 清算盈余, 归入保险基金</span><br><span class="hljs-comment">// surplus &lt; 0: 清算亏损, 从保险基金扣除</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(f *InsuranceFund)</span></span> Settle(surplus decimal.Decimal) &#123;<br>	f.mu.Lock()<br>	<span class="hljs-keyword">defer</span> f.mu.Unlock()<br>	f.balance = f.balance.Add(surplus)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(f *InsuranceFund)</span></span> Balance() decimal.Decimal &#123;<br>	f.mu.RLock()<br>	<span class="hljs-keyword">defer</span> f.mu.RUnlock()<br>	<span class="hljs-keyword">return</span> f.balance<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(f *InsuranceFund)</span></span> Reset() &#123;<br>	f.mu.Lock()<br>	<span class="hljs-keyword">defer</span> f.mu.Unlock()<br>	f.balance = decimal.Zero<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="10-2-ADL-自动减仓"><a href="#10-2-ADL-自动减仓" class="headerlink" title="10.2 ADL (自动减仓)"></a>10.2 ADL (自动减仓)</h3><p>当保险基金不足以覆盖清算亏损时, 系统需要从盈利方的仓位中 “借” 来覆盖. ADL 的核心是<strong>排序</strong>: 选谁来被减仓?</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 440">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fb923c"/>
+    </marker>
+  </defs>
+  <rect width="880" height="440" rx="8" fill="#1a1a2e"/>
+  <text x="440" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="12" font-weight="bold">ADL 自动减仓触发链路 (Auto-Deleveraging Flow)</text>
+  <!-- Step 1: Liquidation fails -->
+  <rect x="30" y="55" width="180" height="55" rx="6" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="1"/>
+  <text x="120" y="77" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">清算执行</text>
+  <text x="120" y="95" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Executor.Liquidate()</text>
+  <!-- Arrow -->
+  <line x1="210" y1="82" x2="243" y2="82" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 2: Check result -->
+  <rect x="255" y="50" width="170" height="65" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="340" y="72" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">结果检查</text>
+  <text x="340" y="88" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">surplus &lt; 0 ?</text>
+  <text x="340" y="103" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">保险基金余额 &lt; 0 ?</text>
+  <!-- Branch: OK -->
+  <line x1="340" y1="115" x2="340" y2="135" stroke="#34d399" stroke-width="1"/>
+  <text x="340" y="150" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="8">基金充足 → 正常结算</text>
+  <!-- Branch: Not OK (right) -->
+  <line x1="425" y1="82" x2="468" y2="82" stroke="#fb923c" stroke-width="1" marker-end="url(#arr1)"/>
+  <!-- Step 3: Insurance depleted -->
+  <rect x="480" y="55" width="180" height="55" rx="6" fill="#fb923c" fill-opacity="0.12" stroke="#fb923c" stroke-width="1"/>
+  <text x="570" y="72" text-anchor="middle" fill="#fb923c" font-family="monospace" font-size="9" font-weight="bold">保险基金不足!</text>
+  <text x="570" y="90" text-anchor="middle" fill="#fb923c" font-family="monospace" font-size="7">deficit = |balance|</text>
+  <text x="570" y="103" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">需要 ADL 覆盖亏损</text>
+  <!-- Arrow -->
+  <line x1="660" y1="82" x2="693" y2="82" stroke="#fb923c" stroke-width="1" marker-end="url(#arr1)"/>
+  <!-- Step 4: ADL Engine -->
+  <rect x="700" y="50" width="150" height="65" rx="6" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1.2"/>
+  <text x="775" y="72" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">ADL 引擎</text>
+  <text x="775" y="88" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">CoverDeficit()</text>
+  <text x="775" y="103" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">强制减仓盈利方</text>
+  <!-- ADL Process Detail -->
+  <line x1="775" y1="115" x2="775" y2="138" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- ADL Ranking Box -->
+  <rect x="80" y="155" width="720" height="140" rx="6" fill="#a78bfa" fill-opacity="0.06" stroke="#a78bfa" stroke-width="0.8"/>
+  <text x="440" y="175" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="10" font-weight="bold">ADL 排序: 选谁被减仓?</text>
+  <!-- Formula -->
+  <rect x="100" y="190" width="350" height="45" rx="4" fill="#a78bfa" fill-opacity="0.1" stroke="#a78bfa" stroke-width="0.5"/>
+  <text x="275" y="210" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="9" font-weight="bold">优先级 = 盈利百分比 x 有效杠杆</text>
+  <text x="275" y="226" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">(uPnL / margin) x (notional / (margin + uPnL))</text>
+  <!-- Ranking example -->
+  <rect x="480" y="190" width="300" height="95" rx="4" fill="#a78bfa" fill-opacity="0.08" stroke="#a78bfa" stroke-width="0.5"/>
+  <text x="630" y="207" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="8" font-weight="bold">排序示例 (对手方向盈利仓位)</text>
+  <rect x="495" y="215" width="270" height="18" rx="3" fill="#f472b6" fill-opacity="0.2" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="630" y="228" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">Dave: +150% PnL, 20x 杠杆 → 优先级 30</text>
+  <rect x="495" y="237" width="270" height="18" rx="3" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="630" y="250" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">Eve:  +80% PnL, 10x 杠杆 → 优先级 8</text>
+  <rect x="495" y="259" width="270" height="18" rx="3" fill="#f472b6" fill-opacity="0.05" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="630" y="272" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Frank: +20% PnL, 3x 杠杆 → 优先级 0.6</text>
+  <!-- Bottom: Execution -->
+  <line x1="440" y1="295" x2="440" y2="313" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <rect x="140" y="322" width="600" height="90" rx="6" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="440" y="342" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">ADL 执行过程</text>
+  <text x="200" y="365" fill="#cbd5e1" font-family="monospace" font-size="8">1. 从优先级最高的开始减仓</text>
+  <text x="200" y="382" fill="#cbd5e1" font-family="monospace" font-size="8">2. 按破产价格强制平仓 (盈利方损失部分未实现利润)</text>
+  <text x="200" y="399" fill="#cbd5e1" font-family="monospace" font-size="8">3. 逐个减仓直到 deficit 被覆盖</text>
+  <!-- Note -->
+  <text x="440" y="434" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">ADL 是最后手段: 它牺牲了盈利用户的利益来维护系统偿付能力, 因此各平台都尽力避免触发 ADL</text>
+</svg>
+</div>
+
+<p>排序公式 (与 Binance, Hyperliquid 类似):</p>
+<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs gauss">ADL 优先级 = 盈利百分比 × 有效杠杆<br><br>其中:<br>  盈利百分比 = unrealizedPnL / <span class="hljs-built_in">margin</span><br>  有效杠杆   = notionalValue / (<span class="hljs-built_in">margin</span> + unrealizedPnL)<br></code></pre></td></tr></table></figure>
+
+<p>直觉: 赚得越多 + 杠杆越高的仓位, 被 ADL 的优先级越高. 因为这些仓位从市场失衡中获益最多, 且高杠杆本身就是风险来源.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// ADLEngine 自动减仓引擎.</span><br><span class="hljs-keyword">type</span> ADLEngine <span class="hljs-keyword">struct</span>&#123;&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewADLEngine</span><span class="hljs-params">()</span></span> *ADLEngine &#123; <span class="hljs-keyword">return</span> &amp;ADLEngine&#123;&#125; &#125;<br><br><span class="hljs-comment">// adlCandidate 是 ADL 候选仓位.</span><br><span class="hljs-keyword">type</span> adlCandidate <span class="hljs-keyword">struct</span> &#123;<br>	Position *Position<br>	Priority decimal.Decimal <span class="hljs-comment">// 越大越优先被减仓</span><br>&#125;<br><br><span class="hljs-comment">// CoverDeficit 通过 ADL 覆盖保险基金亏损.</span><br><span class="hljs-comment">// 选择对手方向的盈利仓位, 按优先级从高到低减仓, 直到覆盖 deficit.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(a *ADLEngine)</span></span> CoverDeficit(<br>	ctx context.Context,<br>	symbol <span class="hljs-type">string</span>,<br>	liquidatedSide Side,<br>	deficit decimal.Decimal,<br>	positions <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*Position,<br>	executor Executor,<br>) <span class="hljs-type">error</span> &#123;<br>	targetSide := <span class="hljs-number">1</span> - liquidatedSide<br><br>	<span class="hljs-keyword">var</span> candidates []adlCandidate<br>	<span class="hljs-keyword">for</span> _, pos := <span class="hljs-keyword">range</span> positions &#123;<br>		<span class="hljs-keyword">if</span> pos.Symbol != symbol || pos.Side != targetSide &#123;<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br>		priority := a.calcPriority(pos)<br>		<span class="hljs-keyword">if</span> priority.IsPositive() &#123;<br>			candidates = <span class="hljs-built_in">append</span>(candidates, adlCandidate&#123;Position: pos, Priority: priority&#125;)<br>		&#125;<br>	&#125;<br><br>	sort.Slice(candidates, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i, j <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">bool</span> &#123;<br>		<span class="hljs-keyword">return</span> candidates[i].Priority.GreaterThan(candidates[j].Priority)<br>	&#125;)<br><br>	remaining := deficit<br>	<span class="hljs-keyword">for</span> _, c := <span class="hljs-keyword">range</span> candidates &#123;<br>		<span class="hljs-keyword">if</span> !remaining.IsPositive() &#123;<br>			<span class="hljs-keyword">break</span><br>		&#125;<br>		order := LiquidationOrder&#123;<br>			PositionID: c.Position.ID,<br>			Account:    c.Position.Account,<br>			Symbol:     symbol,<br>			Side:       <span class="hljs-number">1</span> - c.Position.Side,<br>			Size:       c.Position.Size,<br>			MarkPrice:  c.Position.EntryPrice,<br>			Timestamp:  time.Now(),<br>		&#125;<br>		<span class="hljs-keyword">if</span> _, err := executor.Liquidate(ctx, order); err != <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;ADL position %s: %w&quot;</span>, c.Position.ID, err)<br>		&#125;<br>		remaining = remaining.Sub(c.Position.Margin)<br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">// calcPriority 计算 ADL 优先级.</span><br><span class="hljs-comment">// priority = profitPercent * effectiveLeverage</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(a *ADLEngine)</span></span> calcPriority(pos *Position) decimal.Decimal &#123;<br>	<span class="hljs-comment">// 实际生产中需要传入 markPrice 计算 unrealizedPnL</span><br>	<span class="hljs-comment">// 此处为 placeholder</span><br>	<span class="hljs-keyword">return</span> decimal.Zero<br>&#125;<br><br><span class="hljs-comment">// Execute 在清算订单无法成交时触发 ADL.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(a *ADLEngine)</span></span> Execute(ctx context.Context, pos *Position, positions <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*Position, executor Executor) <span class="hljs-type">error</span> &#123;<br>	<span class="hljs-keyword">return</span> a.CoverDeficit(ctx, pos.Symbol, pos.Side, pos.Margin, positions, executor)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十一、完整-Demo"><a href="#十一、完整-Demo" class="headerlink" title="十一、完整 Demo"></a>十一、完整 Demo</h2><p>用 LocalExecutor 模拟一个完整的清算流程: 创建仓位, 价格波动, 触发清算.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;context&quot;</span><br>	<span class="hljs-string">&quot;fmt&quot;</span><br><br>	<span class="hljs-string">&quot;github.com/shopspring/decimal&quot;</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-comment">// === 初始化 ===</span><br>	insuranceFund := NewInsuranceFund(decimal.NewFromInt(<span class="hljs-number">100</span>_000)) <span class="hljs-comment">// $100,000</span><br>	mockEngine := &amp;MockMatchingEngine&#123;&#125;<br>	executor := NewLocalExecutor(mockEngine)<br><br>	config := LiquidationConfig&#123;<br>		PartialRatio:    decimal.NewFromFloat(<span class="hljs-number">0.25</span>),  <span class="hljs-comment">// 每次清算 25%</span><br>		MinPositionSize: decimal.NewFromInt(<span class="hljs-number">500</span>),     <span class="hljs-comment">// 名义价值 &lt; $500 时全部清算</span><br>	&#125;<br>	engine := NewEngine(config, executor, insuranceFund)<br><br>	<span class="hljs-comment">// === 注册仓位 ===</span><br>	<span class="hljs-comment">// Alice: $300 保证金, 10x 杠杆做多 ETH @ $3,000</span><br>	<span class="hljs-comment">// 名义价值 = $300 × 10 = $3,000, 数量 = 1 ETH</span><br>	<span class="hljs-comment">// ── 逐仓仓位 ──</span><br><br>	alice := &amp;Position&#123;<br>		ID:              <span class="hljs-string">&quot;pos-alice&quot;</span>,<br>		Account:         <span class="hljs-string">&quot;alice&quot;</span>,<br>		Symbol:          <span class="hljs-string">&quot;ETH-USD&quot;</span>,<br>		Side:            Long,<br>		Size:            decimal.NewFromInt(<span class="hljs-number">1</span>),       <span class="hljs-comment">// 1 ETH</span><br>		EntryPrice:      decimal.NewFromInt(<span class="hljs-number">3000</span>),    <span class="hljs-comment">// $3,000</span><br>		Margin:          decimal.NewFromInt(<span class="hljs-number">300</span>),      <span class="hljs-comment">// $300</span><br>		MaintenanceRate: decimal.NewFromFloat(<span class="hljs-number">0.005</span>), <span class="hljs-comment">// 0.5%</span><br>		MarginMode:      Isolated,<br>	&#125;<br>	engine.RegisterPosition(alice)<br>	fmt.Printf(<span class="hljs-string">&quot;Alice (逐仓) 清算价格: $%s\n&quot;</span>, alice.LiquidationPrice.StringFixed(<span class="hljs-number">2</span>))<br><br>	bob := &amp;Position&#123;<br>		ID:              <span class="hljs-string">&quot;pos-bob&quot;</span>,<br>		Account:         <span class="hljs-string">&quot;bob&quot;</span>,<br>		Symbol:          <span class="hljs-string">&quot;ETH-USD&quot;</span>,<br>		Side:            Short,<br>		Size:            decimal.NewFromInt(<span class="hljs-number">1</span>),<br>		EntryPrice:      decimal.NewFromInt(<span class="hljs-number">3000</span>),<br>		Margin:          decimal.NewFromInt(<span class="hljs-number">150</span>),<br>		MaintenanceRate: decimal.NewFromFloat(<span class="hljs-number">0.005</span>),<br>		MarginMode:      Isolated,<br>	&#125;<br>	engine.RegisterPosition(bob)<br>	fmt.Printf(<span class="hljs-string">&quot;Bob   (逐仓) 清算价格: $%s\n&quot;</span>, bob.LiquidationPrice.StringFixed(<span class="hljs-number">2</span>))<br><br>	<span class="hljs-comment">// ── 全仓仓位: Carol 同时做多 ETH 和做空 BTC ──</span><br><br>	<span class="hljs-comment">// 先给 Carol 账户充值</span><br>	carolAcc := engine.GetOrCreateAccount(<span class="hljs-string">&quot;carol&quot;</span>)<br>	carolAcc.Balance = decimal.NewFromInt(<span class="hljs-number">10000</span>) <span class="hljs-comment">// $10,000 可用余额</span><br><br>	carolETH := &amp;Position&#123;<br>		ID:              <span class="hljs-string">&quot;pos-carol-eth&quot;</span>,<br>		Account:         <span class="hljs-string">&quot;carol&quot;</span>,<br>		Symbol:          <span class="hljs-string">&quot;ETH-USD&quot;</span>,<br>		Side:            Long,<br>		Size:            decimal.NewFromInt(<span class="hljs-number">10</span>),      <span class="hljs-comment">// 10 ETH</span><br>		EntryPrice:      decimal.NewFromInt(<span class="hljs-number">3000</span>),    <span class="hljs-comment">// $3,000</span><br>		Margin:          decimal.NewFromInt(<span class="hljs-number">3000</span>),     <span class="hljs-comment">// $3,000 (10x)</span><br>		MaintenanceRate: decimal.NewFromFloat(<span class="hljs-number">0.005</span>),<br>		MarginMode:      Cross,<br>	&#125;<br>	engine.RegisterPosition(carolETH)<br>	fmt.Printf(<span class="hljs-string">&quot;Carol (全仓) ETH Long 10 @ $3,000\n&quot;</span>)<br><br>	carolBTC := &amp;Position&#123;<br>		ID:              <span class="hljs-string">&quot;pos-carol-btc&quot;</span>,<br>		Account:         <span class="hljs-string">&quot;carol&quot;</span>,<br>		Symbol:          <span class="hljs-string">&quot;BTC-USD&quot;</span>,<br>		Side:            Short,<br>		Size:            decimal.RequireFromString(<span class="hljs-string">&quot;0.5&quot;</span>), <span class="hljs-comment">// 0.5 BTC</span><br>		EntryPrice:      decimal.NewFromInt(<span class="hljs-number">60000</span>),        <span class="hljs-comment">// $60,000</span><br>		Margin:          decimal.NewFromInt(<span class="hljs-number">3000</span>),          <span class="hljs-comment">// $3,000 (10x)</span><br>		MaintenanceRate: decimal.NewFromFloat(<span class="hljs-number">0.005</span>),<br>		MarginMode:      Cross,<br>	&#125;<br>	engine.RegisterPosition(carolBTC)<br>	fmt.Printf(<span class="hljs-string">&quot;Carol (全仓) BTC Short 0.5 @ $60,000\n&quot;</span>)<br><br>	<span class="hljs-comment">// === 模拟价格波动 ===</span><br>	ctx := context.Background()<br>	prices := []<span class="hljs-type">int64</span>&#123;<span class="hljs-number">3000</span>, <span class="hljs-number">2900</span>, <span class="hljs-number">2800</span>, <span class="hljs-number">2750</span>, <span class="hljs-number">2710</span>, <span class="hljs-number">2700</span>&#125;<br><br>	<span class="hljs-keyword">for</span> _, p := <span class="hljs-keyword">range</span> prices &#123;<br>		markPrice := decimal.NewFromInt(p)<br>		fmt.Printf(<span class="hljs-string">&quot;\n--- Mark Price: $%d ---\n&quot;</span>, p)<br><br>		<span class="hljs-keyword">if</span> err := engine.OnPriceUpdate(ctx, <span class="hljs-string">&quot;ETH-USD&quot;</span>, markPrice); err != <span class="hljs-literal">nil</span> &#123;<br>			fmt.Printf(<span class="hljs-string">&quot;Error: %v\n&quot;</span>, err)<br>		&#125;<br><br>		fmt.Printf(<span class="hljs-string">&quot;保险基金余额: $%s\n&quot;</span>, insuranceFund.Balance().StringFixed(<span class="hljs-number">2</span>))<br>		fmt.Printf(<span class="hljs-string">&quot;活跃仓位数: %d\n&quot;</span>, <span class="hljs-built_in">len</span>(engine.positions))<br><br>		<span class="hljs-comment">// 打印 Carol 全仓状态</span><br>		<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(carolAcc.Positions) &gt; <span class="hljs-number">0</span> &#123;<br>			<span class="hljs-comment">// 假设 BTC 价格同步小幅波动 (简化: 固定 $59,000)</span><br>			carolPrices := <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]decimal.Decimal&#123;<br>				<span class="hljs-string">&quot;ETH-USD&quot;</span>: markPrice,<br>				<span class="hljs-string">&quot;BTC-USD&quot;</span>: decimal.NewFromInt(<span class="hljs-number">59000</span>), <span class="hljs-comment">// BTC 微跌, Carol 空头盈利</span><br>			&#125;<br>			ratio := CalcAccountMarginRatio(carolAcc, carolPrices)<br>			equity := carolAcc.TotalEquity(carolPrices)<br>			fmt.Printf(<span class="hljs-string">&quot;Carol 全仓权益: $%s, 保证金率: %s\n&quot;</span>,<br>				equity.StringFixed(<span class="hljs-number">2</span>), ratio.StringFixed(<span class="hljs-number">4</span>))<br>		&#125;<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// MockMatchingEngine 模拟撮合引擎.</span><br><span class="hljs-keyword">type</span> MockMatchingEngine <span class="hljs-keyword">struct</span>&#123;&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *MockMatchingEngine)</span></span> SubmitOrder(symbol <span class="hljs-type">string</span>, side Side, price, size decimal.Decimal) ([]Trade, <span class="hljs-type">error</span>) &#123;<br>	fmt.Printf(<span class="hljs-string">&quot;  [撮合] 清算订单: %s %s %s @ $%s\n&quot;</span>,<br>		symbol,<br>		<span class="hljs-keyword">map</span>[Side]<span class="hljs-type">string</span>&#123;Long: <span class="hljs-string">&quot;BUY&quot;</span>, Short: <span class="hljs-string">&quot;SELL&quot;</span>&#125;[side],<br>		size.String(),<br>		price.StringFixed(<span class="hljs-number">2</span>),<br>	)<br>	<span class="hljs-keyword">return</span> []Trade&#123;&#123;Price: price, Size: size&#125;&#125;, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>运行效果:</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">Alice 清算价格</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$2714.57</span><br><span class="hljs-attribute">Bob   清算价格</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$3149.25</span><br><br><span class="hljs-attribute">--- Mark Price</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$3000 ---</span><br><span class="hljs-attribute">保险基金余额</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$100000.00</span><br><span class="hljs-attribute">活跃仓位数</span><span class="hljs-punctuation">:</span> <span class="hljs-string">2</span><br><br><span class="hljs-attribute">--- Mark Price</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$2900 ---</span><br><span class="hljs-attribute">保险基金余额</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$100000.00</span><br><span class="hljs-attribute">活跃仓位数</span><span class="hljs-punctuation">:</span> <span class="hljs-string">2</span><br><br><span class="hljs-attribute">--- Mark Price</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$2800 ---</span><br><span class="hljs-attribute">保险基金余额</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$100000.00</span><br><span class="hljs-attribute">活跃仓位数</span><span class="hljs-punctuation">:</span> <span class="hljs-string">2</span><br><br><span class="hljs-attribute">--- Mark Price</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$2750 ---</span><br><span class="hljs-attribute">保险基金余额</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$100000.00</span><br><span class="hljs-attribute">活跃仓位数</span><span class="hljs-punctuation">:</span> <span class="hljs-string">2</span><br><br><span class="hljs-attribute">--- Mark Price</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$2710 ---</span><br>  <span class="hljs-attribute">[撮合] 清算订单</span><span class="hljs-punctuation">:</span> <span class="hljs-string">ETH-USD SELL 1 @ $2700.00</span><br><span class="hljs-attribute">保险基金余额</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$100010.00</span><br><span class="hljs-attribute">活跃仓位数</span><span class="hljs-punctuation">:</span> <span class="hljs-string">1</span><br><br><span class="hljs-attribute">--- Mark Price</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$2700 ---</span><br><span class="hljs-attribute">保险基金余额</span><span class="hljs-punctuation">:</span> <span class="hljs-string">$100010.00</span><br><span class="hljs-attribute">活跃仓位数</span><span class="hljs-punctuation">:</span> <span class="hljs-string">1</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十二、小结"><a href="#十二、小结" class="headerlink" title="十二、小结"></a>十二、小结</h2><h3 id="12-1-级联清算与死亡螺旋"><a href="#12-1-级联清算与死亡螺旋" class="headerlink" title="12.1 级联清算与死亡螺旋"></a>12.1 级联清算与死亡螺旋</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f472b6"/>
+    </marker>
+  </defs>
+  <rect width="880" height="460" rx="8" fill="#1a1a2e"/>
+  <text x="440" y="24" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="12" font-weight="bold">级联清算 / 死亡螺旋 (Cascading Liquidation / Death Spiral)</text>
+  <!-- Spiral loop visualization -->
+  <!-- Step 1 -->
+  <rect x="300" y="50" width="280" height="45" rx="6" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="1"/>
+  <text x="440" y="70" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">1. 市场突发利空 → 价格暴跌</text>
+  <text x="440" y="86" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">如: LUNA 崩盘, FTX 暴雷, 黑天鹅事件</text>
+  <!-- Arrow down -->
+  <line x1="440" y1="95" x2="440" y2="113" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 2 -->
+  <rect x="300" y="120" width="280" height="45" rx="6" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="1"/>
+  <text x="440" y="140" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">2. 大量多头仓位触发清算</text>
+  <text x="440" y="156" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">优先队列扫描 → 批量生成清算订单</text>
+  <!-- Arrow down -->
+  <line x1="440" y1="165" x2="440" y2="183" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 3 -->
+  <rect x="300" y="190" width="280" height="45" rx="6" fill="#fb923c" fill-opacity="0.12" stroke="#fb923c" stroke-width="1"/>
+  <text x="440" y="210" text-anchor="middle" fill="#fb923c" font-family="monospace" font-size="9" font-weight="bold">3. 清算订单 = 大量卖单涌入</text>
+  <text x="440" y="226" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">订单簿买方深度不足, 滑点飙升</text>
+  <!-- Arrow down -->
+  <line x1="440" y1="235" x2="440" y2="253" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <!-- Step 4 -->
+  <rect x="300" y="260" width="280" height="45" rx="6" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1.2"/>
+  <text x="440" y="280" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9" font-weight="bold">4. 卖压推动价格进一步下跌!</text>
+  <text x="440" y="296" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">清算导致的卖出 → 价格下跌 → 更多清算</text>
+  <!-- Loop arrow back to step 2 -->
+  <line x1="580" y1="282" x2="680" y2="282" stroke="#f472b6" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <line x1="680" y1="282" x2="680" y2="142" stroke="#f472b6" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <line x1="680" y1="142" x2="587" y2="142" stroke="#f472b6" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arr1)"/>
+  <text x="720" y="215" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">恶性</text>
+  <text x="720" y="230" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">循环</text>
+  <!-- Step 5: Consequences -->
+  <line x1="440" y1="305" x2="440" y2="323" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr0)"/>
+  <rect x="140" y="330" width="600" height="50" rx="6" fill="#a78bfa" fill-opacity="0.1" stroke="#a78bfa" stroke-width="0.8"/>
+  <text x="440" y="350" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="9" font-weight="bold">5. 终局: 保险基金耗尽 → 触发 ADL → 盈利方被强制减仓</text>
+  <text x="440" y="370" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">系统偿付能力受损, 用户信心崩溃, 进一步加剧抛售</text>
+  <!-- Prevention measures -->
+  <rect x="30" y="395" width="820" height="50" rx="6" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="440" y="415" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">防御措施</text>
+  <text x="155" y="435" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">部分清算 (减缓卖压)</text>
+  <text x="345" y="435" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">充足保险基金 (兜底)</text>
+  <text x="535" y="435" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">动态维持保证金率</text>
+  <text x="725" y="435" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">价格熔断 / 限仓</text>
+  <!-- Left side: Real world examples -->
+  <rect x="30" y="50" width="250" height="85" rx="6" fill="#fbbf24" fill-opacity="0.06" stroke="#fbbf24" stroke-width="0.5"/>
+  <text x="155" y="70" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">历史案例</text>
+  <text x="155" y="88" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">2020.03 BTC $8K→$3.8K (BitMEX)</text>
+  <text x="155" y="103" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">2022.05 LUNA→$0 (级联清算)</text>
+  <text x="155" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">2024.08 ETH -20% (Aave/dYdX ADL)</text>
+</svg>
+</div>
+
+<h3 id="12-2-核心要点"><a href="#12-2-核心要点" class="headerlink" title="12.2 核心要点"></a>12.2 核心要点</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>要点</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>清算引擎是主动组件</td>
+<td>每次价格更新触发扫描, 不等用户操作</td>
+</tr>
+<tr>
+<td>Executor 接口分离判断和执行</td>
+<td>同一套扫描逻辑适配进程内&#x2F;gRPC&#x2F;链上三种模式</td>
+</tr>
+<tr>
+<td>优先队列避免全量扫描</td>
+<td>按清算价排序, 从危险端开始扫, 遇到安全仓位就停</td>
+</tr>
+<tr>
+<td>部分清算优于全部清算</td>
+<td>可配置比例 (25%~50%), 小仓位直接全平, 大仓位分批减仓</td>
+</tr>
+<tr>
+<td>逐仓&#x2F;全仓双模式</td>
+<td>逐仓按仓位判断, 全仓按账户判断 (盈利仓可救亏损仓)</td>
+</tr>
+<tr>
+<td>保险基金 + ADL 是最后防线</td>
+<td>清算盈余喂保险基金, 不足时 ADL 减仓盈利方</td>
+</tr>
+<tr>
+<td>链上清算靠 Keeper 激励</td>
+<td>清算奖励 (仓位名义值的 0.25%) 驱动链下机器人竞争清算</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="12-3-延伸阅读"><a href="#12-3-延伸阅读" class="headerlink" title="12.3 延伸阅读"></a>12.3 延伸阅读</h3><blockquote>
+<ul>
+<li><a href="/2025/07/28/perp-margin-and-liquidation/">保证金管理与清算引擎</a> - 保证金与清算的机制原理</li>
+<li><a href="/2025/11/08/perp-matching-engine/">撮合引擎原理与 Go 实现</a> - 撮合引擎 (本文的 LocalExecutor 直接对接撮合引擎的实现)</li>
+<li><a href="/2025/12/10/perp-faq/">永续合约 FAQ</a> - 清算相关的延伸问题</li>
+</ul>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/web3/" class="category-chain-item">Web3</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/web3/" class="print-no-link">#Web3</a>
+      
+        <a href="/tags/%E6%B8%85%E7%AE%97%E5%BC%95%E6%93%8E/" class="print-no-link">#清算引擎</a>
+      
+        <a href="/tags/%E6%B8%85%E7%AE%97/" class="print-no-link">#清算</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>永续合约 10 - 清算引擎架构与实现</div>
+      <div>https://mritd.com/2025/11/25/perp-liquidation-engine/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年11月25日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/12/10/perp-faq/" title="永续合约 11 - 一些边界问题">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">永续合约 11 - 一些边界问题</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/11/08/perp-matching-engine/" title="永续合约 09 - 撮合引擎原理与 Go 实现">
+                        <span class="hidden-mobile">永续合约 09 - 撮合引擎原理与 Go 实现</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2025/11/25/perp-liquidation-engine/';
+          this.page.identifier = '/2025/11/25/perp-liquidation-engine/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

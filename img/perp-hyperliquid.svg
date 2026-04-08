@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2a20"/>
+      <stop offset="100%" style="stop-color:#2a4a38"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+
+  <!-- L1 blockchain nodes in hexagonal pattern -->
+  <g transform="translate(400, 145)" fill="none" stroke="#66bb6a" stroke-width="2">
+    <!-- Center hexagon -->
+    <polygon points="0,-35 30,-17 30,17 0,35 -30,17 -30,-17" fill="#66bb6a" fill-opacity="0.2"/>
+    <!-- Surrounding hexagons -->
+    <polygon points="65,-35 95,-17 95,17 65,35 35,17 35,-17" opacity="0.6"/>
+    <polygon points="-65,-35 -35,-17 -35,17 -65,35 -95,17 -95,-17" opacity="0.6"/>
+    <polygon points="32,-75 62,-57 62,-23 32,-5 2,-23 2,-57" opacity="0.6"/>
+    <polygon points="-32,-75 -2,-57 -2,-23 -32,-5 -62,-23 -62,-57" opacity="0.6"/>
+    <polygon points="32,5 62,23 62,57 32,75 2,57 2,23" opacity="0.6"/>
+    <polygon points="-32,5 -2,23 -2,57 -32,75 -62,57 -62,23" opacity="0.6"/>
+  </g>
+  <!-- Center dot -->
+  <circle cx="400" cy="145" r="5" fill="#66bb6a"/>
+
+  <text x="400" y="310" text-anchor="middle" fill="#e8eaed" font-family="'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="700">Hyperliquid</text>
+  <text x="400" y="350" text-anchor="middle" fill="#66bb6a" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="400">Purpose-Built L1 Chain</text>
+  <rect x="340" y="370" width="120" height="3" rx="1.5" fill="#66bb6a"/>
+</svg>

@@ -1,0 +1,2191 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kovacs">
+  <meta name="keywords" content="Web3,永续合约,Funding Rate,标记价格,多空平衡">
+  
+    <meta name="description" content="本文从 CeFi 永续入手, 介绍永续合约的核心运作机制, 包括资金费率, 标记价格与指数价格的区别, 多空平衡以及链上三种定价模型的对比">
+<meta property="og:type" content="article">
+<meta property="og:title" content="永续合约 01 - 永续合约机制详解">
+<meta property="og:url" content="https://mritd.com/2025/07/15/perp-mechanics/index.html">
+<meta property="og:site_name" content="Kovacs">
+<meta property="og:description" content="本文从 CeFi 永续入手, 介绍永续合约的核心运作机制, 包括资金费率, 标记价格与指数价格的区别, 多空平衡以及链上三种定价模型的对比">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mritd.com/img/perp-mechanics.svg">
+<meta property="article:published_time" content="2025-07-15T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-07-15T02:00:00.000Z">
+<meta property="article:author" content="Kovacs">
+<meta property="article:tag" content="Funding Rate">
+<meta property="article:tag" content="Web3">
+<meta property="article:tag" content="永续合约">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mritd.com/img/perp-mechanics.svg">
+<meta name="twitter:creator" content="@kovacs_orz">
+<meta name="twitter:site" content="https://twitter.com/kovacs_orz">
+  
+  
+  
+  <title>永续合约 01 - 永续合约机制详解 - Kovacs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"mritd.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":80,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":true,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-H06NPECR0Z"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-H06NPECR0Z", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-H06NPECR0Z');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Kovacs" type="application/atom+xml">
+<link rel="alternate" href="/rss.xml" title="Kovacs" type="application/rss+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kovacs</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/friends/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/friends/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>友链</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="永续合约 01 - 永续合约机制详解"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Kovacs
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-07-15 10:00" pubdate>
+          2025年7月15日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          19k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          157 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">永续合约 01 - 永续合约机制详解</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>永续合约没有到期日, 不需要持有现货, 通过 Funding Rate 让多空双方持续互相支付资金费用来把合约价格锚定到现货. 本文介绍永续合约的核心机制, 包括 Index &#x2F; Mark &#x2F; Last Price 三价体系, Funding Rate 计算逻辑, 盈亏公式, 以及链上三种定价模型 (vAMM, Oracle 型, 订单簿) 的对比.</p>
+<hr>
+<h2 id="一、术语表"><a href="#一、术语表" class="headerlink" title="一、术语表"></a>一、术语表</h2><h3 id="1-1-基础概念"><a href="#1-1-基础概念" class="headerlink" title="1.1 基础概念"></a>1.1 基础概念</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>永续合约</td>
+<td>Perpetual Swap &#x2F; Perp</td>
+<td>无到期日的衍生品合约, 追踪底层资产价格</td>
+</tr>
+<tr>
+<td>底层资产</td>
+<td>Underlying Asset</td>
+<td>合约追踪的标的, 如 ETH, BTC</td>
+</tr>
+<tr>
+<td>做多</td>
+<td>Long</td>
+<td>押注价格上涨, 价格涨了赚差价</td>
+</tr>
+<tr>
+<td>做空</td>
+<td>Short</td>
+<td>押注价格下跌, 价格跌了赚差价</td>
+</tr>
+<tr>
+<td>杠杆</td>
+<td>Leverage</td>
+<td>用少量保证金控制更大头寸. 10x 杠杆 &#x3D; 用 100U 控制 1000U</td>
+</tr>
+<tr>
+<td>头寸</td>
+<td>Position</td>
+<td>持有的合约仓位, 包含方向 (多&#x2F;空), 大小, 开仓价格</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-2-价格体系"><a href="#1-2-价格体系" class="headerlink" title="1.2 价格体系"></a>1.2 价格体系</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>指数价格</td>
+<td>Index Price</td>
+<td>多个现货交易所的加权平均价格, 代表 “真实市场价”</td>
+</tr>
+<tr>
+<td>标记价格</td>
+<td>Mark Price</td>
+<td>协议用于计算盈亏和清算的参考价格, 通常基于指数价格 + 溢价的移动平均</td>
+</tr>
+<tr>
+<td>最新成交价</td>
+<td>Last Price</td>
+<td>协议内最近一笔交易的成交价格</td>
+</tr>
+<tr>
+<td>中间价</td>
+<td>Mid Price</td>
+<td>订单簿 (所有挂单的列表) 最高买价和最低卖价的平均值</td>
+</tr>
+<tr>
+<td>溢价</td>
+<td>Premium</td>
+<td>本协议价格比现货贵多少 (或便宜多少). 溢价 &#x3D; 中间价 - 指数价格. 正数&#x3D;贵, 负数&#x3D;便宜</td>
+</tr>
+<tr>
+<td>溢价指数</td>
+<td>Premium Index</td>
+<td>对一段时间内的溢价做加权平均后的值, 用于计算资金费率 (见下方)</td>
+</tr>
+<tr>
+<td>基差</td>
+<td>Basis</td>
+<td>标记价格与指数价格的偏差. 和溢价相关但不等价 (详见 §2.3)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-3-资金费率"><a href="#1-3-资金费率" class="headerlink" title="1.3 资金费率"></a>1.3 资金费率</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>资金费率</td>
+<td>Funding Rate</td>
+<td>多空双方定期互相支付的费率, 用于锚定永续价格到现货价格</td>
+</tr>
+<tr>
+<td>资金费用</td>
+<td>Funding Payment</td>
+<td>实际支付金额 &#x3D; 仓位大小 × 资金费率</td>
+</tr>
+<tr>
+<td>结算周期</td>
+<td>Funding Interval</td>
+<td>资金费率结算频率, 通常 8h (CEX, 中心化交易所) 或 1h (部分 DeFi, 去中心化金融)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="1-4-保证金-详见-保证金管理与清算引擎"><a href="#1-4-保证金-详见-保证金管理与清算引擎" class="headerlink" title="1.4 保证金 (详见 保证金管理与清算引擎)"></a>1.4 保证金 (详见 <a href="/2025/07/28/perp-margin-and-liquidation/">保证金管理与清算引擎</a>)</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>英文</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>保证金</td>
+<td>Margin &#x2F; Collateral</td>
+<td>开仓时抵押的资金, 作为履约担保</td>
+</tr>
+<tr>
+<td>初始保证金</td>
+<td>Initial Margin (IM)</td>
+<td>开仓所需的最低保证金, IM &#x3D; position size &#x2F; leverage</td>
+</tr>
+<tr>
+<td>维持保证金</td>
+<td>Maintenance Margin (MM)</td>
+<td>持仓所需的最低保证金, 低于此触发清算</td>
+</tr>
+<tr>
+<td>清算</td>
+<td>Liquidation</td>
+<td>保证金不足时强制平仓, 防止穿仓 (负债)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="二、为什么需要永续合约"><a href="#二、为什么需要永续合约" class="headerlink" title="二、为什么需要永续合约?"></a>二、为什么需要永续合约?</h2><h3 id="2-1-传统期货-vs-永续合约"><a href="#2-1-传统期货-vs-永续合约" class="headerlink" title="2.1 传统期货 vs 永续合约"></a>2.1 传统期货 vs 永续合约</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5eead4"/>
+    </marker>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="300" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">传统期货 vs 永续合约</text>
+  <!-- Traditional Futures -->
+  <rect x="30" y="42" width="660" height="100" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="50" y="62" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">传统期货 (Dated Futures)</text>
+  <rect x="50" y="74" width="100" height="28" rx="5" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1"/>
+  <text x="100" y="92" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">开仓</text>
+  <line x1="150" y1="88" x2="220" y2="88" stroke="#9ca3af" stroke-width="1" stroke-dasharray="4"/>
+  <text x="185" y="82" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">持仓期</text>
+  <rect x="220" y="74" width="100" height="28" rx="5" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1"/>
+  <text x="270" y="92" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">季度到期</text>
+  <line x1="320" y1="88" x2="368" y2="88" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr1)"/>
+  <rect x="380" y="74" width="120" height="28" rx="5" fill="#fbbf24" fill-opacity="0.15" stroke="#fbbf24" stroke-width="1"/>
+  <text x="440" y="92" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9">强制交割/平仓</text>
+  <line x1="500" y1="88" x2="538" y2="88" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr1)"/>
+  <rect x="550" y="74" width="120" height="28" rx="5" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1"/>
+  <text x="610" y="86" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">重新开仓</text>
+  <text x="610" y="98" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">(新合约, 新费用)</text>
+  <text x="360" y="130" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">到期 → 强制平仓 → 移仓成本 → 流动性分散在多个到期日</text>
+  <!-- Perpetual -->
+  <rect x="30" y="155" width="660" height="130" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="50" y="175" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">永续合约 (Perpetual Swap)</text>
+  <rect x="50" y="187" width="100" height="28" rx="5" fill="#5eead4" fill-opacity="0.15" stroke="#5eead4" stroke-width="1"/>
+  <text x="100" y="205" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">开仓</text>
+  <line x1="150" y1="201" x2="558" y2="201" stroke="#5eead4" stroke-width="1" marker-end="url(#arr0)"/>
+  <text x="355" y="195" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">永不到期, 想持多久持多久</text>
+  <rect x="570" y="187" width="100" height="28" rx="5" fill="#5eead4" fill-opacity="0.15" stroke="#5eead4" stroke-width="1"/>
+  <text x="620" y="205" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9">平仓</text>
+  <!-- Funding ticks -->
+  <circle cx="220" cy="225" r="3" fill="#fbbf24"/>
+  <circle cx="310" cy="225" r="3" fill="#fbbf24"/>
+  <circle cx="400" cy="225" r="3" fill="#fbbf24"/>
+  <circle cx="490" cy="225" r="3" fill="#fbbf24"/>
+  <text x="355" y="240" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">每 8h / 1h 结算一次 funding</text>
+  <text x="360" y="270" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">无到期日 → 无移仓成本 → 流动性集中 → 靠 funding rate 锚定现货价</text>
+</svg>
+</div>
+
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>传统期货</th>
+<th>永续合约</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>到期日</td>
+<td>有 (季度&#x2F;月度)</td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td>价格锚定</td>
+<td>到期日交割收敛</td>
+<td><strong>funding rate (资金费率)</strong> 持续锚定</td>
+</tr>
+<tr>
+<td>移仓成本</td>
+<td>每个到期日需要移仓</td>
+<td>无, 一直持有</td>
+</tr>
+<tr>
+<td>流动性</td>
+<td>分散在多个到期日</td>
+<td>集中在一个合约</td>
+</tr>
+<tr>
+<td>持仓费用</td>
+<td>无 (到期前)</td>
+<td>funding payment (资金费用, 可正可负)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>核心区别</strong>: 传统期货用 “到期交割” 拉回价格, 永续合约用 “资金费率 (funding rate)” 持续锚定.<br>永续合约的 funding rate 本质上是 <strong>把到期日交割的一次性收敛, 分摊成每 8h 的微调</strong>.</p>
+</blockquote>
+<h3 id="2-2-到期交割-vs-Funding-Rate-资金费率"><a href="#2-2-到期交割-vs-Funding-Rate-资金费率" class="headerlink" title="2.2 到期交割 vs Funding Rate (资金费率)"></a>2.2 到期交割 vs Funding Rate (资金费率)</h3><p>两种锚定机制的本质不同: 到期交割是 <strong>硬锚定 (hard peg)</strong>, funding rate 是 <strong>软锚定 (soft peg)</strong>:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 360">
+  <rect width="780" height="360" rx="8" fill="#1a1a2e"/>
+  <text x="390" y="22" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">到期交割 vs Funding Rate (资金费率)</text>
+  <!-- Traditional futures -->
+  <rect x="30" y="40" width="350" height="170" rx="6" fill="#f472b6" fill-opacity="0.08" stroke="#f472b6" stroke-width="1"/>
+  <text x="205" y="60" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">传统期货: 硬锚定</text>
+  <text x="50" y="82" fill="#cbd5e1" font-family="monospace" font-size="8">到期日强制按 index price 现金结算</text>
+  <text x="50" y="98" fill="#cbd5e1" font-family="monospace" font-size="8">数学保证: 到期瞬间 futures = spot</text>
+  <text x="50" y="118" fill="#9ca3af" font-family="monospace" font-size="7">类比: 考试交卷: 平时可以乱写, 但交卷时必须对</text>
+  <line x1="50" y1="130" x2="360" y2="130" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <text x="50" y="148" fill="#fbbf24" font-family="monospace" font-size="7">优势: 有明确的 deadline, 偏离必须归零</text>
+  <text x="50" y="163" fill="#fbbf24" font-family="monospace" font-size="7">      套利者知道终点一定来, 提前布局</text>
+  <text x="50" y="182" fill="#f472b6" font-family="monospace" font-size="7">劣势: 远离到期日时 basis (基差) 可以很大 (+5%~8%)</text>
+  <text x="50" y="197" fill="#f472b6" font-family="monospace" font-size="7">      多个到期日分散流动性</text>
+  <!-- Perpetual -->
+  <rect x="400" y="40" width="350" height="170" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="575" y="60" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">永续合约: 软锚定</text>
+  <text x="420" y="82" fill="#cbd5e1" font-family="monospace" font-size="8">持续经济激励, 偏离越大费率越高</text>
+  <text x="420" y="98" fill="#cbd5e1" font-family="monospace" font-size="8">不保证任何时刻 perp = spot</text>
+  <text x="420" y="118" fill="#9ca3af" font-family="monospace" font-size="7">类比: 持续随堂测验: 每次纠偏一点, 但不保证完全正确</text>
+  <line x1="420" y1="130" x2="730" y2="130" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <text x="420" y="148" fill="#fbbf24" font-family="monospace" font-size="7">优势: 日常锚定精度高 (每 8h/1h 持续修正)</text>
+  <text x="420" y="163" fill="#fbbf24" font-family="monospace" font-size="7">      流动性集中, 价格发现更连续</text>
+  <text x="420" y="182" fill="#f472b6" font-family="monospace" font-size="7">劣势: 极端行情可能持续偏离, 费率有上限 (clamp)</text>
+  <text x="420" y="197" fill="#f472b6" font-family="monospace" font-size="7">      没有 deadline, 市场可以 "一直不理性"</text>
+  <!-- Bottom: why funding rate can fail -->
+  <rect x="30" y="225" width="720" height="120" rx="5" fill="#fbbf24" fill-opacity="0.05" stroke="#fbbf24" stroke-width="0.6"/>
+  <text x="390" y="245" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">Funding Rate 软锚定可能失效的三个环节</text>
+  <circle cx="55" cy="268" r="9" fill="#f472b6" fill-opacity="0.2" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="55" y="272" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">1</text>
+  <text x="72" y="272" fill="#cbd5e1" font-family="monospace" font-size="8">费率有上限: clamp ±0.75%/8h, 偏离 5% 时费率到顶也不够补偿, 套利者不进场</text>
+  <circle cx="55" cy="292" r="9" fill="#f472b6" fill-opacity="0.2" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="55" y="296" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">2</text>
+  <text x="72" y="296" fill="#cbd5e1" font-family="monospace" font-size="8">套利需要资金: 同时持有现货+反向仓位, 极端行情下借贷利率飙升, 成本 > funding 收入</text>
+  <circle cx="55" cy="316" r="9" fill="#f472b6" fill-opacity="0.2" stroke="#f472b6" stroke-width="0.8"/>
+  <text x="55" y="320" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">3</text>
+  <text x="72" y="320" fill="#cbd5e1" font-family="monospace" font-size="8">没有终止条件: 传统期货到期日是 deadline, funding rate 没有, 偏离可以无限持续</text>
+</svg>
+</div>
+
+<p><strong>真实案例</strong>: 2021 年牛市高峰, BTC 永续溢价持续 +2%~3%, funding rate 连续几周 &gt; +0.1%&#x2F;8h (年化超过 100%), 但价格就是不收敛, 做多情绪太强, 即使付高额 funding 也不愿平仓. 同期 CME BTC 季度合约也有 +5%~8% basis (基差, 期货价与现货价的偏差), 但到期前几天 basis 快速收敛, 因为做市商知道 deadline 一定会来.</p>
+<blockquote>
+<p><strong>一句话总结</strong>: 传统期货是 “考试交卷”: 平时可以乱写, 但交卷时必须对. Funding rate 是 “持续随堂测验”: 每次纠偏一点, 但没有一个时刻能保证完全正确. 日常运行中 funding rate 的锚定更平滑; 但遇到极端行情, 到期交割的硬保证是 funding rate 无法替代的.</p>
+</blockquote>
+<h3 id="2-3-为什么对标期货而不是股票"><a href="#2-3-为什么对标期货而不是股票" class="headerlink" title="2.3 为什么对标期货而不是股票?"></a>2.3 为什么对标期货而不是股票?</h3><p>期货不一定要交割实物. 加密货币期货几乎全部是 <strong>现金交割 (cash-settled)</strong>, 到期时只按 index price (指数价格) 算盈亏, 多退少补, 从来没有人真的 “交付 BTC”.</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>交割方式</th>
+<th>到期时</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>实物交割 (Physical Delivery)</td>
+<td>真的交付商品</td>
+<td>原油期货 → 交付原油</td>
+</tr>
+<tr>
+<td><strong>现金交割 (Cash Settlement)</strong></td>
+<td>只结算价差</td>
+<td>BTC 季度期货 → 结算 USD 差价</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>所以期货的本质不是 “交割实物”, 而是: <strong>一份关于未来价格的合约 (contract)</strong>.</p>
+<p>永续合约对标期货而非股票, 是因为两者共享同一套 DNA:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>特征</th>
+<th>股票 (Stock)</th>
+<th>期货 (Futures)</th>
+<th>永续 (Perp)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>持有底层资产</td>
+<td>是 (你是股东)</td>
+<td><strong>否</strong> (只是一份合约)</td>
+<td><strong>否</strong></td>
+</tr>
+<tr>
+<td>杠杆能力: 少量资金撬动大头寸</td>
+<td>非原生 (融资: 向券商借钱买股)</td>
+<td><strong>原生</strong> (交保证金即可, 比例决定杠杆)</td>
+<td><strong>原生</strong></td>
+</tr>
+<tr>
+<td>做空能力: 看跌也能赚钱</td>
+<td>非原生 (融券: 向券商借股票来卖)</td>
+<td><strong>原生</strong> (卖出合约即可)</td>
+<td><strong>原生</strong></td>
+</tr>
+<tr>
+<td>对手方</td>
+<td>无 (你拥有资产)</td>
+<td><strong>有</strong> (零和博弈)</td>
+<td><strong>有</strong></td>
+</tr>
+<tr>
+<td>到期日 (Expiry)</td>
+<td>无</td>
+<td>有</td>
+<td>无</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 150">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="150" rx="8" fill="#1a1a2e"/>
+  <!-- Spot row -->
+  <rect x="20" y="15" width="155" height="30" rx="5" fill="#34d399" fill-opacity="0.15" stroke="#34d399" stroke-width="1"/>
+  <text x="97" y="33" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">Spot (现货) 买 BTC</text>
+  <text x="192" y="34" fill="#9ca3af" font-family="monospace" font-size="10">=</text>
+  <rect x="210" y="15" width="90" height="30" rx="5" fill="#34d399" fill-opacity="0.08" stroke="#34d399" stroke-width="0.6"/>
+  <text x="255" y="33" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">买股票</text>
+  <line x1="310" y1="30" x2="338" y2="30" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Spot tags -->
+  <rect x="352" y="18" width="72" height="22" rx="10" fill="#34d399" fill-opacity="0.12" stroke="#34d399" stroke-width="0.6"/>
+  <text x="388" y="32" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="7">拥有资产</text>
+  <rect x="432" y="18" width="60" height="22" rx="10" fill="#9ca3af" fill-opacity="0.1" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="462" y="32" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">无杠杆</text>
+  <rect x="500" y="18" width="55" height="22" rx="10" fill="#9ca3af" fill-opacity="0.1" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="527" y="32" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">无到期</text>
+  <rect x="563" y="18" width="65" height="22" rx="10" fill="#9ca3af" fill-opacity="0.1" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="595" y="32" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">无对手方</text>
+  <!-- Perp row -->
+  <rect x="20" y="65" width="155" height="30" rx="5" fill="#5eead4" fill-opacity="0.15" stroke="#5eead4" stroke-width="1"/>
+  <text x="97" y="83" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">永续做多 BTC</text>
+  <text x="192" y="84" fill="#9ca3af" font-family="monospace" font-size="10">=</text>
+  <rect x="210" y="65" width="90" height="30" rx="5" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="0.6"/>
+  <text x="255" y="83" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9">买期货合约</text>
+  <line x1="310" y1="80" x2="338" y2="80" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <!-- Perp tags -->
+  <rect x="352" y="68" width="80" height="22" rx="10" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-width="0.6"/>
+  <text x="392" y="82" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">不拥有资产</text>
+  <rect x="440" y="68" width="55" height="22" rx="10" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="0.6"/>
+  <text x="467" y="82" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">有杠杆</text>
+  <rect x="503" y="68" width="65" height="22" rx="10" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-width="0.6"/>
+  <text x="535" y="82" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">有对手方</text>
+  <rect x="576" y="68" width="120" height="22" rx="10" fill="#5eead4" fill-opacity="0.12" stroke="#5eead4" stroke-width="0.6"/>
+  <text x="636" y="82" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">funding rate 锚定</text>
+  <!-- Contrast note -->
+  <text x="360" y="120" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">现货 = 拥有资产本身 | 永续 = 持有一份关于价格的合约 (零和博弈)</text>
+  <line x1="120" y1="130" x2="600" y2="130" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <text x="360" y="143" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">永续合约的本质: 不交割, 不持有, 只赌价格方向</text>
+</svg>
+</div>
+
+<blockquote>
+<p><strong>一句话</strong>: 永续合约是 “去掉到期日的期货”, 不是 “加了杠杆的股票”.<br>它和期货一样, 本质是一份关于价格的 <strong>对赌合约 (contract)</strong>, 交易者从未拥有底层资产.</p>
+<p>补充: 传统金融中的 <strong>CFD (Contract for Difference, 差价合约)</strong> 和永续合约非常像 –<br>也是不持有资产, 只赌价差, 有杠杆. 永续合约本质上就是加密货币版的 CFD,<br>但多了 funding rate (资金费率) 这个锚定机制.</p>
+</blockquote>
+<h3 id="2-4-永续合约-链上做空最简单的方式"><a href="#2-4-永续合约-链上做空最简单的方式" class="headerlink" title="2.4 永续合约 &#x3D; 链上做空最简单的方式"></a>2.4 永续合约 &#x3D; 链上做空最简单的方式</h3><p>链上做空不止永续合约一种, 但永续是成本最低、操作最简单的:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>操作</th>
+<th>持续成本</th>
+<th>复杂度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>借贷做空 (Aave)</td>
+<td>存抵押 → 借 ETH → 卖 → 等跌 → 买回 → 还</td>
+<td>借贷利率 + 2 次 swap 费</td>
+<td>高 (6 步)</td>
+</tr>
+<tr>
+<td>期权做空 (Lyra)</td>
+<td>买 PUT 期权 (看跌期权)</td>
+<td>期权费 (注: 这里 premium 指买期权的费用, 和后文的 “溢价” 是不同含义)</td>
+<td>中</td>
+</tr>
+<tr>
+<td><strong>永续做空</strong></td>
+<td>开 short position</td>
+<td><strong>funding (可能收钱)</strong></td>
+<td><strong>低 (1 步)</strong></td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>永续合约让做空变得和做多一样简单: 开一个 short position (空头仓位), 价格跌了就赚钱.</p>
+<hr>
+<h2 id="三、价格体系-Index-Mark-Last"><a href="#三、价格体系-Index-Mark-Last" class="headerlink" title="三、价格体系: Index, Mark, Last"></a>三、价格体系: Index, Mark, Last</h2><p>三个价格各有分工, 不要混淆:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="280" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">三种价格的关系与用途</text>
+  <!-- Index Price -->
+  <rect x="40" y="50" width="190" height="100" rx="6" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1"/>
+  <text x="135" y="70" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="10" font-weight="bold">Index Price</text>
+  <text x="135" y="88" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">现货市场加权均价</text>
+  <text x="135" y="104" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">Binance 30% + OKX 25%</text>
+  <text x="135" y="116" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">+ Coinbase 25% + Kraken 20%</text>
+  <text x="135" y="136" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="7">来源: 外部 (链下/链上预言机)</text>
+  <!-- Mark Price -->
+  <rect x="265" y="50" width="190" height="100" rx="6" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1"/>
+  <text x="360" y="70" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">Mark Price</text>
+  <text x="360" y="88" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">保证金 &amp; 清算参考价</text>
+  <text x="360" y="108" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">= index + EMA(basis)</text>
+  <text x="360" y="120" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">或 = index (部分 DeFi)</text>
+  <text x="360" y="136" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">用途: PnL 计算, 清算判定</text>
+  <!-- Last Price -->
+  <rect x="490" y="50" width="190" height="100" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="585" y="70" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="bold">Last Price</text>
+  <text x="585" y="88" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">最新成交价</text>
+  <text x="585" y="108" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">由市场供需决定</text>
+  <text x="585" y="120" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">可能偏离 index</text>
+  <text x="585" y="136" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">用途: 市场实时供需参考</text>
+  <!-- Arrows -->
+  <line x1="230" y1="100" x2="263" y2="100" stroke="#9ca3af" stroke-width="1" marker-end="url(#arr)"/>
+  <text x="248" y="93" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">输入</text>
+  <!-- Bottom: what each price is used for -->
+  <rect x="40" y="175" width="640" height="85" rx="6" fill="#ffffff" fill-opacity="0.03" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="360" y="195" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9" font-weight="bold">为什么不直接用 Last Price 做一切?</text>
+  <text x="360" y="215" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">Last Price 容易被操纵: 一笔大单就能瞬间拉高/砸低</text>
+  <text x="360" y="230" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">如果用 last price 判定清算, 攻击者可以故意砸盘触发大规模清算后抄底</text>
+  <text x="360" y="245" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">Mark Price 基于 Index (多交易所均价), 抗操纵能力远强于单一市场的 Last Price</text>
+</svg>
+</div>
+
+<h3 id="3-1-Index-Price-真实市场价"><a href="#3-1-Index-Price-真实市场价" class="headerlink" title="3.1 Index Price: 真实市场价"></a>3.1 Index Price: 真实市场价</h3><p>Index price 是多个现货交易所的加权平均价格:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">index_price (指数价格) = Σ(weight_i (权重) × <span class="hljs-title function_">spot_price_i</span> <span class="hljs-params">(现货价格)</span>)<br><br><span class="hljs-comment">// 例: ETH Index</span><br><span class="hljs-comment">// = 0.30 × Binance_ETH + 0.25 × OKX_ETH + 0.25 × Coinbase_ETH + 0.20 × Kraken_ETH</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>链上协议获取 index price 的方式</strong>:</p>
+<ul>
+<li><strong>CEX (Binance&#x2F;OKX)</strong>: 自己算, 取多个交易所价格加权</li>
+<li><strong>GMX</strong>: 用 Chainlink oracle 喂价 (多个 data source 聚合)</li>
+<li><strong>dYdX v4</strong>: 验证者节点各自从多个交易所拉价格, 链上达成共识</li>
+<li><strong>Hyperliquid</strong>: 验证者从多个 CEX 拉价格, 取中位数</li>
+</ul>
+<h3 id="3-2-Mark-Price-清算参考价"><a href="#3-2-Mark-Price-清算参考价" class="headerlink" title="3.2 Mark Price: 清算参考价"></a>3.2 Mark Price: 清算参考价</h3><p>Mark price 是协议 <strong>内部</strong> 使用的价格, 用于:</p>
+<ol>
+<li>计算未实现盈亏 (unrealized PnL)</li>
+<li>判定是否触发清算</li>
+<li>计算保证金率</li>
+</ol>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-comment">// 常见公式 (Binance 风格)</span><br>mark_price (标记价格) = index_price (指数价格) + <span class="hljs-built_in">EMA</span>(last_price (最新成交价) - index_price)<br><span class="hljs-comment">//                                               ↑ 基差的指数移动平均 (下面详解)</span><br><br><span class="hljs-comment">// 简化版 (部分 DeFi 协议)</span><br>mark_price = index_price   <span class="hljs-comment">// 直接用 oracle 价格, 如 GMX</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>为什么 Mark ≠ Last?</strong> Last price 是单一市场内的价格, 可以被操纵.<br>如果用 last price 判定清算, 攻击者只需在本协议内砸盘就能批量清算他人.<br>Mark price 锚定 index (多交易所均价), 攻击者必须同时操纵多个交易所, 成本极高.</p>
+</blockquote>
+<h3 id="3-3-基差移动平均-EMA-of-Premium-怎么算"><a href="#3-3-基差移动平均-EMA-of-Premium-怎么算" class="headerlink" title="3.3 基差移动平均 (EMA of Premium) 怎么算?"></a>3.3 基差移动平均 (EMA of Premium) 怎么算?</h3><p>EMA (Exponential Moving Average, 指数移动平均) 是一种 “算平均值” 的方法,<br>但 <strong>越新的数据越重要, 越旧的数据越不重要</strong>.</p>
+<p>先和简单平均对比:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260">
+  <rect width="720" height="260" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="22" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">简单平均 vs EMA: 权重对比</text>
+  <text x="360" y="40" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">过去 4 次采到的溢价 (旧→新): +10, +18, +12, +15</text>
+  <!-- Simple Average -->
+  <rect x="20" y="52" width="330" height="90" rx="5" fill="#9ca3af" fill-opacity="0.06" stroke="#9ca3af" stroke-width="0.6"/>
+  <text x="185" y="70" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="9" font-weight="bold">简单平均: 权重相同</text>
+  <!-- Equal bars -->
+  <rect x="45" y="82" width="55" height="30" rx="3" fill="#9ca3af" fill-opacity="0.25" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="72" y="100" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">+10</text>
+  <text x="72" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">25%</text>
+  <rect x="115" y="82" width="55" height="30" rx="3" fill="#9ca3af" fill-opacity="0.25" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="142" y="100" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">+18</text>
+  <text x="142" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">25%</text>
+  <rect x="185" y="82" width="55" height="30" rx="3" fill="#9ca3af" fill-opacity="0.25" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="212" y="100" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">+12</text>
+  <text x="212" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">25%</text>
+  <rect x="255" y="82" width="55" height="30" rx="3" fill="#9ca3af" fill-opacity="0.25" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="282" y="100" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">+15</text>
+  <text x="282" y="118" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">25%</text>
+  <text x="40" y="80" fill="#9ca3af" font-family="monospace" font-size="6">旧</text>
+  <text x="300" y="80" fill="#9ca3af" font-family="monospace" font-size="6">新</text>
+  <text x="185" y="138" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">= (10+18+12+15) / 4 = 13.75</text>
+  <!-- EMA -->
+  <rect x="370" y="52" width="330" height="90" rx="5" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="0.6"/>
+  <text x="535" y="70" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">EMA: 越新权重越大</text>
+  <!-- Growing bars -->
+  <rect x="395" y="97" width="55" height="15" rx="3" fill="#5eead4" fill-opacity="0.15" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="422" y="108" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">+10</text>
+  <text x="422" y="118" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="6">10%</text>
+  <rect x="465" y="92" width="55" height="20" rx="3" fill="#5eead4" fill-opacity="0.25" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="492" y="105" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">+18</text>
+  <text x="492" y="118" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="6">20%</text>
+  <rect x="535" y="87" width="55" height="25" rx="3" fill="#5eead4" fill-opacity="0.35" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="562" y="103" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">+12</text>
+  <text x="562" y="118" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="6">30%</text>
+  <rect x="605" y="82" width="55" height="30" rx="3" fill="#5eead4" fill-opacity="0.5" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="632" y="100" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">+15</text>
+  <text x="632" y="118" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="6">40%</text>
+  <text x="390" y="80" fill="#9ca3af" font-family="monospace" font-size="6">旧</text>
+  <text x="650" y="80" fill="#9ca3af" font-family="monospace" font-size="6">新</text>
+  <text x="535" y="138" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">= 10×0.1 + 18×0.2 + 12×0.3 + 15×0.4 = 14.2</text>
+  <!-- Comparison -->
+  <line x1="100" y1="160" x2="620" y2="160" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <!-- Number line -->
+  <line x1="100" y1="195" x2="620" y2="195" stroke="#9ca3af" stroke-width="0.5"/>
+  <line x1="100" y1="190" x2="100" y2="200" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="100" y="212" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">13.0</text>
+  <line x1="620" y1="190" x2="620" y2="200" stroke="#9ca3af" stroke-width="0.5"/>
+  <text x="620" y="212" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">15.0</text>
+  <!-- 13.75 marker -->
+  <circle cx="295" cy="195" r="5" fill="#9ca3af" fill-opacity="0.3" stroke="#9ca3af" stroke-width="1"/>
+  <text x="295" y="180" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7" font-weight="bold">13.75</text>
+  <text x="295" y="228" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">简单平均</text>
+  <!-- 14.2 marker -->
+  <circle cx="412" cy="195" r="5" fill="#5eead4" fill-opacity="0.3" stroke="#5eead4" stroke-width="1"/>
+  <text x="412" y="180" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7" font-weight="bold">14.2</text>
+  <text x="412" y="228" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="6">EMA</text>
+  <!-- Arrow showing EMA closer to latest -->
+  <line x1="500" y1="195" x2="600" y2="195" stroke="#fbbf24" stroke-width="0.8" stroke-dasharray="3"/>
+  <text x="550" y="228" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="6">最新值 = 15</text>
+  <text x="360" y="250" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">EMA 更接近最新数据 (15), 因为新数据权重更大</text>
+</svg>
+</div>
+
+<p>递推公式:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 155">
+  <rect width="720" height="155" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="22" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">EMA 递推公式</text>
+  <!-- Formula box -->
+  <rect x="150" y="35" width="420" height="32" rx="6" fill="#5eead4" fill-opacity="0.1" stroke="#5eead4" stroke-width="1"/>
+  <text x="360" y="56" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11">EMA_t = α × value_t + (1 - α) × EMA_t-1</text>
+  <!-- Labels: 4 boxes, each 155px wide, 10px gap -->
+  <rect x="30" y="80" width="155" height="18" rx="3" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="0.5"/>
+  <text x="107" y="92" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">α (alpha) = 新数据权重</text>
+  <rect x="195" y="80" width="155" height="18" rx="3" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-width="0.5"/>
+  <text x="272" y="92" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="7">value_t = 刚采到的新数据</text>
+  <rect x="360" y="80" width="155" height="18" rx="3" fill="#a78bfa" fill-opacity="0.1" stroke="#a78bfa" stroke-width="0.5"/>
+  <text x="437" y="92" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="7">EMA_t-1 = 上一轮平均值</text>
+  <rect x="525" y="80" width="155" height="18" rx="3" fill="#f472b6" fill-opacity="0.1" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="602" y="92" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">EMA_t = 新平均值 (结果)</text>
+  <!-- Plain language -->
+  <line x1="60" y1="110" x2="660" y2="110" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <text x="360" y="128" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">大白话 (α = 0.4): 新平均 = 40% × 新数据 + 60% × 旧平均</text>
+  <text x="360" y="145" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">两部分加起来 = 40% + 60% = 100%, 永远如此</text>
+</svg>
+</div>
+
+<p>手算一遍 (α &#x3D; 0.4):</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="720" height="200" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="20" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">EMA 手算 (α = 0.4)</text>
+  <!-- Round 0: starting point -->
+  <rect x="20" y="35" width="85" height="40" rx="5" fill="#9ca3af" fill-opacity="0.1" stroke="#9ca3af" stroke-width="0.8"/>
+  <text x="62" y="52" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">起点</text>
+  <text x="62" y="67" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="9" font-weight="bold">10</text>
+  <!-- Arrow -->
+  <line x1="105" y1="55" x2="128" y2="55" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr)"/>
+  <!-- Round 1 -->
+  <rect x="135" y="35" width="170" height="40" rx="5" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="220" y="50" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">第 1 轮: 新数据 = 18</text>
+  <text x="220" y="67" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">0.4×18 + 0.6×10 = <tspan fill="#5eead4" font-weight="bold">13.2</tspan></text>
+  <!-- Arrow -->
+  <line x1="305" y1="55" x2="328" y2="55" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr)"/>
+  <!-- Round 2 -->
+  <rect x="335" y="35" width="170" height="40" rx="5" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="420" y="50" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">第 2 轮: 新数据 = 12</text>
+  <text x="420" y="67" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">0.4×12 + 0.6×13.2 = <tspan fill="#5eead4" font-weight="bold">12.72</tspan></text>
+  <!-- Arrow -->
+  <line x1="505" y1="55" x2="528" y2="55" stroke="#9ca3af" stroke-width="0.8" marker-end="url(#arr)"/>
+  <!-- Round 3 -->
+  <rect x="535" y="35" width="170" height="40" rx="5" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="620" y="50" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">第 3 轮: 新数据 = 15</text>
+  <text x="620" y="67" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">0.4×15 + 0.6×12.72 = <tspan fill="#5eead4" font-weight="bold">13.63</tspan></text>
+  <!-- Trend line -->
+  <text x="50" y="100" fill="#9ca3af" font-family="monospace" font-size="7">趋势:</text>
+  <line x1="90" y1="155" x2="650" y2="155" stroke="#9ca3af" stroke-width="0.3"/>
+  <text x="80" y="158" text-anchor="end" fill="#9ca3af" font-family="monospace" font-size="6">10</text>
+  <text x="80" y="108" text-anchor="end" fill="#9ca3af" font-family="monospace" font-size="6">18</text>
+  <!-- Data points and EMA line -->
+  <circle cx="140" cy="155" r="3" fill="#9ca3af"/>
+  <text x="140" y="170" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">10</text>
+  <circle cx="280" cy="108" r="3" fill="#cbd5e1"/>
+  <text x="280" y="103" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="6">18</text>
+  <circle cx="420" cy="138" r="3" fill="#cbd5e1"/>
+  <text x="420" y="133" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="6">12</text>
+  <circle cx="560" cy="123" r="3" fill="#cbd5e1"/>
+  <text x="560" y="118" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="6">15</text>
+  <!-- EMA line (smoothed) -->
+  <polyline points="140,155 280,131 420,135 560,129" fill="none" stroke="#5eead4" stroke-width="1.5"/>
+  <circle cx="140" cy="155" r="3" fill="#5eead4"/>
+  <circle cx="280" cy="131" r="3" fill="#5eead4"/>
+  <text x="280" y="126" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="6">13.2</text>
+  <circle cx="420" cy="135" r="3" fill="#5eead4"/>
+  <text x="420" y="148" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="6">12.72</text>
+  <circle cx="560" cy="129" r="3" fill="#5eead4"/>
+  <text x="560" y="142" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="6">13.63</text>
+  <!-- Legend -->
+  <circle cx="90" cy="190" r="3" fill="#cbd5e1"/>
+  <text x="100" y="193" fill="#cbd5e1" font-family="monospace" font-size="6">原始数据 (跳跃)</text>
+  <line x1="230" y1="190" x2="250" y2="190" stroke="#5eead4" stroke-width="1.5"/>
+  <circle cx="240" cy="190" r="3" fill="#5eead4"/>
+  <text x="260" y="193" fill="#5eead4" font-family="monospace" font-size="6">EMA (平滑跟踪, 方向一致但幅度小)</text>
+</svg>
+</div>
+
+<p>α 的大小决定了 “反应速度”:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 165">
+  <rect width="720" height="165" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="20" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">α 越大反应越快, 越小越稳定</text>
+  <!-- Scale bar -->
+  <defs>
+    <linearGradient id="alphaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#f472b6;stop-opacity:0.6"/>
+    </linearGradient>
+  </defs>
+  <rect x="80" y="40" width="560" height="14" rx="7" fill="url(#alphaGrad)"/>
+  <!-- Markers -->
+  <line x1="130" y1="38" x2="130" y2="56" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="130" y="70" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="8" font-weight="bold">α = 0.1</text>
+  <text x="130" y="82" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">新数据占 10%</text>
+  <line x1="360" y1="38" x2="360" y2="56" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="360" y="70" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8" font-weight="bold">α = 0.4</text>
+  <text x="360" y="82" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">新数据占 40%</text>
+  <line x1="590" y1="38" x2="590" y2="56" stroke="#f472b6" stroke-width="1.5"/>
+  <text x="590" y="70" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="8" font-weight="bold">α = 0.9</text>
+  <text x="590" y="82" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">新数据占 90%</text>
+  <!-- Labels at ends -->
+  <text x="80" y="35" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="6">慢/稳定</text>
+  <text x="640" y="35" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="6">快/敏感</text>
+  <!-- Descriptions -->
+  <rect x="30" y="95" width="210" height="35" rx="4" fill="#a78bfa" fill-opacity="0.06" stroke="#a78bfa" stroke-width="0.5"/>
+  <text x="135" y="110" text-anchor="middle" fill="#a78bfa" font-family="monospace" font-size="7">老学究: 要看很多证据才改变看法</text>
+  <text x="135" y="123" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">N=99 → α=0.02 极度平滑</text>
+  <rect x="255" y="95" width="210" height="35" rx="4" fill="#cbd5e1" fill-opacity="0.06" stroke="#cbd5e1" stroke-width="0.5"/>
+  <text x="360" y="110" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">普通人: 新旧都参考, 适度调整</text>
+  <text x="360" y="123" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">N=10 → α=0.18 中等平滑</text>
+  <rect x="480" y="95" width="210" height="35" rx="4" fill="#f472b6" fill-opacity="0.06" stroke="#f472b6" stroke-width="0.5"/>
+  <text x="585" y="110" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="7">急性子: 听到什么就信什么</text>
+  <text x="585" y="123" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="6">N=3 → α=0.5 快速跟踪</text>
+  <!-- Formula -->
+  <text x="360" y="152" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">公式: α = 2 / (N + 1), N = 窗口期 (采样点数量)</text>
+</svg>
+</div>
+
+<h3 id="3-4-什么是-TWAP-时间加权平均价格"><a href="#3-4-什么是-TWAP-时间加权平均价格" class="headerlink" title="3.4 什么是 TWAP (时间加权平均价格)?"></a>3.4 什么是 TWAP (时间加权平均价格)?</h3><p>TWAP (Time-Weighted Average Price, 时间加权平均价格) 是另一种 “算平均值” 的方法.<br>和 EMA 的思路类似, 都是让新数据权重大于旧数据, 但实现方式不同:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 85">
+  <rect width="720" height="85" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="20" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="bold">EMA vs TWAP: 一句话区别</text>
+  <rect x="20" y="35" width="330" height="35" rx="5" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="0.6"/>
+  <text x="185" y="48" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7" font-weight="bold">EMA: 流式</text>
+  <text x="185" y="62" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">每来一个新数据, 递推算一次 (α×新 + (1-α)×旧)</text>
+  <rect x="370" y="35" width="330" height="35" rx="5" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="0.6"/>
+  <text x="535" y="48" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7" font-weight="bold">TWAP: 批量</text>
+  <text x="535" y="62" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="7">收集窗口期内所有数据, 按 "距今多近" 分配权重, 一次性算</text>
+</svg>
+</div>
+
+<p>TWAP 的核心思想 + 手算:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"/>
+    </marker>
+  </defs>
+  <rect width="720" height="300" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="22" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="11" font-weight="bold">TWAP 公式与手算</text>
+  <!-- Formula -->
+  <rect x="150" y="35" width="420" height="30" rx="6" fill="#fbbf24" fill-opacity="0.1" stroke="#fbbf24" stroke-width="1"/>
+  <text x="360" y="55" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10">TWAP = Σ(数据_i × 时间权重_i) / Σ(时间权重_i)</text>
+  <text x="360" y="78" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">时间权重: 越近越大, 越远越小 (甚至为 0). Σ = 全部加起来</text>
+  <!-- Hand calc: weight bars -->
+  <text x="30" y="102" fill="#cbd5e1" font-family="monospace" font-size="8">过去 4 分钟数据, 权重 = (4 - 距今分钟数):</text>
+  <!-- Data point 1: 3min ago, weight=1 — lightest -->
+  <rect x="60" y="112" width="120" height="55" rx="5" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="0.6"/>
+  <text x="120" y="128" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">3 分钟前 (旧)</text>
+  <text x="120" y="146" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="10">+10</text>
+  <text x="120" y="162" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">权重 1</text>
+  <!-- Data point 2: 2min ago, weight=2 -->
+  <rect x="200" y="112" width="120" height="55" rx="5" fill="#fbbf24" fill-opacity="0.15" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="260" y="128" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">2 分钟前</text>
+  <text x="260" y="146" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="10">+18</text>
+  <text x="260" y="162" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">权重 2</text>
+  <!-- Data point 3: 1min ago, weight=3 -->
+  <rect x="340" y="112" width="120" height="55" rx="5" fill="#fbbf24" fill-opacity="0.22" stroke="#fbbf24" stroke-width="1"/>
+  <text x="400" y="128" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">1 分钟前</text>
+  <text x="400" y="146" text-anchor="middle" fill="#ffffff" font-family="monospace" font-size="10">+12</text>
+  <text x="400" y="162" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">权重 3</text>
+  <!-- Data point 4: just now, weight=4 — brightest -->
+  <rect x="480" y="112" width="120" height="55" rx="5" fill="#fbbf24" fill-opacity="0.32" stroke="#fbbf24" stroke-width="1.2"/>
+  <text x="540" y="128" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7" font-weight="bold">刚才 (新)</text>
+  <text x="540" y="146" text-anchor="middle" fill="#ffffff" font-family="monospace" font-size="10" font-weight="bold">+15</text>
+  <text x="540" y="162" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">权重 4</text>
+  <!-- Arrow showing weight growth -->
+  <line x1="630" y1="155" x2="630" y2="122" stroke="#fbbf24" stroke-width="0.8" marker-end="url(#arr)"/>
+  <text x="660" y="140" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="6">权重</text>
+  <text x="660" y="150" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="6">递增</text>
+  <!-- Calculation -->
+  <line x1="40" y1="178" x2="680" y2="178" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <text x="360" y="198" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">TWAP = (10×1 + 18×2 + 12×3 + 15×4) / (1 + 2 + 3 + 4)</text>
+  <text x="360" y="216" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">     = (10 + 36 + 36 + 60) / 10</text>
+  <text x="360" y="234" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">     = 142 / 10 = 14.2</text>
+  <!-- Comparison -->
+  <line x1="40" y1="250" x2="680" y2="250" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <text x="240" y="270" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">简单平均 = 13.75</text>
+  <text x="480" y="270" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">TWAP = 14.2 (更接近最新值 15)</text>
+  <text x="360" y="290" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">和 EMA 结果一样 (14.2), 因为示例数据和权重恰好吻合. 实际中两者结果会有差异.</text>
+</svg>
+</div>
+
+<p>EMA vs TWAP 对比:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300">
+  <rect width="720" height="300" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="22" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">EMA vs TWAP: 对比与选型</text>
+  <!-- EMA column -->
+  <rect x="20" y="38" width="330" height="135" rx="5" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="0.8"/>
+  <text x="185" y="56" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="9" font-weight="bold">EMA (流式计算)</text>
+  <text x="40" y="74" fill="#cbd5e1" font-family="monospace" font-size="7">每来一个数据立刻更新</text>
+  <text x="40" y="90" fill="#34d399" font-family="monospace" font-size="7">存储: 1 个数字 (旧平均已浓缩所有历史)</text>
+  <text x="40" y="106" fill="#34d399" font-family="monospace" font-size="7">实时性: 来一个算一个, 立刻出结果</text>
+  <text x="40" y="122" fill="#34d399" font-family="monospace" font-size="7">历史范围: 理论上无限长 (旧数据衰减但不为零)</text>
+  <text x="40" y="142" fill="#f472b6" font-family="monospace" font-size="7">可调整性: 差, 原始数据已 "融化", 改 α 需从头重算</text>
+  <text x="40" y="162" fill="#fbbf24" font-family="monospace" font-size="7">适合: 实时系统</text>
+  <!-- TWAP column -->
+  <rect x="370" y="38" width="330" height="135" rx="5" fill="#fbbf24" fill-opacity="0.06" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="535" y="56" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">TWAP (批量计算)</text>
+  <text x="390" y="74" fill="#cbd5e1" font-family="monospace" font-size="7">收集窗口期所有数据, 一次性算</text>
+  <text x="390" y="90" fill="#f472b6" font-family="monospace" font-size="7">存储: 窗口内所有原始数据 (如 1920 个点)</text>
+  <text x="390" y="106" fill="#f472b6" font-family="monospace" font-size="7">实时性: 需要窗口期内数据才完整</text>
+  <text x="390" y="122" fill="#f472b6" font-family="monospace" font-size="7">历史范围: 有硬窗口 (8h 前的数据权重=0, 彻底丢弃)</text>
+  <text x="390" y="142" fill="#34d399" font-family="monospace" font-size="7">可调整性: 好, 保留原始数据, 可事后改权重/剔除异常</text>
+  <text x="390" y="162" fill="#fbbf24" font-family="monospace" font-size="7">适合: 定期结算 (每 8h 算一次资金费率)</text>
+  <!-- Why on-chain vs off-chain -->
+  <line x1="40" y1="185" x2="680" y2="185" stroke="#9ca3af" stroke-width="0.3" stroke-opacity="0.3"/>
+  <text x="360" y="205" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="bold">为什么链上用 EMA, 链下用 TWAP?</text>
+  <!-- On-chain -->
+  <rect x="20" y="215" width="330" height="70" rx="5" fill="#5eead4" fill-opacity="0.05" stroke="#5eead4" stroke-width="0.5"/>
+  <text x="185" y="232" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8" font-weight="bold">链上合约 (存储 = gas, 非常贵)</text>
+  <text x="40" y="250" fill="#cbd5e1" font-family="monospace" font-size="7">→ 倾向 EMA, 只需存 1 个状态变量</text>
+  <text x="40" y="266" fill="#9ca3af" font-family="monospace" font-size="7">例: GMX v2 资金费率用 EMA 风格累积</text>
+  <!-- Off-chain -->
+  <rect x="370" y="215" width="330" height="70" rx="5" fill="#fbbf24" fill-opacity="0.05" stroke="#fbbf24" stroke-width="0.5"/>
+  <text x="535" y="232" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8" font-weight="bold">链下系统 (存储便宜, 需精确控制)</text>
+  <text x="390" y="250" fill="#cbd5e1" font-family="monospace" font-size="7">→ 倾向 TWAP, 存所有原始数据, 随时调整</text>
+  <text x="390" y="266" fill="#9ca3af" font-family="monospace" font-size="7">例: Binance 标记价格 (服务器上跑, 存 1920 点)</text>
+</svg>
+</div>
+
+<blockquote>
+<p>链上和链下在同一个概念 (如资金费率) 上用不同算法,<br>不是因为数学上哪个更好, 而是 <strong>链上存储成本</strong> 决定了选择.</p>
+</blockquote>
+<h3 id="3-5-Binance-实际怎么算-Mark-Price"><a href="#3-5-Binance-实际怎么算-Mark-Price" class="headerlink" title="3.5 Binance 实际怎么算 Mark Price"></a>3.5 Binance 实际怎么算 Mark Price</h3><p>Binance 的做法更接近 TWAP 而非经典 EMA:</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs gams"><span class="hljs-number">1.</span> 每 <span class="hljs-number">15</span> 秒采样一次溢价 (premium, 本协议价格比现货贵多少):<br><br>   先理解订单簿 (order book, 就是所有挂单的列表) 的两个关键价格:<br>   - best_bid (最高买价): 所有买单中出价最高的, 即 <span class="hljs-string">&quot;有人愿意最多花这么多钱买&quot;</span><br>   - best_ask (最低卖价): 所有卖单中要价最低的, 即 <span class="hljs-string">&quot;有人愿意最少收这么多钱卖&quot;</span><br>   - mid_price (中间价): 两者的平均值 = (best_bid + best_ask) / <span class="hljs-number">2</span><br><br>   例: best_bid = <span class="hljs-symbol">$</span><span class="hljs-number">2998</span>, best_ask = <span class="hljs-symbol">$</span><span class="hljs-number">3002</span><br>       mid_price = (<span class="hljs-symbol">$</span><span class="hljs-number">2998</span> + <span class="hljs-symbol">$</span><span class="hljs-number">3002</span>) / <span class="hljs-number">2</span> = <span class="hljs-symbol">$</span><span class="hljs-number">3000</span><br><br>   premium_i (瞬时溢价) = mid_price 和 index_price (指数价格) 的差距:<br>   premium_i = mid_price - index_price<br><br>   <span class="hljs-comment">// premium_i &gt; 0: 本协议价格高于现货 → 多头偏强</span><br>   <span class="hljs-comment">// premium_i &lt; 0: 本协议价格低于现货 → 空头偏强</span><br><br><span class="hljs-number">2.</span> 过去 <span class="hljs-number">8</span>h 内有 <span class="hljs-number">1920</span> 个采样点 (<span class="hljs-number">8</span>h × <span class="hljs-number">60</span><span class="hljs-built_in">min</span> × 每分钟 <span class="hljs-number">4</span> 个)<br><br><span class="hljs-number">3.</span> 对所有采样点做 TWAP (时间加权平均):<br>   premium_index (溢价指数) = Σ(premium_i × 时间权重_i) / Σ(时间权重_i)<br><br>   时间权重_i = <span class="hljs-built_in">max</span>(<span class="hljs-number">0</span>, <span class="hljs-number">480</span> - 距今分钟数_i)<br>   <span class="hljs-comment">// 刚采的: 权重=480 (最大)</span><br>   <span class="hljs-comment">// 4h 前的: 权重=240 (一半)</span><br>   <span class="hljs-comment">// 8h 前的: 权重=0 (完全忽略)</span><br><br><span class="hljs-number">4.</span> Mark Price (标记价格):<br>   mark_price = index_price + premium_index<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs awk">数字例子:<br>─────────────────────────────────<br>ETH index_price (指数价格) = <span class="hljs-variable">$3000</span><br><br>过去几个采样点的溢价 (旧→新):<br>  <span class="hljs-number">8</span>h 前:  mid=<span class="hljs-variable">$3010</span>, 溢价 = +<span class="hljs-variable">$10</span>, 权重 = <span class="hljs-number">0</span>   (太旧, 忽略)<br>  <span class="hljs-number">4</span>h 前:  mid=<span class="hljs-variable">$3018</span>, 溢价 = +<span class="hljs-variable">$18</span>, 权重 = <span class="hljs-number">240</span><br>  <span class="hljs-number">15</span>s 前: mid=<span class="hljs-variable">$3012</span>, 溢价 = +<span class="hljs-variable">$12</span>, 权重 = <span class="hljs-number">479</span><br>  刚才:   mid=<span class="hljs-variable">$3015</span>, 溢价 = +<span class="hljs-variable">$15</span>, 权重 = <span class="hljs-number">480</span><br>  ...<br>  (实际有 <span class="hljs-number">1920</span> 个点, 这里只展示 <span class="hljs-number">4</span> 个帮助理解)<br><br>时间加权平均后, premium_index (溢价指数) ≈ +<span class="hljs-variable">$13</span><br><br>mark_price = <span class="hljs-variable">$3000</span> + <span class="hljs-variable">$13</span> = <span class="hljs-variable">$3013</span><br><br><span class="hljs-regexp">//</span> mark (<span class="hljs-variable">$3013</span>) 既不是最新的 mid (<span class="hljs-variable">$3015</span>) 也不是 index (<span class="hljs-variable">$3000</span>)<br><span class="hljs-regexp">//</span> 而是 index + 平滑后的溢价, 抗短期操纵<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-6-为什么不直接用-EMA-last-price"><a href="#3-6-为什么不直接用-EMA-last-price" class="headerlink" title="3.6 为什么不直接用 EMA(last_price)?"></a>3.6 为什么不直接用 EMA(last_price)?</h3><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs vim">方案 A: <span class="hljs-keyword">mark</span> (标记价格) = EMA(last_price (最新成交价))<br>  问题: last_price 被砸盘到 $<span class="hljs-number">2800</span>, EMA 虽然平滑但会被逐渐拖下去<br>        攻击者持续施压, 最终可以操纵 <span class="hljs-keyword">mark</span> price<br><br>方案 B: <span class="hljs-keyword">mark</span> = <span class="hljs-built_in">index</span> (指数价格) + EMA(<span class="hljs-keyword">last</span> - <span class="hljs-built_in">index</span>)   ← 实际采用<br>  优势: <span class="hljs-built_in">index</span> 来自多个外部交易所, 攻击者无法操纵<br>        EMA 只平滑 <span class="hljs-string">&quot;溢价&quot;</span> 部分<br>        即使本协议的 last_price 被操纵, <span class="hljs-keyword">mark</span> price 仍然锚定 <span class="hljs-built_in">index</span><br>        极端情况: 协议内被砸但外部不动 → 溢价 (premium) 变负 → EMA 拉回 → <span class="hljs-keyword">mark</span> ≈ <span class="hljs-built_in">index</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>各协议对比</strong>:</p>
+<ul>
+<li><strong>Binance</strong>: index + TWAP(溢价), 每 15s 采样, 8h 窗口</li>
+<li><strong>GMX</strong>: 直接 <code>mark = chainlink_oracle_price</code>, 无需 EMA (Oracle 本身已是多源聚合)</li>
+<li><strong>dYdX v4</strong>: 验证者各自从多个 CEX 拉价格, 链上共识取中位数</li>
+<li><strong>Uniswap TWAP</strong>: 同样的思路, 用时间窗口内的加权平均来抗短期操纵</li>
+</ul>
+</blockquote>
+<h3 id="3-7-Basis-基差-标记价格与指数价格的偏差"><a href="#3-7-Basis-基差-标记价格与指数价格的偏差" class="headerlink" title="3.7 Basis (基差): 标记价格与指数价格的偏差"></a>3.7 Basis (基差): 标记价格与指数价格的偏差</h3><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs 1c">basis (基差) = mark_price (标记价格) - index_price (指数价格)<br><br><span class="hljs-comment">// basis &gt; 0: 永续价格 &gt; 现货价格 (溢价, 说明多头更强)</span><br><span class="hljs-comment">// basis &lt; 0: 永续价格 &lt; 现货价格 (折价, 说明空头更强)</span><br><br><span class="hljs-comment">// 注意区分:</span><br><span class="hljs-comment">// basis   = mark_price - index_price  (描述 mark 和 index 的偏差)</span><br><span class="hljs-comment">// premium (溢价) = mid_price (中间价) - index_price   (用于计算 funding rate, 详见 §3.2)</span><br><span class="hljs-comment">// 两者相关但不等价: basis 用于描述市场状态, premium 用于 funding rate 计算</span><br></code></pre></td></tr></table></figure>
+
+<p>basis 反映市场状态, 而 funding rate 的计算基于 premium (order book 中间价与 index 的偏差), 下一节详解.</p>
+<hr>
+<h2 id="四、Funding-Rate-永续合约的灵魂"><a href="#四、Funding-Rate-永续合约的灵魂" class="headerlink" title="四、Funding Rate: 永续合约的灵魂"></a>四、Funding Rate: 永续合约的灵魂</h2><p>Funding rate 是永续合约最核心的创新. 它解决了一个关键问题:</p>
+<blockquote>
+<p><strong>没有到期日, 永续价格凭什么跟着现货走?</strong></p>
+<p>答: 每隔固定时间, 让 “赢的一方” 付钱给 “输的一方”, 制造经济激励, 把价格拉回来.</p>
+</blockquote>
+<h3 id="4-1-直觉理解"><a href="#4-1-直觉理解" class="headerlink" title="4.1 直觉理解"></a>4.1 直觉理解</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 260">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"/>
+    </marker>
+  </defs>
+  <rect width="820" height="260" rx="8" fill="#1a1a2e"/>
+  <text x="410" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">Funding Rate 核心机制</text>
+  <!-- Scenario 1: perp > spot -->
+  <rect x="20" y="38" width="380" height="195" rx="6" fill="#f472b6" fill-opacity="0.06" stroke="#f472b6" stroke-width="1"/>
+  <text x="210" y="56" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold">场景 A: 永续 &gt; 现货 (溢价)</text>
+  <text x="210" y="70" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">多头太多, 把永续价格推高了</text>
+  <!-- Long pays Short -->
+  <rect x="50" y="82" width="90" height="36" rx="5" fill="#34d399" fill-opacity="0.15" stroke="#34d399" stroke-width="1"/>
+  <text x="95" y="104" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">多头 Long</text>
+  <rect x="270" y="82" width="90" height="36" rx="5" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1"/>
+  <text x="315" y="104" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">空头 Short</text>
+  <line x1="140" y1="100" x2="263" y2="100" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="203" y="93" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">funding rate &gt; 0</text>
+  <text x="203" y="126" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">多头付钱给空头</text>
+  <text x="210" y="152" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">效果:</text>
+  <text x="210" y="167" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">• 持有多头有成本 → 部分多头平仓</text>
+  <text x="210" y="181" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">• 持有空头有收益 → 吸引新空头</text>
+  <text x="210" y="200" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">→ 多空再平衡, 永续价格回落</text>
+  <!-- Scenario 2: perp < spot -->
+  <rect x="420" y="38" width="380" height="195" rx="6" fill="#5eead4" fill-opacity="0.06" stroke="#5eead4" stroke-width="1"/>
+  <text x="610" y="56" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">场景 B: 永续 &lt; 现货 (折价)</text>
+  <text x="610" y="70" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">空头太多, 把永续价格压低了</text>
+  <!-- Short pays Long -->
+  <rect x="450" y="82" width="90" height="36" rx="5" fill="#34d399" fill-opacity="0.15" stroke="#34d399" stroke-width="1"/>
+  <text x="495" y="104" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="9">多头 Long</text>
+  <rect x="670" y="82" width="90" height="36" rx="5" fill="#f472b6" fill-opacity="0.15" stroke="#f472b6" stroke-width="1"/>
+  <text x="715" y="104" text-anchor="middle" fill="#f472b6" font-family="monospace" font-size="9">空头 Short</text>
+  <line x1="670" y1="100" x2="547" y2="100" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="607" y="93" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">funding rate &lt; 0</text>
+  <text x="607" y="126" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="8">空头付钱给多头</text>
+  <text x="610" y="152" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">效果:</text>
+  <text x="610" y="167" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">• 持有空头有成本 → 部分空头平仓</text>
+  <text x="610" y="181" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="7">• 持有多头有收益 → 吸引新多头</text>
+  <text x="610" y="200" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="8">→ 多空再平衡, 永续价格回升</text>
+  <!-- Key takeaway -->
+  <text x="410" y="250" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="9">funding rate 是一个自动的 "弹簧": 永续价格偏离现货越远, 回拉的力就越大</text>
+</svg>
+</div>
+
+<h3 id="4-2-资金费率-Funding-Rate-计算"><a href="#4-2-资金费率-Funding-Rate-计算" class="headerlink" title="4.2 资金费率 (Funding Rate) 计算"></a>4.2 资金费率 (Funding Rate) 计算</h3><p>资金费率的计算因协议而异, 但核心逻辑一致:</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs angelscript">资金费率 = 溢价分量 + 利率分量<br><br>即:<br>funding_rate            = premium_component + <span class="hljs-built_in">int</span>erest_rate_component<br>(资金费率)                (溢价分量)            (利率分量)<br><br><span class="hljs-comment">// 溢价分量: 衡量 &quot;永续价格偏离现货多远&quot;, 是主要部分</span><br><span class="hljs-comment">// 利率分量: 两种货币的借贷利率差, 通常很小, 可忽略</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-Binance-模型-中心化交易所标准-也是很多-DeFi-协议的参考"><a href="#4-3-Binance-模型-中心化交易所标准-也是很多-DeFi-协议的参考" class="headerlink" title="4.3 Binance 模型 (中心化交易所标准, 也是很多 DeFi 协议的参考)"></a>4.3 Binance 模型 (中心化交易所标准, 也是很多 DeFi 协议的参考)</h3><figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs mel"><span class="hljs-comment">// 1) 每 15s 采样一次瞬时溢价率 (详见 §2.2 中间价/溢价的定义)</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">//    中间价 = (最高买价 + 最低卖价) / 2</span><br><span class="hljs-comment">//    溢价率 = (中间价 - 指数价格) / 指数价格</span><br><span class="hljs-comment">//</span><br>premium_i = (mid_price - index_price) / index_price<br>(瞬时溢价率) (中间价)     (指数价格)     (指数价格)<br><br><span class="hljs-comment">// 2) 溢价指数 = 对过去 8h 内所有瞬时溢价率做时间加权平均 (详见 §2.2 TWAP)</span><br><span class="hljs-comment">//</span><br>premium_index = TWAP(premium_i, <span class="hljs-keyword">window</span>=<span class="hljs-number">8</span>h)<br>(溢价指数)      (时间加权平均)(瞬时溢价率)<br><br><span class="hljs-comment">// 3) 利率分量 (通常固定, 很小)</span><br><span class="hljs-comment">//    = USDT 的借贷利率 - BTC 的借贷利率</span><br><span class="hljs-comment">//</span><br>interest_rate = <span class="hljs-number">0.01</span>% per <span class="hljs-number">8</span>h<br>(利率分量)<br><br><span class="hljs-comment">// 4) 资金费率 (每 8 小时结算一次)</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">//    clamp 的作用: 把利率分量限制在 -0.05% ~ +0.05% 之间, 防止利率异常时影响太大</span><br><span class="hljs-comment">//</span><br>funding_rate   = premium_index + <span class="hljs-keyword">clamp</span>(interest_rate - premium_index, <span class="hljs-number">-0.05</span>%, +<span class="hljs-number">0.05</span>%)<br>(资金费率)       (溢价指数)       (限幅函数)(利率分量)<br><br><span class="hljs-comment">// 简化理解: 利率分量很小, clamp 项 ≈ 0</span><br><span class="hljs-comment">// 所以大多数情况下: 资金费率 ≈ 溢价指数 ≈ &quot;永续价格偏离现货多远&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-资金费用-Funding-Payment"><a href="#4-4-资金费用-Funding-Payment" class="headerlink" title="4.4 资金费用 (Funding Payment)"></a>4.4 资金费用 (Funding Payment)</h3><p>每次结算时, 每个仓位需要支付 (或收取) 的金额:</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs awk">资金费用 = 仓位名义价值 × 资金费率<br><br>即:<br>funding_payment = position_size × funding_rate<br>(资金费用)        (仓位名义价值)   (资金费率)<br><br><span class="hljs-regexp">//</span> 例: 保证金 <span class="hljs-variable">$300</span>, <span class="hljs-number">10</span>x 杠杆做多 ETH @ <span class="hljs-variable">$3000</span><br><span class="hljs-regexp">//</span>     仓位名义价值 = <span class="hljs-variable">$300</span> × <span class="hljs-number">10</span> = <span class="hljs-variable">$3000</span> (= <span class="hljs-number">1</span> ETH)<br><span class="hljs-regexp">//</span>     资金费率 = +<span class="hljs-number">0.01</span>%<br><span class="hljs-regexp">//</span>     资金费用 = <span class="hljs-variable">$3000</span> × <span class="hljs-number">0.01</span>% = <span class="hljs-variable">$0</span>.<span class="hljs-number">30</span><br><span class="hljs-regexp">//</span><br><span class="hljs-regexp">//</span> 注意: 按仓位名义价值 <span class="hljs-variable">$3000</span> 计算, 不是按保证金 <span class="hljs-variable">$300</span><br><span class="hljs-regexp">//</span> 所以 <span class="hljs-number">10</span>x 杠杆意味着 funding 对保证金的影响也被放大了 <span class="hljs-number">10</span> 倍<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>关键</strong>: funding 是 <strong>多空之间互相支付</strong>, 协议不收取也不支付 funding (零和博弈).<br>这和借贷利率不同, Aave 的利息由借款人付给存款人, 平台抽成.</p>
+</blockquote>
+<h3 id="4-5-Funding-Rate-的经济含义"><a href="#4-5-Funding-Rate-的经济含义" class="headerlink" title="4.5 Funding Rate 的经济含义"></a>4.5 Funding Rate 的经济含义</h3><p>funding rate 不仅是锚定机制, 还是 <strong>市场情绪的晴雨表</strong>:</p>
+<div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>资金费率</th>
+<th>市场情绪</th>
+<th>含义</th>
+<th>套利机会</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>大幅正 (&gt;0.05%)</td>
+<td>极度看多</td>
+<td>多头愿意付高额费率持仓</td>
+<td>现货买入 + 永续做空 &#x3D; 赚资金费用 (详见 §3.4)</td>
+</tr>
+<tr>
+<td>小幅正 (~0.01%)</td>
+<td>温和看多</td>
+<td>正常市场, 多头略多</td>
+<td>-</td>
+</tr>
+<tr>
+<td>0 附近</td>
+<td>中性</td>
+<td>多空均衡</td>
+<td>-</td>
+</tr>
+<tr>
+<td>小幅负</td>
+<td>温和看空</td>
+<td>空头略多</td>
+<td>-</td>
+</tr>
+<tr>
+<td>大幅负 (&lt;-0.05%)</td>
+<td>极度看空</td>
+<td>空头愿意付高额费率持仓</td>
+<td>借币卖出 (做空) + 永续做多 &#x3D; 赚资金费用</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="4-6-资金费率套利-Delta-Neutral-方向中性"><a href="#4-6-资金费率套利-Delta-Neutral-方向中性" class="headerlink" title="4.6 资金费率套利 (Delta-Neutral, 方向中性)"></a>4.6 资金费率套利 (Delta-Neutral, 方向中性)</h3><p>核心思路: <strong>一边做多, 一边做空, 价格涨跌对你没影响, 只赚资金费用.</strong></p>
+<p>当资金费率持续为正时 (多头付钱给空头), 经典套利策略:</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs powershell">策略: 现货买入 + 永续做空 (Cash<span class="hljs-operator">-and</span><span class="hljs-literal">-Carry</span>)<br>───────────────────────────────<br><br><span class="hljs-number">1</span>. 现货市场: 买入 <span class="hljs-number">1</span> ETH (<span class="hljs-variable">$3000</span>)         ← 真的持有 ETH<br><span class="hljs-number">2</span>. 永续合约: 做空 <span class="hljs-number">1</span> ETH (<span class="hljs-variable">$3000</span>, <span class="hljs-number">1</span>x)     ← 开空头仓位<br><br>两边对冲:<br>  +<span class="hljs-number">1</span> ETH (现货持有) - <span class="hljs-number">1</span> ETH (永续做空) = <span class="hljs-number">0</span>  ← 净敞口为零, 不赌方向<br><br>价格涨跌对你没影响:<br>  ETH 涨到 <span class="hljs-variable">$3500</span> → 现货赚 <span class="hljs-variable">$500</span>, 永续亏 <span class="hljs-variable">$500</span>, 互相抵消<br>  ETH 跌到 <span class="hljs-variable">$2500</span> → 现货亏 <span class="hljs-variable">$500</span>, 永续赚 <span class="hljs-variable">$500</span>, 互相抵消<br><br>利润来源 = 资金费用:<br>  资金费率 = +<span class="hljs-number">0.01</span>% 每 <span class="hljs-number">8</span><span class="hljs-built_in">h</span><br>  你的空头仓位每 <span class="hljs-number">8</span><span class="hljs-built_in">h</span> 收到: <span class="hljs-variable">$3000</span> × <span class="hljs-number">0.01</span>% = <span class="hljs-variable">$0</span>.<span class="hljs-number">30</span><br>  每天 <span class="hljs-number">3</span> 次结算: <span class="hljs-variable">$0</span>.<span class="hljs-number">30</span> × <span class="hljs-number">3</span> = <span class="hljs-variable">$0</span>.<span class="hljs-number">90</span><br>  年化收益率 ≈ <span class="hljs-number">0.01</span>% × <span class="hljs-number">3</span> × <span class="hljs-number">365</span> = <span class="hljs-number">10.95</span>%<br><br>风险:<br>  - 资金费率可能转负 → 你从收钱变成付钱, 需要及时关仓<br>  - 永续做空需要保证金, 极端行情可能被清算<br>  - 交易所风险 (中心化交易所跑路) / 合约风险 (DeFi 智能合约漏洞)<br></code></pre></td></tr></table></figure>
+
+<p>反过来, 当资金费率持续为负时 (空头付钱给多头):</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs gcode">策略: 借币卖出 + 永续做多<br>───────────────────────────────<br><br><span class="hljs-number">1.</span> 借贷平台 <span class="hljs-comment">(如 Aave)</span>: 借 <span class="hljs-number">1</span> ETH, 卖掉得 $<span class="hljs-number">3000</span>  ← 现货做空<br><span class="hljs-number">2.</span> 永续合约: 做多 <span class="hljs-number">1</span> ETH <span class="hljs-comment">($3000, 1x)</span>               ← 开多头仓位<br><br>两边对冲, 净敞口 = <span class="hljs-number">0</span><br>利润来源 = 你的多头仓位每 <span class="hljs-number">8</span>h 收到资金费用<br>额外成本 = 借贷利率 <span class="hljs-comment">(需要利润 &gt; 借贷成本才有赚)</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这就是为什么资金费率不会长期偏离太远, 套利者会持续把它拉回来.<br>费率越高, 套利利润越大, 吸引越多人来做反向对冲, 费率就被压下去了.</p>
+</blockquote>
+<hr>
+<h2 id="五、盈亏计算-PnL"><a href="#五、盈亏计算-PnL" class="headerlink" title="五、盈亏计算 (PnL)"></a>五、盈亏计算 (PnL)</h2><h3 id="5-1-基本公式"><a href="#5-1-基本公式" class="headerlink" title="5.1 基本公式"></a>5.1 基本公式</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-regexp">//</span> 做多 (Long)<br>PnL (盈亏) = (exit_price (平仓价) - entry_price (开仓价)) × quantity (持仓数量)<br>           = (exit_price - entry_price) <span class="hljs-regexp">/ entry_price × position_size (名义价值)  /</span>/ 等价写法, 详见 P02 §<span class="hljs-number">2.2</span><br><br><span class="hljs-regexp">//</span> 做空 (Short)<br>PnL = (entry_price - exit_price) × quantity<br><br><span class="hljs-regexp">//</span> 其中:<br><span class="hljs-regexp">//</span>   quantity      = 持有的 token 数量 (如 <span class="hljs-number">1</span> ETH)<br><span class="hljs-regexp">//</span>   position_size = quantity × entry_price = 名义价值 (如 <span class="hljs-variable">$3000</span>)<br><br>ROE (回报率) = PnL <span class="hljs-regexp">/ margin (保证金) = PnL × leverage (杠杆) /</span> position_size<br><br><span class="hljs-regexp">//</span> 例: <span class="hljs-number">10</span>x 杠杆做多 <span class="hljs-number">1</span> ETH @ <span class="hljs-variable">$3000</span><br><span class="hljs-regexp">//</span> quantity = <span class="hljs-number">1</span> ETH, position_size = <span class="hljs-variable">$3000</span><br><span class="hljs-regexp">//</span> margin = <span class="hljs-variable">$3000</span> / <span class="hljs-number">10</span> = <span class="hljs-variable">$300</span> (初始保证金)<br><span class="hljs-regexp">//</span> ETH 涨到 <span class="hljs-variable">$3150</span> (+<span class="hljs-number">5</span>%)<br><span class="hljs-regexp">//</span> PnL = (<span class="hljs-variable">$3150</span> - <span class="hljs-variable">$3000</span>) × <span class="hljs-number">1</span> = <span class="hljs-variable">$150</span><br><span class="hljs-regexp">//</span> ROE = <span class="hljs-variable">$150</span> / <span class="hljs-variable">$300</span> = <span class="hljs-number">50</span>%   ← <span class="hljs-number">5</span>% 的价格变动, <span class="hljs-number">10</span>x 杠杆 = <span class="hljs-number">50</span>% 收益<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-2-完整-PnL-含-funding-费用"><a href="#5-2-完整-PnL-含-funding-费用" class="headerlink" title="5.2 完整 PnL (含 funding + 费用)"></a>5.2 完整 PnL (含 funding + 费用)</h3><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs 1c">realized_PnL (已实现盈亏) = trading_PnL (交易盈亏) + Σ(funding_payments (资金费用)) - trading_fees (交易手续费)<br><br><span class="hljs-comment">// trading_PnL:    开/平仓的价差盈亏</span><br><span class="hljs-comment">// funding:        持仓期间所有 funding 结算的累计 (可正可负)</span><br><span class="hljs-comment">// trading_fees:   开仓 + 平仓的手续费 (taker ~0.05%, maker ~0.02%)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="5-3-杠杆的双面性"><a href="#5-3-杠杆的双面性" class="headerlink" title="5.3 杠杆的双面性"></a>5.3 杠杆的双面性</h3><div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 220">
+  <rect width="950" height="220" rx="8" fill="#1a1a2e"/>
+  <text x="475" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">10x 杠杆做多 ETH @ $3000 (保证金 $300)</text>
+  <!-- Price scale -->
+  <line x1="60" y1="60" x2="60" y2="190" stroke="#9ca3af" stroke-width="1"/>
+  <text x="55" y="55" text-anchor="end" fill="#9ca3af" font-family="monospace" font-size="7">价格</text>
+  <!-- $3300 = +10% -->
+  <line x1="60" y1="70" x2="660" y2="70" stroke="#34d399" stroke-width="0.5" stroke-dasharray="3"/>
+  <text x="55" y="73" text-anchor="end" fill="#34d399" font-family="monospace" font-size="7">$3300</text>
+  <text x="665" y="73" fill="#34d399" font-family="monospace" font-size="8">+10% → ROE +100% ($300 → $600)</text>
+  <!-- $3150 = +5% -->
+  <line x1="60" y1="100" x2="660" y2="100" stroke="#34d399" stroke-width="0.5" stroke-dasharray="3"/>
+  <text x="55" y="103" text-anchor="end" fill="#34d399" font-family="monospace" font-size="7">$3150</text>
+  <text x="665" y="103" fill="#34d399" font-family="monospace" font-size="8">+5% → ROE +50% ($300 → $450)</text>
+  <!-- $3000 = entry -->
+  <line x1="60" y1="130" x2="660" y2="130" stroke="#5eead4" stroke-width="1"/>
+  <text x="55" y="133" text-anchor="end" fill="#5eead4" font-family="monospace" font-size="7">$3000</text>
+  <text x="665" y="133" fill="#5eead4" font-family="monospace" font-size="8">开仓价 (保证金 $300)</text>
+  <!-- $2850 = -5% -->
+  <line x1="60" y1="160" x2="660" y2="160" stroke="#f472b6" stroke-width="0.5" stroke-dasharray="3"/>
+  <text x="55" y="163" text-anchor="end" fill="#f472b6" font-family="monospace" font-size="7">$2850</text>
+  <text x="665" y="163" fill="#f472b6" font-family="monospace" font-size="8">-5% → ROE -50% ($300 → $150)</text>
+  <!-- $2700 = -10% = liquidation -->
+  <line x1="60" y1="190" x2="660" y2="190" stroke="#ef4444" stroke-width="1"/>
+  <text x="55" y="193" text-anchor="end" fill="#ef4444" font-family="monospace" font-size="7">$2700</text>
+  <text x="665" y="193" fill="#ef4444" font-family="monospace" font-size="8">-10% → ROE -100% → 清算 (保证金归零)</text>
+</svg>
+</div>
+
+<blockquote>
+<p><strong>10x 杠杆做多</strong>: 价格涨 10% → 翻倍; <strong>价格跌 10% → 清零</strong> (清算).<br>杠杆放大收益的同时, 等比例放大亏损. 清算线 ≈ 1&#x2F;leverage - MMR ≈ 9.5% (详见 <a href="/2025/07/28/perp-margin-and-liquidation/">P02</a> §2.3).</p>
+</blockquote>
+<hr>
+<h2 id="六、多空平衡与-Open-Interest"><a href="#六、多空平衡与-Open-Interest" class="headerlink" title="六、多空平衡与 Open Interest"></a>六、多空平衡与 Open Interest</h2><h3 id="6-1-Open-Interest-OI-未平仓合约"><a href="#6-1-Open-Interest-OI-未平仓合约" class="headerlink" title="6.1 Open Interest (OI, 未平仓合约)"></a>6.1 Open Interest (OI, 未平仓合约)</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java">open_interest (未平仓合约总量) = Σ(所有未平仓的 <span class="hljs-type">long</span> <span class="hljs-title function_">positions</span> <span class="hljs-params">(多头仓位)</span>)<br>                              = Σ(所有未平仓的 <span class="hljs-type">short</span> <span class="hljs-title function_">positions</span> <span class="hljs-params">(空头仓位)</span>)<br>                              <span class="hljs-comment">// 两者相等, 因为每一个多头必须有一个空头对手方</span><br><br><span class="hljs-comment">// 注: OI 统计的是 &quot;合约数量&quot;, 不是 &quot;人数&quot;</span><br><span class="hljs-comment">// 100 个人做多 vs 1 个人做空, 只要名义价值相等, 就是平衡的</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="6-2-OI-的意义"><a href="#6-2-OI-的意义" class="headerlink" title="6.2 OI 的意义"></a>6.2 OI 的意义</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>OI 变化</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OI 上升 + 价格上升</td>
+<td>新多头入场 (看多信号增强)</td>
+</tr>
+<tr>
+<td>OI 上升 + 价格下降</td>
+<td>新空头入场 (看空信号增强)</td>
+</tr>
+<tr>
+<td>OI 下降 + 价格上升</td>
+<td>空头平仓 (空头投降)</td>
+</tr>
+<tr>
+<td>OI 下降 + 价格下降</td>
+<td>多头平仓 (多头投降)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="6-3-链上-vs-CEX-的-OI-限制"><a href="#6-3-链上-vs-CEX-的-OI-限制" class="headerlink" title="6.3 链上 vs CEX 的 OI 限制"></a>6.3 链上 vs CEX 的 OI 限制</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>CEX (Binance)</th>
+<th>DeFi (GMX)</th>
+<th>DeFi (dYdX)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OI 上限</td>
+<td>动态调整</td>
+<td>硬上限 (per asset)</td>
+<td>硬上限 (per market)</td>
+</tr>
+<tr>
+<td>多空平衡</td>
+<td>市场自由决定</td>
+<td>OI cap 限制单侧</td>
+<td>funding rate 调节</td>
+</tr>
+<tr>
+<td>OI 数据</td>
+<td>API 查询</td>
+<td>链上可读</td>
+<td>链上可读</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<blockquote>
+<p><strong>DeFi 特有问题</strong>: GMX 这类 Oracle 型永续, LP 池 (GLP) 是所有交易者的对手方.<br>如果 90% 的人做多, LP 池就承担了巨大的空头风险.<br>所以 GMX 必须设置 OI cap 限制单侧持仓, 否则 LP 可能被抽干.<br>这个话题在 <a href="/2025/08/10/perp-gmx/">P03 (GMX)</a> 中详细展开.</p>
+</blockquote>
+<hr>
+<h2 id="七、链上永续合约的三种定价模型"><a href="#七、链上永续合约的三种定价模型" class="headerlink" title="七、链上永续合约的三种定价模型"></a>七、链上永续合约的三种定价模型</h2><p>链上实现永续合约有三种主流方式, 各有优劣:</p>
+<div style="margin: 1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 350">
+  <rect width="720" height="350" rx="8" fill="#1a1a2e"/>
+  <text x="360" y="24" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="11" font-weight="bold">三种链上永续定价模型</text>
+  <!-- Model 1: Oracle -->
+  <rect x="30" y="45" width="200" height="280" rx="6" fill="#818cf8" fill-opacity="0.08" stroke="#818cf8" stroke-width="1"/>
+  <text x="130" y="65" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="10" font-weight="bold">Oracle 型</text>
+  <text x="130" y="82" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">代表: GMX, Gains Network</text>
+  <text x="45" y="105" fill="#9ca3af" font-family="monospace" font-size="7">定价: Chainlink Oracle</text>
+  <text x="45" y="120" fill="#9ca3af" font-family="monospace" font-size="7">对手方: LP 池 (GLP)</text>
+  <text x="45" y="135" fill="#9ca3af" font-family="monospace" font-size="7">市价单滑点: 无滑点</text>
+  <text x="45" y="150" fill="#9ca3af" font-family="monospace" font-size="7">结算: 链上</text>
+  <text x="45" y="175" fill="#34d399" font-family="monospace" font-size="7">+ 零滑点, UX 好</text>
+  <text x="45" y="190" fill="#34d399" font-family="monospace" font-size="7">+ 简单直觉</text>
+  <text x="45" y="210" fill="#f472b6" font-family="monospace" font-size="7">- LP 承担方向性风险</text>
+  <text x="45" y="225" fill="#f472b6" font-family="monospace" font-size="7">- OI 受限于池子大小</text>
+  <text x="45" y="240" fill="#f472b6" font-family="monospace" font-size="7">- 依赖 Oracle 安全</text>
+  <text x="130" y="270" text-anchor="middle" fill="#818cf8" font-family="monospace" font-size="7">→ 详见 P03</text>
+  <!-- Model 2: Order Book -->
+  <rect x="260" y="45" width="200" height="280" rx="6" fill="#5eead4" fill-opacity="0.08" stroke="#5eead4" stroke-width="1"/>
+  <text x="360" y="65" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="10" font-weight="bold">订单簿型</text>
+  <text x="360" y="82" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">代表: dYdX, Hyperliquid</text>
+  <text x="275" y="105" fill="#9ca3af" font-family="monospace" font-size="7">定价: Maker/Taker 撮合</text>
+  <text x="275" y="120" fill="#9ca3af" font-family="monospace" font-size="7">对手方: 其他交易者</text>
+  <text x="275" y="135" fill="#9ca3af" font-family="monospace" font-size="7">市价单滑点: 取决于深度</text>
+  <text x="275" y="150" fill="#9ca3af" font-family="monospace" font-size="7">结算: 链上/链下</text>
+  <text x="275" y="175" fill="#34d399" font-family="monospace" font-size="7">+ 真正的价格发现</text>
+  <text x="275" y="190" fill="#34d399" font-family="monospace" font-size="7">+ 无 OI 天花板</text>
+  <text x="275" y="210" fill="#f472b6" font-family="monospace" font-size="7">- 需要做市商提供深度</text>
+  <text x="275" y="225" fill="#f472b6" font-family="monospace" font-size="7">- 冷门币对深度差</text>
+  <text x="275" y="240" fill="#f472b6" font-family="monospace" font-size="7">- 链上撮合性能要求高</text>
+  <text x="360" y="270" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="7">→ 详见 P04 (dYdX), P06 (Hyperliquid)</text>
+  <!-- Model 3: vAMM -->
+  <rect x="490" y="45" width="200" height="280" rx="6" fill="#fbbf24" fill-opacity="0.08" stroke="#fbbf24" stroke-width="1"/>
+  <text x="590" y="65" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="bold">vAMM 型</text>
+  <text x="590" y="82" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="8">代表: Perp Protocol, Drift</text>
+  <text x="505" y="105" fill="#9ca3af" font-family="monospace" font-size="7">定价: 虚拟 AMM 曲线</text>
+  <text x="505" y="120" fill="#9ca3af" font-family="monospace" font-size="7">对手方: 虚拟池 (无真实LP)</text>
+  <text x="505" y="135" fill="#9ca3af" font-family="monospace" font-size="7">市价单滑点: 曲线斜率决定</text>
+  <text x="505" y="150" fill="#9ca3af" font-family="monospace" font-size="7">结算: 链上</text>
+  <text x="505" y="175" fill="#34d399" font-family="monospace" font-size="7">+ 纯链上定价 (v1 无 Oracle, v2 引入辅助)</text>
+  <text x="505" y="190" fill="#34d399" font-family="monospace" font-size="7">+ 无需做市商</text>
+  <text x="505" y="210" fill="#f472b6" font-family="monospace" font-size="7">- 虚拟池参数调节难</text>
+  <text x="505" y="225" fill="#f472b6" font-family="monospace" font-size="7">- 易被 squeeze</text>
+  <text x="505" y="240" fill="#f472b6" font-family="monospace" font-size="7">- 大额滑点高</text>
+  <text x="590" y="270" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="7">→ 详见 P05</text>
+  <!-- Bottom comparison -->
+  <text x="360" y="340" text-anchor="middle" fill="#9ca3af" font-family="monospace" font-size="8">Oracle 型 → 用户体验优先 | 订单簿型 → 资本效率优先 | vAMM 型 → 去中心化优先</text>
+</svg>
+</div>
+
+<h3 id="7-1-模型对比"><a href="#7-1-模型对比" class="headerlink" title="7.1 模型对比"></a>7.1 模型对比</h3><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Oracle 型 (GMX)</th>
+<th>订单簿型 (dYdX)</th>
+<th>vAMM 型 (Perp Protocol)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>价格来源</td>
+<td>Chainlink 喂价</td>
+<td>做市商报价撮合</td>
+<td>虚拟 x*y&#x3D;k 曲线</td>
+</tr>
+<tr>
+<td>市价单滑点</td>
+<td>无滑点</td>
+<td>取决于订单簿深度</td>
+<td>取决于虚拟池大小</td>
+</tr>
+<tr>
+<td>LP 风险</td>
+<td>高 (方向性风险)</td>
+<td>无传统 LP</td>
+<td>无真实 LP</td>
+</tr>
+<tr>
+<td>资本效率</td>
+<td>低 (需要大 GLP 池)</td>
+<td>高 (做市商杠杆)</td>
+<td>中</td>
+</tr>
+<tr>
+<td>去中心化程度</td>
+<td>中 (依赖 Oracle)</td>
+<td>低~中 (链下撮合)</td>
+<td>高 (v1 纯链上, v2 依赖 Oracle)</td>
+</tr>
+<tr>
+<td>可扩展性</td>
+<td>受 Oracle 币种限制</td>
+<td>理论无限</td>
+<td>受虚拟池参数限制</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<hr>
+<h2 id="八、Funding-Rate-的链上实现"><a href="#八、Funding-Rate-的链上实现" class="headerlink" title="八、Funding Rate 的链上实现"></a>八、Funding Rate 的链上实现</h2><p>不同协议对 funding rate 的实现差异很大, 这里给出核心思路:</p>
+<h3 id="8-1-离散结算-CEX-风格"><a href="#8-1-离散结算-CEX-风格" class="headerlink" title="8.1 离散结算 (CEX 风格)"></a>8.1 离散结算 (CEX 风格)</h3><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><span class="hljs-comment">// 每 8h 结算一次 (Binance 模式)</span><br><span class="hljs-comment">// 结算时间: 00:00, 08:00, 16:00 UTC</span><br><br><span class="hljs-keyword">if</span> block.timestamp &gt;= <span class="hljs-built_in">next_funding_time</span> (下次结算时间):<br>    <span class="hljs-built_in">rate</span> (费率) = <span class="hljs-built_in">calculate_funding_rate</span>()<br>    <span class="hljs-keyword">for</span> each <span class="hljs-built_in">position</span> (仓位):<br>        <span class="hljs-built_in">payment</span> (费用) = position.<span class="hljs-built_in">size</span> (仓位大小) * rate<br>        <span class="hljs-keyword">if</span> position.is_long:<br>            position.<span class="hljs-built_in">margin</span> (保证金) -= payment   <span class="hljs-comment">// rate &gt; 0 时多头付钱</span><br>        <span class="hljs-keyword">else</span>:<br>            position.margin += payment            <span class="hljs-comment">// rate &gt; 0 时空头收钱</span><br>    next_funding_time += <span class="hljs-number">8</span> hours<br></code></pre></td></tr></table></figure>
+
+<h3 id="8-2-连续累积-DeFi-常见"><a href="#8-2-连续累积-DeFi-常见" class="headerlink" title="8.2 连续累积 (DeFi 常见)"></a>8.2 连续累积 (DeFi 常见)</h3><p>链上不可能遍历所有 position, 所以用 <strong>全局累积变量</strong> 实现:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs solidity">// 类似 Uniswap 的 feeGrowthGlobal 思路<br>int256 public cumulativeFundingRate;  // 全局累积资金费率<br><br>// 每次有交互时更新全局状态<br>function _updateFunding() internal &#123;<br>    int256 rate = _calculateFundingRate();                // rate (费率)<br>    int256 elapsed = block.timestamp - lastFundingUpdate; // elapsed (经过时间)<br>    cumulativeFundingRate += rate * elapsed;               // 累积资金费率 += 费率 × 时间<br>    lastFundingUpdate = block.timestamp;<br>&#125;<br><br>// 每个 position (仓位) 记录 &quot;入场时的累积值&quot;<br>struct Position &#123;<br>    int256 size;              // size (仓位大小): 正=多头, 负=空头<br>    uint256 margin;           // margin (保证金)<br>    int256 entryFundingRate;  // entryFundingRate (入场累积费率): 开仓时的 cumulativeFundingRate<br>&#125;<br><br>// 计算某个 position 的 pending funding (待结算资金费用)<br>function pendingFunding(Position memory pos) view returns (int256) &#123;<br>    int256 fundingDelta = cumulativeFundingRate - pos.entryFundingRate; // fundingDelta (费率差值)<br>    return pos.size * fundingDelta;<br>    // size &gt; 0 = long, size &lt; 0 = short<br>    // fundingDelta &gt; 0 = 多头付钱<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>这个模式和 Uniswap 的手续费累积完全一样</strong> (Uniswap V3 的手续费累积机制).<br>核心思想: 不逐个更新, 而是维护一个全局累积值, 每个 position 只记录 “入场快照”.<br>任何时刻: pending &#x3D; global_cumulative - entry_snapshot.<br>这样无论有多少 position, gas 成本都是 O(1).</p>
+</blockquote>
+<p><strong>累积值是双向变化的, 不是单调递增:</strong></p>
+<p><code>rate</code> 是 <code>int256</code> (有符号), 所以:</p>
+<ul>
+<li>多头多 → premium &gt; 0 → rate &gt; 0 → 累积值上升</li>
+<li>空头多 → premium &lt; 0 → rate &lt; 0 → 累积值下降</li>
+</ul>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs gcode"><span class="hljs-comment">// 手算示例: rate 在正负之间切换</span><br>t=<span class="hljs-number">0</span>:   cumulative <span class="hljs-comment">(累积值)</span> = <span class="hljs-number">0</span><br>t=<span class="hljs-number">100</span>: rate=<span class="hljs-number">+0.001</span><span class="hljs-meta">%</span>  → cumulative = <span class="hljs-number">0</span> + <span class="hljs-comment">(+0.001% × 100)</span>   = <span class="hljs-number">+0.1</span><span class="hljs-meta">%</span>  ↑<br>t=<span class="hljs-number">300</span>: rate=<span class="hljs-number">-0.002</span><span class="hljs-meta">%</span>  → cumulative = <span class="hljs-number">0.1</span><span class="hljs-meta">%</span> + <span class="hljs-comment">(-0.002% × 200)</span> = <span class="hljs-number">-0.3</span><span class="hljs-meta">%</span> ↓<br>t=<span class="hljs-number">500</span>: rate=<span class="hljs-number">+0.001</span><span class="hljs-meta">%</span>  → cumulative = <span class="hljs-number">-0.3</span><span class="hljs-meta">%</span> + <span class="hljs-comment">(+0.001% × 200)</span> = <span class="hljs-number">-0.1</span><span class="hljs-meta">%</span> ↑<br><span class="hljs-comment">// 累积值围绕 0 波动, 不会单方向跑飞</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>为什么不会跑飞: 负反馈机制:</strong></p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs excel">累积值持续上涨 → 做多成本越来越高 → 多头平仓<br>  → premium 下降 → <span class="hljs-built_in">rate</span> 转负 → 累积值回落<br><br>累积值持续下跌 → 做空成本越来越高 → 空头平仓<br>  → premium 上升 → <span class="hljs-built_in">rate</span> 转正 → 累积值回升<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>funding rate 本质上是一根弹簧: 价格偏离越大, 回拉力越强.<br>在一个活跃市场里, 累积值会围绕某个区间波动, 自动趋于平衡.</p>
+</blockquote>
+<h3 id="8-3-Go-Funding-Rate-计算"><a href="#8-3-Go-Funding-Rate-计算" class="headerlink" title="8.3 Go: Funding Rate 计算"></a>8.3 Go: Funding Rate 计算</h3><p>上面 Solidity 代码中的 <code>cumulativeFundingRate</code> 和 <code>entryFundingRate</code> 是链上合约的 storage 变量,<br>需要通过 RPC 调用合约的 view 函数读取. 完整的链上读取示例见 <strong><a href="/2025/10/22/perp-data/">P08 (perp-data)</a></strong>.</p>
+<p>这里展示拿到数据后的本地计算逻辑:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;fmt&quot;</span><br><br>	<span class="hljs-string">&quot;github.com/shopspring/decimal&quot;</span><br>)<br><br><span class="hljs-comment">// CalcPendingFunding 计算某个 position (仓位) 的待结算 funding (资金费用)</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">// 参数来源 (需通过 RPC 从合约读取, 读到的 big.Int 用 decimal.NewFromBigInt 转换):</span><br><span class="hljs-comment">//   - positionSize:         合约的 positions[account].size</span><br><span class="hljs-comment">//   - entryFundingRate:     合约的 positions[account].entryFundingRate</span><br><span class="hljs-comment">//   - currentCumulativeRate: 合约的 cumulativeFundingRate (全局累积值)</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">// 返回值 &gt; 0 表示需要支付, &lt; 0 表示可以收取</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CalcPendingFunding</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">	positionSize decimal.Decimal,         // 仓位大小: 正=多头, 负=空头</span></span><br><span class="hljs-params"><span class="hljs-function">	entryFundingRate decimal.Decimal,     // 开仓时记录的全局累积费率</span></span><br><span class="hljs-params"><span class="hljs-function">	currentCumulativeRate decimal.Decimal, // 当前全局累积费率</span></span><br><span class="hljs-params"><span class="hljs-function">)</span></span> decimal.Decimal &#123;<br>	<span class="hljs-comment">// fundingDelta (费率差值) = 当前累积值 - 入场时累积值</span><br>	delta := currentCumulativeRate.Sub(entryFundingRate)<br>	<span class="hljs-comment">// pending (待结算) = 仓位大小 × 费率差值</span><br>	<span class="hljs-keyword">return</span> positionSize.Mul(delta)<br>&#125;<br><br><span class="hljs-comment">// AnnualizedRate 将单周期 funding rate 转换为年化收益率 (%)</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">// 不同协议结算周期不同:</span><br><span class="hljs-comment">//   - CEX (Binance 等):       每 8h, periodsPerDay = 3</span><br><span class="hljs-comment">//   - Hyperliquid, dYdX v4:   每 1h, periodsPerDay = 24</span><br><span class="hljs-comment">//   - GMX v2:                 每秒连续累积, periodsPerDay = 86400</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">AnnualizedRate</span><span class="hljs-params">(ratePerPeriod decimal.Decimal, periodsPerDay <span class="hljs-type">int</span>)</span></span> decimal.Decimal &#123;<br>	<span class="hljs-comment">// annual(%) = rate × periodsPerDay × 365 × 100</span><br>	<span class="hljs-keyword">return</span> ratePerPeriod.<br>		Mul(decimal.NewFromInt(<span class="hljs-type">int64</span>(periodsPerDay))).<br>		Mul(decimal.NewFromInt(<span class="hljs-number">365</span>)).<br>		Mul(decimal.NewFromInt(<span class="hljs-number">100</span>))<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-comment">// === 验证 1: CEX 8h funding rate ===</span><br>	rate8h := decimal.NewFromFloat(<span class="hljs-number">0.0001</span>) <span class="hljs-comment">// 0.01% per 8h</span><br>	fmt.Printf(<span class="hljs-string">&quot;CEX 8h rate:  %s%%\n&quot;</span>, rate8h.Mul(decimal.NewFromInt(<span class="hljs-number">100</span>)).StringFixed(<span class="hljs-number">4</span>))<br>	fmt.Printf(<span class="hljs-string">&quot;Annualized:   %s%%\n&quot;</span>, AnnualizedRate(rate8h, <span class="hljs-number">3</span>).StringFixed(<span class="hljs-number">2</span>))<br><br>	<span class="hljs-comment">// === 验证 2: Hyperliquid 1h funding rate (真实数据 2026-04-05 23:00 BTC) ===</span><br>	<span class="hljs-comment">// 数据来源: POST https://api.hyperliquid.xyz/info</span><br>	<span class="hljs-comment">//   body: &#123;&quot;type&quot;: &quot;fundingHistory&quot;, &quot;coin&quot;: &quot;BTC&quot;, &quot;startTime&quot;: &lt;unix_ms&gt;, &quot;endTime&quot;: &lt;unix_ms&gt;&#125;</span><br>	<span class="hljs-comment">//   响应: [&#123;&quot;coin&quot;:&quot;BTC&quot;, &quot;fundingRate&quot;:&quot;-0.0000177249&quot;, &quot;premium&quot;:&quot;...&quot;, &quot;time&quot;:1743890400000&#125;]</span><br>	hlRate := decimal.RequireFromString(<span class="hljs-string">&quot;-0.0000177249&quot;</span>) <span class="hljs-comment">// 每小时</span><br>	fmt.Printf(<span class="hljs-string">&quot;\nHL 1h rate:   %s%%\n&quot;</span>, hlRate.Mul(decimal.NewFromInt(<span class="hljs-number">100</span>)).StringFixed(<span class="hljs-number">6</span>))<br>	fmt.Printf(<span class="hljs-string">&quot;Annualized:   %s%%\n&quot;</span>, AnnualizedRate(hlRate, <span class="hljs-number">24</span>).StringFixed(<span class="hljs-number">2</span>))<br><br>	<span class="hljs-comment">// === 验证 3: dYdX v4 1h funding rate (真实数据 2026-04-05 15:00 BTC-USD) ===</span><br>	<span class="hljs-comment">// 数据来源: GET https://indexer.dydx.trade/v4/historicalFunding/BTC-USD?limit=8</span><br>	<span class="hljs-comment">//   响应: &#123;&quot;historicalFunding&quot;: [&#123;&quot;rate&quot;:&quot;-0.000004&quot;, &quot;effectiveAt&quot;:&quot;2026-04-05T15:00:00.381Z&quot;&#125;]&#125;</span><br>	dydxRate := decimal.RequireFromString(<span class="hljs-string">&quot;-0.000004&quot;</span>) <span class="hljs-comment">// 每小时</span><br>	fmt.Printf(<span class="hljs-string">&quot;\ndYdX 1h rate: %s%%\n&quot;</span>, dydxRate.Mul(decimal.NewFromInt(<span class="hljs-number">100</span>)).StringFixed(<span class="hljs-number">6</span>))<br>	fmt.Printf(<span class="hljs-string">&quot;Annualized:   %s%%\n&quot;</span>, AnnualizedRate(dydxRate, <span class="hljs-number">24</span>).StringFixed(<span class="hljs-number">2</span>))<br><br>	<span class="hljs-comment">// === 验证 4: CalcPendingFunding ===</span><br>	<span class="hljs-comment">// 假设: 多头 10 ETH, 开仓时累积费率 0.005, 当前 0.008</span><br>	size := decimal.NewFromInt(<span class="hljs-number">10</span>)<br>	entry := decimal.RequireFromString(<span class="hljs-string">&quot;0.005&quot;</span>)<br>	current := decimal.RequireFromString(<span class="hljs-string">&quot;0.008&quot;</span>)<br>	pending := CalcPendingFunding(size, entry, current)<br>	fmt.Printf(<span class="hljs-string">&quot;\nPending funding: %s (正=需支付)\n&quot;</span>, pending.StringFixed(<span class="hljs-number">4</span>))<br><br>	<span class="hljs-comment">// Output:</span><br>	<span class="hljs-comment">// CEX 8h rate:  0.0100%</span><br>	<span class="hljs-comment">// Annualized:   10.95%</span><br>	<span class="hljs-comment">//</span><br>	<span class="hljs-comment">// HL 1h rate:   -0.001772%</span><br>	<span class="hljs-comment">// Annualized:   -15.52%</span><br>	<span class="hljs-comment">//</span><br>	<span class="hljs-comment">// dYdX 1h rate: -0.000400%</span><br>	<span class="hljs-comment">// Annualized:   -3.50%</span><br>	<span class="hljs-comment">//</span><br>	<span class="hljs-comment">// Pending funding: 0.0300 (正=需支付)</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="九、小结"><a href="#九、小结" class="headerlink" title="九、小结"></a>九、小结</h2><div style="margin: 1.5em 0">
+
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>一句话</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>永续合约</td>
+<td>无到期日的衍生品, 靠 funding rate 锚定现货</td>
+</tr>
+<tr>
+<td>Index Price</td>
+<td>多交易所加权均价, 代表 “真实价格”</td>
+</tr>
+<tr>
+<td>Mark Price</td>
+<td>协议内部参考价, 用于清算和 PnL, 抗操纵</td>
+</tr>
+<tr>
+<td>Funding Rate</td>
+<td>多空互付的定期费率, rate &gt; 0 多头付空头, 是自动平衡弹簧</td>
+</tr>
+<tr>
+<td>PnL</td>
+<td>价差盈亏 + funding 收支 - 手续费</td>
+</tr>
+<tr>
+<td>Open Interest</td>
+<td>未平仓合约总量, 多头 OI &#x3D; 空头 OI (零和)</td>
+</tr>
+<tr>
+<td>三种定价模型</td>
+<td>Oracle 型 (GMX), 订单簿型 (dYdX), vAMM 型 (Perp)</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3 id="9-1-下一步"><a href="#9-1-下一步" class="headerlink" title="9.1 下一步"></a>9.1 下一步</h3><ul>
+<li><strong><a href="/2025/07/28/perp-margin-and-liquidation/">保证金管理与清算引擎</a></strong>: 初始&#x2F;维持保证金数学, 清算引擎, ADL, 保险基金</li>
+<li><strong><a href="/2025/08/10/perp-gmx/">GMX 协议深度解析</a></strong>: Oracle 型永续的具体实现, GLP 池的运作</li>
+</ul>
+<hr>
+<h2 id="十、参考"><a href="#十、参考" class="headerlink" title="十、参考"></a>十、参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.binance.com/en/support/faq/360033525031">Binance Funding Rate</a> - CEX funding rate 标准实现</li>
+<li><a target="_blank" rel="noopener" href="https://docs.gmx.io/">GMX Docs</a> - Oracle 型永续代表</li>
+<li><a target="_blank" rel="noopener" href="https://docs.dydx.exchange/">dYdX v4 Docs</a> - 订单簿型永续代表</li>
+<li><a target="_blank" rel="noopener" href="https://docs.perp.com/">Perpetual Protocol Docs</a> - vAMM 型永续代表</li>
+<li><a target="_blank" rel="noopener" href="https://hyperliquid.gitbook.io/">Hyperliquid Docs</a> - 链上订单簿永续</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/web3/" class="category-chain-item">Web3</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/web3/" class="print-no-link">#Web3</a>
+      
+        <a href="/tags/%E6%B0%B8%E7%BB%AD%E5%90%88%E7%BA%A6/" class="print-no-link">#永续合约</a>
+      
+        <a href="/tags/funding-rate/" class="print-no-link">#Funding Rate</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>永续合约 01 - 永续合约机制详解</div>
+      <div>https://mritd.com/2025/07/15/perp-mechanics/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kovacs</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年7月15日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/07/28/perp-margin-and-liquidation/" title="永续合约 02 - 保证金管理与清算引擎">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">永续合约 02 - 保证金管理与清算引擎</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/07/05/perps-overview/" title="永续合约 00 - 总览与学习路线">
+                        <span class="hidden-mobile">永续合约 00 - 总览与学习路线</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://mritd.com/2025/07/15/perp-mechanics/';
+          this.page.identifier = '/2025/07/15/perp-mechanics/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'bleem' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-docker"></i> <a href="https://bandwagonhost.com/aff.php?aff=61367" target="_blank" rel="nofollow noopener"><span>BandwagonHost</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":true,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
